@@ -1,6 +1,50 @@
 import { useState } from '#imports';
 
-export type ProjectObj = {
+/**
+ * {
+ *               "afterText": "",
+ *               "beforeText": "Incompatible:",
+ *               "id": "",
+ *               "operator": "",
+ *               "orRequired": [
+ *                 {
+ *                   "req": ""
+ *                 },
+ *                 {
+ *                   "req": ""
+ *                 },
+ *                 {
+ *                   "req": ""
+ *                 },
+ *                 {
+ *                   "req": ""
+ *                 }
+ *               ],
+ *               "reqId": "nyan",
+ *               "reqId1": "",
+ *               "reqId2": "",
+ *               "reqId3": "",
+ *               "reqPoints": 0,
+ *               "required": false,
+ *               "requireds": [],
+ *               "showRequired": true,
+ *               "type": "id"
+ *             }
+ */
+export type Condition = {
+  reqId: string;
+  reqId1: string;
+  reqId2: string;
+  reqId3: string;
+  required: boolean;
+  type: 'id';
+}
+
+export type HasConditions = {
+  requireds: Condition[];
+}
+
+export type ProjectObj = HasConditions & {
   id: string;
   title: string;
   text: string;
@@ -9,7 +53,7 @@ export type ProjectObj = {
   objectWidth?: string;
 }
 
-export type ProjectRow = {
+export type ProjectRow = HasConditions & {
   id: string;
   title: string;
   titleText?: string;

@@ -1,6 +1,6 @@
 <template>
   <div v-if="project" class="project">
-    <ViewProjectRow v-for="row in project.rows" :row="row" />
+    <ViewProjectRow v-for="row in project.rows" :row="row" :selected="selected" />
   </div>
   <div v-else class="dialog-container">
     <div class="dialog">
@@ -10,20 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import {ProjectObj, ProjectRow, useProject} from "~/composables/project";
+import { ref } from "vue";
+import {useProject} from "~/composables/project";
 
 const project = useProject();
-
-const objClass = (row: ProjectRow, obj: ProjectObj) => {
-  let className = row.objectWidth;
-  if (obj.objectWidth)
-    className = obj.objectWidth;
-
-  return { [className]: true };
-};
-
-const formatText = (text: string) =>
-    text.replaceAll('\n', '<br/>')
+const selected = ref<string[]>([]);
 </script>
 
 <style lang="scss">

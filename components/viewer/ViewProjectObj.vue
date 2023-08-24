@@ -1,9 +1,10 @@
 <template>
-  <div class="col" :class="objClass(row, obj)">
+  <div class="col"
+       :class="objClass(row, obj)">
     <div class="project-obj">
       <img class="obj-image" :src="obj.image" v-if="obj.image" :alt="obj.title"/>
       <div class="obj-content">
-        <div class="obj-title">{{ obj.title }}</div>
+        <div class="obj-title"><input type="checkbox" v-model="isSelected" /> {{ obj.title }}</div>
         <div class="obj-text" v-html="formatText(obj.text)"></div>
       </div>
     </div>
@@ -14,7 +15,13 @@
 import {ProjectObj, ProjectRow} from "~/composables/project";
 import {formatText} from "~/composables/text";
 
-defineProps<{ row: ProjectRow, obj: ProjectObj }>()
+const { row, obj, selected } = defineProps<{
+  row: ProjectRow,
+  obj: ProjectObj,
+  selected: Ref<string[]>
+}>()
+
+const isSelected = ref<boolean>(false);
 
 const objClass = (row: ProjectRow, obj: ProjectObj) => {
   let className = row.objectWidth;
@@ -23,6 +30,15 @@ const objClass = (row: ProjectRow, obj: ProjectObj) => {
 
   return { [className]: true };
 };
+
+watch(isSelected, (newIsSelected) => {
+  console.log(`isSelected(${obj.id})`, newIsSelected);
+  if (newIsSelected) {
+    selected.value = R.append(obj.id, selected.value);
+  } else {
+    selected.value = R.without([obj.id], selected.value);
+  }
+});
 </script>
 
 <style lang="scss">

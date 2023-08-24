@@ -1,13 +1,15 @@
 <template>
-  <div class="project-row">
+  <div class="project-row"
+       v-if="checkConditions(row, selected)">
     <div class="row-meta">
       <div class="row-title">{{ row.title }}</div>
+      <pre>{{ JSON.stringify(row.requireds) }}</pre>
       <img class="row-image" :src="row.image" v-if="row.image" :alt="row.title" />
       <div class="row-text" v-if="row.titleText">{{ row.titleText }}</div>
     </div>
     <div class="container-fluid p-0">
       <div class="row g-2">
-        <ViewProjectObj v-for="obj in row.objects" :obj="obj" :row="row" />
+        <ViewProjectObj v-for="obj in row.objects" :obj="obj" :row="row" :selected="selected" />
       </div>
     </div>
 
@@ -16,8 +18,13 @@
 
 <script setup lang="ts">
 import {ProjectRow} from "~/composables/project";
+import {checkConditions} from "~/composables/conditions";
+import {Ref} from "vue";
 
-defineProps<{ row: ProjectRow }>()
+defineProps<{
+  row: ProjectRow,
+  selected: Ref<string[]>
+}>()
 </script>
 
 <style lang="scss">

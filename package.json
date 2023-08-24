@@ -18,8 +18,11 @@
   },
   "dependencies": {
     "@iconify-json/carbon": "^1.1.20",
+    "@types/ramda": "^0.29.3",
     "@unocss/nuxt": "^0.55.2",
     "@unocss/reset": "^0.55.2",
-    "bootstrap": "5.3.*"
+    "bootstrap": "5.3.*",
+    "ramda": "^0.29.0",
+    "ts-pattern": "^5.0.5"
   }
 }
