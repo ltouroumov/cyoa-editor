@@ -1,47 +1,40 @@
 import { useState } from '#imports';
 
-/**
- * {
- *               "afterText": "",
- *               "beforeText": "Incompatible:",
- *               "id": "",
- *               "operator": "",
- *               "orRequired": [
- *                 {
- *                   "req": ""
- *                 },
- *                 {
- *                   "req": ""
- *                 },
- *                 {
- *                   "req": ""
- *                 },
- *                 {
- *                   "req": ""
- *                 }
- *               ],
- *               "reqId": "nyan",
- *               "reqId1": "",
- *               "reqId2": "",
- *               "reqId3": "",
- *               "reqPoints": 0,
- *               "required": false,
- *               "requireds": [],
- *               "showRequired": true,
- *               "type": "id"
- *             }
- */
-export type Condition = {
+export type ConditionTerm = {
   reqId: string;
   reqId1: string;
   reqId2: string;
   reqId3: string;
+  orRequired: { req: string }[];
   required: boolean;
-  type: 'id';
+  showRequired: boolean;
+  type: 'id' | 'or';
+
+  beforeText: string;
+  afterText: string;
+}
+
+/*
+  {
+    "afterText": "CP",
+    "beforeText": "Cost:",
+    "id": "2b",
+    "requireds": [],
+    "showScore": true,
+    "type": "",
+    "value": "5"
+  }
+ */
+export type Score = {
+  id: string;
+  value: string;
+  beforeText: string;
+  afterText: string;
+  requireds: ConditionTerm[];
 }
 
 export type HasConditions = {
-  requireds: Condition[];
+  requireds: ConditionTerm[];
 }
 
 export type ProjectObj = HasConditions & {
@@ -51,6 +44,7 @@ export type ProjectObj = HasConditions & {
   image: string;
   imageIsLink: boolean;
   objectWidth?: string;
+  scores: Score[];
 }
 
 export type ProjectRow = HasConditions & {
@@ -70,13 +64,6 @@ export type Project = {
 }
 
 export type ProjectFile = {
-  project: Project;
+  data: Project;
   file: string;
-}
-
-export const useProjectFile = () => useState<ProjectFile | undefined>('project');
-export const useProject = () => computed(() => useProjectFile().value?.project);
-export const unloadProject = () => {
-  const project = useProjectFile();
-  project.value = undefined;
 }

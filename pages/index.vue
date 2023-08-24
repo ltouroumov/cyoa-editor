@@ -1,15 +1,15 @@
 <template>
-  <div id="container">
+  <div id="container" v-if="isLoaded">
     <div id="dialog">
-      <LoadProject v-if="!project" />
+      <LoadProject />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref, useProjectFile} from '#imports';
+import { useProjectStore } from '~/composables/store/project';
 
-const project = useProjectFile();
+const { isLoaded } = useProjectStore();
 </script>
 
 <style lang="scss">

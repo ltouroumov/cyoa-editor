@@ -18,11 +18,14 @@
   },
   "dependencies": {
     "@iconify-json/carbon": "^1.1.20",
+    "@pinia/nuxt": "^0.4.11",
     "@types/ramda": "^0.29.3",
     "@unocss/nuxt": "^0.55.2",
     "@unocss/reset": "^0.55.2",
     "bootstrap": "5.3.*",
+    "pinia": "^2.1.6",
     "ramda": "^0.29.0",
     "ts-pattern": "^5.0.5"
-  }
+  },
+  "packageManager": "yarn@3.6.3"
 }

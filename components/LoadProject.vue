@@ -2,36 +2,83 @@
   <div class="load-project">
     <div class="mb-3">
       <label class="form-label">Project File</label>
-      <input class="form-control" type="file" ref="fileInput"/>
+      <input class="form-control" type="file" ref="fileInput" @change="checkCanLoad"/>
     </div>
-    <div>
-      <button class="btn btn-outline-primary" @click="loadProject">Load Project</button>
+    <div class="alert alert-danger mb-3" role="alert" v-if="error">
+      {{ error }}
+    </div>
+    <div class="d-flex gap-2 justify-content-between align-items-center">
+      <button class="btn btn-primary"
+              :class="{ disabled: !canLoad }"
+              @click="loadProjectFile">Load Project
+      </button>
+      <div class="spinner-border text-primary" role="status" v-if="isLoading">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref, useProjectFile} from '#imports';
+import { ref } from '#imports';
+import { useProjectStore } from '~/composables/store/project';
 
-const projectFile = useProjectFile();
+const { loadProject } = useProjectStore();
 const fileInput = ref<HTMLInputElement>();
+const isLoading = ref<boolean>(false);
+const canLoad = ref<boolean>(false);
+const error = ref<string | null>(null);
 
-const loadProject = () => {
+const checkCanLoad = () => {
+  error.value = null;
   if (fileInput.value && fileInput.value.files) {
     const [file] = fileInput.value.files;
+    if (!file) {
+      canLoad.value = false;
+    } else if (file.type !== 'application/json') {
+      canLoad.value = false;
+      error.value = 'File is not JSON';
+    } else {
+      canLoad.value = true;
+    }
+  } else {
+    canLoad.value = false;
+  }
+};
+
+checkCanLoad();
+
+const loadProjectFile = () => {
+  if (fileInput.value && fileInput.value.files) {
+    const [file] = fileInput.value.files;
+    if (!file) {
+      error.value = 'No file selected';
+      return;
+    }
+
+    isLoading.value = true;
 
     const reader = new FileReader();
-    reader.readAsText(file);
     reader.addEventListener('load', () => {
       if (reader.result && typeof reader.result === 'string') {
-        const project = JSON.parse(reader.result);
-        projectFile.value = {
-          project,
-          file: file.name,
-        };
+        const data = JSON.parse(reader.result);
+        isLoading.value = false;
+        loadProject(data, file.name);
       }
     });
+    reader.addEventListener('error', () => {
+      error.value = reader.error?.message ?? 'An error occurred';
+      isLoading.value = false;
+    });
 
+    try {
+      reader.readAsText(file);
+    } catch (e: unknown) {
+      isLoading.value = false;
+      if (e instanceof Error) {
+        error.value = e.message;
+      }
+    }
   }
 };
 </script>

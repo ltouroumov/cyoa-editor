@@ -7,9 +7,9 @@
           <NuxtLink href="/viewer" class="nav-link">Viewer</NuxtLink>
         </div>
         <span class="navbar-text">
-          {{ projectFile?.file ?? "No File Selected" }}
+          {{ project?.file ?? "No File Selected" }}
           <button class="btn btn-dark btn-sm i-carbon-close"
-                  v-if="projectFile?.file"
+                  v-if="isLoaded"
                   @click="unloadProject">
           </button>
         </span>
@@ -19,9 +19,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import {useProjectFile, unloadProject} from "~/composables/project";
+import { useProjectStore } from '~/composables/store/project';
+import { storeToRefs } from 'pinia';
 
-const projectFile = useProjectFile();
+const store = useProjectStore();
+const { project, isLoaded } = storeToRefs(store);
 </script>
 
 <style lang="scss">

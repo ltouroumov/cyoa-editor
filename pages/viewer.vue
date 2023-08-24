@@ -1,20 +1,20 @@
 <template>
   <div v-if="project" class="project">
-    <ViewProjectRow v-for="row in project.rows" :row="row" :selected="selected" />
+    <ViewProjectRow v-for="row in project.data.rows" :row="row"/>
   </div>
   <div v-else class="dialog-container">
     <div class="dialog">
-      <LoadProject />
+      <LoadProject/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import {useProject} from "~/composables/project";
+import { useProjectStore } from '~/composables/store/project';
+import { storeToRefs } from 'pinia';
 
-const project = useProject();
-const selected = ref<string[]>([]);
+const store = useProjectStore();
+const { project } = storeToRefs(store);
 </script>
 
 <style lang="scss">

@@ -1,34 +1,46 @@
 <template>
-  <div class="project-row"
-       v-if="checkConditions(row, selected)">
+  <div class="project-row" :class="{ hidden: !isVisible }">
     <div class="row-meta">
       <div class="row-title">{{ row.title }}</div>
-      <pre>{{ JSON.stringify(row.requireds) }}</pre>
-      <img class="row-image" :src="row.image" v-if="row.image" :alt="row.title" />
+      <img class="row-image" :src="row.image" v-if="row.image" :alt="row.title"/>
       <div class="row-text" v-if="row.titleText">{{ row.titleText }}</div>
     </div>
     <div class="container-fluid p-0">
       <div class="row g-2">
-        <ViewProjectObj v-for="obj in row.objects" :obj="obj" :row="row" :selected="selected" />
+        <ViewProjectObj v-for="obj in row.objects" :obj="obj" :row="row"/>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import {ProjectRow} from "~/composables/project";
-import {checkConditions} from "~/composables/conditions";
-import {Ref} from "vue";
+import { ProjectRow } from '~/composables/project';
+import { buildConditions } from '~/composables/conditions';
+import { useViewerStore } from '~/composables/store/viewer';
+import { storeToRefs } from 'pinia';
 
-defineProps<{
-  row: ProjectRow,
-  selected: Ref<string[]>
-}>()
+const { row } = defineProps<{
+  row: ProjectRow
+}>();
+const store = useViewerStore();
+const { selected } = storeToRefs(store);
+
+const condition = buildConditions(row);
+const isVisible = ref<boolean>(condition(selected.value));
+
+watch(selected, (newSelection) => {
+  const result = condition(newSelection);
+  console.log('updating visibility', row.title, result);
+  isVisible.value = result
+})
 </script>
 
 <style lang="scss">
 .project-row {
+  &.hidden {
+    display: none;
+  }
+
   .row-meta {
     display: flex;
     flex-direction: column;
