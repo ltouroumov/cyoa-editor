@@ -29,9 +29,7 @@ const condition = buildConditions(row);
 const isVisible = ref<boolean>(condition(selected.value));
 
 watch(selected, (newSelection) => {
-  const result = condition(newSelection);
-  console.log('updating visibility', row.title, result);
-  isVisible.value = result
+  isVisible.value = condition(newSelection)
 })
 </script>
 

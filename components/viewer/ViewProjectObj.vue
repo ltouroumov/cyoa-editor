@@ -2,7 +2,7 @@
   <div class="col"
        :class="objClass(row, obj)">
     <div class="project-obj"
-         :class="{ selected: isSelected }"
+         :class="{ selected: isSelected, disabled: !isEnabled }"
          @click="toggle">
       <img class="obj-image" :src="obj.image" v-if="obj.image" :alt="obj.title"/>
       <div class="obj-content">
@@ -42,17 +42,19 @@ const objClass = (row: ProjectRow, obj: ProjectObj) => {
 };
 
 const toggle = () => {
-  isSelected.value = !isSelected.value;
+  if (isEnabled.value) {
+    isSelected.value = !isSelected.value;
+  }
 }
 
 const store = useViewerStore();
 const { selected } = storeToRefs(store);
 
-const condition = buildConditions(row);
-const isVisible = ref<boolean>(condition(selected.value));
+const condition = buildConditions(obj);
+const isEnabled = ref<boolean>(condition(selected.value));
 const isSelected = ref<boolean>(R.includes(obj.id, selected.value));
 watch(selected, (newSelection) => {
-  isVisible.value = condition(newSelection)
+  isEnabled.value = condition(newSelection)
 })
 watch(isSelected, (newIsSelected) => {
   store.setSelected(obj.id, newIsSelected);
@@ -70,6 +72,10 @@ watch(isSelected, (newIsSelected) => {
 
   &.selected {
     background-color: #193C78FF;
+  }
+
+  &.disabled {
+    background-color: gray;
   }
 
   .obj-image {
@@ -92,10 +98,12 @@ watch(isSelected, (newIsSelected) => {
         grid-column: 1 / span 1;
         justify-self: left;
       }
+
       .obj-title-text {
         grid-column: 2 / span 1;
         justify-self: center;
       }
+
       .obj-title-id {
         grid-column: 3 / span 1;
         justify-self: right;
