@@ -34,7 +34,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "20"
           cache: yarn
       - name: Restore cache
         uses: actions/cache@v3
@@ -42,6 +42,7 @@ jobs:
           path: |
             dist
             .nuxt
+            .output
           key: ${{ runner.os }}-nuxt-build-${{ hashFiles('dist') }}
           restore-keys: |
             ${{ runner.os }}-nuxt-build-
