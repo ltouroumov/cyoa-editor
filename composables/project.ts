@@ -1,5 +1,3 @@
-import { useState } from '#imports';
-
 export type ConditionTerm = {
   reqId: string;
   reqId1: string;
@@ -12,7 +10,7 @@ export type ConditionTerm = {
 
   beforeText: string;
   afterText: string;
-}
+};
 
 /*
   {
@@ -31,11 +29,11 @@ export type Score = {
   beforeText: string;
   afterText: string;
   requireds: ConditionTerm[];
-}
+};
 
 export type HasConditions = {
   requireds: ConditionTerm[];
-}
+};
 
 export type ProjectObj = HasConditions & {
   id: string;
@@ -45,7 +43,7 @@ export type ProjectObj = HasConditions & {
   imageIsLink: boolean;
   objectWidth?: string;
   scores: Score[];
-}
+};
 
 export type ProjectRow = HasConditions & {
   id: string;
@@ -57,7 +55,7 @@ export type ProjectRow = HasConditions & {
   objectWidth: string;
 
   objects: ProjectObj[];
-}
+};
 
 export type PointType = {
   id: string;
@@ -71,9 +69,9 @@ export type PointType = {
 export type Project = {
   rows: ProjectRow[];
   pointTypes: PointType[];
-}
+};
 
 export type ProjectFile = {
   data: Project;
   file: string;
-}
+};

@@ -2,17 +2,25 @@
   <div class="load-project">
     <div class="mb-3">
       <label class="form-label">Project File</label>
-      <input class="form-control" type="file" ref="fileInput" @change="checkCanLoad"/>
+      <input
+        ref="fileInput"
+        class="form-control"
+        type="file"
+        @change="checkCanLoad"
+      />
     </div>
-    <div class="alert alert-danger mb-3" role="alert" v-if="error">
+    <div v-if="error" class="alert alert-danger mb-3" role="alert">
       {{ error }}
     </div>
     <div class="d-flex gap-2 justify-content-between align-items-center">
-      <button class="btn btn-primary"
-              :class="{ disabled: !canLoad }"
-              @click="loadProjectFile">Load Project
+      <button
+        class="btn btn-primary"
+        :class="{ disabled: !canLoad }"
+        @click="loadProjectFile"
+      >
+        Load Project
       </button>
-      <div class="spinner-border text-primary" role="status" v-if="isLoading">
+      <div v-if="isLoading" class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>

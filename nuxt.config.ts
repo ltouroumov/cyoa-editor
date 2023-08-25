@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   css: [
     '@unocss/reset/normalize.css',
     '~/assets/css/bootstrap.scss',
-    '~/assets/css/main.css'
+    '~/assets/css/main.css',
   ],
   devtools: { enabled: true },
   typescript: { typeCheck: true },
@@ -14,8 +14,5 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-  modules: [
-    '@unocss/nuxt',
-    '@pinia/nuxt',
-  ]
-})
+  modules: ['@unocss/nuxt', '@pinia/nuxt'],
+});

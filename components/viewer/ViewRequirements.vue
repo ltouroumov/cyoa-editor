@@ -1,7 +1,6 @@
 <template>
-  <div class="obj-requirements" v-if="obj.requireds.length > 0">
-    <div class="obj-requirement"
-         v-for="req in obj.requireds">
+  <div v-if="obj.requireds.length > 0" class="obj-requirements">
+    <div v-for="(req, idx) in obj.requireds" :key="idx" class="obj-requirement">
       <span v-if="req.beforeText">{{ req.beforeText }}</span>
       <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
       <span v-if="req.afterText">{{ req.afterText }}</span>

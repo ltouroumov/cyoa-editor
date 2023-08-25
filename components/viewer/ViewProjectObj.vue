@@ -1,18 +1,27 @@
 <template>
-  <div class="col"
-       :class="objClass(row, obj)">
-    <div class="project-obj"
-         :class="{ selected: isSelected, disabled: !isEnabled }"
-         @click="toggle">
-      <img class="obj-image" :src="obj.image" v-if="obj.image" :alt="obj.title"/>
+  <div class="col" :class="objClass(row, obj)">
+    <div
+      class="project-obj"
+      :class="{ selected: isSelected, disabled: !isEnabled }"
+      @click="toggle"
+    >
+      <img
+        v-if="obj.image"
+        class="obj-image"
+        :src="obj.image"
+        :alt="obj.title"
+      />
       <div class="obj-content">
         <div class="obj-title">
-          <div class="i-carbon-checkmark text-green-400 obj-title-icon" v-if="isSelected"></div>
+          <div
+            v-if="isSelected"
+            class="i-carbon-checkmark text-green-400 obj-title-icon"
+          ></div>
           <span class="obj-title-text">{{ obj.title }}</span>
           <span class="obj-title-id">({{ obj.id }})</span>
         </div>
-        <ViewScores :obj="obj"/>
-        <ViewRequirements :obj="obj"/>
+        <ViewScores :obj="obj" />
+        <ViewRequirements :obj="obj" />
         <div class="obj-text" v-html="formatText(obj.text)"></div>
       </div>
     </div>
@@ -20,23 +29,23 @@
 </template>
 
 <script setup lang="ts">
-import { ProjectObj, ProjectRow } from '~/composables/project';
-import { formatText } from '~/composables/text';
-import * as R from 'ramda';
-import { useViewerStore } from '~/composables/store/viewer';
-import { buildConditions } from '~/composables/conditions';
 import { storeToRefs } from 'pinia';
+import * as R from 'ramda';
+
 import ViewScores from '~/components/viewer/ViewScores.vue';
+import { buildConditions } from '~/composables/conditions';
+import { ProjectObj, ProjectRow } from '~/composables/project';
+import { useViewerStore } from '~/composables/store/viewer';
+import { formatText } from '~/composables/text';
 
 const { row, obj } = defineProps<{
-  row: ProjectRow,
-  obj: ProjectObj
-}>()
+  row: ProjectRow;
+  obj: ProjectObj;
+}>();
 
 const objClass = (row: ProjectRow, obj: ProjectObj) => {
   let className = row.objectWidth;
-  if (obj.objectWidth)
-    className = obj.objectWidth;
+  if (obj.objectWidth) className = obj.objectWidth;
 
   return { [className]: true };
 };
@@ -45,7 +54,7 @@ const toggle = () => {
   if (isEnabled.value) {
     isSelected.value = !isSelected.value;
   }
-}
+};
 
 const store = useViewerStore();
 const { selected } = storeToRefs(store);
@@ -54,11 +63,11 @@ const condition = buildConditions(obj);
 const isEnabled = ref<boolean>(condition(selected.value));
 const isSelected = ref<boolean>(R.includes(obj.id, selected.value));
 watch(selected, (newSelection) => {
-  isEnabled.value = condition(newSelection)
-})
+  isEnabled.value = condition(newSelection);
+});
 watch(isSelected, (newIsSelected) => {
   store.setSelected(obj.id, newIsSelected);
-})
+});
 </script>
 
 <style lang="scss">
@@ -71,7 +80,7 @@ watch(isSelected, (newIsSelected) => {
   flex-direction: column;
 
   &.selected {
-    background-color: #193C78FF;
+    background-color: #193c78ff;
   }
 
   &.disabled {

@@ -1,24 +1,24 @@
 <template>
   <div v-if="project" class="project">
-    <ViewProjectRow v-for="row in project.data.rows" :row="row"/>
+    <ViewProjectRow v-for="row in project.data.rows" :key="row.id" :row="row" />
     <ScoreBar />
   </div>
   <div v-else class="dialog-container">
     <div class="dialog">
-      <LoadProject/>
+      <LoadProject />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useProjectStore } from '~/composables/store/project';
 import { storeToRefs } from 'pinia';
+
 import ScoreBar from '~/components/viewer/ScoreBar.vue';
+import { useProjectStore } from '~/composables/store/project';
 
 const store = useProjectStore();
 const { project } = storeToRefs(store);
 </script>
-
 
 <style lang="scss">
 .project {

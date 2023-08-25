@@ -1,9 +1,13 @@
 <template>
-  <div class="obj-scores" v-if="obj.scores.length > 0">
-    <div class="obj-score" v-for="score in obj.scores">
-      <span class="score-before" v-if="score.beforeText">{{ score.beforeText }}</span>
+  <div v-if="obj.scores.length > 0" class="obj-scores">
+    <div v-for="(score, idx) in obj.scores" :key="idx" class="obj-score">
+      <span v-if="score.beforeText" class="score-before">{{
+        score.beforeText
+      }}</span>
       <span class="score-value">{{ score.value }}</span>
-      <span class="score-after" v-if="score.afterText">{{ score.afterText }}</span>
+      <span v-if="score.afterText" class="score-after">{{
+        score.afterText
+      }}</span>
     </div>
   </div>
 </template>

@@ -11,7 +11,7 @@ export const useViewerStore = defineStore('viewer', () => {
     } else {
       selected.value = R.without([id], selected.value);
     }
-  }
+  };
 
   return { selected, setSelected };
 });

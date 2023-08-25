@@ -2,25 +2,36 @@
   <div class="project-row" :class="{ hidden: !isVisible }">
     <div class="row-meta">
       <div class="row-title">{{ row.title }}</div>
-      <img class="row-image" :src="row.image" v-if="row.image" :alt="row.title"/>
-      <div class="row-text" v-if="row.titleText">{{ row.titleText }}</div>
+      <img
+        v-if="row.image"
+        class="row-image"
+        :src="row.image"
+        :alt="row.title"
+      />
+      <div v-if="row.titleText" class="row-text">{{ row.titleText }}</div>
     </div>
     <div class="container-fluid p-0">
       <div class="row g-2">
-        <ViewProjectObj v-for="obj in row.objects" :obj="obj" :row="row"/>
+        <ViewProjectObj
+          v-for="obj in row.objects"
+          :key="obj.id"
+          :obj="obj"
+          :row="row"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ProjectRow } from '~/composables/project';
-import { buildConditions } from '~/composables/conditions';
-import { useViewerStore } from '~/composables/store/viewer';
 import { storeToRefs } from 'pinia';
 
+import { buildConditions } from '~/composables/conditions';
+import { ProjectRow } from '~/composables/project';
+import { useViewerStore } from '~/composables/store/viewer';
+
 const { row } = defineProps<{
-  row: ProjectRow
+  row: ProjectRow;
 }>();
 const store = useViewerStore();
 const { selected } = storeToRefs(store);
@@ -29,8 +40,8 @@ const condition = buildConditions(row);
 const isVisible = ref<boolean>(condition(selected.value));
 
 watch(selected, (newSelection) => {
-  isVisible.value = condition(newSelection)
-})
+  isVisible.value = condition(newSelection);
+});
 </script>
 
 <style lang="scss">
