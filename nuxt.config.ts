@@ -1,5 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  app: {
+    baseURL: '/cyoa-editor/',
+    buildAssetsDir: 'assets',
+  },
   imports: { autoImport: true },
   css: [
     '@unocss/reset/normalize.css',
