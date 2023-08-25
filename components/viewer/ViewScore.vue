@@ -3,7 +3,9 @@
     <span v-if="score.beforeText" class="score-before">{{
       score.beforeText
     }}</span>
-    <span class="score-value">{{ score.value }}</span>
+    <span class="score-value">{{
+      Math.abs(Number.parseInt(score.value))
+    }}</span>
     <span v-if="score.afterText" class="score-after">{{
       score.afterText
     }}</span>
