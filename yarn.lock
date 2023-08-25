@@ -986,6 +986,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@iconify-json/solar@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@iconify-json/solar@npm:1.1.2"
+  dependencies:
+    "@iconify/types": "*"
+  checksum: a0938f8c0102a14a522d6f4da91d5d8fad6c28207c195cfe1f78c83a12f848aa9b1c09d9f3e2b660a6e0419c141e4ad39c0d1ca33369cd8dc7101132dcd8f496
+  languageName: node
+  linkType: hard
+
 "@iconify/types@npm:*, @iconify/types@npm:^2.0.0":
   version: 2.0.0
   resolution: "@iconify/types@npm:2.0.0"
@@ -7864,6 +7873,7 @@ __metadata:
   resolution: "nuxt-app@workspace:."
   dependencies:
     "@iconify-json/carbon": ^1.1.20
+    "@iconify-json/solar": ^1.1.2
     "@nuxt/devtools": latest
     "@nuxtjs/eslint-config-typescript": ^12.0.0
     "@pinia/nuxt": ^0.4.11

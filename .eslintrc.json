@@ -19,6 +19,7 @@
     "unused-imports"
   ],
   "rules": {
+    "no-console": "off",
     "sort-imports": [
       "error",
       {

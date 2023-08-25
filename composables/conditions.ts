@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import { P, match } from 'ts-pattern';
 
-import { ConditionTerm, HasConditions } from '~/composables/project';
+import { ConditionTerm, HasRequirements } from '~/composables/project';
 
 type Term = (selected: string[]) => boolean;
 type Condition = {
@@ -9,7 +9,7 @@ type Condition = {
   deps: string[];
 };
 
-export const buildConditions = (item: HasConditions): Term =>
+export const buildConditions = (item: HasRequirements): Term =>
   buildRootCondition(item.requireds);
 
 const buildRootCondition = (terms: ConditionTerm[]): Term => {

@@ -20,22 +20,22 @@
           <span class="obj-title-text">{{ obj.title }}</span>
           <span class="obj-title-id">({{ obj.id }})</span>
         </div>
-        <ViewScores :obj="obj" />
-        <ViewRequirements :obj="obj" />
+        <ViewScores :scores="obj.scores" />
+        <ViewRequirements :requireds="obj.requireds" />
         <div class="obj-text" v-html="formatText(obj.text)"></div>
       </div>
+      <ViewAddon v-for="(addon, idx) in obj.addons" :key="idx" :addon="addon" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import * as R from 'ramda';
 
 import ViewScores from '~/components/viewer/ViewScores.vue';
 import { buildConditions } from '~/composables/conditions';
 import { ProjectObj, ProjectRow } from '~/composables/project';
-import { useViewerStore } from '~/composables/store/viewer';
+import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
 
 const { row, obj } = defineProps<{
@@ -56,8 +56,8 @@ const toggle = () => {
   }
 };
 
-const store = useViewerStore();
-const { selected } = storeToRefs(store);
+const store = useProjectStore();
+const { selected } = useProjectRefs();
 
 const condition = buildConditions(obj);
 const isEnabled = ref<boolean>(condition(selected.value));
@@ -73,8 +73,9 @@ watch(isSelected, (newIsSelected) => {
 <style lang="scss">
 .project-obj {
   height: 100%;
-  border: 1px solid white;
-  border-radius: 5px;
+  border: 2px solid white;
+  border-radius: 1em;
+  overflow: hidden;
 
   display: flex;
   flex-direction: column;
@@ -93,10 +94,11 @@ watch(isSelected, (newIsSelected) => {
   }
 
   .obj-content {
-    padding: 5px;
+    padding: 0.5em;
 
     .obj-title {
       font-size: 1.2em;
+      font-weight: bolder;
       margin-bottom: 5px;
 
       display: grid;

@@ -1,20 +1,14 @@
 <template>
-  <div v-if="obj.requireds.length > 0" class="obj-requirements">
-    <div v-for="(req, idx) in obj.requireds" :key="idx" class="obj-requirement">
-      <span v-if="req.beforeText">{{ req.beforeText }}</span>
-      <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
-      <span v-if="req.afterText">{{ req.afterText }}</span>
-    </div>
+  <div v-if="requireds.length > 0" class="obj-requirements">
+    <ViewRequirement v-for="(req, idx) in requireds" :key="idx" :req="req" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ProjectObj } from '~/composables/project';
-import { useProjectStore } from '~/composables/store/project';
+import ViewRequirement from '~/components/viewer/ViewRequirement.vue';
+import { ConditionTerm } from '~/composables/project';
 
-defineProps<{ obj: ProjectObj }>();
-
-const { getObject } = useProjectStore();
+defineProps<{ requireds: ConditionTerm[] }>();
 </script>
 
 <style lang="scss">
@@ -22,11 +16,5 @@ const { getObject } = useProjectStore();
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  .obj-requirement {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-  }
 }
 </style>

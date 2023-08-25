@@ -8,34 +8,29 @@ export type ConditionTerm = {
   showRequired: boolean;
   type: 'id' | 'or';
 
+  requireds: ConditionTerm[];
+
   beforeText: string;
   afterText: string;
 };
 
-/*
-  {
-    "afterText": "CP",
-    "beforeText": "Cost:",
-    "id": "2b",
-    "requireds": [],
-    "showScore": true,
-    "type": "",
-    "value": "5"
-  }
- */
-export type Score = {
+export type HasRequirements = {
+  requireds: ConditionTerm[];
+};
+
+export type Score = HasRequirements & {
   id: string;
   value: string;
   beforeText: string;
   afterText: string;
-  requireds: ConditionTerm[];
 };
 
-export type HasConditions = {
-  requireds: ConditionTerm[];
+export type ObjAddon = HasRequirements & {
+  title: string;
+  text: string;
 };
 
-export type ProjectObj = HasConditions & {
+export type ProjectObj = HasRequirements & {
   id: string;
   title: string;
   text: string;
@@ -43,9 +38,10 @@ export type ProjectObj = HasConditions & {
   imageIsLink: boolean;
   objectWidth?: string;
   scores: Score[];
+  addons: ObjAddon[];
 };
 
-export type ProjectRow = HasConditions & {
+export type ProjectRow = HasRequirements & {
   id: string;
   title: string;
   titleText?: string;

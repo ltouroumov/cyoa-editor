@@ -24,17 +24,15 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-
 import { buildConditions } from '~/composables/conditions';
 import { ProjectRow } from '~/composables/project';
-import { useViewerStore } from '~/composables/store/viewer';
+import { useProjectRefs } from '~/composables/store/project';
 
 const { row } = defineProps<{
   row: ProjectRow;
 }>();
-const store = useViewerStore();
-const { selected } = storeToRefs(store);
+
+const { selected } = useProjectRefs();
 
 const condition = buildConditions(row);
 const isVisible = ref<boolean>(condition(selected.value));

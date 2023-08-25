@@ -12,11 +12,9 @@ import {
 
 export const useProjectStore = defineStore('project', () => {
   const project = ref<ProjectFile | null>(null);
+  const selected = ref<string[]>([]);
 
-  const rows: Ref<ProjectRow[]> = computed(
-    () => project.value?.data.rows ?? [],
-  );
-  const scores: Ref<PointType[]> = computed(
+  const pointTypes: Ref<PointType[]> = computed(
     () => project.value?.data.pointTypes ?? [],
   );
 
@@ -43,14 +41,23 @@ export const useProjectStore = defineStore('project', () => {
     project.value = null;
   };
 
+  const setSelected = (id: string, isSelected: boolean) => {
+    console.log(`setSelected(${id}, ${isSelected})`);
+    if (isSelected) {
+      selected.value = R.append(id, selected.value);
+    } else {
+      selected.value = R.without([id], selected.value);
+    }
+  };
   return {
     project,
-    rows,
-    scores,
+    selected,
+    pointTypes,
     isLoaded,
     loadProject,
     unloadProject,
     getObject,
+    setSelected,
   };
 });
 
