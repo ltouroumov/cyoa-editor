@@ -1,6 +1,7 @@
 <template>
   <div v-if="project" class="project">
     <ViewProjectRow v-for="row in project.data.rows" :row="row"/>
+    <ScoreBar />
   </div>
   <div v-else class="dialog-container">
     <div class="dialog">
@@ -12,10 +13,12 @@
 <script setup lang="ts">
 import { useProjectStore } from '~/composables/store/project';
 import { storeToRefs } from 'pinia';
+import ScoreBar from '~/components/viewer/ScoreBar.vue';
 
 const store = useProjectStore();
 const { project } = storeToRefs(store);
 </script>
+
 
 <style lang="scss">
 .project {

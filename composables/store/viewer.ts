@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
 
 export const useViewerStore = defineStore('viewer', () => {
@@ -14,4 +14,6 @@ export const useViewerStore = defineStore('viewer', () => {
   }
 
   return { selected, setSelected };
-})
+});
+
+export const useViewerRefs = () => storeToRefs(useViewerStore());

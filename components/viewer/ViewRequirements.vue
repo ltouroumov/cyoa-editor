@@ -3,7 +3,7 @@
     <div class="obj-requirement"
          v-for="req in obj.requireds">
       <span v-if="req.beforeText">{{ req.beforeText }}</span>
-      <span>{{ getName(req.reqId) }}</span>
+      <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
       <span v-if="req.afterText">{{ req.afterText }}</span>
     </div>
   </div>
@@ -15,7 +15,7 @@ import { useProjectStore } from '~/composables/store/project';
 
 defineProps<{ obj: ProjectObj }>();
 
-const { getName } = useProjectStore();
+const { getObject } = useProjectStore();
 </script>
 
 <style lang="scss">

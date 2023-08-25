@@ -59,8 +59,18 @@ export type ProjectRow = HasConditions & {
   objects: ProjectObj[];
 }
 
+export type PointType = {
+  id: string;
+  name: string;
+  beforeText: string;
+  afterText: string;
+  startingSum: number;
+  activatedId: string;
+};
+
 export type Project = {
   rows: ProjectRow[];
+  pointTypes: PointType[];
 }
 
 export type ProjectFile = {
