@@ -48,11 +48,13 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Generate Static Site
-        run: yarn run build
+        run: yarn run generate
+        env:
+          NITRO_PRESET: github_pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./.nuxt/dist
+          path: ./.ouput/public
 
   # Deployment job
   deploy:
