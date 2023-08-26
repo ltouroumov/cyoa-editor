@@ -5,17 +5,30 @@ import { ConditionTerm, HasRequirements } from '~/composables/project';
 
 export type Term = (selected: string[]) => boolean;
 export type Condition = {
+  code: string;
+  deps: string[];
+};
+
+export type ConditionExec = {
   exec: Term;
   deps: string[];
 };
 
 export const buildConditions = (item: HasRequirements): Term => {
   const { exec } = buildRootCondition(item.requireds);
+
   return exec;
 };
-export const buildRootCondition = (terms: ConditionTerm[]): Condition => {
-  if (terms.length === 0) return ALWAYS;
-  else return AND(R.map(buildCondition, terms));
+export const buildRootCondition = (terms: ConditionTerm[]): ConditionExec => {
+  const { code, deps } =
+    terms.length === 0 ? ALWAYS : AND(R.map(buildCondition, terms));
+
+  // eslint-disable-next-line no-new-func
+  const func = Function('sel', `return ${code}`);
+  return {
+    exec: func as Term,
+    deps,
+  };
 };
 
 const buildCondition = (term: ConditionTerm): Condition => {
@@ -51,30 +64,47 @@ const buildCondition = (term: ConditionTerm): Condition => {
 const mergeDeps = (terms: Condition[]) =>
   R.uniq(R.flatten(R.map(R.prop('deps'), terms)));
 
-const combine = (fn: (ev: Term[]) => Term, terms: Condition[]): Condition => ({
-  exec: fn(R.map(R.prop('exec'), terms)),
+const combine = (
+  fn: (ev: string[]) => string,
+  terms: Condition[],
+): Condition => ({
+  code: fn(R.map(R.prop('code'), terms)),
   deps: mergeDeps(terms),
 });
 
-const ALWAYS: Condition = { exec: () => true, deps: [] };
+const ALWAYS: Condition = { code: 'true', deps: [] };
 
 const SELECTED = (id: string): Condition => ({
-  exec: R.includes(id),
+  code: `sel.includes(${JSON.stringify(id)})`,
   deps: [id],
 });
 const UNSELECTED = (id: string): Condition => ({
-  exec: (s) => !R.includes(id, s),
+  code: `!sel.includes(${JSON.stringify(id)})`,
   deps: [id],
 });
 
 const AND = (terms: Condition[]): Condition => {
   if (terms.length === 0) return ALWAYS;
   else if (terms.length === 1) return terms[0];
-  else return combine(R.allPass, terms);
+  else
+    return combine(
+      R.pipe(
+        R.map((c) => `(${c})`),
+        R.join(' && '),
+      ),
+      terms,
+    );
 };
 
 const OR = (terms: Condition[]): Condition => {
   if (terms.length === 0) return ALWAYS;
   else if (terms.length === 1) return terms[0];
-  else return combine(R.anyPass, terms);
+  else
+    return combine(
+      R.pipe(
+        R.map((c) => `(${c})`),
+        R.join(' && '),
+      ),
+      terms,
+    );
 };

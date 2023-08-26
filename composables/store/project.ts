@@ -2,7 +2,7 @@ import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
 import { ComputedRef, Ref, computed } from 'vue';
 
-import { Condition, buildRootCondition } from '~/composables/conditions';
+import { ConditionExec, buildRootCondition } from '~/composables/conditions';
 import {
   HasId,
   HasRequirements,
@@ -86,7 +86,7 @@ export const useProjectStore = defineStore('project', () => {
   function _buildConditions(seq: (HasId & HasRequirements)[]) {
     return R.pipe(
       R.filter(({ requireds }: HasRequirements) => !R.isEmpty(requireds)),
-      R.map((item: HasRequirements & HasId): [string, Condition] => [
+      R.map((item: HasRequirements & HasId): [string, ConditionExec] => [
         item.id,
         buildRootCondition(item.requireds),
       ]),
@@ -94,10 +94,10 @@ export const useProjectStore = defineStore('project', () => {
     )(seq);
   }
 
-  function _buildDeps(seq: Record<string, Condition>): Deps {
+  function _buildDeps(seq: Record<string, ConditionExec>): Deps {
     return R.pipe(
       R.toPairs,
-      R.chain(([id, { deps }]: [string, Condition]) =>
+      R.chain(([id, { deps }]: [string, ConditionExec]) =>
         R.map((dep: string): [string, string] => [dep, id], deps),
       ),
       R.reduceBy(
