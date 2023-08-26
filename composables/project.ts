@@ -18,6 +18,10 @@ export type HasRequirements = {
   requireds: ConditionTerm[];
 };
 
+export type HasId = {
+  id: string;
+};
+
 export type Score = HasRequirements & {
   id: string;
   value: string;
@@ -30,30 +34,30 @@ export type ObjAddon = HasRequirements & {
   text: string;
 };
 
-export type ProjectObj = HasRequirements & {
-  id: string;
-  title: string;
-  text: string;
-  image: string;
-  imageIsLink: boolean;
-  objectWidth?: string;
-  scores: Score[];
-  addons: ObjAddon[];
-};
+export type ProjectObj = HasId &
+  HasRequirements & {
+    title: string;
+    text: string;
+    image: string;
+    imageIsLink: boolean;
+    objectWidth?: string;
+    scores: Score[];
+    addons: ObjAddon[];
+  };
 
-export type ProjectRow = HasRequirements & {
-  id: string;
-  title: string;
-  titleText?: string;
+export type ProjectRow = HasId &
+  HasRequirements & {
+    title: string;
+    titleText?: string;
 
-  image: string;
-  imageIsLink: boolean;
-  objectWidth: string;
+    image: string;
+    imageIsLink: boolean;
+    objectWidth: string;
 
-  resultGroupId: string;
+    resultGroupId: string;
 
-  objects: ProjectObj[];
-};
+    objects: ProjectObj[];
+  };
 
 export type PointType = {
   id: string;

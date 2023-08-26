@@ -3,21 +3,19 @@ import { P, match } from 'ts-pattern';
 
 import { ConditionTerm, HasRequirements } from '~/composables/project';
 
-type Term = (selected: string[]) => boolean;
-type Condition = {
+export type Term = (selected: string[]) => boolean;
+export type Condition = {
   exec: Term;
   deps: string[];
 };
 
-export const buildConditions = (item: HasRequirements): Term =>
-  buildRootCondition(item.requireds);
-
-const buildRootCondition = (terms: ConditionTerm[]): Term => {
-  if (terms.length === 0) return () => true;
-  else {
-    const { exec } = AND(R.map(buildCondition, terms));
-    return (selected) => exec(selected);
-  }
+export const buildConditions = (item: HasRequirements): Term => {
+  const { exec } = buildRootCondition(item.requireds);
+  return exec;
+};
+export const buildRootCondition = (terms: ConditionTerm[]): Condition => {
+  if (terms.length === 0) return ALWAYS;
+  else return AND(R.map(buildCondition, terms));
 };
 
 const buildCondition = (term: ConditionTerm): Condition => {

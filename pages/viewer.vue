@@ -10,8 +10,8 @@
     <ViewBackpack />
     <ScoreBar />
   </div>
-  <div v-else class="dialog-container bg-dark">
-    <div class="dialog bg-dark">
+  <div v-else class="dialog-container">
+    <div class="dialog bg-dark-subtle text-light">
       <h5>Default Files</h5>
       <ul class="list-group mb-3">
         <li class="list-group-item">

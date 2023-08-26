@@ -30,9 +30,7 @@ if (score.requireds.length > 0) {
   isEnabled.value = condition(selected.value);
 
   watch(selected, (newSelection) => {
-    const value = condition(newSelection);
-    console.log('score enabled', score, value);
-    isEnabled.value = value;
+    isEnabled.value = condition(newSelection);
   });
 }
 </script>

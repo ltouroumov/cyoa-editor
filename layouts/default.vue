@@ -1,6 +1,6 @@
 <template>
   <div data-bs-theme="dark">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg bg-dark-subtle navbar-dark">
       <div class="container-fluid">
         <div class="navbar-nav">
           <NuxtLink href="/editor" class="nav-link">Editor</NuxtLink>

@@ -24,7 +24,8 @@
 </template>
 
 <script setup lang="ts">
-import { buildConditions } from '~/composables/conditions';
+import { computed } from 'vue';
+
 import { ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 
@@ -32,14 +33,9 @@ const { row } = defineProps<{
   row: ProjectRow;
 }>();
 
-const { selected } = useProjectRefs();
+const { rowStatus } = useProjectRefs();
 
-const condition = buildConditions(row);
-const isVisible = ref<boolean>(condition(selected.value));
-
-watch(selected, (newSelection) => {
-  isVisible.value = condition(newSelection);
-});
+const isVisible = computed(() => rowStatus.value[row.id] ?? true);
 </script>
 
 <style lang="scss">

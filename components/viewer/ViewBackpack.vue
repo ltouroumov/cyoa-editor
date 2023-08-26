@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
@@ -60,10 +60,6 @@ const packRows = computed(() => {
         : [],
     backpack.value,
   );
-});
-
-watch(packRows, (newChoices) => {
-  console.log('choices', newChoices);
 });
 </script>
 
