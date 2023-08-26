@@ -43,14 +43,15 @@ const { toggleBackpack } = useViewerStore();
 const { isBackpackVisible } = useViewerRefs();
 
 const packRows = computed(() => {
-  const choicesByGroup: Record<string, { obj: ProjectObj; row: ProjectRow }> =
-    R.groupBy(
-      ({ row }) => row.resultGroupId,
-      R.map(
-        (id: string) => ({ obj: getObject(id), row: getRow(getObjectRow(id)) }),
-        selected.value,
-      ),
-    );
+  const choicesByGroup: Partial<
+    Record<string, { obj: ProjectObj; row: ProjectRow }[]>
+  > = R.groupBy(
+    ({ row }) => row.resultGroupId,
+    R.map(
+      (id: string) => ({ obj: getObject(id), row: getRow(getObjectRow(id)) }),
+      selected.value,
+    ),
+  );
 
   return R.chain(
     (row: ProjectRow) =>

@@ -71,6 +71,14 @@ export const useProjectStore = defineStore('project', () => {
     project.value = null;
   };
 
+  const conditions = computed(() =>
+    R.pipe(
+      R.chain((row: ProjectRow) =>
+        R.map((obj: ProjectObj) => [row, obj], row.objects),
+      ),
+    )(project.value?.data.rows ?? []),
+  );
+
   const setSelected = (id: string, isSelected: boolean) => {
     console.log(`setSelected(${id}, ${isSelected})`);
     if (isSelected) {
@@ -92,6 +100,7 @@ export const useProjectStore = defineStore('project', () => {
     getObject,
     getObjectRow,
     setSelected,
+    conditions,
   };
 });
 
