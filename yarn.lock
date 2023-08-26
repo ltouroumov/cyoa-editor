@@ -1658,6 +1658,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@popperjs/core@npm:^2.11.8":
+  version: 2.11.8
+  resolution: "@popperjs/core@npm:2.11.8"
+  checksum: e5c69fdebf52a4012f6a1f14817ca8e9599cb1be73dd1387e1785e2ed5e5f0862ff817f420a87c7fc532add1f88a12e25aeb010ffcbdc98eace3d55ce2139cf0
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-alias@npm:^5.0.0":
   version: 5.0.0
   resolution: "@rollup/plugin-alias@npm:5.0.0"
@@ -7877,6 +7884,7 @@ __metadata:
     "@nuxt/devtools": latest
     "@nuxtjs/eslint-config-typescript": ^12.0.0
     "@pinia/nuxt": ^0.4.11
+    "@popperjs/core": ^2.11.8
     "@types/node": ^18.17.3
     "@types/ramda": ^0.29.3
     "@typescript-eslint/eslint-plugin": ^6.4.1

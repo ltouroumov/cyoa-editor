@@ -50,6 +50,8 @@ export type ProjectRow = HasRequirements & {
   imageIsLink: boolean;
   objectWidth: string;
 
+  resultGroupId: string;
+
   objects: ProjectObj[];
 };
 
@@ -64,6 +66,7 @@ export type PointType = {
 
 export type Project = {
   rows: ProjectRow[];
+  backpack: ProjectRow[];
   pointTypes: PointType[];
 };
 

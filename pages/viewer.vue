@@ -1,10 +1,17 @@
 <template>
   <div v-if="project" class="project">
-    <ViewProjectRow v-for="row in project.data.rows" :key="row.id" :row="row" />
+    <div class="rows">
+      <ViewProjectRow
+        v-for="row in project.data.rows"
+        :key="row.id"
+        :row="row"
+      />
+    </div>
+    <ViewBackpack />
     <ScoreBar />
   </div>
-  <div v-else class="dialog-container">
-    <div class="dialog">
+  <div v-else class="dialog-container bg-dark">
+    <div class="dialog bg-dark">
       <h5>Default Files</h5>
       <ul class="list-group mb-3">
         <li class="list-group-item">
@@ -36,6 +43,7 @@
 <script setup lang="ts">
 import { ref } from '#imports';
 import ScoreBar from '~/components/viewer/ScoreBar.vue';
+import ViewBackpack from '~/components/viewer/ViewBackpack.vue';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
 const { loadProject } = useProjectStore();

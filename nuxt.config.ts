@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '~/assets/css/bootstrap.scss',
     '~/assets/css/main.css',
   ],
+  plugins: [],
   devtools: { enabled: true },
   typescript: { typeCheck: true },
   components: [
