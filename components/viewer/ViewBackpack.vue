@@ -1,7 +1,7 @@
 <template>
   <SideDrawer :visible="isBackpackVisible" side="right">
     <div class="pack-header bg-dark">
-      <h5>Choices</h5>
+      <h5 class="m-0">Choices</h5>
       <button
         class="btn btn-dark i-solar-backpack-outline"
         @click="toggleBackpack()"
@@ -11,11 +11,13 @@
       <div class="pack-scores">
         <ViewScoreStatus vertical />
       </div>
-      <div v-for="row in activePackRows" :key="row.id" class="pack-row">
-        <strong>{{ row.title }} ({{ row.resultGroupId }})</strong>
+      <div v-for="{ row, choices } in packRows" :key="row.id" class="pack-row">
+        <strong class="pack-row-title">
+          {{ row.title }} ({{ row.resultGroupId }})
+        </strong>
         <ul class="list-group list-group-flush">
           <li
-            v-for="{ obj } in activePackRows[row.resultGroupId] ?? []"
+            v-for="{ obj } in choices"
             :key="obj.id"
             class="list-group-item choice"
           >
@@ -40,24 +42,26 @@ const { selected, backpack } = useProjectRefs();
 const { toggleBackpack } = useViewerStore();
 const { isBackpackVisible } = useViewerRefs();
 
-const activePackRows = computed(() => {
-  return R.filter(
-    (row: ProjectRow) => row.resultGroupId in choicesByGroup.value,
+const packRows = computed(() => {
+  const choicesByGroup: Record<string, { obj: ProjectObj; row: ProjectRow }> =
+    R.groupBy(
+      ({ row }) => row.resultGroupId,
+      R.map(
+        (id: string) => ({ obj: getObject(id), row: getRow(getObjectRow(id)) }),
+        selected.value,
+      ),
+    );
+
+  return R.chain(
+    (row: ProjectRow) =>
+      row.resultGroupId in choicesByGroup
+        ? [{ row, choices: choicesByGroup[row.resultGroupId] }]
+        : [],
     backpack.value,
   );
 });
 
-const choicesByGroup = computed<Record<string, ProjectObj[]>>(() => {
-  return R.groupBy(
-    ({ row }) => row.resultGroupId,
-    R.map(
-      (id: string) => ({ obj: getObject(id), row: getRow(getObjectRow(id)) }),
-      selected.value,
-    ),
-  );
-});
-
-watch(choicesByGroup, (newChoices) => {
+watch(packRows, (newChoices) => {
   console.log('choices', newChoices);
 });
 </script>
@@ -74,11 +78,15 @@ watch(choicesByGroup, (newChoices) => {
   overflow: auto;
 
   .pack-scores {
-    padding: 1em;
+    padding: 0 1em 1em 1em;
   }
 
   .pack-row {
-    padding: 1em;
+    padding: 0;
+    .pack-row-title {
+      padding: 0 1rem;
+      font-size: 1.1em;
+    }
   }
 }
 </style>
