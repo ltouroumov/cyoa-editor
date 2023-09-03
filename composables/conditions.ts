@@ -19,6 +19,7 @@ export const buildConditions = (item: HasRequirements): Term => {
 
   return exec;
 };
+
 export const buildRootCondition = (terms: ConditionTerm[]): ConditionExec => {
   const { code, deps } =
     terms.length === 0 ? ALWAYS : AND(R.map(buildCondition, terms));
@@ -103,7 +104,7 @@ const OR = (terms: Condition[]): Condition => {
     return combine(
       R.pipe(
         R.map((c) => `(${c})`),
-        R.join(' && '),
+        R.join(' || '),
       ),
       terms,
     );

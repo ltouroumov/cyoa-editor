@@ -50,24 +50,18 @@ const objClass = (row: ProjectRow, obj: ProjectObj) => {
   return { [className]: true };
 };
 
-const toggle = () => {
-  if (isEnabled.value) {
-    isSelected.value = !isSelected.value;
-  }
-};
-
 const store = useProjectStore();
 const { selected } = useProjectRefs();
 
 const condition = buildConditions(obj);
-const isEnabled = ref<boolean>(condition(selected.value));
-const isSelected = ref<boolean>(R.includes(obj.id, selected.value));
-watch(selected, (newSelection) => {
-  isEnabled.value = condition(newSelection);
-});
-watch(isSelected, (newIsSelected) => {
-  store.setSelected(obj.id, newIsSelected);
-});
+const isEnabled = computed<boolean>(() => condition(selected.value));
+const isSelected = computed<boolean>(() => R.includes(obj.id, selected.value));
+
+const toggle = () => {
+  if (isEnabled.value) {
+    store.setSelected(obj.id, !isSelected.value);
+  }
+};
 </script>
 
 <style lang="scss">

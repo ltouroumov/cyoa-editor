@@ -3,6 +3,9 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/cyoa-editor/',
     buildAssetsDir: 'assets',
+    head: {
+      title: 'Interactive CYOA',
+    },
   },
   imports: { autoImport: true },
   css: [

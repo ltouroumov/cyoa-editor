@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed } from 'vue';
 
 import { buildConditions } from '~/composables/conditions';
 import { Score } from '~/composables/project';
@@ -23,16 +23,8 @@ const { score } = defineProps<{ score: Score }>();
 
 const { selected } = useProjectRefs();
 
-const isEnabled = ref<boolean>(true);
-
-if (score.requireds.length > 0) {
-  const condition = buildConditions(score);
-  isEnabled.value = condition(selected.value);
-
-  watch(selected, (newSelection) => {
-    isEnabled.value = condition(newSelection);
-  });
-}
+const condition = buildConditions(score);
+const isEnabled = computed<boolean>(() => condition(selected.value));
 </script>
 
 <style lang="scss">

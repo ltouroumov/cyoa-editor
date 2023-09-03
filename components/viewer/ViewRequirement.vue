@@ -7,8 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-
 import { buildConditions } from '~/composables/conditions';
 import { ConditionTerm } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
@@ -20,10 +18,7 @@ const { getObject } = useProjectStore();
 const { selected } = useProjectRefs();
 
 const condition = buildConditions(req);
-const isEnabled = ref<boolean>(condition(selected.value));
-watch(selected, (newSelection) => {
-  isEnabled.value = condition(newSelection);
-});
+const isEnabled = computed<boolean>(() => condition(selected.value));
 </script>
 
 <style lang="scss">
