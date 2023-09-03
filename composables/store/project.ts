@@ -2,12 +2,14 @@ import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
 import { ComputedRef, computed } from 'vue';
 
+import { buildConditions } from '~/composables/conditions';
 import {
   PointType,
   Project,
   ProjectFile,
   ProjectObj,
   ProjectRow,
+  Score,
 } from '~/composables/project';
 
 export const useProjectStore = defineStore('project', () => {
@@ -83,12 +85,46 @@ export const useProjectStore = defineStore('project', () => {
     }
   };
 
+  const points = computed<Record<string, number>>(() => {
+    const _selected = selected.value;
+
+    const startingSums: Record<string, number> = R.pipe(
+      R.map(({ id, startingSum }: PointType): [string, number] => [
+        id,
+        startingSum,
+      ]),
+      R.fromPairs,
+    )(pointTypes.value);
+
+    return R.pipe(
+      R.map((id: string) => getObject.value(id)),
+      R.chain(({ scores }: ProjectObj) => {
+        return R.pipe(
+          R.filter((score: Score) => {
+            const cond = buildConditions(score);
+            return cond(_selected);
+          }),
+          R.map(({ id, value }: Score): [string, number] => [
+            id,
+            -Number.parseInt(value),
+          ]),
+        )(scores);
+      }),
+      R.reduceBy(
+        (acc, [_, value]) => acc + value,
+        0,
+        ([id, _]) => id,
+      ),
+    )(_selected);
+  });
+
   return {
     project,
     projectRows,
     backpack,
-    selected,
     pointTypes,
+    selected,
+    points,
     isLoaded,
     loadProject,
     unloadProject,
