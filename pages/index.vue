@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoaded" id="container">
+  <div v-if="!isLoaded" id="container">
     <div id="dialog">
       <LoadProject />
     </div>

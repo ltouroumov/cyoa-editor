@@ -79,7 +79,26 @@ export const useProjectStore = defineStore('project', () => {
 
   const setSelected = (id: string, isSelected: boolean) => {
     if (isSelected) {
-      selected.value = R.append(id, selected.value);
+      const rowId = getObjectRow.value(id);
+      const row = getRow.value(rowId);
+      if (row.allowedChoices > 0) {
+        const selectedRowObjects = R.intersection(
+          selected.value,
+          R.map(R.prop('id'), row.objects),
+        );
+
+        if (selectedRowObjects.length >= row.allowedChoices) {
+          const toDeselect = selectedRowObjects[0];
+          selected.value = R.pipe(
+            R.without([toDeselect]),
+            R.append(id),
+          )(selected.value);
+        } else {
+          selected.value = R.append(id, selected.value);
+        }
+      } else {
+        selected.value = R.append(id, selected.value);
+      }
     } else {
       selected.value = R.without([id], selected.value);
     }
@@ -106,7 +125,7 @@ export const useProjectStore = defineStore('project', () => {
           }),
           R.map(({ id, value }: Score): [string, number] => [
             id,
-            -Number.parseInt(value),
+            Number.parseInt(value),
           ]),
         )(scores);
       }),
@@ -115,6 +134,7 @@ export const useProjectStore = defineStore('project', () => {
         0,
         ([id, _]) => id,
       ),
+      R.mergeWith(R.add, startingSums),
     )(_selected);
   });
 

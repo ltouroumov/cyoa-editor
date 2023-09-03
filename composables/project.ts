@@ -55,6 +55,7 @@ export type ProjectRow = HasId &
     objectWidth: string;
 
     resultGroupId: string;
+    allowedChoices: number;
 
     objects: ProjectObj[];
   };

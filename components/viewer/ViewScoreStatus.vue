@@ -6,7 +6,7 @@
       class="d-flex flex-row gap-2"
     >
       <span v-if="score.beforeText">{{ score.beforeText }}</span>
-      <span>{{ value }}</span>
+      <span>{{ -value }}</span>
       <span v-if="score.afterText">{{ score.afterText }}</span>
     </span>
   </div>
