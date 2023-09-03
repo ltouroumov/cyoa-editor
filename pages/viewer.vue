@@ -22,14 +22,6 @@
             Worm V6 (Lt's Fork)
           </a>
         </li>
-        <li class="list-group-item">
-          <a
-            href="https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/xenon.json"
-            @click.prevent="loadRemoteFile"
-          >
-            Xenon (WIP)
-          </a>
-        </li>
       </ul>
 
       <div
