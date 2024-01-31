@@ -1,5 +1,9 @@
 <template>
-  <SideDrawer :visible="isBackpackVisible" side="right">
+  <SideDrawer
+    :visible="isBackpackVisible"
+    side="right"
+    @close="toggleBackpack()"
+  >
     <div class="pack-header bg-dark">
       <h5 class="m-0">Choices</h5>
       <button
@@ -13,7 +17,7 @@
       </div>
       <div v-for="{ row, choices } in packRows" :key="row.id" class="pack-row">
         <strong class="pack-row-title">
-          {{ row.title }} ({{ row.resultGroupId }})
+          {{ row.title }}
         </strong>
         <ul class="list-group list-group-flush">
           <li
@@ -22,6 +26,9 @@
             class="list-group-item choice"
           >
             {{ obj.title }}
+            <template v-if="obj.isSelectableMultiple">
+              (×{{ selected[obj.id] }})
+            </template>
           </li>
         </ul>
       </div>
@@ -38,20 +45,18 @@ import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 
 const { getObject, getObjectRow, getRow } = useProjectStore();
-const { selected, backpack } = useProjectRefs();
+const { selected, selectedIds, backpack } = useProjectRefs();
 const { toggleBackpack } = useViewerStore();
 const { isBackpackVisible } = useViewerRefs();
 
 const packRows = computed(() => {
+  const selectedChoices = R.map(
+    (id: string) => ({ obj: getObject(id), row: getRow(getObjectRow(id)) }),
+    selectedIds.value,
+  );
   const choicesByGroup: Partial<
     Record<string, { obj: ProjectObj; row: ProjectRow }[]>
-  > = R.groupBy(
-    ({ row }) => row.resultGroupId,
-    R.map(
-      (id: string) => ({ obj: getObject(id), row: getRow(getObjectRow(id)) }),
-      selected.value,
-    ),
-  );
+  > = R.groupBy(({ row }) => row.resultGroupId, selectedChoices);
 
   return R.chain(
     (row: ProjectRow) =>

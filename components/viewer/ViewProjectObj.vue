@@ -13,10 +13,33 @@
       />
       <div class="obj-content">
         <div class="obj-title">
-          <div
-            v-if="isSelected"
-            class="i-carbon-checkmark text-green-400 obj-title-icon"
-          ></div>
+          <template v-if="obj.isSelectableMultiple">
+            <div class="d-flex flex-row align-items-center obj-title-icon">
+              <div
+                class="i-carbon-subtract-alt"
+                :class="{
+                  'text-green-400': selectedAmount > minSelectedAmount,
+                  'text-grey-400': selectedAmount <= minSelectedAmount,
+                }"
+                @click="decrement"
+              />
+              <span class="mx-1">{{ selectedAmount }}</span>
+              <div
+                class="i-carbon-add-alt"
+                :class="{
+                  'text-green-400': selectedAmount < maxSelectedAmount,
+                  'text-grey-400': selectedAmount >= minSelectedAmount,
+                }"
+                @click="increment"
+              />
+            </div>
+          </template>
+          <template v-else>
+            <div
+              v-if="isSelected"
+              class="i-carbon-checkmark text-green-400 obj-title-icon"
+            />
+          </template>
           <span class="obj-title-text">{{ obj.title }}</span>
           <span class="obj-title-id">({{ obj.id }})</span>
         </div>
@@ -51,15 +74,34 @@ const objClass = (row: ProjectRow, obj: ProjectObj) => {
 };
 
 const store = useProjectStore();
-const { selected } = useProjectRefs();
+const { selectedIds, selected } = useProjectRefs();
 
 const condition = buildConditions(obj);
-const isEnabled = computed<boolean>(() => condition(selected.value));
-const isSelected = computed<boolean>(() => R.includes(obj.id, selected.value));
+const isEnabled = computed<boolean>(() => condition(selectedIds.value));
+const isSelected = computed<boolean>(() => R.has(obj.id, selected.value));
+
+const selectedAmount = computed(() => {
+  if (obj.isSelectableMultiple) return selected.value[obj.id] ?? 0;
+  else return 0;
+});
+
+const minSelectedAmount = Number.parseInt(obj.numMultipleTimesMinus);
+const maxSelectedAmount = Number.parseInt(obj.numMultipleTimesPluss);
 
 const toggle = () => {
-  if (isEnabled.value) {
+  if (isEnabled.value && !obj.isSelectableMultiple) {
     store.setSelected(obj.id, !isSelected.value);
+  }
+};
+
+const increment = () => {
+  if (isEnabled.value) {
+    store.incSelected(obj.id);
+  }
+};
+const decrement = () => {
+  if (isEnabled.value) {
+    store.decSelected(obj.id);
   }
 };
 </script>
@@ -96,7 +138,7 @@ const toggle = () => {
       margin-bottom: 5px;
 
       display: grid;
-      grid-template-columns: 50px 1fr 50px;
+      grid-template-columns: 1fr max-content 1fr;
       grid-template-rows: auto;
 
       .obj-title-icon {

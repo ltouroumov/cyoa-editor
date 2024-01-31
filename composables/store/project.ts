@@ -12,9 +12,12 @@ import {
   Score,
 } from '~/composables/project';
 
+export type Selections = Record<string, number>;
+
 export const useProjectStore = defineStore('project', () => {
-  const project = ref<ProjectFile | null>(null);
-  const selected = ref<string[]>([]);
+  const project = shallowRef<ProjectFile | null>(null);
+  const selected = ref<Selections>({});
+  const selectedIds = computed(() => R.keys(selected.value));
 
   const backpack: ComputedRef<ProjectRow[]> = computed(
     () => project.value?.data.backpack ?? [],
@@ -83,29 +86,56 @@ export const useProjectStore = defineStore('project', () => {
       const row = getRow.value(rowId);
       if (row.allowedChoices > 0) {
         const selectedRowObjects = R.intersection(
-          selected.value,
+          R.keys(selected.value),
           R.map(R.prop('id'), row.objects),
         );
 
         if (selectedRowObjects.length >= row.allowedChoices) {
           const toDeselect = selectedRowObjects[0];
           selected.value = R.pipe(
-            R.without([toDeselect]),
-            R.append(id),
+            R.dissoc(toDeselect),
+            R.assoc(id, 1),
           )(selected.value);
         } else {
-          selected.value = R.append(id, selected.value);
+          selected.value = R.assoc(id, 1, selected.value);
         }
       } else {
-        selected.value = R.append(id, selected.value);
+        selected.value = R.assoc(id, 1, selected.value);
       }
     } else {
-      selected.value = R.without([id], selected.value);
+      selected.value = R.dissoc(id, selected.value);
+    }
+  };
+  const incSelected = (id: string, incValue: number = 1) => {
+    if (!R.has(id, selected.value)) {
+      setSelected(id, true);
+    } else {
+      const obj = getObject.value(id);
+      const maxValue = Number.parseInt(obj.numMultipleTimesPluss);
+
+      const curValue = selected.value[id];
+      selected.value[id] = Math.min(curValue + incValue, maxValue);
+    }
+  };
+
+  const decSelected = (id: string, decValue: number = 1) => {
+    if (R.has(id, selected.value)) {
+      const obj = getObject.value(id);
+      const minValue = Number.parseInt(obj.numMultipleTimesMinus);
+
+      const curValue = selected.value[id];
+      const nextValue = Math.max(curValue - decValue, minValue);
+      if (nextValue <= 0) {
+        setSelected(id, false);
+      } else {
+        selected.value[id] = nextValue;
+      }
     }
   };
 
   const points = computed<Record<string, number>>(() => {
-    const _selected = selected.value;
+    const _selected = R.clone(selected.value);
+    const _selectedIds = R.clone(selectedIds.value);
 
     const startingSums: Record<string, number> = R.pipe(
       R.map(({ id, startingSum }: PointType): [string, number] => [
@@ -116,23 +146,30 @@ export const useProjectStore = defineStore('project', () => {
     )(pointTypes.value);
 
     return R.pipe(
-      R.map((id: string) => getObject.value(id)),
-      R.chain(({ scores }: ProjectObj) => {
+      R.keys,
+      R.map((id): { obj: ProjectObj; count: number } => ({
+        obj: getObject.value(id),
+        count: _selected[id],
+      })),
+
+      R.chain(({ obj, count }) => {
         return R.pipe(
           R.filter((score: Score) => {
             const cond = buildConditions(score);
-            return cond(_selected);
+            return cond(_selectedIds);
           }),
-          R.map(({ id, value }: Score): [string, number] => [
-            id,
-            Number.parseInt(value),
-          ]),
-        )(scores);
+          R.map(({ id, value }: Score): { id: string; value: number } => {
+            return {
+              id,
+              value: Number.parseInt(value) * count,
+            };
+          }),
+        )(obj.scores);
       }),
       R.reduceBy(
-        (acc, [_, value]) => acc + value,
+        (acc, { value }) => acc + value,
         0,
-        ([id, _]) => id,
+        ({ id }) => id,
       ),
       R.mergeWith(R.add, startingSums),
     )(_selected);
@@ -144,6 +181,7 @@ export const useProjectStore = defineStore('project', () => {
     backpack,
     pointTypes,
     selected,
+    selectedIds,
     points,
     isLoaded,
     loadProject,
@@ -152,6 +190,8 @@ export const useProjectStore = defineStore('project', () => {
     getObject,
     getObjectRow,
     setSelected,
+    incSelected,
+    decSelected,
   };
 });
 

@@ -1,6 +1,6 @@
 <template>
   <div class="project-row-wrapper">
-    <div v-if="isVisible" class="project-row">
+    <div :class="{ 'project-row': true, hidden: !isVisible }">
       <div class="row-meta">
         <div class="row-title">{{ row.title }}</div>
         <img
@@ -36,10 +36,10 @@ const { row } = defineProps<{
   row: ProjectRow;
 }>();
 
-const { selected } = useProjectRefs();
+const { selectedIds } = useProjectRefs();
 
 const condition = buildConditions(row);
-const isVisible = computed(() => condition(selected.value));
+const isVisible = computed(() => condition(selectedIds.value));
 </script>
 
 <style lang="scss">

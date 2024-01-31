@@ -32,7 +32,7 @@ const activeScores = computed<{ score: PointType; value: number }[]>(() => {
     R.filter(
       (score: PointType) =>
         R.isEmpty(score.activatedId) ||
-        R.includes(score.activatedId, selected.value),
+        R.has(score.activatedId, selected.value),
     ),
     R.map((score) => ({ score, value: points.value[score.id] ?? 0 })),
   )(scores);

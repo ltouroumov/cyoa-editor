@@ -15,10 +15,10 @@ const { req } = defineProps<{ req: ConditionTerm }>();
 
 const { getObject } = useProjectStore();
 
-const { selected } = useProjectRefs();
+const { selectedIds } = useProjectRefs();
 
 const condition = buildConditions(req);
-const isEnabled = computed<boolean>(() => condition(selected.value));
+const isEnabled = computed<boolean>(() => condition(selectedIds.value));
 </script>
 
 <style lang="scss">

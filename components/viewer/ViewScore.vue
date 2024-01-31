@@ -21,10 +21,10 @@ import { useProjectRefs } from '~/composables/store/project';
 
 const { score } = defineProps<{ score: Score }>();
 
-const { selected } = useProjectRefs();
+const { selectedIds } = useProjectRefs();
 
 const condition = buildConditions(score);
-const isEnabled = computed<boolean>(() => condition(selected.value));
+const isEnabled = computed<boolean>(() => condition(selectedIds.value));
 </script>
 
 <style lang="scss">

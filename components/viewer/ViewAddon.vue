@@ -15,11 +15,11 @@ import { useProjectRefs } from '~/composables/store/project';
 
 const { addon } = defineProps<{ addon: ObjAddon }>();
 
-const { selected } = useProjectRefs();
+const { selectedIds } = useProjectRefs();
 
 const condition = buildConditions(addon);
-const isEnabled = ref<boolean>(condition(selected.value));
-watch(selected, (newSelection) => {
+const isEnabled = ref<boolean>(condition(selectedIds.value));
+watch(selectedIds, (newSelection) => {
   isEnabled.value = condition(newSelection);
 });
 </script>

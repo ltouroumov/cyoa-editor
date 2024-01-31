@@ -43,6 +43,10 @@ export type ProjectObj = HasId &
     objectWidth?: string;
     scores: Score[];
     addons: ObjAddon[];
+
+    isSelectableMultiple: boolean;
+    numMultipleTimesMinus: string;
+    numMultipleTimesPluss: string;
   };
 
 export type ProjectRow = HasId &

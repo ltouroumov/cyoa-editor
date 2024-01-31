@@ -1,5 +1,9 @@
 <template>
-  <div class="drawer-base" :class="{ hidden: !visible }">
+  <div
+    class="drawer-base"
+    :class="{ hidden: !visible }"
+    @click="$emit('close')"
+  >
     <div class="drawer-container" :class="[`side-${side ?? 'left'}`]">
       <slot />
     </div>
@@ -11,6 +15,8 @@ const { visible, side } = defineProps<{
   visible: boolean;
   side: 'top' | 'right' | 'bottom' | 'left';
 }>();
+
+defineEmits<{ (e: 'close'): void }>();
 </script>
 
 <style lang="scss">
