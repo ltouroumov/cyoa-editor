@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   imports: { autoImport: true },
   css: [
     '@unocss/reset/normalize.css',
-    '~/assets/css/bootstrap.scss',
+    '~/assets/css/bootstrap/global.scss',
     '~/assets/css/main.css',
   ],
   plugins: [],

@@ -1,14 +1,17 @@
 <template>
-  <div v-if="project" class="project">
-    <div class="rows">
-      <ViewProjectRow
-        v-for="row in project.data.rows"
-        :key="row.id"
-        :row="row"
-      />
+  <div v-if="project">
+    <ViewMenuBar />
+    <div class="project">
+      <div class="rows">
+        <ViewProjectRow
+          v-for="row in project.data.rows"
+          :key="row.id"
+          :row="row"
+        />
+      </div>
     </div>
     <ViewBackpack />
-    <ScoreBar />
+    <ViewSearch />
   </div>
   <div v-else class="dialog-container">
     <div class="dialog bg-dark-subtle text-light">
@@ -23,7 +26,6 @@
           </a>
         </li>
       </ul>
-
       <div
         v-if="isLoading"
         class="d-flex align-items-center justify-content-start gap-3 mb-3"
@@ -42,8 +44,9 @@
 
 <script setup lang="ts">
 import { ref } from '#imports';
-import ScoreBar from '~/components/viewer/ScoreBar.vue';
-import ViewBackpack from '~/components/viewer/ViewBackpack.vue';
+import ViewBackpack from '~/components/viewer/modal/ViewBackpack.vue';
+import ViewSearch from '~/components/viewer/modal/ViewSearch.vue';
+import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
 const { loadProject } = useProjectStore();

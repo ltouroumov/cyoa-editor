@@ -7899,6 +7899,7 @@ __metadata:
     eslint-plugin-prettier: ^5.0.0
     eslint-plugin-unused-imports: ^3.0.0
     nuxt: ^3.6.5
+    perfect-debounce: ^1.0.0
     pinia: ^2.1.6
     prettier: ^3.0.2
     ramda: ^0.29.0
