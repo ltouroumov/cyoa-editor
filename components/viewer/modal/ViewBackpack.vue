@@ -1,45 +1,44 @@
 <template>
-  <SideDrawer
-    :visible="isBackpackVisible"
-    side="right"
-    @close="toggleBackpack()"
-  >
-    <div class="pack-header bg-dark">
+  <ModalDialog :show="isBackpackVisible" @close="toggleBackpack(false)">
+    <template #header>
       <h5 class="m-0">Choices</h5>
-      <button
-        class="btn btn-dark i-solar-backpack-outline"
-        @click="toggleBackpack()"
-      />
-    </div>
-    <div class="pack-content bg-dark flex-grow-1">
-      <div class="pack-scores">
-        <ViewScoreStatus vertical />
+    </template>
+    <template #default>
+      <div class="pack-content bg-dark flex-grow-1">
+        <div class="pack-scores">
+          <ViewScoreStatus vertical />
+        </div>
+        <div
+          v-for="{ row, choices } in packRows"
+          :key="row.id"
+          class="pack-row"
+        >
+          <strong class="pack-row-title">
+            {{ row.title }}
+          </strong>
+          <ul class="list-group list-group-flush">
+            <li
+              v-for="{ obj } in choices"
+              :key="obj.id"
+              class="list-group-item choice"
+            >
+              {{ obj.title }}
+              <template v-if="obj.isSelectableMultiple">
+                (×{{ selected[obj.id] }})
+              </template>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div v-for="{ row, choices } in packRows" :key="row.id" class="pack-row">
-        <strong class="pack-row-title">
-          {{ row.title }}
-        </strong>
-        <ul class="list-group list-group-flush">
-          <li
-            v-for="{ obj } in choices"
-            :key="obj.id"
-            class="list-group-item choice"
-          >
-            {{ obj.title }}
-            <template v-if="obj.isSelectableMultiple">
-              (×{{ selected[obj.id] }})
-            </template>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </SideDrawer>
+    </template>
+  </ModalDialog>
 </template>
 
 <script setup lang="ts">
 import * as R from 'ramda';
 import { computed } from 'vue';
 
+import ModalDialog from '~/components/utils/ModalDialog.vue';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
@@ -80,14 +79,19 @@ const packRows = computed(() => {
   overflow: auto;
 
   .pack-scores {
-    padding: 0 1em 1em 1em;
+    margin-bottom: 0.5rem;
   }
 
   .pack-row {
     padding: 0;
+
     .pack-row-title {
-      padding: 0 1rem;
-      font-size: 1.1em;
+      font-size: 1.1rem;
+    }
+
+    .choice {
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 }

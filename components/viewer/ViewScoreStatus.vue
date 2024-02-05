@@ -5,7 +5,7 @@
       :key="score.id"
       class="d-flex flex-row gap-2"
     >
-      <span v-if="score.beforeText">{{ score.beforeText }}</span>
+      <span v-if="score.beforeText && !short">{{ score.beforeText }}</span>
       <span>{{ -value }}</span>
       <span v-if="score.afterText">{{ score.afterText }}</span>
     </span>
@@ -19,8 +19,9 @@ import { computed } from 'vue';
 import { PointType } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 
-const { vertical } = defineProps<{
+const { vertical, short = true } = defineProps<{
   vertical?: boolean;
+  short?: boolean;
 }>();
 
 const { selected, pointTypes, points } = useProjectRefs();

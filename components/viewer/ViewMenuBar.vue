@@ -1,10 +1,12 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-dark-subtle text-white navbar-dark">
+  <nav
+    class="navbar fixed fixed-top navbar-expand-lg bg-dark-subtle text-white navbar-dark"
+  >
     <div class="container-fluid">
       <div class="d-flex flex-row items-center">
         <button class="btn btn-light btn-lg i-solar-hamburger-menu-outline" />
       </div>
-      <ViewScoreStatus />
+      <ViewScoreStatus short />
       <div class="d-flex gap-1">
         <button
           class="btn btn-light btn-lg i-solar-magnifer-outline"
