@@ -65,6 +65,14 @@ const searchText = ref<string>('');
 const searchResults = ref<ResultGroup[]>([]);
 const searchView = ref<ResultView | null>(null);
 
+watch(isSearchVisible, (newValue) => {
+  if (newValue === false) {
+    searchText.value = '';
+    searchResults.value = [];
+    searchView.value = null;
+  }
+});
+
 const search = debounce(() => {
   if (!project.value) return;
 
