@@ -22,5 +22,5 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-  modules: ['@unocss/nuxt', '@pinia/nuxt'],
+  modules: ['@unocss/nuxt', '@pinia/nuxt', '@vueuse/nuxt'],
 });

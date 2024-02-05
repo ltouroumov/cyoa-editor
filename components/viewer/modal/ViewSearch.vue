@@ -1,6 +1,6 @@
 <template>
   <div class="search-base" :class="{ hidden: !isSearchVisible }">
-    <div class="search-modal">
+    <div class="search-modal" :class="{ 'show-view': !!searchView }">
       <div class="search-header">
         <input
           v-model="searchText"
@@ -9,19 +9,34 @@
           @input="search"
         />
       </div>
-      <div class="search-results text-light">
+      <div class="search-result-list text-light">
         <div
           v-for="group in searchResults"
           :key="group.row.id"
           class="result-group"
         >
           <div class="group-title">{{ group.row.title }}</div>
-          <div v-for="obj in group.items" :key="obj.id" class="result-item">
+          <div
+            v-for="obj in group.items"
+            :key="obj.id"
+            class="result-item"
+            :class="{ selected: searchView?.obj.id === obj.id }"
+            @click="preview(obj, group.row)"
+          >
             {{ obj.title }}
           </div>
         </div>
       </div>
+      <div v-if="!!searchView" class="search-result-view text-light">
+        <ViewProjectObj
+          :key="searchView.obj.id"
+          :obj="searchView.obj"
+          :row="searchView.row"
+          preview
+        />
+      </div>
     </div>
+    <div class="search-shade" @click="toggleSearch(false)"></div>
   </div>
 </template>
 
@@ -31,8 +46,9 @@ import { isEmpty } from 'ramda';
 
 import { Project, ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
-import { useViewerRefs } from '~/composables/store/viewer';
+import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 
+const { toggleSearch } = useViewerStore();
 const { isSearchVisible } = useViewerRefs();
 const { project } = useProjectRefs();
 
@@ -40,13 +56,17 @@ type ResultGroup = {
   row: ProjectRow;
   items: ProjectObj[];
 };
+type ResultView = {
+  row: ProjectRow;
+  obj: ProjectObj;
+};
 
 const searchText = ref<string>('');
 const searchResults = ref<ResultGroup[]>([]);
+const searchView = ref<ResultView | null>(null);
+
 const search = debounce(() => {
   if (!project.value) return;
-
-  console.log('searching', searchText.value);
 
   const searchTextLC = searchText.value.toLowerCase();
   const results: ResultGroup[] = [];
@@ -77,6 +97,14 @@ const search = debounce(() => {
 
   searchResults.value = results;
 }, 200);
+
+const preview = (obj: ProjectObj, row: ProjectRow) => {
+  if (!!searchView.value && searchView.value.obj.id === obj.id) {
+    searchView.value = null;
+  } else {
+    searchView.value = { obj, row };
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -88,9 +116,6 @@ const search = debounce(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 9999;
-
-  background: rgba(50, 50, 50, 0.5);
 
   display: flex;
   justify-content: center;
@@ -101,26 +126,57 @@ const search = debounce(() => {
   }
 }
 
+.search-shade {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+
+  background: rgba(50, 50, 50, 0.5);
+}
+
 .search-modal {
   min-width: 200px;
   min-height: 200px;
-  width: 50%;
-  height: 70%;
+  width: 80%;
+  height: 80%;
 
   padding: 0.75em;
   border-radius: 1em;
   background: $body-bg-dark;
 
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 0.5em;
 
-  .search-results {
-    flex-grow: 1;
-    border: var(--bs-border-width) solid var(--bs-border-color);
-    border-radius: var(--bs-border-radius);
+  grid-template:
+    'header header' auto
+    'list list' 1fr
+    / 1fr 1fr;
 
+  &.show-view {
+    grid-template:
+      'header header' auto
+      'list view' 1fr
+      / 2fr 1fr;
+  }
+
+  .search-header {
+    grid-area: header;
+  }
+
+  .search-result-list {
+    grid-area: list;
     overflow: auto;
+  }
+
+  .search-result-view {
+    grid-area: view;
+    overflow: auto;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
   }
 
   .result-group {
@@ -131,6 +187,10 @@ const search = debounce(() => {
     }
     .result-item {
       padding: 0.2rem 0.5rem;
+
+      &.selected {
+        background: var(--bs-primary);
+      }
     }
   }
 }

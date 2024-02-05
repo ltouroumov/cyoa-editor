@@ -1,5 +1,5 @@
 <template>
-  <div v-if="project">
+  <div v-if="project" class="text-light">
     <ViewMenuBar />
     <div class="project">
       <div class="rows">

@@ -1,5 +1,5 @@
 <template>
-  <div class="col" :class="objClass(row, obj)">
+  <div :class="objClass">
     <div
       class="project-obj"
       :class="{ selected: isSelected, disabled: !isEnabled }"
@@ -61,23 +61,32 @@ import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
 
-const { row, obj } = defineProps<{
+const {
+  row,
+  obj,
+  preview = false,
+} = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
+  preview?: boolean;
 }>();
 
-const objClass = (row: ProjectRow, obj: ProjectObj) => {
-  let className = row.objectWidth;
-  if (obj.objectWidth) className = obj.objectWidth;
+const objClass = computed(() => {
+  if (preview) return [];
 
-  return { [className]: true };
-};
+  let className = row.objectWidth;
+  if (obj.objectWidth) {
+    className = obj.objectWidth;
+  }
+
+  return ['col', { [className]: true }];
+});
 
 const store = useProjectStore();
 const { selectedIds, selected } = useProjectRefs();
 
-const condition = buildConditions(obj);
-const isEnabled = computed<boolean>(() => condition(selectedIds.value));
+const condition = computed(() => buildConditions(obj));
+const isEnabled = computed<boolean>(() => condition.value(selectedIds.value));
 const isSelected = computed<boolean>(() => R.has(obj.id, selected.value));
 
 const selectedAmount = computed(() => {
@@ -85,8 +94,12 @@ const selectedAmount = computed(() => {
   else return 0;
 });
 
-const minSelectedAmount = Number.parseInt(obj.numMultipleTimesMinus);
-const maxSelectedAmount = Number.parseInt(obj.numMultipleTimesPluss);
+const minSelectedAmount = computed(() =>
+  Number.parseInt(obj.numMultipleTimesMinus),
+);
+const maxSelectedAmount = computed(() =>
+  Number.parseInt(obj.numMultipleTimesPluss),
+);
 
 const toggle = () => {
   if (isEnabled.value && !obj.isSelectableMultiple) {
@@ -131,6 +144,7 @@ const decrement = () => {
 
   .obj-content {
     padding: 0.5em;
+    overflow-x: auto;
 
     .obj-title {
       font-size: 1.2em;
