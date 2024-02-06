@@ -5,18 +5,21 @@
       :class="{ selected: isSelected, disabled: !isEnabled }"
       @click="toggle"
     >
-      <img
-        v-if="obj.image"
-        class="obj-image"
-        :src="obj.image"
-        :alt="obj.title"
-      />
-      <div class="obj-content">
-        <div class="obj-title">
+      <div class="project-obj-content">
+        <img
+          v-if="obj.image"
+          class="obj-image"
+          :src="obj.image"
+          :alt="obj.title"
+        />
+        <div class="obj-content">
+          <div class="obj-title">
+            <span class="obj-title-text">{{ obj.title }}</span>
+          </div>
           <template v-if="obj.isSelectableMultiple">
-            <div class="d-flex flex-row align-items-center obj-title-icon">
+            <div class="obj-select-multi">
               <div
-                class="i-carbon-subtract-alt"
+                class="i-carbon-subtract-alt text-xl"
                 :class="{
                   'text-green-400': selectedAmount > minSelectedAmount,
                   'text-grey-400': selectedAmount <= minSelectedAmount,
@@ -25,7 +28,7 @@
               />
               <span class="mx-1">{{ selectedAmount }}</span>
               <div
-                class="i-carbon-add-alt"
+                class="i-carbon-add-alt text-xl"
                 :class="{
                   'text-green-400': selectedAmount < maxSelectedAmount,
                   'text-grey-400': selectedAmount >= minSelectedAmount,
@@ -34,20 +37,16 @@
               />
             </div>
           </template>
-          <template v-else>
-            <div
-              v-if="isSelected"
-              class="i-carbon-checkmark text-green-400 obj-title-icon"
-            />
-          </template>
-          <span class="obj-title-text">{{ obj.title }}</span>
-          <span class="obj-title-id">({{ obj.id }})</span>
+          <ViewScores :scores="obj.scores" />
+          <ViewRequirements :requireds="obj.requireds" />
+          <div class="obj-text" v-html="formatText(obj.text)"></div>
         </div>
-        <ViewScores :scores="obj.scores" />
-        <ViewRequirements :requireds="obj.requireds" />
-        <div class="obj-text" v-html="formatText(obj.text)"></div>
+        <ViewAddon
+          v-for="(addon, idx) in obj.addons"
+          :key="idx"
+          :addon="addon"
+        />
       </div>
-      <ViewAddon v-for="(addon, idx) in obj.addons" :key="idx" :addon="addon" />
     </div>
   </div>
 </template>
@@ -65,14 +64,17 @@ const {
   row,
   obj,
   preview = false,
+  width = null,
 } = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
   preview?: boolean;
+  width?: string;
 }>();
 
 const objClass = computed(() => {
-  if (preview) return [];
+  if (preview) return ['obj-preview'];
+  if (width) return ['col', { [width]: true }];
 
   let className = row.objectWidth;
   if (obj.objectWidth) {
@@ -120,14 +122,24 @@ const decrement = () => {
 </script>
 
 <style lang="scss">
+@import '~/assets/css/bootstrap/_config.scss';
+
+.obj-preview {
+  overflow: auto;
+}
+
 .project-obj {
   height: 100%;
-  border: 2px solid white;
+  border: 1px solid white;
   border-radius: 1em;
   overflow: hidden;
 
   display: flex;
   flex-direction: column;
+
+  .project-obj-content {
+    overflow: auto;
+  }
 
   &.selected {
     background-color: #193c78ff;
@@ -138,8 +150,8 @@ const decrement = () => {
   }
 
   .obj-image {
-    margin-bottom: 5px;
     width: 100%;
+    aspect-ratio: 5/3;
   }
 
   .obj-content {
@@ -150,27 +162,19 @@ const decrement = () => {
       font-size: 1.2em;
       font-weight: bolder;
       margin-bottom: 5px;
+      text-align: center;
+    }
 
-      display: grid;
-      grid-template-columns: 1fr max-content 1fr;
-      grid-template-rows: auto;
+    .obj-select-multi {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 5px;
+    }
 
-      .obj-title-icon {
-        grid-column: 1 / span 1;
-        justify-self: left;
-      }
-
-      .obj-title-text {
-        grid-column: 2 / span 1;
-        justify-self: center;
-      }
-
-      .obj-title-id {
-        grid-column: 3 / span 1;
-        justify-self: right;
-        font-size: 0.7em;
-        color: gray;
-      }
+    .obj-text {
+      text-align: center;
     }
   }
 }

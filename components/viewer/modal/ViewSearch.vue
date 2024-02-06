@@ -1,48 +1,52 @@
 <template>
-  <div class="search-base" :class="{ hidden: !isSearchVisible }">
-    <div class="search-modal" :class="{ 'show-view': !!searchView }">
-      <div class="search-header">
-        <input
-          v-model="searchText"
-          class="form-control"
-          placeholder="Search CYOA"
-          @input="search"
-        />
-      </div>
-      <div class="search-result-list text-light">
-        <div
-          v-for="group in searchResults"
-          :key="group.row.id"
-          class="result-group"
-        >
-          <div class="group-title">{{ group.row.title }}</div>
+  <ModalDialog :show="isSearchVisible" @close="toggleSearch(false)">
+    <template #header>
+      <h5 class="m-0">Search</h5>
+    </template>
+    <template #default>
+      <div class="search-modal" :class="{ 'show-view': !!searchView }">
+        <div class="search-header">
+          <input
+            v-model="searchText"
+            class="form-control"
+            placeholder="Search CYOA"
+            @input="search"
+          />
+        </div>
+        <div class="search-result-list text-light">
           <div
-            v-for="obj in group.items"
-            :key="obj.id"
-            class="result-item"
-            :class="{ selected: searchView?.obj.id === obj.id }"
-            @click="preview(obj, group.row)"
+            v-for="group in searchResults"
+            :key="group.row.id"
+            class="result-group"
           >
-            {{ obj.title }}
+            <div class="group-title">{{ group.row.title }}</div>
+            <div
+              v-for="obj in group.items"
+              :key="obj.id"
+              class="result-item"
+              :class="{ selected: searchView?.obj.id === obj.id }"
+              @click="preview(obj, group.row)"
+            >
+              {{ obj.title }}
+            </div>
           </div>
         </div>
+        <div v-if="!!searchView" class="search-result-view text-light">
+          <ViewProjectObj
+            :key="searchView.obj.id"
+            :obj="searchView.obj"
+            :row="searchView.row"
+            preview
+          />
+        </div>
       </div>
-      <div v-if="!!searchView" class="search-result-view text-light">
-        <ViewProjectObj
-          :key="searchView.obj.id"
-          :obj="searchView.obj"
-          :row="searchView.row"
-          preview
-        />
-      </div>
-    </div>
-    <div class="search-shade" @click="toggleSearch(false)"></div>
-  </div>
+    </template>
+  </ModalDialog>
 </template>
 
 <script setup lang="ts">
 import { debounce } from 'perfect-debounce';
-import { isEmpty } from 'ramda';
+import { all, any, includes, isEmpty } from 'ramda';
 
 import { Project, ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
@@ -73,10 +77,46 @@ watch(isSearchVisible, (newValue) => {
   }
 });
 
+watch(searchText, (newValue) => {
+  if (newValue === '') {
+    searchView.value = null;
+  }
+});
+
+function createSearchFunction(searchText: string) {
+  const searchTerms = searchText.toLowerCase().split(/\s+/);
+
+  const matchesOne = (text: string): boolean => {
+    const textLC = text.toLowerCase();
+    return any((term) => includes(term, textLC), searchTerms);
+  };
+
+  const matchesAll = (text: string): boolean => {
+    const textLC = text.toLowerCase();
+    return all((term) => includes(term, textLC), searchTerms);
+  };
+
+  return (obj: ProjectObj): boolean => {
+    const idMatch = matchesOne(obj.id);
+    const titleMatch = matchesAll(obj.title);
+    const textMatch = matchesAll(obj.text);
+
+    const anyAddonMatch = any((addon) => {
+      const titleMatch = matchesAll(addon.title);
+      const textMatch = matchesAll(addon.text);
+      return titleMatch || textMatch;
+    }, obj.addons);
+
+    return idMatch || titleMatch || textMatch || anyAddonMatch;
+  };
+}
+
 const search = debounce(() => {
   if (!project.value) return;
 
   const searchTextLC = searchText.value.toLowerCase();
+  const searchFn = createSearchFunction(searchText.value);
+
   const results: ResultGroup[] = [];
 
   if (isEmpty(searchTextLC)) {
@@ -89,8 +129,8 @@ const search = debounce(() => {
     const _results: ProjectObj[] = [];
 
     for (const obj of row.objects) {
-      const titleLC = obj.title.toLowerCase();
-      if (titleLC.includes(searchTextLC)) {
+      const objMatch = searchFn(obj);
+      if (objMatch) {
         _results.push(obj);
       }
     }
@@ -118,43 +158,8 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 <style scoped lang="scss">
 @import '~/assets/css/bootstrap/config';
 
-.search-base {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &.hidden {
-    display: none;
-  }
-}
-
-.search-shade {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: -1;
-
-  background: rgba(50, 50, 50, 0.5);
-}
-
 .search-modal {
-  min-width: 200px;
-  min-height: 200px;
-  width: 80%;
-  height: 80%;
-
-  padding: 0.75em;
-  border-radius: 1em;
-  background: $body-bg-dark;
-
+  flex: 1 1 auto;
   display: grid;
   gap: 0.5em;
 
@@ -181,10 +186,10 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 
   .search-result-view {
     grid-area: view;
-    overflow: auto;
     display: flex;
     align-items: stretch;
     justify-content: stretch;
+    overflow: auto;
   }
 
   .result-group {

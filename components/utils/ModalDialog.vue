@@ -1,11 +1,16 @@
 <template>
-  <dialog ref="dialog" class="modal-window text-light">
+  <dialog
+    ref="dialog"
+    class="modal-window text-light"
+    :class="{ show: show }"
+    @cancel="onCancel"
+  >
     <div class="modal-content">
       <div class="modal-header">
         <slot name="header" />
         <button
           type="button"
-          class="btn-close"
+          class="btn-close btn-sm"
           aria-label="Close"
           @click="$emit('close')"
         ></button>
@@ -20,7 +25,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'close'): void;
 }>();
 
@@ -40,6 +45,11 @@ watch(
     }
   },
 );
+
+const onCancel = (event: Event) => {
+  event.preventDefault();
+  emit('close');
+};
 </script>
 
 <style scoped lang="scss">
@@ -77,11 +87,28 @@ dialog.modal-window {
   background: none;
 
   min-width: var(--bs-modal-width);
-  width: 60%;
+  min-height: $modal-sm;
+  width: 80%;
+  height: 80%;
+
+  display: none;
+  overflow: hidden;
+
+  &.show {
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+  }
 
   &::backdrop {
     background: var(--bs-backdrop-bg);
     opacity: var(--bs-backdrop-opacity);
+    overscroll-behavior: contain;
+  }
+
+  .modal-body {
+    display: flex;
+    overflow: auto;
   }
 }
 </style>

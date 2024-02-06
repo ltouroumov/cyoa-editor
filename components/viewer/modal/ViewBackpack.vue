@@ -9,25 +9,25 @@
           <ViewScoreStatus vertical />
         </div>
         <div
-          v-for="{ row, choices } in packRows"
-          :key="row.id"
+          v-for="{ packRow, choices } in packRows"
+          :key="packRow.id"
           class="pack-row"
         >
-          <strong class="pack-row-title">
-            {{ row.title }}
-          </strong>
-          <ul class="list-group list-group-flush">
-            <li
-              v-for="{ obj } in choices"
-              :key="obj.id"
-              class="list-group-item choice"
-            >
-              {{ obj.title }}
-              <template v-if="obj.isSelectableMultiple">
-                (×{{ selected[obj.id] }})
-              </template>
-            </li>
-          </ul>
+          <div class="pack-row-title">
+            {{ packRow.title }}
+          </div>
+          <div class="container-fluid p-0">
+            <div class="row g-2">
+              <ViewProjectObj
+                v-for="{ obj, row } in choices"
+                :key="obj.id"
+                :obj="obj"
+                :row="row"
+                :width="packRow.objectWidth"
+                :can-toggle="false"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </template>
@@ -60,7 +60,7 @@ const packRows = computed(() => {
   return R.chain(
     (row: ProjectRow) =>
       row.resultGroupId in choicesByGroup
-        ? [{ row, choices: choicesByGroup[row.resultGroupId] }]
+        ? [{ packRow: row, choices: choicesByGroup[row.resultGroupId] }]
         : [],
     backpack.value,
   );
@@ -84,9 +84,13 @@ const packRows = computed(() => {
 
   .pack-row {
     padding: 0;
+    margin-bottom: 0.5rem;
 
     .pack-row-title {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
+      font-weight: bolder;
+      text-align: center;
+      margin-bottom: 0.2rem;
     }
 
     .choice {

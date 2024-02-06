@@ -36,6 +36,11 @@ watch(selectedIds, (newSelection) => {
   .obj-title {
     font-size: 1em;
     font-weight: bold;
+    text-align: center;
+  }
+
+  .obj-text {
+    text-align: center;
   }
 }
 </style>
