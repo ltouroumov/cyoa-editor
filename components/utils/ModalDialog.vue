@@ -95,6 +95,7 @@ dialog.modal-window {
   overflow: hidden;
 
   &.show {
+    position: fixed;
     display: flex;
     align-items: stretch;
     justify-content: stretch;
