@@ -43,6 +43,8 @@ export type ProjectObj = HasId &
     objectWidth?: string;
     scores: Score[];
     addons: ObjAddon[];
+    activateOtherChoice: boolean;
+    activateThisChoice: string;
 
     isSelectableMultiple: boolean;
     numMultipleTimesMinus: string;
