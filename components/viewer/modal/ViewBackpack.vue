@@ -29,6 +29,23 @@
             </div>
           </div>
         </div>
+        <div class="pack-import-export">
+          <strong>Import / Export</strong>
+          <textarea class="export-code form-control" :value="exportCode" />
+          <button
+            class="export-btn btn btn-outline-primary"
+            @click="copyExportCode"
+          >
+            Copy to Clipboard
+          </button>
+          <textarea v-model="importCode" class="import-code form-control" />
+          <button
+            class="import-btn btn btn-outline-primary"
+            @click="readImportCode"
+          >
+            Import Build
+          </button>
+        </div>
       </div>
     </template>
   </ModalDialog>
@@ -40,7 +57,11 @@ import { computed } from 'vue';
 
 import ModalDialog from '~/components/utils/ModalDialog.vue';
 import { ProjectObj, ProjectRow } from '~/composables/project';
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import {
+  Selections,
+  useProjectRefs,
+  useProjectStore,
+} from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 
 const { getObject, getObjectRow, getRow } = useProjectStore();
@@ -65,6 +86,51 @@ const packRows = computed(() => {
     backpack.value,
   );
 });
+
+const importCode = ref<string>();
+const exportCode = computed<string>(() => {
+  return R.pipe(
+    R.map(([id, amt]) => (amt > 1 ? `${id}:${amt}` : id)),
+    R.join(';'),
+  )(R.toPairs(selected.value));
+});
+
+function copyExportCode() {
+  navigator.clipboard.writeText(exportCode.value);
+}
+
+const LEGACY_RX = /^(\w+(\/ON#\d+)?)(,(\w+(\/ON#\d+)?))*$/;
+function readImportCode() {
+  const _code = importCode.value;
+  console.log(`Import Code ${_code}`);
+  if (!_code) return;
+
+  const selections: Selections = {};
+  if (LEGACY_RX.test(_code)) {
+    console.log(`Legacy Import Mode`);
+    R.split(',', _code).forEach((part) => {
+      const sepIdx = part.indexOf('/ON#');
+      if (sepIdx === -1) {
+        selections[part] = 1;
+      } else {
+        const objId = part.substring(0, sepIdx);
+        const amountS = part.substring(sepIdx + 4);
+        selections[objId] = Number.parseInt(amountS);
+      }
+    });
+  } else {
+    R.split(';', _code).forEach((part) => {
+      const sepIdx = part.indexOf(':');
+      if (sepIdx === -1) {
+        selections[part] = 1;
+      } else {
+        const [objId, amountS] = R.split(':', part);
+        selections[objId] = Number.parseInt(amountS);
+      }
+    });
+  }
+  selected.value = selections;
+}
 </script>
 
 <style lang="scss">
@@ -76,7 +142,8 @@ const packRows = computed(() => {
 }
 
 .pack-content {
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   .pack-scores {
     margin-bottom: 0.5rem;
@@ -97,6 +164,34 @@ const packRows = computed(() => {
       padding-left: 0;
       padding-right: 0;
     }
+  }
+}
+
+.pack-import-export {
+  display: grid;
+  gap: 0.5rem;
+  grid-template:
+    'head head' auto
+    'in-txt out-txt' auto
+    'in-btn out-btn' auto
+    / 1fr 1fr;
+
+  strong {
+    grid-area: head;
+    display: block;
+    text-align: center;
+  }
+  .import-code {
+    grid-area: in-txt;
+  }
+  .export-code {
+    grid-area: out-txt;
+  }
+  .import-btn {
+    grid-area: in-btn;
+  }
+  .export-btn {
+    grid-area: out-btn;
   }
 }
 </style>
