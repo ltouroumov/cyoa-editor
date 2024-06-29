@@ -1,5 +1,9 @@
 <template>
-  <div class="obj-requirement" :class="{ disabled: !isEnabled }">
+  <div
+    v-if="req.showRequired"
+    class="obj-requirement"
+    :class="{ disabled: !isEnabled }"
+  >
     <span v-if="req.beforeText">{{ req.beforeText }}</span>
     <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
     <span v-if="req.afterText">{{ req.afterText }}</span>
