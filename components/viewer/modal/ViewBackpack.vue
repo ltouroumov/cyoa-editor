@@ -101,7 +101,7 @@ function copyExportCode() {
 
 const LEGACY_RX = /^(\w+(\/ON#\d+)?)(,(\w+(\/ON#\d+)?))*$/;
 function readImportCode() {
-  const _code = importCode.value;
+  const _code = importCode.value?.trim();
   console.log(`Import Code ${_code}`);
   if (!_code) return;
 
