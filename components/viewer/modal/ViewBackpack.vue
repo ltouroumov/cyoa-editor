@@ -130,6 +130,7 @@ function readImportCode() {
     });
   }
   selected.value = selections;
+  importCode.value = '';
 }
 </script>
 
