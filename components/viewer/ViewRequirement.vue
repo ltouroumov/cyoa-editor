@@ -11,12 +11,10 @@
     <div v-else-if="req.type === 'or'">
       <span v-for="(orReq, idx) in req.orRequired" :key="idx">
         <span v-if="idx > 0">, or</span>
-        {{ getObject(orReq.req).title ?? '???' }}
+        {{ getObject(orReq.req)?.title ?? '???' }}
       </span>
     </div>
-    <div v-else>
-      Unknown Condition
-    </div>
+    <div v-else>Unknown Condition</div>
     <span v-if="req.afterText">{{ req.afterText }}</span>
   </div>
 </template>
@@ -26,7 +24,7 @@ import { buildConditions } from '~/composables/conditions';
 import { ConditionTerm } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
-const { req, reqId } = defineProps<{ req: ConditionTerm; reqId?: string }>();
+const { req } = defineProps<{ req: ConditionTerm }>();
 
 const { getObject } = useProjectStore();
 
