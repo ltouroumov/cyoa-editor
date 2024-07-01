@@ -39,7 +39,6 @@
           </template>
           <ViewScores :scores="obj.scores" />
           <ViewRequirements :requireds="obj.requireds" />
-          <br />
           <div class="obj-text" v-html="formatText(obj.text)"></div>
         </div>
         <ViewAddon
@@ -182,6 +181,7 @@ const decrement = () => {
 
     .obj-text {
       text-align: center;
+      margin-top: 1rem;
     }
   }
 }
