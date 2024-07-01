@@ -181,6 +181,7 @@ const decrement = () => {
 
     .obj-text {
       text-align: center;
+      margin-top: 1rem;
     }
   }
 }

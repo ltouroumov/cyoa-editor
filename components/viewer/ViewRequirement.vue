@@ -5,7 +5,16 @@
     :class="{ disabled: !isEnabled }"
   >
     <span v-if="req.beforeText">{{ req.beforeText }}</span>
-    <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
+    <div v-if="req.type === 'id'">
+      <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
+    </div>
+    <div v-else-if="req.type === 'or'">
+      <span v-for="(orReq, idx) in req.orRequired" :key="idx">
+        <span v-if="idx > 0">, or</span>
+        {{ getObject(orReq.req)?.title ?? '???' }}
+      </span>
+    </div>
+    <div v-else>Unknown Condition</div>
     <span v-if="req.afterText">{{ req.afterText }}</span>
   </div>
 </template>
