@@ -19,7 +19,8 @@
       <ul class="list-group mb-3">
         <li class="list-group-item">
           <a
-            href="https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/project-v17.json"
+            href="#"
+            data-fileurl="https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/project-v17.json"
             @click.prevent="loadRemoteFile"
           >
             Worm V6 (Lt's Fork)
@@ -56,8 +57,9 @@ const isLoading = ref<boolean>(false);
 
 const loadRemoteFile = async ({ target }: MouseEvent) => {
   if (target && target instanceof HTMLAnchorElement) {
+    const fileURL = target.dataset.fileurl;
+    if (!fileURL) return;
     isLoading.value = true;
-    const fileURL = target.href;
     const result: any = await $fetch(fileURL, { parseResponse: JSON.parse });
     loadProject(result, fileURL);
     isLoading.value = false;
