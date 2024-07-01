@@ -36,8 +36,10 @@
             class="export-btn btn btn-outline-primary"
             :class="{ isCopied: isCopied }"
             @click="copyExportCode"
-            v-text="clipboardText"
-          ></button>
+          >
+            <span v-if="isCopied">Copied to Clipboard!</span>
+            <span v-else>Copy to Clipboard</span>
+          </button>
           <textarea v-model="importCode" class="import-code form-control" />
           <button
             class="import-btn btn btn-outline-primary"
@@ -95,15 +97,12 @@ const exportCode = computed<string>(() => {
   )(R.toPairs(selected.value));
 });
 
-const clipboardText = ref('Copy to Clipboard');
 const isCopied = ref(false);
 function copyExportCode() {
   navigator.clipboard.writeText(exportCode.value);
-  clipboardText.value = 'Copied to Clipboard!';
   isCopied.value = true;
 
   setTimeout(() => {
-    clipboardText.value = 'Copy to Clipboard';
     isCopied.value = false;
   }, 4000);
 }
