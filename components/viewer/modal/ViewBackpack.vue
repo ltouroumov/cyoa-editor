@@ -34,10 +34,10 @@
           <textarea class="export-code form-control" :value="exportCode" />
           <button
             class="export-btn btn btn-outline-primary"
+            :class="{ isCopied: isCopied }"
             @click="copyExportCode"
-          >
-            Copy to Clipboard
-          </button>
+            v-text="clipboardText"
+          ></button>
           <textarea v-model="importCode" class="import-code form-control" />
           <button
             class="import-btn btn btn-outline-primary"
@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import ModalDialog from '~/components/utils/ModalDialog.vue';
 import { ProjectObj, ProjectRow } from '~/composables/project';
@@ -95,8 +95,17 @@ const exportCode = computed<string>(() => {
   )(R.toPairs(selected.value));
 });
 
+const clipboardText = ref('Copy to Clipboard');
+const isCopied = ref(false);
 function copyExportCode() {
   navigator.clipboard.writeText(exportCode.value);
+  clipboardText.value = 'Copied to Clipboard!';
+  isCopied.value = true;
+
+  setTimeout(() => {
+    clipboardText.value = 'Copy to Clipboard';
+    isCopied.value = false;
+  }, 4000);
 }
 
 const LEGACY_RX = /^(\w+(\/ON#\d+)?)(,(\w+(\/ON#\d+)?))*$/;
@@ -193,6 +202,10 @@ function readImportCode() {
   }
   .export-btn {
     grid-area: out-btn;
+  }
+  .isCopied {
+    color: white;
+    background-color: green;
   }
 }
 </style>
