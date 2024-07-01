@@ -5,7 +5,12 @@
     :class="{ disabled: !isEnabled }"
   >
     <span v-if="req.beforeText">{{ req.beforeText }}</span>
-    <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
+    <div v-if="!reqId">
+      <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
+    </div>
+    <div v-else>
+      <span>{{ getObject(reqId!).title }}</span>
+    </div>
     <span v-if="req.afterText">{{ req.afterText }}</span>
   </div>
 </template>
@@ -15,7 +20,7 @@ import { buildConditions } from '~/composables/conditions';
 import { ConditionTerm } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
-const { req } = defineProps<{ req: ConditionTerm }>();
+const { req, reqId } = defineProps<{ req: ConditionTerm; reqId?: string }>();
 
 const { getObject } = useProjectStore();
 
