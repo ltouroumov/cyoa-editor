@@ -9,6 +9,7 @@
         <img
           v-if="obj.image"
           class="obj-image"
+          loading="lazy"
           :src="obj.image"
           :alt="obj.title"
         />
