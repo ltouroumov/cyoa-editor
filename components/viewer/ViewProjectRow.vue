@@ -2,13 +2,13 @@
   <div class="project-row-wrapper">
     <div :class="{ 'project-row': true, hidden: !isVisible }">
       <div class="row-meta">
-        <div class="row-title">{{ row.title }}</div>
         <img
           v-if="row.image"
           class="row-image"
           :src="row.image"
           :alt="row.title"
         />
+        <div class="row-title">{{ row.title }}</div>
         <div v-if="row.titleText" class="row-text">{{ row.titleText }}</div>
       </div>
       <div class="container-fluid p-0">
