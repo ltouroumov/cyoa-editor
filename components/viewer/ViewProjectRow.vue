@@ -1,5 +1,10 @@
 <template>
-  <div class="project-row-wrapper">
+  <div :id="`row-${row.id}`" class="project-row-wrapper">
+    <StyleRow
+      v-if="row.isPrivateStyling"
+      :styles="row.styling"
+      :row-id="row.id"
+    />
     <div :class="{ 'project-row': true, hidden: !isVisible }">
       <div class="row-meta">
         <div class="row-title">{{ row.title }}</div>
@@ -28,6 +33,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import StyleRow from '~/components/viewer/StyleRow.vue';
 import { buildConditions } from '~/composables/conditions';
 import { ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';

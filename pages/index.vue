@@ -10,6 +10,7 @@
         />
       </div>
     </div>
+    <StyleProject :styles="project.data.styling" />
     <ViewBackpack />
     <ViewSearch />
   </div>
@@ -47,6 +48,7 @@
 import { ref } from '#imports';
 import ViewBackpack from '~/components/viewer/modal/ViewBackpack.vue';
 import ViewSearch from '~/components/viewer/modal/ViewSearch.vue';
+import StyleProject from '~/components/viewer/StyleProject.vue';
 import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
@@ -69,9 +71,6 @@ const loadRemoteFile = async ({ target }: MouseEvent) => {
 
 <style lang="scss">
 .project {
-  background: black;
-  color: white;
-
   font-family: sans-serif;
   padding: 0 1em;
 }

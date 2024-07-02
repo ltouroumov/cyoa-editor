@@ -1,3 +1,32 @@
+export type AddonStyles = {
+  addonTitle: string;
+  addonText: string;
+};
+
+export type ObjStyles = {
+  objectTitle: string;
+  objectText: string;
+};
+
+export type RowStyles = ObjStyles &
+  AddonStyles & {
+    rowTitle: string;
+    rowText: string;
+    rowTitleColor: string;
+    rowTextColor: string;
+    rowBgColor: string;
+    rowBgColorIsOn: boolean;
+  };
+
+export type BarStyles = {
+  barTextFont: string;
+};
+
+export type ProjectStyles = RowStyles &
+  BarStyles & {
+    backgroundColor: string;
+  };
+
 export type ConditionTerm = {
   reqId: string;
   reqId1: string;
@@ -50,6 +79,9 @@ export type ProjectObj = HasId &
     isNotSelectable: boolean;
     numMultipleTimesMinus: string;
     numMultipleTimesPluss: string;
+
+    isPrivateStyling: boolean;
+    styling: ObjStyles;
   };
 
 export type ProjectRow = HasId &
@@ -66,6 +98,9 @@ export type ProjectRow = HasId &
     isInfoRow: boolean;
 
     objects: ProjectObj[];
+
+    isPrivateStyling: boolean;
+    styling: RowStyles;
   };
 
 export type PointType = {
@@ -81,6 +116,7 @@ export type Project = {
   rows: ProjectRow[];
   backpack: ProjectRow[];
   pointTypes: PointType[];
+  styling: ProjectStyles;
 };
 
 export type ProjectFile = {
