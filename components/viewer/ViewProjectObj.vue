@@ -2,7 +2,11 @@
   <div :class="objClass">
     <div
       class="project-obj"
-      :class="{ selected: isSelected, disabled: !isEnabled }"
+      :class="{
+        selected: isSelected,
+        disabled: !isEnabled,
+        notSelectable: obj.isNotSelectable || row.isInfoRow,
+      }"
       @click="toggle"
     >
       <div class="project-obj-content">
@@ -105,7 +109,12 @@ const maxSelectedAmount = computed(() =>
 );
 
 const toggle = () => {
-  if (isEnabled.value && !obj.isSelectableMultiple) {
+  if (
+    isEnabled.value &&
+    !obj.isSelectableMultiple &&
+    !obj.isNotSelectable &&
+    !row.isInfoRow
+  ) {
     if (obj.activateOtherChoice) {
       R.split(',', obj.activateThisChoice).forEach((id) => {
         store.setSelected(id, !isSelected.value);
@@ -154,6 +163,11 @@ const decrement = () => {
 
   &.disabled {
     background-color: gray;
+  }
+
+  &.notSelectable {
+    border: none;
+    border-radius: none;
   }
 
   .obj-image {
