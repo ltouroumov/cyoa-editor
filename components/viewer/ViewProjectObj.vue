@@ -105,7 +105,12 @@ const maxSelectedAmount = computed(() =>
 );
 
 const toggle = () => {
-  if (isEnabled.value && !obj.isSelectableMultiple) {
+  if (
+    isEnabled.value &&
+    !obj.isSelectableMultiple &&
+    !obj.isNotSelectable &&
+    !row.isInfoRow
+  ) {
     if (obj.activateOtherChoice) {
       R.split(',', obj.activateThisChoice).forEach((id) => {
         store.setSelected(id, !isSelected.value);

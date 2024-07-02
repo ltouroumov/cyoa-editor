@@ -47,6 +47,7 @@ export type ProjectObj = HasId &
     activateThisChoice: string;
 
     isSelectableMultiple: boolean;
+    isNotSelectable: boolean;
     numMultipleTimesMinus: string;
     numMultipleTimesPluss: string;
   };
@@ -62,6 +63,7 @@ export type ProjectRow = HasId &
 
     resultGroupId: string;
     allowedChoices: number;
+    isInfoRow: boolean;
 
     objects: ProjectObj[];
   };
