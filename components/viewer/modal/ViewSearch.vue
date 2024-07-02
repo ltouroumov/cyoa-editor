@@ -7,6 +7,7 @@
       <div class="search-modal" :class="{ 'show-view': !!searchView }">
         <div class="search-header">
           <input
+            ref="searchInput"
             v-model="searchText"
             class="form-control"
             placeholder="Search CYOA"
@@ -69,11 +70,18 @@ const searchText = ref<string>('');
 const searchResults = ref<ResultGroup[]>([]);
 const searchView = ref<ResultView | null>(null);
 
+const searchInput = ref<HTMLInputElement>();
 watch(isSearchVisible, (newValue) => {
   if (newValue === false) {
     searchText.value = '';
     searchResults.value = [];
     searchView.value = null;
+  } else {
+    nextTick(() => {
+      if (searchInput.value !== undefined) {
+        searchInput.value.focus();
+      }
+    });
   }
 });
 

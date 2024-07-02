@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="req.showRequired"
+    v-if="req.showRequired || !req.id"
     class="obj-requirement"
     :class="{ disabled: !isEnabled }"
   >
