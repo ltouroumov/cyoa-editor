@@ -1,4 +1,5 @@
 export type ConditionTerm = {
+  id: string;
   reqId: string;
   reqId1: string;
   reqId2: string;
