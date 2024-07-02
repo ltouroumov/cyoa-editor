@@ -61,6 +61,7 @@ const isVisible = computed(() => condition(selectedIds.value));
 
     .row-text {
       padding: 5px;
+      text-align: center;
     }
   }
 }
