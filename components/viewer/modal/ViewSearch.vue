@@ -7,6 +7,7 @@
       <div class="search-modal" :class="{ 'show-view': !!searchView }">
         <div class="search-header">
           <input
+            id="search-input"
             v-model="searchText"
             class="form-control"
             placeholder="Search CYOA"

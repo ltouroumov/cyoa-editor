@@ -10,7 +10,7 @@
       <div class="d-flex gap-1">
         <button
           class="btn btn-light btn-lg i-solar-magnifer-outline"
-          @click="toggleSearch(true)"
+          @click="toggleSearchWrapper(true)"
         />
         <button
           class="btn btn-light btn-lg i-solar-backpack-outline"
@@ -23,9 +23,20 @@
 
 <script setup lang="ts">
 import ViewScoreStatus from '~/components/viewer/ViewScoreStatus.vue';
-import { useViewerStore } from '~/composables/store/viewer';
+import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 
 const { toggleBackpack, toggleSearch } = useViewerStore();
+const { isSearchVisible } = useViewerRefs();
+
+const toggleSearchWrapper = (show: boolean) => {
+  toggleSearch(show);
+
+  nextTick(() => {
+    if (isSearchVisible.value) {
+      document.getElementById('search-input')?.focus();
+    }
+  });
+};
 </script>
 
 <style scoped lang="scss"></style>
