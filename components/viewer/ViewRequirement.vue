@@ -10,8 +10,10 @@
     </div>
     <div v-else-if="req.type === 'or'">
       <span v-for="(orReq, idx) in req.orRequired" :key="idx">
-        <span v-if="idx > 0">, or</span>
-        {{ getObject(orReq.req)?.title ?? '???' }}
+        <div v-if="orReq.req">
+          <span v-if="idx > 0">, or</span>
+          {{ getObject(orReq.req)?.title ?? '???' }}
+        </div>
       </span>
     </div>
     <div v-else>Unknown Condition</div>
