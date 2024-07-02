@@ -76,9 +76,7 @@ watch(isSearchVisible, (newValue) => {
     searchText.value = '';
     searchResults.value = [];
     searchView.value = null;
-  }
-
-  if (newValue) {
+  } else {
     nextTick(() => {
       if (searchInput.value !== undefined) {
         searchInput.value.focus();
