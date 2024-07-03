@@ -3,7 +3,7 @@
     <span
       v-for="{ score, value } in activeScores"
       :key="score.id"
-      class="d-flex flex-row gap-2"
+      class="d-flex flex-row gap-2 score"
     >
       <span v-if="score.beforeText && !short">{{ score.beforeText }}</span>
       <span>{{ -value }}</span>
@@ -39,3 +39,8 @@ const activeScores = computed<{ score: PointType; value: number }[]>(() => {
   )(scores);
 });
 </script>
+<style land="scss">
+.score {
+  padding-right: 25px;
+}
+</style>
