@@ -84,7 +84,8 @@ export const useProjectStore = defineStore('project', () => {
     if (isSelected) {
       const rowId = getObjectRow.value(id);
       const row = getRow.value(rowId);
-      if (row.allowedChoices > 0) {
+      const obj = getObject.value(id);
+      if (row.allowedChoices > 0 && !obj.isSelectableMultiple) {
         const selectedRowObjects = R.intersection(
           R.keys(selected.value),
           R.map(R.prop('id'), row.objects),
