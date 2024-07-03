@@ -150,6 +150,11 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       border: none;
       {{/if}}
       
+      {{#if objectHeight}}
+      d-flex;
+      height: 100%;
+      {{/if}}
+      
       {{#if selBgColorIsOn}}
       &.selected {
         background-color: {{selFilterBgColor}}

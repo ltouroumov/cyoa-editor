@@ -52,6 +52,7 @@ export type ObjStyles = ScoreStyles & {
   objectImgBorderIsOn: boolean;
 
   objectMargin: number;
+  objectHeight: boolean;
 
   selBgColorIsOn: boolean;
   selFilterBgColor: string;
