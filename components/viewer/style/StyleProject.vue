@@ -4,13 +4,22 @@
 
 <script setup lang="ts">
 import DynamicStyles from '~/components/utils/DynamicStyles.vue';
+import {
+  ObjStylesGen,
+  ProjectStylesGen,
+  RowStylesGen,
+  createStyles,
+} from '~/components/viewer/style/engine';
 import { ProjectStyles } from '~/composables/project';
 
 const { styles } = defineProps<{ styles: ProjectStyles }>();
 
+const generators = [
+  new ProjectStylesGen(),
+  new RowStylesGen(),
+  new ObjStylesGen(),
+];
 const stylesheet = computed(() => {
-  const parts = [];
-  parts.push(`.project { background-color: ${styles.backgroundColor}; }`);
-  return parts.join('\n');
+  return createStyles(styles, generators);
 });
 </script>

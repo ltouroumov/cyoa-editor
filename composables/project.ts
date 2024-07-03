@@ -6,6 +6,28 @@ export type AddonStyles = {
 export type ObjStyles = {
   objectTitle: string;
   objectText: string;
+
+  objectTitleColor: string;
+  objectTextColor: string;
+
+  objectBgColorIsOn: boolean;
+  objectBgColor: string;
+
+  objectBorderIsOn: boolean;
+  objectBorderColor: string;
+  objectBorderStyle: string;
+  objectBorderWidth: number;
+  objectBorderRadiusTopLeft: string;
+  objectBorderRadiusTopRight: string;
+  objectBorderRadiusBottomRight: string;
+  objectBorderRadiusBottomLeft: string;
+  objectBorderRadiusIsPixels: boolean;
+
+  selBgColorIsOn: boolean;
+  selFilterBgColor: string;
+
+  reqBgColorIsOn: boolean;
+  reqFilterBgColor: string;
 };
 
 export type RowStyles = ObjStyles &

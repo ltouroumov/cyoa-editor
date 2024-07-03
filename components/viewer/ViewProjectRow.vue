@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import StyleRow from '~/components/viewer/StyleRow.vue';
+import StyleRow from '~/components/viewer/style/StyleRow.vue';
 import { buildConditions } from '~/composables/conditions';
 import { ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';

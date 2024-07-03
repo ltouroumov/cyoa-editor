@@ -75,7 +75,7 @@
 import { ref } from '#imports';
 import ViewBackpack from '~/components/viewer/modal/ViewBackpack.vue';
 import ViewSearch from '~/components/viewer/modal/ViewSearch.vue';
-import StyleProject from '~/components/viewer/StyleProject.vue';
+import StyleProject from '~/components/viewer/style/StyleProject.vue';
 import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 

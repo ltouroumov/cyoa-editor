@@ -38,6 +38,7 @@
     "@vueuse/core": "^10.7.2",
     "@vueuse/nuxt": "^10.7.2",
     "bootstrap": "5.3.*",
+    "handlebars": "^4.7.8",
     "perfect-debounce": "^1.0.0",
     "pinia": "^2.1.6",
     "ramda": "^0.29.0",
