@@ -4,20 +4,17 @@
 
 <script setup lang="ts">
 import DynamicStyles from '~/components/utils/DynamicStyles.vue';
+import {
+  ObjStylesGen,
+  RowStylesGen,
+  createStyles,
+} from '~/components/viewer/style/engine';
 import { RowStyles } from '~/composables/project';
 
-const { styles, rowId } = defineProps<{ styles: RowStyles; rowId: string }>();
+const { styles } = defineProps<{ styles: RowStyles }>();
 
+const generators = [new RowStylesGen(), new ObjStylesGen()];
 const stylesheet = computed(() => {
-  const parts = [];
-  if (styles.rowBgColorIsOn) {
-    parts.push(`.project-row { background-color: ${styles.rowBgColor}; }`);
-  }
-
-  if (parts.length > 0) {
-    return `#row-${rowId} { ${parts.join('\n')} }`;
-  } else {
-    return '';
-  }
+  return createStyles(styles, generators);
 });
 </script>

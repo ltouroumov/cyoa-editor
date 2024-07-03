@@ -1,10 +1,6 @@
 <template>
   <div :id="`row-${row.id}`" class="project-row-wrapper">
-    <StyleRow
-      v-if="row.isPrivateStyling"
-      :styles="row.styling"
-      :row-id="row.id"
-    />
+    <StyleRow v-if="row.isPrivateStyling" :styles="row.styling" />
     <div :class="{ 'project-row': true, hidden: !isVisible }">
       <div class="row-meta">
         <img

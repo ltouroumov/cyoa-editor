@@ -1,5 +1,9 @@
 <template>
-  <div :class="objClass">
+  <div
+    :id="`row-${row.id}`"
+    :class="[`obj-${obj.id}`, `row-${row.id}`, objClass]"
+  >
+    <StyleObj v-if="obj.isPrivateStyling" :styles="obj.styling" />
     <div
       class="project-obj"
       :class="{
@@ -64,6 +68,8 @@ import { buildConditions } from '~/composables/conditions';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
+
+import StyleObj from './style/StyleObj.vue';
 
 const {
   row,
