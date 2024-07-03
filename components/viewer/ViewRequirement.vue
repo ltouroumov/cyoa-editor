@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="req.showRequired || !req.id"
+    v-if="req.showRequired || showAlways"
     class="obj-requirement"
     :class="{ disabled: !isEnabled }"
   >
@@ -26,7 +26,10 @@ import { buildConditions } from '~/composables/conditions';
 import { ConditionTerm } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
-const { req } = defineProps<{ req: ConditionTerm }>();
+const { req, showAlways } = defineProps<{
+  req: ConditionTerm;
+  showAlways?: boolean;
+}>();
 
 const { getObject } = useProjectStore();
 

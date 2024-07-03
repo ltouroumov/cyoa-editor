@@ -1,7 +1,7 @@
 <template>
   <div class="obj-addon" :class="{ disabled: !isEnabled }">
     <div class="obj-title">{{ addon.title }}</div>
-    <ViewRequirements :requireds="addon.requireds" />
+    <ViewRequirements :requireds="addon.requireds" :show-always="true" />
     <div class="obj-text">{{ addon.text }}</div>
   </div>
 </template>

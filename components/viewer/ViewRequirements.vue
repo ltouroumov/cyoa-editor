@@ -1,6 +1,11 @@
 <template>
   <div v-if="requireds.length > 0" class="obj-requirements">
-    <ViewRequirement v-for="(req, idx) in requireds" :key="idx" :req="req" />
+    <ViewRequirement
+      v-for="(req, idx) in requireds"
+      :key="idx"
+      :req="req"
+      :show-always="showAlways"
+    />
   </div>
 </template>
 
@@ -8,7 +13,7 @@
 import ViewRequirement from '~/components/viewer/ViewRequirement.vue';
 import { ConditionTerm } from '~/composables/project';
 
-defineProps<{ requireds: ConditionTerm[] }>();
+defineProps<{ requireds: ConditionTerm[]; showAlways?: boolean }>();
 </script>
 
 <style lang="scss">
