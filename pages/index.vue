@@ -21,10 +21,31 @@
         <li class="list-group-item">
           <a
             href="#"
+            data-fileurl="https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.0.json"
+            @click.prevent="loadRemoteFile"
+          >
+            Worm V6.0 (Pixel's Version)
+          </a>
+          <a
+            href="#"
+            data-fileurl="https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.1.json"
+            @click.prevent="loadRemoteFile"
+          >
+            Worm V6.1 (Pixel's Version)
+          </a>
+          <a
+            href="#"
             data-fileurl="https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/project-v17.json"
             @click.prevent="loadRemoteFile"
           >
             Worm V6 (Lt's Fork)
+          </a>
+          <a
+            href="#"
+            data-fileurl="https://raw.githubusercontent.com/ltouroumov/pathfinder-cyoa/main/project-v0.json"
+            @click.prevent="loadRemoteFile"
+          >
+            Pathfinder CYOA (WIP by Lt Ouroumov)
           </a>
         </li>
       </ul>
