@@ -6,7 +6,7 @@
       <div class="d-flex flex-row items-center">
         <button class="btn btn-light btn-lg i-solar-hamburger-menu-outline" />
       </div>
-      <ViewScoreStatus short />
+      <ViewScoreStatus />
       <div class="d-flex gap-1">
         <button
           class="btn btn-light btn-lg i-solar-magnifer-outline"
