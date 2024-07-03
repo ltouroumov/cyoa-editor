@@ -109,6 +109,8 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       border-top-right-radius: {{objectBorderRadiusTopRight}}{{objectBorderRadiusUnit}};
       border-bottom-left-radius: {{objectBorderRadiusBottomLeft}}{{objectBorderRadiusUnit}};
       border-bottom-right-radius: {{objectBorderRadiusBottomRight}}{{objectBorderRadiusUnit}};
+      {{else}}
+      border: none;
       {{/if}}
       
       {{#if selBgColorIsOn}}
