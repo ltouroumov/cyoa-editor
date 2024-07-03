@@ -1,27 +1,57 @@
-export type AddonStyles = {
-  addonTitle: string;
-  addonText: string;
+type TextAlignT = 'left' | 'center' | 'right';
+
+export type ScoreStyles = {
+  scoreText: string;
+  scoreTextAlign: TextAlignT;
+  scoreTextColor: string;
+  scoreTextSize: number;
 };
 
-export type ObjStyles = {
+export type AddonStyles = {
+  addonText: string;
+  addonTextAlign: TextAlignT;
+  addonTextColor: string;
+  addonTextTextSize: number;
+  addonTitle: string;
+  addonTitleAlign: TextAlignT;
+  addonTitleColor: string;
+  addonTitleTextSize: number;
+};
+
+export type ObjStyles = ScoreStyles & {
   objectTitle: string;
   objectText: string;
+  objectTextAlign: TextAlignT;
+  objectTextPadding: 10;
+  objectTextTextSize: 100;
 
   objectTitleColor: string;
   objectTextColor: string;
+  objectTitleAlign: TextAlignT;
+  objectTitleTextSize: 200;
 
   objectBgColorIsOn: boolean;
   objectBgColor: string;
+  objectBackgroundImage: string;
 
   objectBorderIsOn: boolean;
   objectBorderColor: string;
   objectBorderStyle: string;
   objectBorderWidth: number;
-  objectBorderRadiusTopLeft: string;
-  objectBorderRadiusTopRight: string;
-  objectBorderRadiusBottomRight: string;
-  objectBorderRadiusBottomLeft: string;
+  objectBorderRadiusTopLeft: string | number;
+  objectBorderRadiusTopRight: string | number;
+  objectBorderRadiusBottomRight: string | number;
+  objectBorderRadiusBottomLeft: string | number;
   objectBorderRadiusIsPixels: boolean;
+
+  objectImageMarginBottom: number;
+  objectImageMarginTop: number;
+  objectImageWidth: number;
+
+  objectImgBorderColor: string;
+  objectImgBorderIsOn: boolean;
+
+  objectMargin: number;
 
   selBgColorIsOn: boolean;
   selFilterBgColor: string;
@@ -33,11 +63,38 @@ export type ObjStyles = {
 export type RowStyles = ObjStyles &
   AddonStyles & {
     rowTitle: string;
-    rowText: string;
     rowTitleColor: string;
+    rowTitleAlign: TextAlignT;
+    rowTitleTextSize: number;
+
+    rowText: string;
     rowTextColor: string;
+    rowTextAlign: TextAlignT;
+    rowTextPaddingX: number;
+    rowTextPaddingY: number;
+    rowTextTextSize: number;
+
     rowBgColor: string;
     rowBgColorIsOn: boolean;
+    rowBackgroundImage: string;
+
+    rowBodyMarginBottom: number | string;
+    rowBodyMarginSides: number | string;
+    rowBodyMarginTop: number | string;
+
+    rowBorderColor: string;
+    rowBorderIsOn: false;
+    rowBorderStyle: string;
+    rowBorderWidth: number;
+
+    rowImageMarginTop: number;
+    rowImageWidth: number;
+    rowImgBorderColor: string;
+    rowImgBorderIsOn: boolean;
+    rowImgBorderStyle: string;
+    rowImgBorderWidth: number;
+
+    rowMargin: number;
   };
 
 export type BarStyles = {
