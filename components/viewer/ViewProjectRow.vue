@@ -50,6 +50,10 @@ const isVisible = computed(() => condition(selectedIds.value));
 
 <style lang="scss">
 .project-row {
+  // Prevents collapsing margins with .row-body
+  display: flex;
+  flex-direction: column;
+
   &.hidden {
     display: none;
   }
