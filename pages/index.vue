@@ -100,6 +100,12 @@ const loadRemoteFile = async ({ target }: MouseEvent) => {
 .project {
   font-family: sans-serif;
   padding: 0 1em;
+
+  .rows {
+    // Prevents collapsing margins
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .dialog-container {

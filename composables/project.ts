@@ -20,15 +20,20 @@ export type AddonStyles = {
 
 export type ObjStyles = ScoreStyles & {
   objectTitle: string;
+  objectTitleTextSize: 200;
+  objectTitleColor: string;
+  objectTitleAlign: TextAlignT;
+
   objectText: string;
+  objectTextTextSize: 100;
   objectTextAlign: TextAlignT;
   objectTextPadding: 10;
-  objectTextTextSize: 100;
 
-  objectTitleColor: string;
+  objectImageWidth: number;
+  objectImageMarginTop: number;
+  objectImageMarginBottom: number;
+
   objectTextColor: string;
-  objectTitleAlign: TextAlignT;
-  objectTitleTextSize: 200;
 
   objectBgColorIsOn: boolean;
   objectBgColor: string;
@@ -44,14 +49,11 @@ export type ObjStyles = ScoreStyles & {
   objectBorderRadiusBottomLeft: string | number;
   objectBorderRadiusIsPixels: boolean;
 
-  objectImageMarginBottom: number;
-  objectImageMarginTop: number;
-  objectImageWidth: number;
-
   objectImgBorderColor: string;
   objectImgBorderIsOn: boolean;
 
   objectMargin: number;
+  objectHeight: boolean;
 
   selBgColorIsOn: boolean;
   selFilterBgColor: string;
@@ -86,6 +88,7 @@ export type RowStyles = ObjStyles &
     rowBorderIsOn: false;
     rowBorderStyle: string;
     rowBorderWidth: number;
+    rowOverFlowIsOn: boolean;
 
     rowImageMarginTop: number;
     rowImageWidth: number;

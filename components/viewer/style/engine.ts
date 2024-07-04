@@ -64,13 +64,20 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   name = 'row';
 
   private readonly _template;
-  constructor() {
+  private readonly _options;
+  constructor(options: { container?: string } = {}) {
     super();
+    this._options = options;
     this._template = Handlebars.compile(RowStylesGen.TEMPLATE);
   }
 
-  gen(styling: ObjStyles): string {
-    return this._template(styling);
+  gen(styling: RowStyles): string {
+    const styles = this._template(styling);
+    if (this._options.container) {
+      return `${this._options.container} { ${styles} }`;
+    } else {
+      return styles;
+    }
   }
 
   static TEMPLATE: string = `
@@ -81,6 +88,7 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       
       font-family: {{rowText}};
       color: {{rowTextColor}};
+      
       .row-title {
         font-family: {{rowTitle}};
         font-size: {{rowTitleTextSize}}%;
@@ -92,6 +100,18 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
         text-align: {{rowTextAlign}};
         padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}px;
       }
+      .row-image {
+        width: {{rowImageWidth}}%;
+        margin-top: {{rowImageMarginTop}}px;
+      }
+      .row-body {
+        margin-top: {{rowBodyMarginTop}}px;
+        margin-bottom: {{rowBodyMarginBottom}}px;
+        margin-left: {{rowBodyMarginSides}}px;
+        margin-right: {{rowBodyMarginSides}}px;
+      }
+
+      margin: {{rowMargin}}px;
     }
   `;
 }
@@ -100,8 +120,10 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
   name = 'obj';
 
   private readonly _template;
-  constructor() {
+  private readonly _options;
+  constructor(options: { container?: string } = {}) {
     super();
+    this._options = options;
     this._template = Handlebars.compile(ObjStylesGen.TEMPLATE);
   }
 
@@ -123,7 +145,13 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         'objectBorderRadiusBottomRight',
       ),
     });
-    return this._template(computed);
+
+    const styles = this._template(computed);
+    if (this._options.container) {
+      return `${this._options.container} { ${styles} }`;
+    } else {
+      return styles;
+    }
   }
 
   static TEMPLATE: string = `
@@ -132,11 +160,25 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       background-color: {{objectBgColor}};
       {{/if}}
       
+      font-family: {{objectText}};
       color: {{objectTextColor}};
-      .object-title {
+      .obj-title {
+        font-family: {{objectTitle}};
+        font-size: {{objectTitleTextSize}}%;
         color: {{objectTitleColor}};
+        text-align: {{objectTitleAlign}};
       }
-      
+      .obj-text {
+        font-size: {{objectTextTextSize}}%;
+        text-align: {{objectTextAlign}};
+      }
+      .obj-image {
+        width: {{objectImageWidth}}%;
+        margin-top: {{objectImageMarginTop}}px;
+        margin-bottom: {{objectImageMarginBottom}}px;
+        object-fit: cover;
+      }
+
       {{#if objectBorderIsOn}}
       border-color: {{objectBorderColor}};
       border-style: {{objectBorderStyle}};
