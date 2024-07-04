@@ -1,4 +1,5 @@
 @import "bootstrap/scss/mixins/banner";
+
 @include bsBanner("");
 
 // Configuration
@@ -9,8 +10,14 @@
 @import "bootstrap/scss/mixins";
 @import "bootstrap/scss/utilities";
 
-// Helpers
-@import "bootstrap/scss/helpers";
+$widths: map-merge(
+    map-get(map-get($utilities, "width"), "values"),
+    (20: 20%, 14: 14%, 12: 12%, 11: 11%, 10: 10%, 9: 9%)
+);
 
 // Utilities
+@import "utils/width";
 @import "bootstrap/scss/utilities/api";
+
+// Helpers
+@import "bootstrap/scss/helpers";
