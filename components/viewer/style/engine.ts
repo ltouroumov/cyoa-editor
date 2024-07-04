@@ -69,7 +69,7 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
     this._template = Handlebars.compile(RowStylesGen.TEMPLATE);
   }
 
-  gen(styling: ObjStyles): string {
+  gen(styling: RowStyles): string {
     return this._template(styling);
   }
 
