@@ -14,7 +14,7 @@
           :alt="row.title"
         />
         <div class="row-title">{{ row.title }}</div>
-        <div v-if="row.titleText" class="row-text">{{ row.titleText }}</div>
+        <div v-if="row.titleText" class="row-text" v-html="row.titleText" />
       </div>
       <div class="container-fluid p-0">
         <div class="row g-2">
