@@ -144,7 +144,7 @@ const decrement = () => {
 </script>
 
 <style lang="scss">
-@import '~/assets/css/bootstrap/_config.scss';
+@import '~/assets/css/bootstrap/global.scss';
 
 .obj-preview {
   overflow: auto;
