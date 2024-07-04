@@ -1,6 +1,10 @@
 <template>
   <div :id="`row-${row.id}`" class="project-row-wrapper">
-    <StyleRow v-if="row.isPrivateStyling" :styles="row.styling" />
+    <StyleRow
+      v-if="row.isPrivateStyling"
+      :styles="row.styling"
+      row-id="row.id"
+    />
     <div class="project-row" :class="{ hidden: !isVisible }">
       <div class="row-body">
         <img
@@ -48,6 +52,11 @@ const isVisible = computed(() => condition(selectedIds.value));
 .project-row {
   &.hidden {
     display: none;
+  }
+
+  .row-meta {
+    display: flex;
+    flex-direction: column;
   }
 }
 </style>

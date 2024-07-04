@@ -64,13 +64,20 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   name = 'row';
 
   private readonly _template;
-  constructor() {
+  private readonly _options;
+  constructor(options: { container?: string } = {}) {
     super();
+    this._options = options;
     this._template = Handlebars.compile(RowStylesGen.TEMPLATE);
   }
 
   gen(styling: RowStyles): string {
-    return this._template(styling);
+    const styles = this._template(styling);
+    if (this._options.container) {
+      return `${this._options.container} { ${styles} }`;
+    } else {
+      return styles;
+    }
   }
 
   static TEMPLATE: string = `
@@ -79,6 +86,9 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       background-color: {{rowBgColor}};
       {{/if}}
       
+      font-family: {{rowText}};
+      color: {{rowTextColor}};
+      
       .row-title {
         font-family: {{rowTitle}};
         font-size: {{rowTitleTextSize}}%;
@@ -86,30 +96,22 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
         color: {{rowTitleColor}};
       }
       .row-text {
-        font-family: {{rowText}};
         font-size: {{rowTextTextSize}}%;
         text-align: {{rowTextAlign}};
-        color: {{rowTextColor}};
         padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}px;
       }
       .row-image {
-        width: {{rowImageWidth}}px;
+        width: {{rowImageWidth}}%;
         margin-top: {{rowImageMarginTop}}px;
       }
       .row-body {
-        margin: {
-          margin-top: {{rowBodyMarginTop}}px;
-          margin-bottom: {{rowBodyMarginBottom}}px;
-          margin-left: {{rowBodyMarginSides}}px;
-          margin-right: {{rowBodyMarginSides}}px;
-        }
+        margin-top: {{rowBodyMarginTop}}px;
+        margin-bottom: {{rowBodyMarginBottom}}px;
+        margin-left: {{rowBodyMarginSides}}px;
+        margin-right: {{rowBodyMarginSides}}px;
       }
 
       margin: {{rowMargin}}px;
-
-      {{#if rowOverFlowIsOn}}
-      overflow: hidden;
-      {{/if}}
     }
   `;
 }
@@ -118,8 +120,10 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
   name = 'obj';
 
   private readonly _template;
-  constructor() {
+  private readonly _options;
+  constructor(options: { container?: string } = {}) {
     super();
+    this._options = options;
     this._template = Handlebars.compile(ObjStylesGen.TEMPLATE);
   }
 
@@ -141,7 +145,13 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         'objectBorderRadiusBottomRight',
       ),
     });
-    return this._template(computed);
+
+    const styles = this._template(computed);
+    if (this._options.container) {
+      return `${this._options.container} { ${styles} }`;
+    } else {
+      return styles;
+    }
   }
 
   static TEMPLATE: string = `
@@ -150,6 +160,8 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       background-color: {{objectBgColor}};
       {{/if}}
       
+      font-family: {{objectText}};
+      color: {{objectTextColor}};
       .obj-title {
         font-family: {{objectTitle}};
         font-size: {{objectTitleTextSize}}%;
@@ -157,9 +169,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         text-align: {{objectTitleAlign}};
       }
       .obj-text {
-        font-family: {{objectText}};
         font-size: {{objectTextTextSize}}%;
-        color: {{objectTextColor}};
         text-align: {{objectTextAlign}};
       }
       .obj-image {
@@ -180,15 +190,6 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       border-bottom-right-radius: {{objectBorderRadiusBottomRight}}{{objectBorderRadiusUnit}};
       {{else}}
       border: none;
-      {{/if}}
-      
-      {{#if objectHeight}}
-      d-flex;
-      height: 100%;
-      {{/if}}
-
-      {{#if objectOverflowIsOn}}
-      overflow: hidden;
       {{/if}}
       
       {{#if selBgColorIsOn}}

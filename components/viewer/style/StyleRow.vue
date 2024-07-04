@@ -11,9 +11,12 @@ import {
 } from '~/components/viewer/style/engine';
 import { RowStyles } from '~/composables/project';
 
-const { styles } = defineProps<{ styles: RowStyles }>();
+const { styles, rowId } = defineProps<{ styles: RowStyles; rowId: string }>();
 
-const generators = [new RowStylesGen(), new ObjStylesGen()];
+const generators = [
+  new RowStylesGen({ container: `#row-${rowId}` }),
+  new ObjStylesGen(),
+];
 const stylesheet = computed(() => {
   return createStyles(styles, generators);
 });
