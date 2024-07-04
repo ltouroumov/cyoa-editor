@@ -13,49 +13,43 @@
       }"
       @click="toggle"
     >
-      <div class="project-obj-content">
-        <img
-          v-if="obj.image"
-          class="obj-image"
-          loading="lazy"
-          :src="obj.image"
-          :alt="obj.title"
-        />
-        <div class="obj-content">
-          <div class="obj-title">
-            <span class="obj-title-text">{{ obj.title }}</span>
-          </div>
-          <template v-if="obj.isSelectableMultiple">
-            <div class="obj-select-multi">
-              <div
-                class="i-carbon-subtract-alt text-xl"
-                :class="{
-                  'text-green-400': selectedAmount > minSelectedAmount,
-                  'text-grey-400': selectedAmount <= minSelectedAmount,
-                }"
-                @click="decrement"
-              />
-              <span class="mx-1">{{ selectedAmount }}</span>
-              <div
-                class="i-carbon-add-alt text-xl"
-                :class="{
-                  'text-green-400': selectedAmount < maxSelectedAmount,
-                  'text-grey-400': selectedAmount >= minSelectedAmount,
-                }"
-                @click="increment"
-              />
-            </div>
-          </template>
-          <ViewScores :scores="obj.scores" />
-          <ViewRequirements :requireds="obj.requireds" />
-          <div class="obj-text" v-html="formatText(obj.text)"></div>
+      <img
+        v-if="obj.image"
+        class="obj-image"
+        loading="lazy"
+        :src="obj.image"
+        :alt="obj.title"
+      />
+      <div class="obj-content">
+        <div class="obj-title">
+          {{ obj.title }}
         </div>
-        <ViewAddon
-          v-for="(addon, idx) in obj.addons"
-          :key="idx"
-          :addon="addon"
-        />
+        <template v-if="obj.isSelectableMultiple">
+          <div class="obj-select-multi">
+            <div
+              class="i-carbon-subtract-alt text-xl"
+              :class="{
+                'text-green-400': selectedAmount > minSelectedAmount,
+                'text-grey-400': selectedAmount <= minSelectedAmount,
+              }"
+              @click="decrement"
+            />
+            <span class="mx-1">{{ selectedAmount }}</span>
+            <div
+              class="i-carbon-add-alt text-xl"
+              :class="{
+                'text-green-400': selectedAmount < maxSelectedAmount,
+                'text-grey-400': selectedAmount >= minSelectedAmount,
+              }"
+              @click="increment"
+            />
+          </div>
+        </template>
+        <ViewScores :scores="obj.scores" />
+        <ViewRequirements :requireds="obj.requireds" />
+        <div class="obj-text" v-html="formatText(obj.text)"></div>
       </div>
+      <ViewAddon v-for="(addon, idx) in obj.addons" :key="idx" :addon="addon" />
     </div>
   </div>
 </template>
@@ -145,65 +139,4 @@ const decrement = () => {
 
 <style lang="scss">
 @import '~/assets/css/bootstrap/global.scss';
-
-.obj-preview {
-  overflow: auto;
-}
-
-.project-obj {
-  height: 100%;
-  border: 1px solid white;
-  border-radius: 1em;
-  overflow: hidden;
-
-  display: flex;
-  flex-direction: column;
-
-  .project-obj-content {
-    overflow: auto;
-  }
-
-  &.selected {
-    background-color: #193c78ff;
-  }
-
-  &.disabled {
-    background-color: gray;
-  }
-
-  &.notSelectable {
-    border: none;
-    border-radius: none;
-  }
-
-  .obj-image {
-    width: 100%;
-    aspect-ratio: 5/3;
-  }
-
-  .obj-content {
-    padding: 0.5em;
-    overflow-x: auto;
-
-    .obj-title {
-      font-size: 1.2em;
-      font-weight: bolder;
-      margin-bottom: 5px;
-      text-align: center;
-    }
-
-    .obj-select-multi {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 5px;
-    }
-
-    .obj-text {
-      text-align: center;
-      margin-top: 1rem;
-    }
-  }
-}
 </style>

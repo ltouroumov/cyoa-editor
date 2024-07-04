@@ -79,8 +79,6 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       background-color: {{rowBgColor}};
       {{/if}}
       
-      font-family: {{rowText}};
-      color: {{rowTextColor}};
       .row-title {
         font-family: {{rowTitle}};
         font-size: {{rowTitleTextSize}}%;
@@ -88,10 +86,30 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
         color: {{rowTitleColor}};
       }
       .row-text {
+        font-family: {{rowText}};
         font-size: {{rowTextTextSize}}%;
         text-align: {{rowTextAlign}};
+        color: {{rowTextColor}};
         padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}px;
       }
+      .row-image {
+        width: {{rowImageWidth}}px;
+        margin-top: {{rowImageMarginTop}}px;
+      }
+      .row-body {
+        margin: {
+          margin-top: {{rowBodyMarginTop}}px;
+          margin-bottom: {{rowBodyMarginBottom}}px;
+          margin-left: {{rowBodyMarginSides}}px;
+          margin-right: {{rowBodyMarginSides}}px;
+        }
+      }
+
+      margin: {{rowMargin}}px;
+
+      {{#if rowOverFlowIsOn}}
+      overflow: hidden;
+      {{/if}}
     }
   `;
 }
@@ -132,11 +150,25 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       background-color: {{objectBgColor}};
       {{/if}}
       
-      color: {{objectTextColor}};
-      .object-title {
+      .obj-title {
+        font-family: {{objectTitle}};
+        font-size: {{objectTitleTextSize}}%;
         color: {{objectTitleColor}};
+        text-align: {{objectTitleAlign}};
       }
-      
+      .obj-text {
+        font-family: {{objectText}};
+        font-size: {{objectTextTextSize}}%;
+        color: {{objectTextColor}};
+        text-align: {{objectTextAlign}};
+      }
+      .obj-image {
+        width: {{objectImageWidth}}%;
+        margin-top: {{objectImageMarginTop}}px;
+        margin-bottom: {{objectImageMarginBottom}}px;
+        object-fit: cover;
+      }
+
       {{#if objectBorderIsOn}}
       border-color: {{objectBorderColor}};
       border-style: {{objectBorderStyle}};
@@ -153,6 +185,10 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       {{#if objectHeight}}
       d-flex;
       height: 100%;
+      {{/if}}
+
+      {{#if objectOverflowIsOn}}
+      overflow: hidden;
       {{/if}}
       
       {{#if selBgColorIsOn}}
