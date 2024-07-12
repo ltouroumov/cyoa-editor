@@ -28,4 +28,8 @@ import { useViewerStore } from '~/composables/store/viewer';
 const { toggleBackpack, toggleSearch } = useViewerStore();
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.navbar {
+  position: sticky;
+}
+</style>
