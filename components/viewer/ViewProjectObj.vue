@@ -115,12 +115,6 @@ const toggle = () => {
     !obj.isNotSelectable &&
     !row.isInfoRow
   ) {
-    if (obj.activateOtherChoice) {
-      R.split(',', obj.activateThisChoice).forEach((id) => {
-        store.setSelected(id, !isSelected.value);
-      });
-    }
-
     store.setSelected(obj.id, !isSelected.value);
   }
 };
