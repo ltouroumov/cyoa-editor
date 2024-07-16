@@ -81,32 +81,58 @@ export const useProjectStore = defineStore('project', () => {
   };
 
   const setSelected = (id: string, isSelected: boolean) => {
-    if (isSelected) {
-      const rowId = getObjectRow.value(id);
-      const row = getRow.value(rowId);
-      const obj = getObject.value(id);
-      if (row.allowedChoices > 0 && !obj.isSelectableMultiple) {
-        const selectedRowObjects = R.intersection(
-          R.keys(selected.value),
-          R.map(R.prop('id'), row.objects),
-        );
-
-        if (selectedRowObjects.length >= row.allowedChoices) {
-          const toDeselect = selectedRowObjects[0];
-          selected.value = R.pipe(
-            R.dissoc(toDeselect),
-            R.assoc(id, 1),
-          )(selected.value);
-        } else {
-          selected.value = R.assoc(id, 1, selected.value);
-        }
+    let selectedN = R.clone(selected.value);
+    // Add or remove object from selection based on isSelected
+    // function for reuse
+    const addOrRemove = (objId: string, AddToSelected: boolean, num = 1) => {
+      if (AddToSelected) {
+        return R.assoc(objId, num, selectedN);
       } else {
-        selected.value = R.assoc(id, 1, selected.value);
+        return R.dissoc(objId, selectedN);
       }
-    } else {
-      selected.value = R.dissoc(id, selected.value);
+    };
+    // Associate or Dessociate an object from the selected record
+    selectedN = addOrRemove(id, isSelected);
+
+    const obj = getObject.value(id);
+    // If activateOtherChoice is true, select/unselect all objects in activateThisChoice
+    if (obj.activateOtherChoice) {
+      R.split(',', obj.activateThisChoice).forEach((objectId) => {
+        selectedN = addOrRemove(objectId, isSelected);
+      });
     }
+
+    // Only check for incompatible objects if an object is selected
+    if (isSelected) {
+      // Remove any objects that are incompatible with the selected object
+      selectedN = R.pickBy((_, objectId): boolean => {
+        const object = getObject.value(objectId);
+        const pred = buildConditions(object);
+        return pred(R.keys(selectedN));
+      }, selectedN);
+    }
+
+    // If allowedChoices is > 0, then there is a limit on the number of objects selected from the same row
+    // If allowedChoices is 0, then there is no limit
+    const rowId = getObjectRow.value(id);
+    const row = getRow.value(rowId);
+    if (row.allowedChoices > 0 && !obj.isSelectableMultiple) {
+      // Of the selected objects, make a set of all objects selected from the same row
+      const selectedRowObjects = R.intersection(
+        R.keys(selected.value),
+        R.map(R.prop('id'), row.objects),
+      );
+      // If the number of selected objects from the same row is equal to or greater than allowedChoices, deselect the oldest Object
+      // Otherwise, select/unselect as needed
+      if (selectedRowObjects.length >= row.allowedChoices) {
+        const toDeselect = selectedRowObjects[0];
+        selectedN = addOrRemove(toDeselect, false);
+      }
+    }
+
+    selected.value = selectedN;
   };
+
   const incSelected = (id: string, incValue: number = 1) => {
     if (!R.has(id, selected.value)) {
       setSelected(id, true);
