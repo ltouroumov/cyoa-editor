@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { ViewerProjectList } from 'composables/viewer';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { useViewerStore } from '~/composables/store/viewer';
 
 const isLoading = ref<boolean>(false);
 
@@ -44,6 +45,7 @@ const { projectList } = defineProps<{
 }>();
 
 const { loadProject, unloadProject } = useProjectStore();
+const { toggleProjectMenu } = useViewerStore();
 const { isLoaded } = useProjectRefs();
 
 const loadRemoteFile = async ({ target }: MouseEvent) => {
@@ -60,6 +62,7 @@ const loadRemoteFile = async ({ target }: MouseEvent) => {
       nextTick(() => {
         if (!isLoaded.value) {
           loadProject(result, fileURL);
+          toggleProjectMenu(false);
         }
       });
     }
