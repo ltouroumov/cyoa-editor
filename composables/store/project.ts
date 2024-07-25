@@ -95,15 +95,26 @@ export const useProjectStore = defineStore('project', () => {
     selectedN = addOrRemove(id, isSelected);
 
     const obj = getObject.value(id);
-    // If activateOtherChoice is true, select/unselect all objects in activateThisChoice
+    // If activateOtherChoice is true, select/deselect all objects in activateThisChoice
     if (obj.activateOtherChoice) {
       R.split(',', obj.activateThisChoice).forEach((objectId) => {
         selectedN = addOrRemove(objectId, isSelected);
       });
     }
 
-    // Only check for incompatible objects if an object is selected
+    // Only care about deselecting objects if the object is currently being selected
     if (isSelected) {
+      // If deactivateOtherChoice is true, deselect all objects in deactivateThisChoice
+      if (obj.deactivateOtherChoice) {
+        // Only deselect objects in deactivateThisChoice if the object is already selected
+        R.intersection(
+          R.keys(selected.value),
+          R.split(',', obj.deactivateThisChoice),
+        ).forEach((objectId) => {
+          selectedN = addOrRemove(objectId, false);
+        });
+      }
+
       // Remove any objects that are incompatible with the selected object
       selectedN = R.pickBy((_, objectId): boolean => {
         const object = getObject.value(objectId);
