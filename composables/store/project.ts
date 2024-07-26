@@ -78,6 +78,7 @@ export const useProjectStore = defineStore('project', () => {
   };
   const unloadProject = () => {
     project.value = null;
+    selected.value = {};
   };
 
   const setSelected = (id: string, isSelected: boolean) => {

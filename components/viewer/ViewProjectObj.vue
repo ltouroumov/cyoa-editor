@@ -1,5 +1,10 @@
 <template>
-  <div :class="objClass">
+  <div :id="`obj-${obj.id}`" :class="objClass">
+    <StyleObj
+      v-if="obj.isPrivateStyling"
+      :styles="obj.styling"
+      :obj-id="obj.id"
+    />
     <div
       class="project-obj"
       :class="{
@@ -19,7 +24,7 @@
         />
         <div class="obj-content">
           <div class="obj-title">
-            <span class="obj-title-text">{{ obj.title }}</span>
+            {{ obj.title }}
           </div>
           <template v-if="obj.isSelectableMultiple">
             <div class="obj-select-multi">
@@ -46,12 +51,8 @@
           <ViewRequirements :requireds="obj.requireds" />
           <div class="obj-text" v-html="formatText(obj.text)"></div>
         </div>
-        <ViewAddon
-          v-for="(addon, idx) in obj.addons"
-          :key="idx"
-          :addon="addon"
-        />
       </div>
+      <ViewAddon v-for="(addon, idx) in obj.addons" :key="idx" :addon="addon" />
     </div>
   </div>
 </template>
@@ -64,6 +65,8 @@ import { buildConditions } from '~/composables/conditions';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
+
+import StyleObj from './style/StyleObj.vue';
 
 const {
   row,
@@ -132,18 +135,12 @@ const decrement = () => {
 </script>
 
 <style lang="scss">
-@import '~/assets/css/bootstrap/_config.scss';
-
 .obj-preview {
   overflow: auto;
 }
-
 .project-obj {
   height: 100%;
-  border: 1px solid white;
-  border-radius: 1em;
   overflow: hidden;
-
   display: flex;
   flex-direction: column;
 
@@ -151,33 +148,20 @@ const decrement = () => {
     overflow: auto;
   }
 
-  &.selected {
-    background-color: #193c78ff;
-  }
-
-  &.disabled {
-    background-color: gray;
-  }
-
   &.notSelectable {
     border: none;
-    border-radius: none;
+    border-radius: 0;
   }
 
   .obj-image {
     width: 100%;
-    aspect-ratio: 5/3;
   }
 
   .obj-content {
-    padding: 0.5em;
     overflow-x: auto;
 
     .obj-title {
-      font-size: 1.2em;
-      font-weight: bolder;
       margin-bottom: 5px;
-      text-align: center;
     }
 
     .obj-select-multi {
@@ -185,12 +169,6 @@ const decrement = () => {
       flex-direction: row;
       justify-content: center;
       align-items: center;
-      margin-bottom: 5px;
-    }
-
-    .obj-text {
-      text-align: center;
-      margin-top: 1rem;
     }
   }
 }

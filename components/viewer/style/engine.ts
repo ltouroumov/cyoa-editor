@@ -1,5 +1,5 @@
 import Handlebars from 'handlebars';
-import { join, map } from 'ramda';
+import { join, map, mergeRight, multiply, pipe, prop } from 'ramda';
 
 import { ObjStyles, ProjectStyles, RowStyles } from '~/composables/project';
 
@@ -7,6 +7,29 @@ export abstract class StyleGenerator<T> {
   abstract name: string;
   abstract gen(styling: T): string;
 }
+
+type TransformT<S, O> = (styles: S) => O;
+type TransformR<S, TR extends Record<string, TransformT<S, any>>> = {
+  [K in keyof TR]: ReturnType<TR[K]>;
+};
+const StyleUtils = {
+  parseNumber: (input: string | number): number =>
+    typeof input !== 'number' ? Number.parseFloat(input) : input,
+  parseBorderRadius: (key: string) =>
+    pipe(prop(key), StyleUtils.parseNumber, multiply(10)),
+
+  applyTransforms: <
+    S extends object,
+    TR extends Record<string, TransformT<S, any>>,
+  >(
+    styles: S,
+    transforms: TR,
+  ) =>
+    mergeRight(
+      styles,
+      map((value) => value(styles), transforms) as TransformR<S, TR>,
+    ),
+};
 
 export function createStyles<T>(
   styling: T,
@@ -41,13 +64,20 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   name = 'row';
 
   private readonly _template;
-  constructor() {
+  private readonly _options;
+  constructor(options: { container?: string } = {}) {
     super();
+    this._options = options;
     this._template = Handlebars.compile(RowStylesGen.TEMPLATE);
   }
 
-  gen(styling: ObjStyles): string {
-    return this._template(styling);
+  gen(styling: RowStyles): string {
+    const styles = this._template(styling);
+    if (this._options.container) {
+      return `${this._options.container} { ${styles} }`;
+    } else {
+      return styles;
+    }
   }
 
   static TEMPLATE: string = `
@@ -56,10 +86,32 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       background-color: {{rowBgColor}};
       {{/if}}
       
+      font-family: {{rowText}};
       color: {{rowTextColor}};
+      
       .row-title {
+        font-family: {{rowTitle}};
+        font-size: {{rowTitleTextSize}}%;
+        text-align: {{rowTitleAlign}};
         color: {{rowTitleColor}};
       }
+      .row-text {
+        font-size: {{rowTextTextSize}}%;
+        text-align: {{rowTextAlign}};
+        padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}px;
+      }
+      .row-image {
+        width: {{rowImageWidth}}%;
+        margin-top: {{rowImageMarginTop}}px;
+      }
+      .row-body {
+        margin-top: {{rowBodyMarginTop}}px;
+        margin-bottom: {{rowBodyMarginBottom}}px;
+        margin-left: {{rowBodyMarginSides}}px;
+        margin-right: {{rowBodyMarginSides}}px;
+      }
+
+      margin: {{rowMargin}}px;
     }
   `;
 }
@@ -68,25 +120,38 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
   name = 'obj';
 
   private readonly _template;
-  constructor() {
+  private readonly _options;
+  constructor(options: { container?: string } = {}) {
     super();
+    this._options = options;
     this._template = Handlebars.compile(ObjStylesGen.TEMPLATE);
   }
 
   gen(styling: ObjStyles): string {
-    // Ugly Hack but the origina format is cursed
-    const computed = {
-      objectBorderRadiusUnit: styling.objectBorderRadiusIsPixels ? 'px' : '%',
-      objectBorderRadiusTopLeft:
-        Number.parseFloat(styling.objectBorderRadiusTopLeft) * 10,
-      objectBorderRadiusTopRight:
-        Number.parseFloat(styling.objectBorderRadiusTopRight) * 10,
-      objectBorderRadiusBottomLeft:
-        Number.parseFloat(styling.objectBorderRadiusBottomLeft) * 10,
-      objectBorderRadiusBottomRight:
-        Number.parseFloat(styling.objectBorderRadiusBottomRight) * 10,
-    };
-    return this._template({ ...styling, ...computed });
+    // Ugly Hack but the original format is cursed
+    const computed = StyleUtils.applyTransforms(styling, {
+      objectBorderRadiusUnit: (styling) =>
+        styling.objectBorderRadiusIsPixels ? 'px' : '%',
+      objectBorderRadiusTopLeft: StyleUtils.parseBorderRadius(
+        'objectBorderRadiusTopLeft',
+      ),
+      objectBorderRadiusTopRight: StyleUtils.parseBorderRadius(
+        'objectBorderRadiusTopRight',
+      ),
+      objectBorderRadiusBottomLeft: StyleUtils.parseBorderRadius(
+        'objectBorderRadiusBottomLeft',
+      ),
+      objectBorderRadiusBottomRight: StyleUtils.parseBorderRadius(
+        'objectBorderRadiusBottomRight',
+      ),
+    });
+
+    const styles = this._template(computed);
+    if (this._options.container) {
+      return `${this._options.container} { ${styles} }`;
+    } else {
+      return styles;
+    }
   }
 
   static TEMPLATE: string = `
@@ -95,11 +160,25 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       background-color: {{objectBgColor}};
       {{/if}}
       
+      font-family: {{objectText}};
       color: {{objectTextColor}};
-      .object-title {
+      .obj-title {
+        font-family: {{objectTitle}};
+        font-size: {{objectTitleTextSize}}%;
         color: {{objectTitleColor}};
+        text-align: {{objectTitleAlign}};
       }
-      
+      .obj-text {
+        font-size: {{objectTextTextSize}}%;
+        text-align: {{objectTextAlign}};
+      }
+      .obj-image {
+        width: {{objectImageWidth}}%;
+        margin-top: {{objectImageMarginTop}}px;
+        margin-bottom: {{objectImageMarginBottom}}px;
+        object-fit: cover;
+      }
+
       {{#if objectBorderIsOn}}
       border-color: {{objectBorderColor}};
       border-style: {{objectBorderStyle}};

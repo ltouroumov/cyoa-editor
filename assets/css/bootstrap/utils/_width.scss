@@ -1,0 +1,6 @@
+@each $width, $size in $widths {
+  .w-#{$width} {
+    flex: 0 0 $size !important;
+    max-width: $size !important;
+  }
+}

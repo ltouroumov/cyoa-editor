@@ -3,10 +3,10 @@
     <StyleRow
       v-if="row.isPrivateStyling"
       :styles="row.styling"
-      :row-id="row.id"
+      row-id="row.id"
     />
-    <div :class="{ 'project-row': true, hidden: !isVisible }">
-      <div class="row-meta">
+    <div class="project-row" :class="{ hidden: !isVisible }">
+      <div class="row-body">
         <img
           v-if="row.image"
           class="row-image"
@@ -14,7 +14,7 @@
           :alt="row.title"
         />
         <div class="row-title">{{ row.title }}</div>
-        <div v-if="row.titleText" class="row-text">{{ row.titleText }}</div>
+        <div v-if="row.titleText" class="row-text" v-html="row.titleText" />
       </div>
       <div class="container-fluid p-0">
         <div class="row g-2">
@@ -50,6 +50,10 @@ const isVisible = computed(() => condition(selectedIds.value));
 
 <style lang="scss">
 .project-row {
+  // Prevents collapsing margins with .row-body
+  display: flex;
+  flex-direction: column;
+
   &.hidden {
     display: none;
   }
@@ -57,18 +61,6 @@ const isVisible = computed(() => condition(selectedIds.value));
   .row-meta {
     display: flex;
     flex-direction: column;
-
-    .row-title {
-      padding: 5px 0;
-      font-size: 1.5em;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .row-text {
-      padding: 5px;
-      text-align: center;
-    }
   }
 }
 </style>
