@@ -11,41 +11,36 @@
       </div>
     </div>
     <StyleProject :styles="project.data.styling" />
-    <ViewBackpack />
-    <ViewSearch />
-    <ModalDialog :show="isProjectMenuVisible" @close="toggleProjectMenu(false)">
-      <template #header>
-        <h5 class="m-0">Project Menu</h5>
-      </template>
-      <template #default>
-        <ViewProjectMenu :project-list="projectList" />
-      </template>
-    </ModalDialog>
+    <BackpackModal />
+    <SearchModal />
+    <MenuModal />
   </div>
   <div v-else class="dialog-container">
-    <ViewProjectMenu :project-list="projectList" />
+    <div class="dialog bg-dark-subtle text-light">
+      <ProjectMenu :project-list="projectList" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import ViewBackpack from '~/components/viewer/modal/ViewBackpack.vue';
-import ViewProjectMenu from '~/components/viewer/modal/ViewProjectMenu.vue';
-import ViewSearch from '~/components/viewer/modal/ViewSearch.vue';
+import BackpackModal from '~/components/viewer/modal/BackpackModal.vue';
+import MenuModal from '~/components/viewer/modal/MenuModal.vue';
+import SearchModal from '~/components/viewer/modal/SearchModal.vue';
+import ProjectMenu from '~/components/viewer/ProjectMenu.vue';
 import StyleProject from '~/components/viewer/style/StyleProject.vue';
 import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
 import { useProjectRefs } from '~/composables/store/project';
-import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
+import { useViewerRefs } from '~/composables/store/viewer';
 
 const { project } = useProjectRefs();
 const { viewerProjectList } = useViewerRefs();
 
 const projectList = computed(() => viewerProjectList.value);
-
-const { toggleProjectMenu } = useViewerStore();
-const { isProjectMenuVisible } = useViewerRefs();
 </script>
 
 <style lang="scss">
+@import '~/assets/css/bootstrap/config';
+
 .project {
   font-family: sans-serif;
   padding: 0 1em;
@@ -59,8 +54,10 @@ const { isProjectMenuVisible } = useViewerRefs();
 
 .dialog-container {
   min-height: 50vh;
+  margin-top: 5em;
 
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 

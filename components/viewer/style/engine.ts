@@ -36,7 +36,6 @@ export function createStyles<T>(
   generators: StyleGenerator<T>[],
 ): string {
   const styles = map((generator) => generator.gen(styling).trim(), generators);
-  console.log('Generated Styles', styles);
   return join('\n', styles);
 }
 
