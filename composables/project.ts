@@ -97,6 +97,8 @@ export type ProjectObj = HasId &
     addons: ObjAddon[];
     activateOtherChoice: boolean;
     activateThisChoice: string;
+    deactivateOtherChoice: boolean;
+    deactivateThisChoice: string;
 
     isSelectableMultiple: boolean;
     isNotSelectable: boolean;
