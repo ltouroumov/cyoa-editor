@@ -4,7 +4,10 @@
   >
     <div class="container-fluid">
       <div class="d-flex flex-row items-center">
-        <button class="btn btn-light btn-lg i-solar-hamburger-menu-outline" />
+        <button
+          class="btn btn-light btn-lg i-solar-hamburger-menu-outline"
+          @click="toggleProjectMenu(true)"
+        />
       </div>
       <ViewScoreStatus />
       <div class="d-flex gap-1">
@@ -25,7 +28,11 @@
 import ViewScoreStatus from '~/components/viewer/ViewScoreStatus.vue';
 import { useViewerStore } from '~/composables/store/viewer';
 
-const { toggleBackpack, toggleSearch } = useViewerStore();
+const { toggleBackpack, toggleSearch, toggleProjectMenu } = useViewerStore();
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.navbar {
+  position: sticky;
+}
+</style>
