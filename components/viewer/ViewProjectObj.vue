@@ -49,6 +49,7 @@
           </template>
           <ViewScores :scores="obj.scores" />
           <ViewRequirements :requireds="obj.requireds" />
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <div class="obj-text" v-html="formatText(obj.text)"></div>
         </div>
       </div>
@@ -96,7 +97,14 @@ const store = useProjectStore();
 const { selectedIds, selected } = useProjectRefs();
 
 const condition = computed(() => buildConditions(obj));
-const isEnabled = computed<boolean>(() => condition.value(selectedIds.value));
+const isEnabled = computed<boolean>(() => {
+  const rowCondition = computed(() => buildConditions(row));
+  // Ensure row conditions are met
+  if (!rowCondition.value(selectedIds.value)) {
+    return false;
+  }
+  return condition.value(selectedIds.value);
+});
 const isSelected = computed<boolean>(() => R.has(obj.id, selected.value));
 
 const selectedAmount = computed(() => {
