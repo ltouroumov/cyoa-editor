@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import { isEmpty, map } from 'ramda';
 import { P, match } from 'ts-pattern';
 
 import { ConditionTerm, HasRequirements } from '~/composables/project';
@@ -16,7 +17,6 @@ export type ConditionExec = {
 
 export const buildConditions = (item: HasRequirements): Term => {
   const { exec } = buildRootCondition(item.requireds);
-
   return exec;
 };
 
@@ -33,7 +33,8 @@ export const buildRootCondition = (terms: ConditionTerm[]): ConditionExec => {
 };
 
 const buildCondition = (term: ConditionTerm): Condition => {
-  return match(term)
+  // Compute the base condition microcode
+  const base = match(term)
     .with({ type: 'id', required: true }, () => {
       const ids = R.reject(R.isEmpty, [
         term.reqId,
@@ -60,6 +61,14 @@ const buildCondition = (term: ConditionTerm): Condition => {
       },
     )
     .otherwise(() => ALWAYS);
+
+  if (isEmpty(term.requireds)) {
+    return base;
+  } else {
+    // Handle sub-conditions
+    const inner = map(buildCondition, term.requireds);
+    return ALT(AND(inner), base, ALWAYS);
+  }
 };
 
 const mergeDeps = (terms: Condition[]) =>
@@ -108,4 +117,15 @@ const OR = (terms: Condition[]): Condition => {
       ),
       terms,
     );
+};
+
+const ALT = (
+  pred: Condition,
+  ifTrue: Condition,
+  ifFalse: Condition,
+): Condition => {
+  return {
+    code: `(${pred.code}) ? (${ifTrue.code}) : (${ifFalse.code})`,
+    deps: mergeDeps([pred, ifTrue, ifFalse]),
+  };
 };
