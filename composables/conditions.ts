@@ -60,6 +60,13 @@ const buildCondition = (term: ConditionTerm): Condition => {
         return OR(R.map(SELECTED, ids));
       },
     )
+    .with(
+      { type: 'or', required: false, orRequired: P.select() },
+      (orRequired) => {
+        const ids = R.reject(R.isEmpty, R.map(R.prop('req'), orRequired));
+        return OR(R.map(UNSELECTED, ids));
+      },
+    )
     .otherwise(() => ALWAYS);
 
   if (isEmpty(term.requireds)) {
