@@ -84,19 +84,20 @@ import {
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 
 const { getObject, getObjectRow, getRow } = useProjectStore();
-const { selected, selectedIds, backpack } = useProjectRefs();
+const { selected, backpack } = useProjectRefs();
 const { toggleBackpack } = useViewerStore();
 const { isBackpackVisible } = useViewerRefs();
 
-type PackRowChoice = { row: ProjectRow; obj: ProjectObj };
+type PackRowChoice = { row: ProjectRow; obj: ProjectObj; count: number };
 type PackRow = { packRow: ProjectRow; choices: PackRowChoice[] };
 const packRows = computed(() => {
   const selectedChoices = R.map(
-    (id: string): PackRowChoice => ({
+    ([id, count]): PackRowChoice => ({
       obj: getObject(id),
       row: getRow(getObjectRow(id)),
+      count,
     }),
-    selectedIds.value,
+    R.toPairs(selected.value),
   );
   const choicesByGroup: Partial<Record<string, PackRowChoice[]>> = R.groupBy(
     ({ row }) => row.resultGroupId,
@@ -123,7 +124,11 @@ const exportTextHeaders = ref<boolean>(false);
 const exportText = computed<string>(() => {
   return R.pipe(
     R.map(({ packRow, choices }: PackRow): string => {
-      const choiceTitles = R.map(({ obj }) => obj.title, choices);
+      const choiceTitles = R.map(({ obj, count }) => {
+        if (count > 1 || obj.isSelectableMultiple)
+          return `${obj.title} x ${count}`;
+        else return obj.title;
+      }, choices);
       if (exportTextHeaders.value) {
         return R.concat(`**${packRow.title}**\n`, R.join(', ', choiceTitles));
       } else {
