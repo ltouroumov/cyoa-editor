@@ -31,21 +31,38 @@
         </div>
         <div class="pack-import-export">
           <strong>Import / Export</strong>
-          <textarea class="export-code form-control" :value="exportCode" />
-          <button
-            class="export-btn btn btn-outline-primary"
-            :class="{ isCopied: isCopied }"
-            @click="copyExportCode"
-          >
-            <span v-if="isCopied">Copied to Clipboard!</span>
-            <span v-else>Copy to Clipboard</span>
-          </button>
           <textarea v-model="importCode" class="import-code form-control" />
           <button
             class="import-btn btn btn-outline-primary"
             @click="readImportCode"
           >
             Import Build
+          </button>
+          <textarea class="export-code form-control" :value="exportCode" />
+          <button
+            class="export-code-btn btn btn-outline-primary"
+            :class="{ isCopied: isCodeCopied }"
+            @click="copyExportCode"
+          >
+            <span v-if="isCodeCopied">Copied to Clipboard!</span>
+            <span v-else>Copy to Clipboard</span>
+          </button>
+          <textarea class="export-text form-control" :value="exportText" />
+          <div class="export-text-toggle form-check">
+            <input
+              v-model="exportTextHeaders"
+              class="form-check-input"
+              type="checkbox"
+            />
+            <label class="form-check-label">Add Section Titles</label>
+          </div>
+          <button
+            class="export-text-btn btn btn-outline-primary"
+            :class="{ isCopied: isTextCopied }"
+            @click="copyExportText"
+          >
+            <span v-if="isTextCopied">Copied to Clipboard!</span>
+            <span v-else>Copy to Clipboard</span>
           </button>
         </div>
       </div>
@@ -71,19 +88,25 @@ const { selected, selectedIds, backpack } = useProjectRefs();
 const { toggleBackpack } = useViewerStore();
 const { isBackpackVisible } = useViewerRefs();
 
+type PackRowChoice = { row: ProjectRow; obj: ProjectObj };
+type PackRow = { packRow: ProjectRow; choices: PackRowChoice[] };
 const packRows = computed(() => {
   const selectedChoices = R.map(
-    (id: string) => ({ obj: getObject(id), row: getRow(getObjectRow(id)) }),
+    (id: string): PackRowChoice => ({
+      obj: getObject(id),
+      row: getRow(getObjectRow(id)),
+    }),
     selectedIds.value,
   );
-  const choicesByGroup: Partial<
-    Record<string, { obj: ProjectObj; row: ProjectRow }[]>
-  > = R.groupBy(({ row }) => row.resultGroupId, selectedChoices);
+  const choicesByGroup: Partial<Record<string, PackRowChoice[]>> = R.groupBy(
+    ({ row }) => row.resultGroupId,
+    selectedChoices,
+  );
 
   return R.chain(
-    (row: ProjectRow) =>
+    (row: ProjectRow): PackRow[] =>
       row.resultGroupId in choicesByGroup
-        ? [{ packRow: row, choices: choicesByGroup[row.resultGroupId] }]
+        ? [{ packRow: row, choices: choicesByGroup[row.resultGroupId] ?? [] }]
         : [],
     backpack.value,
   );
@@ -96,14 +119,38 @@ const exportCode = computed<string>(() => {
     R.join(';'),
   )(R.toPairs(selected.value));
 });
+const exportTextHeaders = ref<boolean>(false);
+const exportText = computed<string>(() => {
+  return R.pipe(
+    R.map(({ packRow, choices }: PackRow): string => {
+      const choiceTitles = R.map(({ obj }) => obj.title, choices);
+      if (exportTextHeaders.value) {
+        return R.concat(`**${packRow.title}**\n`, R.join(', ', choiceTitles));
+      } else {
+        return R.join(', ', choiceTitles);
+      }
+    }),
+    R.join(exportTextHeaders.value ? '\n' : ', '),
+  )(packRows.value);
+});
 
-const isCopied = ref(false);
+const isCodeCopied = ref(false);
 function copyExportCode() {
   navigator.clipboard.writeText(exportCode.value);
-  isCopied.value = true;
+  isCodeCopied.value = true;
 
   setTimeout(() => {
-    isCopied.value = false;
+    isCodeCopied.value = false;
+  }, 4000);
+}
+
+const isTextCopied = ref(false);
+function copyExportText() {
+  navigator.clipboard.writeText(exportText.value);
+  isTextCopied.value = true;
+
+  setTimeout(() => {
+    isTextCopied.value = false;
   }, 4000);
 }
 
@@ -181,8 +228,10 @@ function readImportCode() {
   gap: 0.5rem;
   grid-template:
     'head head' auto
-    'in-txt out-txt' auto
+    'in-txt out-txt' 1fr
     'in-btn out-btn' auto
+    'list-txt list-txt' 2fr
+    'list-tgl list-btn' auto
     / 1fr 1fr;
 
   strong {
@@ -196,11 +245,22 @@ function readImportCode() {
   .export-code {
     grid-area: out-txt;
   }
+  .export-text {
+    grid-area: list-txt;
+  }
   .import-btn {
     grid-area: in-btn;
   }
-  .export-btn {
+  .export-code-btn {
     grid-area: out-btn;
+  }
+  .export-text-btn {
+    grid-area: list-btn;
+  }
+  .export-text-toggle {
+    grid-area: list-tgl;
+    justify-self: end;
+    align-self: center;
   }
   .isCopied {
     color: white;
