@@ -4,7 +4,8 @@
     class="obj-requirement"
     :class="{ disabled: !isEnabled }"
   >
-    <span v-if="req.beforeText">{{ req.beforeText }}</span>
+    <span v-if="!req.required && showAlways">Incompatible: </span>
+    <span v-else-if="req.beforeText">{{ req.beforeText }}</span>
     <div v-if="req.type === 'id'">
       <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
     </div>
