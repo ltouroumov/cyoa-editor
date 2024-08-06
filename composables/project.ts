@@ -159,6 +159,7 @@ export type ProjectObj = HasId &
     activateThisChoice: string;
     deactivateOtherChoice: boolean;
     deactivateThisChoice: string;
+    groups: { id: string }[];
 
     isSelectableMultiple: boolean;
     isNotSelectable: boolean;

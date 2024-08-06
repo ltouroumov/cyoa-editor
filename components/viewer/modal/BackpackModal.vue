@@ -100,7 +100,7 @@ const packRows = computed(() => {
     R.toPairs(selected.value),
   );
   const choicesByGroup: Partial<Record<string, PackRowChoice[]>> = R.groupBy(
-    ({ row }) => row.resultGroupId,
+    ({ obj, row }) => R.head(obj.groups)?.id ?? row.resultGroupId,
     selectedChoices,
   );
 
