@@ -198,12 +198,6 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
     align-items: stretch;
     justify-content: stretch;
     overflow: auto;
-    .project-obj {
-      overflow-y: scroll;
-    }
-    .project-obj-content {
-      overflow: unset;
-    }
   }
 
   .result-group {
@@ -220,5 +214,14 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
       }
     }
   }
+}
+</style>
+
+<style lang="scss">
+.project-obj {
+  overflow-y: scroll;
+}
+.project-obj .project-obj-content {
+  overflow: unset;
 }
 </style>
