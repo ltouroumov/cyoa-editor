@@ -11,7 +11,10 @@
     <div v-else-if="req.type === 'or'">
       <span v-for="(orReq, idx) in req.orRequired" :key="idx">
         <template v-if="orReq.req">
-          <span v-if="idx > 0">, or</span>
+          <span v-if="idx > 0"
+            >,
+            <span v-if="idx >= req.orRequired.length - 1">or</span>
+          </span>
           {{ getObject(orReq.req)?.title ?? '???' }}
         </template>
       </span>
