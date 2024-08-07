@@ -99,38 +99,7 @@ const { selectedIds, selected } = useProjectRefs();
 const condition = computed(() => buildConditions(obj));
 const isEnabled = computed<boolean>(() => {
   if (preview) {
-    // Takes any id as string, and returns either a ProjectRow or ProjectObj
-    const objectOrRow = (itemId: string) => {
-      if (R.filter((row) => row.id === itemId, store.projectRows).length > 0) {
-        return store.getRow(itemId);
-      } else {
-        return store.getObject(itemId);
-      }
-    };
-
-    // Build a preview condition tree to simulate the row dependencies
-    const getParentRowConditions = (node: string) => {
-      if (!node) {
-        return [];
-      }
-
-      const queue = [node];
-      const results = [];
-
-      while (queue.length > 0) {
-        const current = queue.shift()!;
-        const children = buildRootCondition(objectOrRow(current).requireds);
-
-        results.push(...children.deps);
-        queue.push(...children.deps);
-      }
-      return results;
-    };
-    for (const item in getParentRowConditions(row.id)) {
-      const pred = buildConditions(objectOrRow(item));
-      const preds = pred(selectedIds.value);
-      if (!preds) return false;
-    }
+    store.getParentRowConditionsIsSastified(row.id);
   }
   return condition.value(selectedIds.value);
 });

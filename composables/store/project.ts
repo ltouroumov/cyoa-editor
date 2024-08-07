@@ -72,6 +72,57 @@ export const useProjectStore = defineStore('project', () => {
     return (id: string) => mapping[id];
   });
 
+  // Takes any id as string, and returns either a ProjectRow or ProjectObj
+  const getObjectOrRow = computed(() => {
+    const getItem = (itemId: string) => {
+      if (R.filter((row) => row.id === itemId, projectRows.value).length > 0) {
+        return getRow.value(itemId);
+      } else {
+        return getObject.value(itemId);
+      }
+    };
+
+    return getItem;
+  });
+
+  // Transversely, build a condition tree for a given row or object
+  const getParentRowConditions = computed(() => {
+    const parentRowConditions = (node: string) => {
+      if (!node) {
+        return [];
+      }
+
+      const queue = [node];
+      const results = [];
+
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        const children = buildRootCondition(
+          getObjectOrRow.value(current).requireds,
+        );
+
+        results.push(...children.deps);
+        queue.push(...children.deps);
+      }
+      return results;
+    };
+
+    return parentRowConditions;
+  });
+
+  // Check if a given row or object is sastified by the current selection
+  const getParentRowConditionsIsSastified = computed(() => {
+    const isSastified = (ids: string) => {
+      for (const item in getParentRowConditions.value(ids)) {
+        const pred = buildConditions(getObjectOrRow.value(item));
+        const preds = pred(selectedIds.value);
+        if (!preds) return false;
+      }
+    };
+
+    return isSastified;
+  });
+
   const isLoaded = computed(() => !!project.value);
   const loadProject = (data: Project, file: string) => {
     project.value = { data, file };
@@ -228,6 +279,9 @@ export const useProjectStore = defineStore('project', () => {
     getRow,
     getObject,
     getObjectRow,
+    getObjectOrRow,
+    getParentRowConditions,
+    getParentRowConditionsIsSastified,
     setSelected,
     incSelected,
     decSelected,
