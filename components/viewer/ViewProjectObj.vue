@@ -99,7 +99,7 @@ const { selectedIds, selected } = useProjectRefs();
 const condition = computed(() => buildConditions(obj));
 const isEnabled = computed<boolean>(() => {
   if (preview) {
-    store.getParentRowConditionsIsSastified(row.id);
+    return store.getParentConditionsIsSastified(row.id);
   }
   return condition.value(selectedIds.value);
 });

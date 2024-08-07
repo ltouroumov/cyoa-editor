@@ -111,13 +111,17 @@ export const useProjectStore = defineStore('project', () => {
   });
 
   // Check if a given row or object is sastified by the current selection
-  const getParentRowConditionsIsSastified = computed(() => {
-    const isSastified = (ids: string) => {
-      for (const item in getParentRowConditions.value(ids)) {
-        const pred = buildConditions(getObjectOrRow.value(item));
+  const getParentConditionsIsSastified = computed(() => {
+    const isSastified = (id: string) => {
+      const parentConditions = getParentRowConditions.value(id);
+      for (const item in parentConditions) {
+        const pred = buildConditions(
+          getObjectOrRow.value(parentConditions[item]),
+        );
         const preds = pred(selectedIds.value);
         if (!preds) return false;
       }
+      return true;
     };
 
     return isSastified;
@@ -281,7 +285,7 @@ export const useProjectStore = defineStore('project', () => {
     getObjectRow,
     getObjectOrRow,
     getParentRowConditions,
-    getParentRowConditionsIsSastified,
+    getParentConditionsIsSastified,
     setSelected,
     incSelected,
     decSelected,
