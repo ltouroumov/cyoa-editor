@@ -99,8 +99,17 @@ const { selectedIds, selected } = useProjectRefs();
 const condition = computed(() => buildConditions(obj));
 const isEnabled = computed<boolean>(() => {
   if (preview) {
+    // Takes any id as string, and returns either a ProjectRow or ProjectObj
+    const objectOrRow = (itemId: string) => {
+      if (R.filter((row) => row.id === itemId, store.projectRows).length > 0) {
+        return store.getRow(itemId);
+      } else {
+        return store.getObject(itemId);
+      }
+    };
+
     // Build a preview condition tree to simulate the row dependencies
-    const conditionTree = (node: string) => {
+    const getParentRowConditions = (node: string) => {
       if (!node) {
         return [];
       }
@@ -110,50 +119,18 @@ const isEnabled = computed<boolean>(() => {
 
       while (queue.length > 0) {
         const current = queue.shift()!;
-        let currentItem = null;
+        const children = buildRootCondition(objectOrRow(current).requireds);
 
-        if (
-          R.filter((row) => row.id === current, store.projectRows).length > 0
-        ) {
-          currentItem = store.getRow(current);
-        } else {
-          currentItem = store.getObject(current);
-        }
-        const rowConditions = buildRootCondition(currentItem.requireds);
-
-        const children: string[] = [];
-        for (const child of rowConditions.deps) {
-          const te = conditionTree(child);
-          console.log(
-            'item:',
-            current,
-            '\nchild deps:',
-            child,
-            '\nchild dep results:',
-            te!,
-          );
-          children.push(child, ...te!);
-        }
-        // console.log('Results:', results, '\nQueue:', queue);
-        results.push(...children);
-        queue.push(...children);
+        results.push(...children.deps);
+        queue.push(...children.deps);
       }
       return results;
     };
-    const tree = conditionTree(row.id);
-    for (const item in tree) {
-      let currentItem = null;
-      if (R.filter((row) => row.id === item, store.projectRows).length > 0) {
-        currentItem = store.getRow(tree[item]);
-      } else {
-        currentItem = store.getObject(tree[item]);
-      }
-
-      const pred = buildConditions(currentItem);
+    for (const item in getParentRowConditions(row.id)) {
+      const pred = buildConditions(objectOrRow(item));
       const preds = pred(selectedIds.value);
       if (!preds) return false;
     }
-    console.log('tree:', tree);
   }
   return condition.value(selectedIds.value);
 });
