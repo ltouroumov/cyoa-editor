@@ -115,14 +115,17 @@ export const useProjectStore = defineStore('project', () => {
           selectedN = addOrRemove(objectId, false);
         });
       }
-
-      // Remove any objects that are incompatible with the selected object
-      selectedN = R.pickBy((_, objectId): boolean => {
-        const object = getObject.value(objectId);
-        const pred = buildConditions(object);
-        return pred(R.keys(selectedN));
-      }, selectedN);
     }
+
+    // Remove any objects that do not meet the condition
+    // Removes Incompatible objects, and objects who's requirements are no longer met
+    // TODO: Warn user about incompatible objects or requirements that will be removed,
+    // rather than just removing them
+    selectedN = R.pickBy((_, objectId): boolean => {
+      const object = getObject.value(objectId);
+      const pred = buildConditions(object);
+      return pred(R.keys(selectedN));
+    }, selectedN);
 
     // If allowedChoices is > 0, then there is a limit on the number of objects selected from the same row
     // If allowedChoices is 0, then there is no limit
