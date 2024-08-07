@@ -94,9 +94,13 @@ export const useProjectStore = defineStore('project', () => {
 
       const queue = [node];
       const results = [];
+      const visisted = new Set();
 
       while (queue.length > 0) {
         const current = queue.shift()!;
+        if (visisted.has(current)) continue;
+        visisted.add(current);
+
         const children = buildRootCondition(
           getObjectOrRow.value(current).requireds,
         );
