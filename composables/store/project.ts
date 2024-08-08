@@ -75,8 +75,9 @@ export const useProjectStore = defineStore('project', () => {
   // Takes any id as string, and returns either a ProjectRow or ProjectObj
   const getObjectOrRow = computed(() => {
     const getItem = (itemId: string) => {
-      if (R.filter((row) => row.id === itemId, projectRows.value).length > 0) {
-        return getRow.value(itemId);
+      const row = R.filter((row) => row.id === itemId, projectRows.value);
+      if (row.length > 0) {
+        return row[0];
       } else {
         return getObject.value(itemId);
       }
