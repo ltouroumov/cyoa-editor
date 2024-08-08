@@ -102,9 +102,18 @@ export const useProjectStore = defineStore('project', () => {
         if (visisted.has(current)) continue;
         visisted.add(current);
 
-        const children = buildRootCondition(
-          getObjectOrRow.value(current).requireds,
-        );
+        const item = getObjectOrRow.value(current);
+        let children = null;
+        if (item && item.requireds) {
+          children = buildRootCondition(item.requireds);
+        } else {
+          if (!item) {
+            console.warn(
+              `Invalid object ID: ${current}, skipping...\n(HINT: This may be a sign of a deleted object or row)`,
+            );
+          }
+          continue;
+        }
 
         results.push(...children.deps);
         queue.push(...children.deps);
