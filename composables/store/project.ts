@@ -87,20 +87,20 @@ export const useProjectStore = defineStore('project', () => {
   });
 
   // Transversely, build a condition tree for a given row or object
-  const getParentRowConditions = computed(() => {
-    const parentRowConditions = (node: string) => {
-      if (!node) {
+  const getParentConditions = computed(() => {
+    const parentConditions = (node: string) => {
+      if (R.isEmpty(node)) {
         return [];
       }
 
       const queue = [node];
       const results = [];
-      const visisted = new Set();
+      const visited = new Set();
 
       while (queue.length > 0) {
         const current = queue.shift()!;
-        if (visisted.has(current)) continue;
-        visisted.add(current);
+        if (visited.has(current)) continue;
+        visited.add(current);
 
         const item = getObjectOrRow.value(current);
         let children = null;
@@ -115,19 +115,19 @@ export const useProjectStore = defineStore('project', () => {
           continue;
         }
 
-        results.push(...children.deps);
+        results.push(current);
         queue.push(...children.deps);
       }
       return results;
     };
 
-    return parentRowConditions;
+    return parentConditions;
   });
 
   // Check if a given row or object is sastified by the current selection
   const getParentConditionsIsSastified = computed(() => {
     const isSastified = (id: string) => {
-      const parentConditions = getParentRowConditions.value(id);
+      const parentConditions = getParentConditions.value(id);
       for (const item in parentConditions) {
         const pred = buildConditions(
           getObjectOrRow.value(parentConditions[item]),
@@ -298,7 +298,7 @@ export const useProjectStore = defineStore('project', () => {
     getObject,
     getObjectRow,
     getObjectOrRow,
-    getParentRowConditions,
+    getParentConditions,
     getParentConditionsIsSastified,
     setSelected,
     incSelected,
