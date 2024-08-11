@@ -163,7 +163,8 @@ function copyExportText() {
   }, 4000);
 }
 
-const LEGACY_RX = /([a-zA-Z0-9-]+)(?:\/ON#|:)?(\d*)/g;
+const LEGACY_RX =
+  /^(?:[a-zA-Z0-9-]+(?:\/ON#\d+)?)(?:,[a-zA-Z0-9-]+(?:\/ON#\d+)?)*$/;
 function readImportCode() {
   const _code = importCode.value?.trim();
   console.log(`Import Code ${_code}`);
