@@ -31,7 +31,11 @@
         </div>
         <div class="pack-import-export">
           <strong>Import / Export</strong>
-          <textarea v-model="importCode" class="import-code form-control" />
+          <textarea
+            v-model="importCode"
+            class="import-code form-control"
+            placeholder="Will delete all selected items if empty!!"
+          />
           <button
             class="import-btn btn btn-outline-primary"
             @click="readImportCode"
@@ -159,11 +163,16 @@ function copyExportText() {
   }, 4000);
 }
 
-const LEGACY_RX = /^(\w+(\/ON#\d+)?)(,(\w+(\/ON#\d+)?))*$/;
+const LEGACY_RX =
+  /^(?:[a-zA-Z0-9-]+(?:\/ON#\d+)?)(?:,[a-zA-Z0-9-]+(?:\/ON#\d+)?)*$/;
 function readImportCode() {
   const _code = importCode.value?.trim();
   console.log(`Import Code ${_code}`);
-  if (!_code) return;
+  if (!_code) {
+    console.log(`No import code provided. Clearing Selections...`);
+    selected.value = {};
+    return;
+  }
 
   const selections: Selections = {};
   if (LEGACY_RX.test(_code)) {
