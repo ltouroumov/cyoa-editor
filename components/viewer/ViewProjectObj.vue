@@ -73,11 +73,13 @@ const {
   obj,
   preview = false,
   width = null,
+  alwaysEnable = false,
 } = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
   preview?: boolean;
   width?: string;
+  alwaysEnable?: boolean;
 }>();
 
 const objClass = computed(() => {
@@ -96,7 +98,12 @@ const store = useProjectStore();
 const { selectedIds, selected } = useProjectRefs();
 
 const condition = computed(() => buildConditions(obj));
-const isEnabled = computed<boolean>(() => condition.value(selectedIds.value));
+const isEnabled = computed<boolean>(() => {
+  // always enable when alwaysEnable prop is set to true
+  // Used for the backpack, as objects should always be selectable when viewing the backpack
+  if (alwaysEnable) return true;
+  return condition.value(selectedIds.value);
+});
 const isSelected = computed<boolean>(() => R.has(obj.id, selected.value));
 
 const selectedAmount = computed(() => {

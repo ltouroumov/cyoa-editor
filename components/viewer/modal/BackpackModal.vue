@@ -24,7 +24,7 @@
                 :obj="obj"
                 :row="row"
                 :width="packRow.objectWidth"
-                :can-toggle="false"
+                :always-enable="true"
               />
             </div>
           </div>
