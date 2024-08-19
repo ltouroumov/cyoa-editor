@@ -49,6 +49,7 @@
           </template>
           <ViewScores :scores="obj.scores" />
           <ViewRequirements :requireds="obj.requireds" />
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <div class="obj-text" v-html="formatText(obj.text)"></div>
         </div>
       </div>

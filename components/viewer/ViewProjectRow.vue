@@ -14,6 +14,7 @@
           :alt="row.title"
         />
         <div class="row-title">{{ row.title }}</div>
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <div v-if="row.titleText" class="row-text" v-html="row.titleText" />
       </div>
       <div class="container-fluid p-0">
