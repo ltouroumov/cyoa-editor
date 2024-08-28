@@ -78,6 +78,11 @@ const loadRemoteFile = async ({ target }: MouseEvent) => {
         });
       }
 
+      progress.value = `Loading ${target.text}...`;
+      // A hack, but otherwise the progress value never updates before loadProject is called
+      const pause = new Promise((resolve) => setTimeout(resolve, 100));
+      await pause;
+
       const bodyBytes = new Uint8Array(received);
       let pos = 0;
       for (const chunk of chunks) {
