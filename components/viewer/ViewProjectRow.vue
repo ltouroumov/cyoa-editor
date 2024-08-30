@@ -5,7 +5,7 @@
       :styles="row.styling"
       row-id="row.id"
     />
-    <div class="project-row" :class="{ hidden: !isVisible }">
+    <div v-show="isVisible" class="project-row">
       <div class="row-body">
         <img
           v-if="row.image"
@@ -60,10 +60,6 @@ const isVisible = computed(() => condition(selectedIds.value));
   // Prevents collapsing margins with .row-body
   display: flex;
   flex-direction: column;
-
-  &.hidden {
-    display: none;
-  }
 
   .row-meta {
     display: flex;
