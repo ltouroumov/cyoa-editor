@@ -218,7 +218,7 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 </style>
 
 <style lang="scss">
-.search-modal .result-group {
+.search-modal .search-result-view {
   .project-obj {
     overflow-y: scroll;
   }
