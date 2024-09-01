@@ -218,10 +218,12 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 </style>
 
 <style lang="scss">
-.project-obj {
-  overflow-y: scroll;
-}
-.project-obj .project-obj-content {
-  overflow: unset;
+.search-modal .result-group {
+  .project-obj {
+    overflow-y: scroll;
+  }
+  .project-obj .project-obj-content {
+    overflow: unset;
+  }
 }
 </style>
