@@ -129,14 +129,27 @@ export const useProjectStore = defineStore('project', () => {
     const rowId = getObjectRow.value(id);
     const row = getRow.value(rowId);
     if (row.allowedChoices > 0 && !obj.isSelectableMultiple) {
+      // Get all objectIds selected as an array
+      const selectedKeys = R.keys(selectedN);
       // Of the selected objects, make a set of all objects selected from the same row
       const selectedRowObjects = R.intersection(
-        R.keys(selected.value),
+        selectedKeys,
         R.map(R.prop('id'), row.objects),
       );
+
+      let allowedChoices = row.allowedChoices;
+      // For each selected object, add the numToAddToAllowChoice to the allowedChoices if addToAllowChoice is true
+      // Only uses selected objects in the same row.
+      selectedKeys.forEach((objId: string) => {
+        const object = getObject.value(objId);
+        if (object.addToAllowChoice && object.idOfAllowChoice === rowId) {
+          allowedChoices = allowedChoices + object.numbAddToAllowChoice;
+        }
+      });
+
       // If the number of selected objects from the same row is equal to or greater than allowedChoices, deselect the oldest Object
       // Otherwise, select/unselect as needed
-      if (selectedRowObjects.length >= row.allowedChoices) {
+      if (selectedRowObjects.length >= allowedChoices) {
         const toDeselect = selectedRowObjects[0];
         selectedN = addOrRemove(toDeselect, false);
       }
