@@ -13,6 +13,7 @@ import {
 } from '~/composables/project';
 
 export type Selections = Record<string, number>;
+type Transform = (sel: Selections) => Selections;
 
 export const useProjectStore = defineStore('project', () => {
   const project = shallowRef<ProjectFile | null>(null);
@@ -82,67 +83,142 @@ export const useProjectStore = defineStore('project', () => {
   };
 
   const setSelected = (id: string, isSelected: boolean) => {
-    let selectedN = R.clone(selected.value);
+    const oldSelected: Selections = R.clone(selected.value);
+    const obj = getObject.value(id);
+
     // Add or remove object from selection based on isSelected
     // function for reuse
-    const addOrRemove = (objId: string, AddToSelected: boolean, num = 1) => {
-      if (AddToSelected) {
-        return R.assoc(objId, num, selectedN);
+    const addOrRemove = (objId: string, addToSelected: boolean) => {
+      if (addToSelected) {
+        return R.assoc(objId, 1);
       } else {
-        return R.dissoc(objId, selectedN);
+        return R.dissoc(objId);
       }
     };
-    // Associate or Dessociate an object from the selected record
-    selectedN = addOrRemove(id, isSelected);
 
-    const obj = getObject.value(id);
-    // If activateOtherChoice is true, select/deselect all objects in activateThisChoice
-    if (obj.activateOtherChoice) {
-      R.split(',', obj.activateThisChoice).forEach((objectId) => {
-        selectedN = addOrRemove(objectId, isSelected);
-      });
-    }
+    const addOrRemoveAll =
+      (objIds: string[], addToSelected: boolean): Transform =>
+      (sel: Selections) =>
+        R.reduceRight(
+          (id, acc) => addOrRemove(id, addToSelected)(acc),
+          sel,
+          objIds,
+        );
 
-    // Only care about deselecting objects if the object is currently being selected
-    if (isSelected) {
-      // If deactivateOtherChoice is true, deselect all objects in deactivateThisChoice
-      if (obj.deactivateOtherChoice) {
-        // Only deselect objects in deactivateThisChoice if the object is already selected
-        R.intersection(
-          R.keys(selected.value),
-          R.split(',', obj.deactivateThisChoice),
-        ).forEach((objectId) => {
-          selectedN = addOrRemove(objectId, false);
-        });
+    const addActivateOtherChoice = (
+      obj: ProjectObj,
+      addToSelected: boolean,
+    ): Transform => {
+      if (!obj.activateOtherChoice) {
+        return R.identity;
+      } else {
+        const choices = R.split(',', obj.activateThisChoice);
+        return addOrRemoveAll(choices, addToSelected);
       }
+    };
 
-      // Remove any objects that are incompatible with the selected object
-      selectedN = R.pickBy((_, objectId): boolean => {
+    const addDeactivateOtherChoice = (
+      obj: ProjectObj,
+      addToSelected: boolean,
+    ): Transform => {
+      // Skip if the object is being de-selected
+      if (!obj.deactivateOtherChoice || !addToSelected) {
+        return R.identity;
+      } else {
+        const choices = R.split(',', obj.activateThisChoice);
+        return addOrRemoveAll(choices, false);
+      }
+    };
+
+    const clearIncompatibleChoices = (): Transform => (sel: Selections) =>
+      R.pickBy((_, objectId): boolean => {
         const object = getObject.value(objectId);
         const pred = buildConditions(object);
-        return pred(R.keys(selectedN));
-      }, selectedN);
-    }
+        return pred(R.keys(sel));
+      }, sel);
 
-    // If allowedChoices is > 0, then there is a limit on the number of objects selected from the same row
-    // If allowedChoices is 0, then there is no limit
-    const rowId = getObjectRow.value(id);
-    const row = getRow.value(rowId);
-    if (row.allowedChoices > 0 && !obj.isSelectableMultiple) {
-      // Of the selected objects, make a set of all objects selected from the same row
-      const selectedRowObjects = R.intersection(
-        R.keys(selected.value),
-        R.map(R.prop('id'), row.objects),
-      );
-      // If the number of selected objects from the same row is equal to or greater than allowedChoices, deselect the oldest Object
-      // Otherwise, select/unselect as needed
-      if (selectedRowObjects.length >= row.allowedChoices) {
-        const toDeselect = selectedRowObjects[0];
-        selectedN = addOrRemove(toDeselect, false);
-      }
-    }
+    const enforceRowLimits =
+      (addedIds: string[]): Transform =>
+      (sel: Selections) => {
+        // Compute which rows had a modified limit based on the selected items
+        const rowDeltas: Record<string, number> = R.pipe(
+          R.toPairs,
+          R.reduceRight(([objectId, count]: [string, number], acc) => {
+            const obj: ProjectObj = getObject.value(objectId);
+            if (obj.addToAllowChoice) {
+              const path = [obj.idOfAllowChoice];
+              const delta = R.pipe(
+                R.pathOr(0, path),
+                // Multiply the allowed choices by the number of times the choice is selected
+                R.add(obj.numbAddToAllowChoice * count),
+              )(acc);
+              return R.assocPath(path, delta, acc);
+            } else {
+              return acc;
+            }
+          }, {}),
+        )(sel);
 
-    selected.value = selectedN;
+        const removeObjIds: string[] = R.pipe(
+          // Extract only the IDs since we don't care about the quantity
+          R.keys,
+          // Group by rowId
+          R.groupBy((objId: string): string => getObjectRow.value(objId)),
+          // Only check rows that had items added
+          // (by comparing the intersection with the added set)
+          R.pickBy((val: string[]) => {
+            return !R.isEmpty(R.intersection(val, addedIds));
+          }),
+          // Check the limit for each row and return the set of IDs to remove
+          R.mapObjIndexed(
+            (selectedObjIds: string[] | undefined, rowId: string): string[] => {
+              if (!selectedObjIds) return [];
+
+              const row: ProjectRow = getRow.value(rowId);
+
+              // Get the delta (if any) and ensure that the value cannot go below 0
+              const delta: number = R.propOr(0, row.id, rowDeltas);
+              const allowedChoices = Math.max(row.allowedChoices + delta, 0);
+
+              if (allowedChoices > 0) {
+                // If the number of selected objects from the same row is equal to or greater than allowedChoices,
+                // deselect the oldest objects
+                const amountToRemove = selectedObjIds.length - allowedChoices;
+                if (amountToRemove > 0) {
+                  // Exclude the newly added choices from the possible items to remove
+                  const canRemoveIds = R.difference(selectedObjIds, addedIds);
+                  return R.slice(0, amountToRemove, canRemoveIds);
+                }
+              }
+              return [];
+            },
+          ),
+          R.values,
+          R.flatten,
+        )(sel);
+
+        return addOrRemoveAll(removeObjIds, false)(sel);
+      };
+
+    // Compute the set of new selections
+    const newSelected: Selections = R.pipe(
+      // Add or remove the objectId to the selection array
+      addOrRemove(id, isSelected),
+      // Toggle the choices that depend on this object
+      addActivateOtherChoice(obj, isSelected),
+      // Disable the choices that depend on this object
+      addDeactivateOtherChoice(obj, isSelected),
+      // Remove incompatible objects
+      clearIncompatibleChoices(),
+    )(oldSelected);
+
+    // Compute which elements were added (if any)
+    const addedIds = R.difference(R.keys(newSelected), R.keys(oldSelected));
+    if (addedIds.length > 0) {
+      selected.value = enforceRowLimits(addedIds)(newSelected);
+    } else {
+      selected.value = newSelected;
+    }
   };
 
   const incSelected = (id: string, incValue: number = 1) => {

@@ -166,6 +166,10 @@ export type ProjectObj = HasId &
     numMultipleTimesMinus: string;
     numMultipleTimesPluss: string;
 
+    addToAllowChoice: boolean;
+    numbAddToAllowChoice: number;
+    idOfAllowChoice: string;
+
     isPrivateStyling: boolean;
     styling: ObjStyles;
   };

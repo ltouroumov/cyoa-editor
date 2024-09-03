@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from '#imports';
 import { useProjectStore } from '~/composables/store/project';
 
 const { loadProject } = useProjectStore();
