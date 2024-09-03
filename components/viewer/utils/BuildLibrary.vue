@@ -11,15 +11,26 @@
       <div v-for="build in builds" :key="build.id" class="build-details">
         <div class="name">{{ build.name }}</div>
         <div class="date">{{ build.updatedAt?.toLocaleDateString() }}</div>
-        <div class="choices">{{ build.selected }}</div>
+        <div class="choices">
+          <BuildChoices :selected="build.selected" />
+        </div>
         <div class="actions">
-          <button class="btn btn-outline-primary" @click="loadBuild(build)">
+          <button
+            class="btn btn-outline-primary btn-sm"
+            @click="loadBuild(build)"
+          >
             Load
           </button>
-          <button class="btn btn-outline-primary" @click="saveBuild(build)">
+          <button
+            class="btn btn-outline-primary btn-sm"
+            @click="saveBuild(build)"
+          >
             Save
           </button>
-          <button class="btn btn-outline-danger" @click="deleteBuild(build.id)">
+          <button
+            class="btn btn-outline-danger btn-sm"
+            @click="deleteBuild(build.id)"
+          >
             Delete
           </button>
         </div>
@@ -31,6 +42,7 @@
 <script setup lang="ts">
 import * as R from 'ramda';
 
+import BuildChoices from '~/components/viewer/utils/BuildChoices.vue';
 import { Selections, useProjectRefs } from '~/composables/store/project';
 import { IndexedDB } from '~/composables/utils/idb';
 
@@ -76,6 +88,7 @@ const addStuff = async () => {
       selected: R.clone(selected.value),
     });
     builds.value = await store.getAll();
+    buildName.value = '';
   });
 };
 
@@ -107,5 +120,47 @@ const loadBuild = (build: any) => {
 <style scoped lang="scss">
 .build-library {
   min-width: 500px;
+}
+
+.build-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  margin-top: 1rem;
+
+  .build-details {
+    display: grid;
+    grid-template:
+      'name actions' auto
+      'date actions' auto
+      'choices choices' auto
+      / 1fr auto;
+
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--bs-border-color);
+
+    .name {
+      grid-area: name;
+      font-size: 1.25em;
+      font-weight: bold;
+    }
+    .date {
+      grid-area: date;
+      font-style: italic;
+      color: gray;
+    }
+    .choices {
+      grid-area: choices;
+    }
+    .actions {
+      grid-area: actions;
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+  }
 }
 </style>
