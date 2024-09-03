@@ -139,7 +139,7 @@ export const useProjectStore = defineStore('project', () => {
 
       let allowedChoices = row.allowedChoices;
       // For each selected object, add the numToAddToAllowChoice to the allowedChoices if addToAllowChoice is true
-      // Only uses selected objects in the same row.
+      // Only uses selected objects when object's idOfAllowChoice is the same as the selected Object's row
       selectedKeys.forEach((objId: string) => {
         const object = getObject.value(objId);
         if (object.addToAllowChoice && object.idOfAllowChoice === rowId) {
