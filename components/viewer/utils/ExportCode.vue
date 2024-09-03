@@ -1,31 +1,43 @@
 <template>
   <div class="export-code-wrapper">
-    <textarea class="export-code form-control" :value="exportCode" />
-    <button
-      class="export-code-btn btn btn-outline-primary"
-      :class="{ isCopied: isCodeCopied }"
-      @click="copyExportCode"
-    >
-      <span v-if="isCodeCopied">Copied to Clipboard!</span>
-      <span v-else>Copy to Clipboard</span>
-    </button>
-    <textarea class="export-text form-control" :value="exportText" />
-    <div class="export-text-toggle form-check">
-      <input
-        v-model="exportTextHeaders"
-        class="form-check-input"
-        type="checkbox"
+    <div class="export-code">
+      <textarea
+        class="export-code-input form-control"
+        placeholder="Nothing has been selected yet ..."
+        :value="exportCode"
       />
-      <label class="form-check-label">Add Section Titles</label>
+      <button
+        class="export-code-btn btn btn-outline-primary"
+        :class="{ isCopied: isCodeCopied }"
+        @click="copyExportCode"
+      >
+        <span v-if="isCodeCopied">Copied to Clipboard!</span>
+        <span v-else>Copy to Clipboard</span>
+      </button>
     </div>
-    <button
-      class="export-text-btn btn btn-outline-primary"
-      :class="{ isCopied: isTextCopied }"
-      @click="copyExportText"
-    >
-      <span v-if="isTextCopied">Copied to Clipboard!</span>
-      <span v-else>Copy to Clipboard</span>
-    </button>
+    <div class="export-text">
+      <textarea
+        class="export-text-input form-control"
+        placeholder="Nothing has been selected yet ..."
+        :value="exportText"
+      />
+      <div class="export-text-toggle form-check">
+        <input
+          v-model="exportTextHeaders"
+          class="form-check-input"
+          type="checkbox"
+        />
+        <label class="form-check-label">Add Section Titles</label>
+      </div>
+      <button
+        class="export-text-btn btn btn-outline-primary"
+        :class="{ isCopied: isTextCopied }"
+        @click="copyExportText"
+      >
+        <span v-if="isTextCopied">Copied to Clipboard!</span>
+        <span v-else>Copy to Clipboard</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -114,8 +126,15 @@ function copyExportText() {
 .export-code-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 
   min-width: 500px;
+
+  .export-code,
+  .export-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 </style>

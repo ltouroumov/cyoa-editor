@@ -2,7 +2,8 @@
   <div class="obj-addon" :class="{ disabled: !isEnabled }">
     <div class="obj-title">{{ addon.title }}</div>
     <ViewRequirements :requireds="addon.requireds" :show-always="true" />
-    <div class="obj-text">{{ addon.text }}</div>
+    <!-- eslint-disable-next-line vue/no-v-html -->
+    <div class="obj-text" v-html="formatText(addon.text)"></div>
   </div>
 </template>
 

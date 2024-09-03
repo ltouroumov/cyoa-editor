@@ -110,6 +110,7 @@ dialog.modal-window {
   .modal-body {
     display: flex;
     overflow: auto;
+    flex-direction: column;
   }
 }
 </style>

@@ -32,7 +32,7 @@ export const useProjectStore = defineStore('project', () => {
     () => project.value?.data.rows ?? [],
   );
 
-  const getRow = computed(() => {
+  const getRow: ComputedRef<(id: string) => ProjectRow> = computed(() => {
     const rows: Record<string, ProjectRow> = R.fromPairs(
       R.map(
         (row: ProjectRow): [string, ProjectRow] => [row.id, row],
@@ -43,7 +43,7 @@ export const useProjectStore = defineStore('project', () => {
     return (id: string) => rows[id];
   });
 
-  const getObject = computed(() => {
+  const getObject: ComputedRef<(id: string) => ProjectObj> = computed(() => {
     const objects: Record<string, ProjectObj> = R.fromPairs(
       R.chain(
         (row: ProjectRow) =>
@@ -58,7 +58,7 @@ export const useProjectStore = defineStore('project', () => {
     return (id: string) => objects[id];
   });
 
-  const getObjectRow = computed(() => {
+  const getObjectRow: ComputedRef<(id: string) => string> = computed(() => {
     const mapping: Record<string, string> = R.fromPairs(
       R.chain(
         (row: ProjectRow) =>
@@ -82,7 +82,7 @@ export const useProjectStore = defineStore('project', () => {
     selected.value = {};
   };
 
-  const setSelected = (id: string, isSelected: boolean) => {
+  const setSelected = (id: string, isSelected: boolean): void => {
     const oldSelected: Selections = R.clone(selected.value);
     const obj = getObject.value(id);
 
@@ -162,6 +162,7 @@ export const useProjectStore = defineStore('project', () => {
         const removeObjIds: string[] = R.pipe(
           // Extract only the IDs since we don't care about the quantity
           R.keys,
+          R.filter((key) => typeof key === 'string'),
           // Group by rowId
           R.groupBy((objId: string): string => getObjectRow.value(objId)),
           // Only check rows that had items added
@@ -262,7 +263,8 @@ export const useProjectStore = defineStore('project', () => {
 
     return R.pipe(
       R.keys,
-      R.map((id): { obj: ProjectObj; count: number } => ({
+      R.filter((key) => typeof key === 'string'),
+      R.map((id: string): { obj: ProjectObj; count: number } => ({
         obj: getObject.value(id),
         count: _selected[id],
       })),

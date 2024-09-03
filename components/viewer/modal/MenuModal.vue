@@ -44,8 +44,8 @@
         <ProjectMenu :project-list="viewerProjectList" />
       </div>
       <div v-if="selected === 'save-load'">
-        <ExportCode />
         <ImportCode />
+        <ExportCode />
       </div>
       <div v-if="selected === 'library'">
         <BuildLibrary />

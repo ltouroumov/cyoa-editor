@@ -29,6 +29,10 @@
             </div>
           </div>
         </div>
+        <div class="pack-import-export">
+          <ImportCode />
+          <ExportCode />
+        </div>
       </div>
     </template>
   </ModalDialog>
@@ -39,6 +43,8 @@ import * as R from 'ramda';
 import { computed } from 'vue';
 
 import ModalDialog from '~/components/utils/ModalDialog.vue';
+import ExportCode from '~/components/viewer/utils/ExportCode.vue';
+import ImportCode from '~/components/viewer/utils/ImportCode.vue';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
@@ -105,6 +111,19 @@ const packRows = computed(() => {
       padding-left: 0;
       padding-right: 0;
     }
+  }
+}
+
+.pack-import-export {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+
+  .import-code-wrapper {
+    flex-grow: 1;
+  }
+  .export-code-wrapper {
+    flex-grow: 1;
   }
 }
 </style>

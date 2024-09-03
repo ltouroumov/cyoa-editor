@@ -33,10 +33,10 @@
 </template>
 
 <script setup lang="ts">
-import { ViewerProjectList } from 'composables/viewer';
 import { Project } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
+import { ViewerProjectList } from '~/composables/viewer';
 
 const isLoading = ref<boolean>(false);
 const progress = ref<string | null>(null);

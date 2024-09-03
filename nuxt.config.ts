@@ -7,6 +7,7 @@ export default defineNuxtConfig({
       title: 'Interactive CYOA',
     },
   },
+  ssr: false,
   imports: { autoImport: true },
   css: [
     '@unocss/reset/normalize.css',
