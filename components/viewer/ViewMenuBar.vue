@@ -6,7 +6,7 @@
       <div class="d-flex flex-row items-center">
         <button
           class="btn btn-light btn-lg i-solar-hamburger-menu-outline"
-          @click="toggleProjectMenu(true)"
+          @click="toggleProjectMenu()"
         />
       </div>
       <ViewScoreStatus />
@@ -34,5 +34,6 @@ const { toggleBackpack, toggleSearch, toggleProjectMenu } = useViewerStore();
 <style scoped lang="scss">
 .navbar {
   position: sticky;
+  height: 40px;
 }
 </style>
