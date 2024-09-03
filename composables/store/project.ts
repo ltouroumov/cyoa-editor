@@ -103,6 +103,10 @@ export const useProjectStore = defineStore('project', () => {
       });
     }
 
+    const rowId = getObjectRow.value(id);
+    const row = getRow.value(rowId);
+    // To limit the number of objects selected from the same row
+    let allowedChoices = row.allowedChoices;
     // Only care about deselecting objects if the object is currently being selected
     if (isSelected) {
       // If deactivateOtherChoice is true, deselect all objects in deactivateThisChoice
@@ -115,37 +119,33 @@ export const useProjectStore = defineStore('project', () => {
           selectedN = addOrRemove(objectId, false);
         });
       }
+    }
 
-      // Remove any objects that are incompatible with the selected object
-      selectedN = R.pickBy((_, objectId): boolean => {
-        const object = getObject.value(objectId);
+    // For each object selected, loop through the selected objects
+    selectedN = R.pickBy((_, objectId): boolean => {
+      const object = getObject.value(objectId);
+
+      // If addToAllowChoice is true, add the number of additional choices to allowedChoices
+      if (object.addToAllowChoice && object.idOfAllowChoice === rowId) {
+        allowedChoices = allowedChoices + object.numbAddToAllowChoice;
+      }
+
+      if (isSelected) {
+        // Remove any objects that are incompatible with the selected object
         const pred = buildConditions(object);
         return pred(R.keys(selectedN));
-      }, selectedN);
-    }
+      } else return true;
+    }, selectedN);
 
     // If allowedChoices is > 0, then there is a limit on the number of objects selected from the same row
     // If allowedChoices is 0, then there is no limit
-    const rowId = getObjectRow.value(id);
-    const row = getRow.value(rowId);
+
     if (row.allowedChoices > 0 && !obj.isSelectableMultiple) {
-      // Get all objectIds selected as an array
-      const selectedKeys = R.keys(selectedN);
       // Of the selected objects, make a set of all objects selected from the same row
       const selectedRowObjects = R.intersection(
-        selectedKeys,
+        R.keys(selected.value),
         R.map(R.prop('id'), row.objects),
       );
-
-      let allowedChoices = row.allowedChoices;
-      // For each selected object, add the numToAddToAllowChoice to the allowedChoices if addToAllowChoice is true
-      // Only uses selected objects when object's idOfAllowChoice is the same as the selected Object's row
-      selectedKeys.forEach((objId: string) => {
-        const object = getObject.value(objId);
-        if (object.addToAllowChoice && object.idOfAllowChoice === rowId) {
-          allowedChoices = allowedChoices + object.numbAddToAllowChoice;
-        }
-      });
 
       // If the number of selected objects from the same row is equal to or greater than allowedChoices, deselect the oldest Object
       // Otherwise, select/unselect as needed
