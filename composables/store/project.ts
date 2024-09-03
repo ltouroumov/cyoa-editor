@@ -103,24 +103,21 @@ export const useProjectStore = defineStore('project', () => {
       });
     }
 
+    // If deactivateOtherChoice is true, deselect all objects in deactivateThisChoice
+    if (obj.deactivateOtherChoice && isSelected) {
+      // Only deselect objects in deactivateThisChoice if the object is already selected
+      R.intersection(
+        R.keys(selected.value),
+        R.split(',', obj.deactivateThisChoice),
+      ).forEach((objectId) => {
+        selectedN = addOrRemove(objectId, false);
+      });
+    }
+
     const rowId = getObjectRow.value(id);
     const row = getRow.value(rowId);
     // To limit the number of objects selected from the same row
     let allowedChoices = row.allowedChoices;
-    // Only care about deselecting objects if the object is currently being selected
-    if (isSelected) {
-      // If deactivateOtherChoice is true, deselect all objects in deactivateThisChoice
-      if (obj.deactivateOtherChoice) {
-        // Only deselect objects in deactivateThisChoice if the object is already selected
-        R.intersection(
-          R.keys(selected.value),
-          R.split(',', obj.deactivateThisChoice),
-        ).forEach((objectId) => {
-          selectedN = addOrRemove(objectId, false);
-        });
-      }
-    }
-
     // For each object selected, loop through the selected objects
     selectedN = R.pickBy((_, objectId): boolean => {
       const object = getObject.value(objectId);
@@ -139,7 +136,6 @@ export const useProjectStore = defineStore('project', () => {
 
     // If allowedChoices is > 0, then there is a limit on the number of objects selected from the same row
     // If allowedChoices is 0, then there is no limit
-
     if (row.allowedChoices > 0 && !obj.isSelectableMultiple) {
       // Of the selected objects, make a set of all objects selected from the same row
       const selectedRowObjects = R.intersection(
