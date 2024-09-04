@@ -14,8 +14,13 @@
           :alt="row.title"
         />
         <div class="row-title">{{ row.title }}</div>
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <div v-if="row.titleText" class="row-text" v-html="row.titleText" />
+        <!-- eslint-disable vue/no-v-html -->
+        <div
+          v-if="row.titleText"
+          class="row-text"
+          v-html="formatText(row.titleText)"
+        />
+        <!-- eslint-enable vue/no-v-html -->
       </div>
       <div class="container-fluid p-0">
         <div class="row g-2">
@@ -38,6 +43,7 @@ import StyleRow from '~/components/viewer/style/StyleRow.vue';
 import { buildConditions } from '~/composables/conditions';
 import { ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
+import { formatText } from '~/composables/text';
 
 const { row } = defineProps<{
   row: ProjectRow;

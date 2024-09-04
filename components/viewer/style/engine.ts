@@ -97,20 +97,21 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       .row-text {
         font-size: {{rowTextTextSize}}%;
         text-align: {{rowTextAlign}};
-        padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}px;
+        padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}%;
       }
       .row-image {
         width: {{rowImageWidth}}%;
         margin-top: {{rowImageMarginTop}}px;
       }
       .row-body {
-        margin-top: {{rowBodyMarginTop}}px;
-        margin-bottom: {{rowBodyMarginBottom}}px;
-        margin-left: {{rowBodyMarginSides}}px;
-        margin-right: {{rowBodyMarginSides}}px;
+        margin-left: {{rowMargin}}%;
+        margin-right: {{rowMargin}}%;
       }
 
-      margin: {{rowMargin}}px;
+      margin-top: {{rowBodyMarginTop}}px;
+      margin-bottom: {{rowBodyMarginBottom}}px;
+      margin-left: {{rowBodyMarginSides}}%;
+      margin-right: {{rowBodyMarginSides}}%;
     }
   `;
 }
