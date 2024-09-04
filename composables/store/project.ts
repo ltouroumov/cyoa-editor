@@ -176,6 +176,10 @@ export const useProjectStore = defineStore('project', () => {
               if (!selectedObjIds) return [];
 
               const row: ProjectRow = getRow.value(rowId);
+              const selectedObjList: string[] = R.filter(
+                (objId) => !getObject.value(objId)?.isSelectableMultiple,
+                selectedObjIds,
+              );
 
               // Get the delta (if any) and ensure that the value cannot go below 0
               const delta: number = R.propOr(0, row.id, rowDeltas);
@@ -184,10 +188,10 @@ export const useProjectStore = defineStore('project', () => {
               if (allowedChoices > 0) {
                 // If the number of selected objects from the same row is equal to or greater than allowedChoices,
                 // deselect the oldest objects
-                const amountToRemove = selectedObjIds.length - allowedChoices;
+                const amountToRemove = selectedObjList.length - allowedChoices;
                 if (amountToRemove > 0) {
                   // Exclude the newly added choices from the possible items to remove
-                  const canRemoveIds = R.difference(selectedObjIds, addedIds);
+                  const canRemoveIds = R.difference(selectedObjList, addedIds);
                   return R.slice(0, amountToRemove, canRemoveIds);
                 }
               }

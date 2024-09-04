@@ -7,21 +7,27 @@ export default defineNuxtConfig({
       title: 'Interactive CYOA',
     },
   },
+
   ssr: false,
   imports: { autoImport: true },
+
   css: [
     '@unocss/reset/normalize.css',
     '~/assets/css/bootstrap/global.scss',
     '~/assets/css/main.css',
   ],
+
   plugins: [],
   devtools: { enabled: true },
   typescript: { typeCheck: true },
+
   components: [
     {
       path: '~/components',
       pathPrefix: false,
     },
   ],
+
   modules: ['@unocss/nuxt', '@pinia/nuxt', '@vueuse/nuxt'],
+  compatibilityDate: '2024-09-04',
 });
