@@ -85,9 +85,6 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       background-color: {{rowBgColor}};
       {{/if}}
       
-      font-family: {{rowText}};
-      color: {{rowTextColor}};
-      
       .row-title {
         font-family: {{rowTitle}};
         font-size: {{rowTitleTextSize}}%;
@@ -95,13 +92,24 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
         color: {{rowTitleColor}};
       }
       .row-text {
-        font-size: {{rowTextTextSize}}%;
+        font-family: {{rowText}};
         text-align: {{rowTextAlign}};
+        font-size: {{rowTextTextSize}}%;
+        color: {{rowTextColor}};
         padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}%;
       }
       .row-image {
         width: {{rowImageWidth}}%;
-        margin-top: {{rowImageMarginTop}}px;
+        margin-top: {{rowImageMarginTop}}%;
+        margin-bottom: {{rowImageMarginBottom}}%;
+
+        {{#if rowImgOverflowIsOn}}
+        overflow: hidden;
+        {{/if}}
+
+        {{#if rowImgBorderIsOn}}
+        border: {{rowImgBorderWidth}}px {{rowImgBorderStyle}} {{rowImgBorderColor}};
+        {{/if}}
       }
       .row-body {
         margin-left: {{rowMargin}}%;
@@ -112,6 +120,14 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       margin-bottom: {{rowBodyMarginBottom}}px;
       margin-left: {{rowBodyMarginSides}}%;
       margin-right: {{rowBodyMarginSides}}%;
+
+      {{#if rowOverFlowIsOn}}
+      overflow: hidden;
+      {{/if}}
+
+      {{#if rowBorderIsOn}}
+      border: {{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}};
+      {{/if}}
     }
   `;
 }
@@ -160,8 +176,6 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       background-color: {{objectBgColor}};
       {{/if}}
       
-      font-family: {{objectText}};
-      color: {{objectTextColor}};
       .obj-title {
         font-family: {{objectTitle}};
         font-size: {{objectTitleTextSize}}%;
@@ -169,15 +183,49 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         text-align: {{objectTitleAlign}};
       }
       .obj-text {
-        font-size: {{objectTextTextSize}}%;
+        font-family: {{objectText}};
         text-align: {{objectTextAlign}};
+        color: {{objectTextColor}};
+        padding: {{objectTextPadding}}px;
+        font-size: {{objectTextTextSize}}%;
       }
       .obj-image {
         width: {{objectImageWidth}}%;
         margin-top: {{objectImageMarginTop}}px;
         margin-bottom: {{objectImageMarginBottom}}px;
-        object-fit: cover;
+
+        {{#if objectImgObjectFillIsOn}}
+        object-fit: {{objectImgObjectFillStyle}};
+        height: {{objectImgObjectFillHeight}}px;
+        {{/if}}
+
+        {{#if objectImgOverflowIsOn}}
+        overflow: hidden;
+        {{/if}}
       }
+      .addon {
+        .text {
+          font-family: {{addonText}};
+          font-size: {{addonTextTextSize}}%;
+          color: {{addonTextColor}};
+          text-align: {{addonTextAlign}};
+        }
+
+        .title {
+          font-family: {{addonTitle}};
+          font-size: {{addonTitleTextSize}}%;
+          color: {{addonTitleColor}};
+          text-align: {{addonTitleAlign}};
+        }
+      }
+
+      /* FIXME: Disabled as it messes up parent colunms, appears related to grid.css
+      margin: {{objectMargin}}px;
+      */
+
+      {{#if objectOverflowIsOn}}
+      overflow: hidden;
+      {{/if}}
 
       {{#if objectBorderIsOn}}
       border-color: {{objectBorderColor}};

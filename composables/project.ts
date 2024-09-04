@@ -27,13 +27,12 @@ export type ObjStyles = ScoreStyles & {
   objectText: string;
   objectTextTextSize: 100;
   objectTextAlign: TextAlignT;
+  objectTextColor: string;
   objectTextPadding: 10;
 
   objectImageWidth: number;
   objectImageMarginTop: number;
   objectImageMarginBottom: number;
-
-  objectTextColor: string;
 
   objectBgColorIsOn: boolean;
   objectBgColor: string;
@@ -51,9 +50,14 @@ export type ObjStyles = ScoreStyles & {
 
   objectImgBorderColor: string;
   objectImgBorderIsOn: boolean;
+  objectImgFillIsOn: boolean;
+  objectImgObjectFillStyle: string;
+  objectImgObjectFillHeight: string;
+  objectImgOverflowIsOn: boolean;
 
   objectMargin: number;
   objectHeight: boolean;
+  objectOverflowIsOn: boolean;
 
   selBgColorIsOn: boolean;
   selFilterBgColor: string;
@@ -85,17 +89,19 @@ export type RowStyles = ObjStyles &
     rowBodyMarginTop: number | string;
 
     rowBorderColor: string;
-    rowBorderIsOn: false;
+    rowBorderIsOn: boolean;
     rowBorderStyle: string;
     rowBorderWidth: number;
     rowOverFlowIsOn: boolean;
 
     rowImageMarginTop: number;
+    rowImageMarginBottom: number;
     rowImageWidth: number;
     rowImgBorderColor: string;
     rowImgBorderIsOn: boolean;
     rowImgBorderStyle: string;
     rowImgBorderWidth: number;
+    rowImgOverflowIsOn: boolean;
 
     rowMargin: number;
   };

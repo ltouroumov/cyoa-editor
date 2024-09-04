@@ -61,6 +61,11 @@ const isVisible = computed(() => condition(selectedIds.value));
   display: flex;
   flex-direction: column;
 
+  .margin {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
   .row-meta {
     display: flex;
     flex-direction: column;
