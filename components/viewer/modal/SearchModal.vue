@@ -38,6 +38,7 @@
             :obj="searchView.obj"
             :row="searchView.row"
             preview
+            template="1"
           />
         </div>
       </div>
@@ -171,6 +172,8 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
   display: grid;
   gap: 0.5em;
 
+  height: 100%;
+
   grid-template:
     'header header' auto
     'list list' 1fr
@@ -179,7 +182,7 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
   &.show-view {
     grid-template:
       'header header' auto
-      'list view' 1fr
+      'list view' auto
       / 2fr 1fr;
   }
 

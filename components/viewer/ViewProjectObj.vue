@@ -14,14 +14,16 @@
       }"
       @click="toggle"
     >
-      <div class="project-obj-content">
-        <img
-          v-if="obj.image"
-          class="obj-image"
-          loading="lazy"
-          :src="obj.image"
-          :alt="obj.title"
-        />
+      <div class="project-obj-content" :class="objTemplateClass">
+        <div class="obj-image-wrapper">
+          <img
+            v-if="obj.image"
+            class="obj-image"
+            loading="lazy"
+            :src="obj.image"
+            :alt="obj.title"
+          />
+        </div>
         <div class="obj-content">
           <div class="obj-title">
             {{ obj.title }}
@@ -49,15 +51,20 @@
           </template>
           <ViewScores :scores="obj.scores" />
           <ViewRequirements :requireds="obj.requireds" />
-          <!-- eslint-disable-next-line vue/no-v-html -->
+          <!-- eslint-disable vue/no-v-html -->
           <div
             v-if="obj.text"
             class="obj-text"
             v-html="formatText(obj.text)"
           ></div>
+          <!-- eslint-enable vue/no-v-html -->
         </div>
+        <ViewAddon
+          v-for="(addon, idx) in obj.addons"
+          :key="idx"
+          :addon="addon"
+        />
       </div>
-      <ViewAddon v-for="(addon, idx) in obj.addons" :key="idx" :addon="addon" />
     </div>
   </div>
 </template>
@@ -79,12 +86,14 @@ const {
   preview = false,
   width = null,
   alwaysEnable = false,
+  template = null,
 } = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
   preview?: boolean;
   width?: string;
   alwaysEnable?: boolean;
+  template?: string;
 }>();
 
 const objClass = computed(() => {
@@ -97,6 +106,21 @@ const objClass = computed(() => {
   }
 
   return ['col', { [className]: true }];
+});
+
+const objTemplateClass = computed(() => {
+  // Allow to override the template
+  // Used in the search results since the object view is always single-column
+  switch (template ?? obj.template) {
+    case '1':
+      return 'obj-template-top';
+    case '2':
+      return 'obj-template-left';
+    case '3':
+      return 'obj-template-right';
+  }
+
+  return 'obj-template-top';
 });
 
 const store = useProjectStore();
@@ -158,6 +182,25 @@ const decrement = () => {
 
   .project-obj-content {
     overflow: auto;
+
+    &.obj-template-top {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      grid-template-areas: 'image' 'text';
+    }
+    &.obj-template-left {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: 'image text';
+    }
+    &.obj-template-right {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: 'text image';
+    }
   }
 
   &.notSelectable {
@@ -165,12 +208,21 @@ const decrement = () => {
     border-radius: 0;
   }
 
+  .obj-image-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    grid-area: image;
+  }
   .obj-image {
     width: 100%;
+    object-fit: contain;
   }
 
   .obj-content {
     overflow-x: auto;
+    grid-area: text;
 
     .obj-title {
       margin-bottom: 5px;

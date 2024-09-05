@@ -198,10 +198,6 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         object-fit: {{objectImgObjectFillStyle}};
         height: {{objectImgObjectFillHeight}}px;
         {{/if}}
-
-        {{#if objectImgOverflowIsOn}}
-        overflow: hidden;
-        {{/if}}
       }
       .addon {
         .text {
@@ -222,10 +218,6 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       /* FIXME: Disabled as it messes up parent colunms, appears related to grid.css
       margin: {{objectMargin}}px;
       */
-
-      {{#if objectOverflowIsOn}}
-      overflow: hidden;
-      {{/if}}
 
       {{#if objectBorderIsOn}}
       border-color: {{objectBorderColor}};

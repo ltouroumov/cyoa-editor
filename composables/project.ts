@@ -178,6 +178,7 @@ export type ProjectObj = HasId &
 
     isPrivateStyling: boolean;
     styling: ObjStyles;
+    template: string;
   };
 
 export type ProjectRow = HasId &
