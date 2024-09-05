@@ -1,9 +1,9 @@
 <template>
-  <div class="obj-addon" :class="{ disabled: !isEnabled }">
-    <div class="obj-title">{{ addon.title }}</div>
+  <div class="addon" :class="{ disabled: !isEnabled }">
+    <div class="title">{{ addon.title }}</div>
     <ViewRequirements :requireds="addon.requireds" :show-always="true" />
     <!-- eslint-disable-next-line vue/no-v-html -->
-    <div class="obj-text" v-html="formatText(addon.text)"></div>
+    <div class="text" v-html="formatText(addon.text)"></div>
   </div>
 </template>
 
@@ -32,16 +32,6 @@ watch(selectedIds, (newSelection) => {
 
   &.disabled {
     background: gray;
-  }
-
-  .obj-title {
-    font-size: 1em;
-    font-weight: bold;
-    text-align: center;
-  }
-
-  .obj-text {
-    text-align: center;
   }
 }
 </style>

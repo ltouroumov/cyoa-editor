@@ -50,7 +50,11 @@
           <ViewScores :scores="obj.scores" />
           <ViewRequirements :requireds="obj.requireds" />
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <div class="obj-text" v-html="formatText(obj.text)"></div>
+          <div
+            v-if="obj.text"
+            class="obj-text"
+            v-html="formatText(obj.text)"
+          ></div>
         </div>
       </div>
       <ViewAddon v-for="(addon, idx) in obj.addons" :key="idx" :addon="addon" />
