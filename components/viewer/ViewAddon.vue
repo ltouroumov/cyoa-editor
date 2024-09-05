@@ -26,12 +26,7 @@ watch(selectedIds, (newSelection) => {
 </script>
 
 <style lang="scss">
-.obj-addon {
+.addon {
   padding: 0.5em;
-  border-top: 1px solid white;
-
-  &.disabled {
-    background: gray;
-  }
 }
 </style>
