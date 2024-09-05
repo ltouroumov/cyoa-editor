@@ -72,6 +72,7 @@
 <script setup lang="ts">
 import * as R from 'ramda';
 
+import { ObjectSizes } from '~/components/viewer/style/sizes';
 import ViewScores from '~/components/viewer/ViewScores.vue';
 import { buildConditions } from '~/composables/conditions';
 import { ProjectObj, ProjectRow } from '~/composables/project';
@@ -100,17 +101,17 @@ const objClass = computed(() => {
   if (preview) return ['obj-preview'];
   if (width) return ['col', { [width]: true }];
 
-  let className = row.objectWidth;
+  let objectSize = row.objectWidth;
   if (obj.objectWidth) {
-    className = obj.objectWidth;
+    objectSize = obj.objectWidth;
   }
 
-  if (className === 'col-12') {
-    // Full-Width object
-    return ['col', 'col-12'];
+  if (objectSize in ObjectSizes) {
+    const classes = ObjectSizes[objectSize];
+    return ['col', 'col-12', ...classes];
   } else {
-    // Add grid fallback for other objects
-    return ['col', 'col-12', 'col-sm-6', { [className]: true }];
+    console.log(`Missing size reducer for ${objectSize}`);
+    return ['col', 'col-12', objectSize];
   }
 });
 
@@ -236,6 +237,24 @@ const decrement = () => {
       flex-direction: row;
       justify-content: center;
       align-items: center;
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  $widths: (
+    20: 20%,
+    14: 14%,
+    12: 12%,
+    11: 11%,
+    10: 10%,
+    9: 9%,
+  );
+
+  @each $width, $size in $widths {
+    .w-md-#{$width} {
+      flex: 0 0 $size !important;
+      max-width: $size !important;
     }
   }
 }
