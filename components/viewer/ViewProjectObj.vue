@@ -173,6 +173,7 @@ const decrement = () => {
 <style lang="scss">
 .obj-preview {
   overflow: auto;
+  position: sticky;
 }
 .project-obj {
   height: 100%;
