@@ -186,7 +186,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         font-family: {{objectText}};
         text-align: {{objectTextAlign}};
         color: {{objectTextColor}};
-        padding: {{objectTextPadding}}px;
+        padding: max({{objectTextPadding}}px, 0.75rem);
         font-size: {{objectTextTextSize}}%;
       }
       .obj-image {
@@ -205,6 +205,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
           font-size: {{addonTextTextSize}}%;
           color: {{addonTextColor}};
           text-align: {{addonTextAlign}};
+          padding: max({{objectTextPadding}}px, 0.75rem);
         }
 
         .title {
@@ -212,6 +213,10 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
           font-size: {{addonTitleTextSize}}%;
           color: {{addonTitleColor}};
           text-align: {{addonTitleAlign}};
+        }
+        
+        &.disabled {
+          background-color: {{reqFilterBgColor}}
         }
       }
 
