@@ -1,5 +1,5 @@
 <template>
-  <div class="obj-score" :class="{ disabled: !isEnabled }">
+  <div class="score" :class="{ disabled: !isEnabled }">
     <span v-if="score.beforeText" class="score-before">{{
       score.beforeText
     }}</span>
@@ -28,7 +28,7 @@ const isEnabled = computed<boolean>(() => condition(selectedIds.value));
 </script>
 
 <style lang="scss">
-.obj-score {
+.score {
   display: flex;
   flex-direction: row;
   gap: 5px;
