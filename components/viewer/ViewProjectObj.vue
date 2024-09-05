@@ -105,7 +105,13 @@ const objClass = computed(() => {
     className = obj.objectWidth;
   }
 
-  return ['col', { [className]: true }];
+  if (className === 'col-12') {
+    // Full-Width object
+    return ['col', 'col-12'];
+  } else {
+    // Add grid fallback for other objects
+    return ['col', 'col-12', 'col-sm-6', { [className]: true }];
+  }
 });
 
 const objTemplateClass = computed(() => {
@@ -171,9 +177,6 @@ const decrement = () => {
 </script>
 
 <style lang="scss">
-.obj-preview {
-  overflow: auto;
-}
 .project-obj {
   height: 100%;
   overflow: hidden;
