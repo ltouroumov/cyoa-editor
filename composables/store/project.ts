@@ -125,7 +125,7 @@ export const useProjectStore = defineStore('project', () => {
       if (!obj.deactivateOtherChoice || !addToSelected) {
         return R.identity;
       } else {
-        const choices = R.split(',', obj.activateThisChoice);
+        const choices = R.split(',', obj.deactivateThisChoice);
         return addOrRemoveAll(choices, false);
       }
     };
