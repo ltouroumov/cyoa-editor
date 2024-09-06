@@ -1,15 +1,19 @@
 <template>
   <div
     v-if="req.showRequired || showAlways"
-    class="obj-requirement score"
+    class="obj-requirement"
     :class="{ disabled: !isEnabled }"
   >
-    <span v-if="!req.required && showAlways">Incompatible: </span>
-    <span v-else-if="req.beforeText">{{ req.beforeText }}</span>
-    <div v-if="req.type === 'id'">
+    <span v-if="!req.required && showAlways" class="req-before-text">
+      Incompatible:
+    </span>
+    <span v-else-if="req.beforeText" class="req-before-text">
+      {{ req.beforeText }}
+    </span>
+    <template v-if="req.type === 'id'">
       <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
-    </div>
-    <div v-else-if="req.type === 'or'">
+    </template>
+    <template v-else-if="req.type === 'or'">
       <span v-for="(orReq, idx) in req.orRequired" :key="idx">
         <template v-if="orReq.req">
           <span v-if="idx > 0"
@@ -19,7 +23,7 @@
           {{ getObject(orReq.req)?.title ?? '???' }}
         </template>
       </span>
-    </div>
+    </template>
     <div v-else>Unknown Condition</div>
     <span v-if="req.afterText">{{ req.afterText }}</span>
   </div>
@@ -45,9 +49,9 @@ const isEnabled = computed<boolean>(() => condition(selectedIds.value));
 
 <style lang="scss">
 .obj-requirement {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
+  .req-before-text {
+    margin-right: 0.2rem;
+  }
 
   &.disabled {
     display: none;

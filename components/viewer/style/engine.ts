@@ -220,12 +220,12 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         }
       }
 
-    .score {
-      font-family: {{scoreText}};
-      font-size: {{scoreTextSize}}%;
-      text-align: {{scoreTextAlign}};
-      color: {{scoreTextColor}};
-    }
+      .obj-score, .obj-requirements {
+        font-family: {{scoreText}};
+        font-size: {{scoreTextSize}}%;
+        text-align: {{scoreTextAlign}};
+        color: {{scoreTextColor}};
+      }
 
       /* FIXME: Disabled as it messes up parent colunms, appears related to grid.css
       margin: {{objectMargin}}px;
