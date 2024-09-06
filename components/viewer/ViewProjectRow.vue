@@ -6,13 +6,13 @@
       row-id="row.id"
     />
     <div v-show="isVisible" class="project-row">
+      <img
+        v-if="row.image"
+        class="row-image"
+        :src="row.image"
+        :alt="row.title"
+      />
       <div class="row-body">
-        <img
-          v-if="row.image"
-          class="row-image"
-          :src="row.image"
-          :alt="row.title"
-        />
         <div class="row-title">{{ row.title }}</div>
         <!-- eslint-disable vue/no-v-html -->
         <div

@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="req.showRequired || showAlways"
-    class="obj-requirement"
+    class="obj-requirement score"
     :class="{ disabled: !isEnabled }"
   >
     <span v-if="!req.required && showAlways">Incompatible: </span>

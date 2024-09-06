@@ -41,6 +41,10 @@ const projectList = computed(() => viewerProjectList.value);
 <style lang="scss">
 @import '~/assets/css/bootstrap/config';
 
+html {
+  font-size: 16px;
+}
+
 .project {
   font-family: sans-serif;
   padding: 0 1em;

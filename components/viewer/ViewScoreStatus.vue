@@ -39,7 +39,7 @@ const activeScores = computed<{ score: PointType; value: number }[]>(() => {
   )(scores);
 });
 </script>
-<style land="scss">
+<style scoped land="scss">
 .score {
   padding-right: 25px;
 }
