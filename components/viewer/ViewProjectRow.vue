@@ -3,7 +3,7 @@
     <StyleRow
       v-if="row.isPrivateStyling"
       :styles="row.styling"
-      row-id="row.id"
+      :row-id="row.id"
     />
     <div v-show="isVisible" class="project-row">
       <img
