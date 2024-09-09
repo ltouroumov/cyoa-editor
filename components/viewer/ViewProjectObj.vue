@@ -72,14 +72,14 @@
 <script setup lang="ts">
 import * as R from 'ramda';
 
+import StyleObj from './style/StyleObj.vue';
+
 import { ObjectSizes } from '~/components/viewer/style/sizes';
 import ViewScores from '~/components/viewer/ViewScores.vue';
 import { buildConditions } from '~/composables/conditions';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
-
-import StyleObj from './style/StyleObj.vue';
 
 const {
   row,
