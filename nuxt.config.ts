@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
   ],
 
-  plugins: [],
+  plugins: ['~/plugins/vue-toastify.ts'],
   devtools: { enabled: true },
   typescript: { typeCheck: true },
 

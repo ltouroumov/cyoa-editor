@@ -186,6 +186,16 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
       / 2fr 1fr;
   }
 
+  @media screen and (max-width: 768px) {
+    &.show-view {
+      grid-template:
+        'header' auto
+        'list' 1fr
+        'view' 1fr
+        / 1fr;
+    }
+  }
+
   .search-header {
     grid-area: header;
   }

@@ -98,7 +98,7 @@ function request2promise(request: IDBRequest): Promise<any> {
       resolve(request.result);
     };
     request.onerror = () => {
-      resolve(request.error);
+      reject(request.error);
     };
   });
 }

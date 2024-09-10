@@ -5,7 +5,7 @@
     :class="{ show: show }"
     @cancel="onCancel"
   >
-    <div class="modal-content">
+    <div v-if="show" class="modal-content">
       <div class="modal-header">
         <slot name="header" />
         <button
@@ -86,8 +86,8 @@ dialog.modal-window {
   border: 0;
   background: none;
 
-  min-width: var(--bs-modal-width);
-  min-height: $modal-sm;
+  //min-width: var(--bs-modal-width);
+  //min-height: $modal-sm;
   width: 80%;
   height: 80%;
 
@@ -111,6 +111,19 @@ dialog.modal-window {
     display: flex;
     overflow: auto;
     flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  dialog.modal-window {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+
+    .modal-content {
+      border-radius: 0;
+    }
   }
 }
 </style>
