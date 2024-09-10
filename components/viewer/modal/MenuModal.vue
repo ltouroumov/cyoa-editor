@@ -73,6 +73,13 @@ const selected = ref<string>('project');
   width: auto;
 }
 
+@media screen and (max-width: 768px) {
+  .menu-modal {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
 .pack-import-export {
   display: grid;
   gap: 0.5rem;
