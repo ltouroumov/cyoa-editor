@@ -151,7 +151,7 @@ function copyExportText() {
   flex-direction: column;
   gap: 1rem;
 
-  min-width: 500px;
+  // min-width: 500px;
 
   .export-code,
   .export-text {

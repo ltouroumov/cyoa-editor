@@ -2,6 +2,7 @@
   <div
     class="offcanvas"
     :class="[{ show: props.show, hiding: !props.show }, positionClass]"
+    v-bind="$attrs"
   >
     <div v-if="props.header ?? true" class="offcanvas-header">
       <slot name="header" />
@@ -18,6 +19,11 @@
       <slot />
     </div>
   </div>
+  <div
+    v-if="show"
+    class="offcanvas-backdrop fade show"
+    @click="$emit('close')"
+  ></div>
 </template>
 
 <script setup lang="ts">

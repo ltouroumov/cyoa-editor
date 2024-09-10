@@ -45,6 +45,7 @@
       </div>
       <div v-if="selected === 'save-load'">
         <ImportCode />
+        <hr />
         <ExportCode />
       </div>
       <div v-if="selected === 'library'">
@@ -66,19 +67,6 @@ const selected = ref<string>('project');
 
 <style scoped lang="scss">
 @import '~/assets/css/bootstrap/config';
-
-.menu-modal {
-  margin-top: 40px;
-  max-width: 50%;
-  width: auto;
-}
-
-@media screen and (max-width: 768px) {
-  .menu-modal {
-    width: 100%;
-    max-width: 100%;
-  }
-}
 
 .pack-import-export {
   display: grid;
@@ -122,6 +110,20 @@ const selected = ref<string>('project');
   .isCopied {
     color: white;
     background-color: green;
+  }
+}
+</style>
+
+<style lang="scss">
+.menu-modal {
+  margin-top: 40px;
+  width: 768px !important;
+}
+
+@media screen and (max-width: 768px) {
+  .menu-modal {
+    width: 100% !important;
+    max-width: 100%;
   }
 }
 </style>

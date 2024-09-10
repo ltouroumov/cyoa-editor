@@ -86,6 +86,7 @@ const {
   obj,
   preview = false,
   width = null,
+  forceWidth = null,
   alwaysEnable = false,
   template = null,
 } = defineProps<{
@@ -93,17 +94,21 @@ const {
   obj: ProjectObj;
   preview?: boolean;
   width?: string;
+  forceWidth?: string;
   alwaysEnable?: boolean;
   template?: string;
 }>();
 
 const objClass = computed(() => {
   if (preview) return ['obj-preview'];
-  if (width) return ['col', { [width]: true }];
+  if (forceWidth) return ['col', { [forceWidth]: true }];
 
   let objectSize = row.objectWidth;
   if (obj.objectWidth) {
     objectSize = obj.objectWidth;
+  }
+  if (width) {
+    objectSize = width;
   }
 
   if (objectSize in ObjectSizes) {

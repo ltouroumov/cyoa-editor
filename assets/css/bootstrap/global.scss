@@ -4,3 +4,10 @@
 body {
   background: $body-bg-dark;
 }
+
+// Black Magic
+// https://stackoverflow.com/a/77722504
+body:has(dialog[open]),
+body:has(div.offcanvas.show) {
+  overflow: hidden;
+}

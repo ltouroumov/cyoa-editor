@@ -66,6 +66,6 @@ function readImportCode() {
   flex-direction: column;
   gap: 0.5rem;
 
-  min-width: 500px;
+  // min-width: 500px;
 }
 </style>

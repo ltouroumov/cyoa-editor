@@ -126,4 +126,10 @@ const packRows = computed(() => {
     flex-grow: 1;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .pack-import-export {
+    flex-direction: column;
+  }
+}
 </style>

@@ -1,11 +1,14 @@
 <template>
-  <div class="d-flex gap-3" :class="{ 'flex-column': vertical }">
+  <div class="d-flex gap-2" :class="{ 'flex-column': vertical }">
     <span
       v-for="{ score, value } in activeScores"
       :key="score.id"
       class="d-flex score flex-row gap-2"
     >
-      <span v-if="score.beforeText && !short" class="d-none d-sm-block">
+      <span
+        v-if="score.beforeText"
+        :class="short ? ['d-none', 'd-sm-block'] : []"
+      >
         {{ score.beforeText }}
       </span>
       <span>{{ -value }}</span>
@@ -21,7 +24,7 @@ import { computed } from 'vue';
 import { PointType } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 
-const { vertical, short = true } = defineProps<{
+const { vertical, short = false } = defineProps<{
   vertical?: boolean;
   short?: boolean;
 }>();

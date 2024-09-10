@@ -94,6 +94,8 @@ dialog.modal-window {
   display: none;
   overflow: hidden;
 
+  overscroll-behavior: contain;
+
   &.show {
     position: fixed;
     display: flex;

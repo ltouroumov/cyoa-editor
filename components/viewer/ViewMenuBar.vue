@@ -9,7 +9,7 @@
           @click="toggleProjectMenu()"
         />
       </div>
-      <ViewScoreStatus />
+      <ViewScoreStatus short />
       <div class="d-flex gap-1">
         <button
           class="btn btn-light btn-lg i-solar-magnifer-outline"
@@ -32,8 +32,14 @@ const { toggleBackpack, toggleSearch, toggleProjectMenu } = useViewerStore();
 </script>
 
 <style scoped lang="scss">
+@import '~/assets/css/bootstrap/config';
+
 .navbar {
   position: sticky;
   height: 40px;
+}
+
+body:has(.menu-modal.show) .navbar {
+  z-index: $zindex-offcanvas;
 }
 </style>
