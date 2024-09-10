@@ -6,6 +6,19 @@
         placeholder="Nothing has been selected yet ..."
         :value="exportCode"
       />
+      <div class="form-check form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="flexSwitchCheckChecked"
+          v-model="exportNewCodeStyle"
+          checked
+        />
+        <label class="form-check-label" for="flexSwitchCheckChecked"
+          >Use new style of build codes</label
+        >
+      </div>
       <button
         class="btn btn-outline-primary export-code-btn"
         :class="{ isCopied: isCodeCopied }"
@@ -76,10 +89,20 @@ const packRows = computed(() => {
   );
 });
 
+const exportNewCodeStyle = ref<boolean>(true);
 const exportCode = computed<string>(() => {
+  const join = exportNewCodeStyle.value ? ';' : ',';
+
   return R.pipe(
-    R.map(([id, amt]) => (amt > 1 ? `${id}:${amt}` : id)),
-    R.join(';'),
+    R.map(([id, amt]) => {
+      if (exportNewCodeStyle.value) {
+        return amt > 1 ? `${id}:${amt}` : id;
+      } else {
+        const object = getObject(id);
+        return amt > 1 || object.isSelectableMultiple ? `${id}/ON#${amt}` : id;
+      }
+    }),
+    R.join(join),
   )(R.toPairs(selected.value));
 });
 const exportTextHeaders = ref<boolean>(false);
