@@ -16,7 +16,7 @@
     <MenuModal />
   </div>
   <div v-else class="dialog-container">
-    <div class="dialog bg-dark-subtle text-light">
+    <div class="bg-dark-subtle dialog text-light">
       <ProjectMenu :project-list="projectList" />
     </div>
   </div>

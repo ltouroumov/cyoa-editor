@@ -28,7 +28,7 @@
             Save
           </button>
           <button
-            class="btn btn-outline-danger btn-sm"
+            class="btn btn-sm btn-outline-danger"
             @click="deleteBuild(build.id)"
           >
             Delete

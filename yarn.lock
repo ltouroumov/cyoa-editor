@@ -2620,7 +2620,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/utils@npm:^8.1.0, @typescript-eslint/utils@npm:^8.4.0":
+"@typescript-eslint/utils@npm:^8.1.0, @typescript-eslint/utils@npm:^8.2.0, @typescript-eslint/utils@npm:^8.4.0":
   version: 8.5.0
   resolution: "@typescript-eslint/utils@npm:8.5.0"
   dependencies:
@@ -2767,6 +2767,28 @@ __metadata:
   version: 0.62.3
   resolution: "@unocss/core@npm:0.62.3"
   checksum: 5971fe6db286816e768b0ac8e514bf9b05e23f0bfa843522cf27d0c81a41df75d8a646c0d86518110a4e8bff8215147eba0b7a4b93a62d176a53a8f3eabfc50a
+  languageName: node
+  linkType: hard
+
+"@unocss/eslint-config@npm:^0.62.3":
+  version: 0.62.3
+  resolution: "@unocss/eslint-config@npm:0.62.3"
+  dependencies:
+    "@unocss/eslint-plugin": 0.62.3
+  checksum: 4c4399d530d0b8a2566a617748ce68fdece172ddcc63ad566b3124ebe8d2ed8afc85de876ee67d44aef3060d51564d9e4ee001a5c8fe926e95fbbf998f5443b7
+  languageName: node
+  linkType: hard
+
+"@unocss/eslint-plugin@npm:0.62.3":
+  version: 0.62.3
+  resolution: "@unocss/eslint-plugin@npm:0.62.3"
+  dependencies:
+    "@typescript-eslint/utils": ^8.2.0
+    "@unocss/config": 0.62.3
+    "@unocss/core": 0.62.3
+    magic-string: ^0.30.11
+    synckit: ^0.9.1
+  checksum: 3cfda49e7dc2a6cd5ca83fef96ff53a4b20c8bfbdb5fe2549a458fae953b0a7580e6277b17563190c39a1c139d8a6cb46e61978ff034d6888bad170ba498b094
   languageName: node
   linkType: hard
 
@@ -8523,6 +8545,7 @@ __metadata:
     "@types/ramda": ^0.30.2
     "@typescript-eslint/eslint-plugin": ^8.4.0
     "@typescript-eslint/parser": ^8.4.0
+    "@unocss/eslint-config": ^0.62.3
     "@unocss/nuxt": ^0.62.3
     "@unocss/reset": ^0.62.3
     "@vueuse/core": ^11.0.3

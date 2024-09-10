@@ -4,7 +4,7 @@
       <h5 class="m-0">Choices</h5>
     </template>
     <template #default>
-      <div class="pack-content bg-dark flex-grow-1">
+      <div class="pack-content flex-grow-1 bg-dark">
         <div class="pack-scores">
           <ViewScoreStatus vertical />
         </div>

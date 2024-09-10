@@ -3,7 +3,7 @@
     <span
       v-for="{ score, value } in activeScores"
       :key="score.id"
-      class="d-flex flex-row gap-2 score"
+      class="d-flex score flex-row gap-2"
     >
       <span v-if="score.beforeText && !short">{{ score.beforeText }}</span>
       <span>{{ -value }}</span>

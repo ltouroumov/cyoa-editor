@@ -13,6 +13,7 @@
     "@nuxt",
     "plugin:@typescript-eslint/recommended",
     "plugin:vue/vue3-recommended",
+    "@unocss",
     "plugin:prettier/recommended",
     "prettier",
     "plugin:import/recommended",
