@@ -93,7 +93,7 @@ export class ObjectStore {
 }
 
 function request2promise(request: IDBRequest): Promise<any> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     request.onsuccess = () => {
       resolve(request.result);
     };
