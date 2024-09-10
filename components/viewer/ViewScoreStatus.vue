@@ -1,11 +1,13 @@
 <template>
-  <div class="d-flex gap-1" :class="{ 'flex-column': vertical }">
+  <div class="d-flex gap-3" :class="{ 'flex-column': vertical }">
     <span
       v-for="{ score, value } in activeScores"
       :key="score.id"
       class="d-flex score flex-row gap-2"
     >
-      <span v-if="score.beforeText && !short">{{ score.beforeText }}</span>
+      <span v-if="score.beforeText && !short" class="d-none d-sm-block">
+        {{ score.beforeText }}
+      </span>
       <span>{{ -value }}</span>
       <span v-if="score.afterText">{{ score.afterText }}</span>
     </span>
@@ -39,8 +41,8 @@ const activeScores = computed<{ score: PointType; value: number }[]>(() => {
   )(scores);
 });
 </script>
-<style scoped land="scss">
+<style scoped lang="scss">
 .score {
-  padding-right: 25px;
+  // padding-right: 25px;
 }
 </style>
