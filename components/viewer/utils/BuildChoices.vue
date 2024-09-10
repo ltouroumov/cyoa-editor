@@ -3,14 +3,14 @@
     <template v-for="({ packRow, choices }, idx) in packRows" :key="packRow.id">
       <span v-if="idx > 0" class="group-spacer">|</span>
       <strong class="choice-group-title">{{ packRow.title }}:</strong>
-      <template v-for="({ obj, count }, idx) in choices" :key="obj.id">
+      <template v-for="({ obj, count }, idx2) in choices" :key="obj.id">
         <span class="choice-name">
           {{ obj.title }}
           <span v-if="obj.isSelectableMultiple" class="choice-count">
             (x{{ count }})
           </span>
         </span>
-        <span v-if="idx < choices.length - 1" class="choice-spacer">,</span>
+        <span v-if="idx2 < choices.length - 1" class="choice-spacer">,</span>
       </template>
     </template>
   </div>

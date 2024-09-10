@@ -2,12 +2,12 @@
   <div class="export-code-wrapper">
     <div class="export-code">
       <textarea
-        class="export-code-input form-control"
+        class="form-control export-code-input"
         placeholder="Nothing has been selected yet ..."
         :value="exportCode"
       />
       <button
-        class="export-code-btn btn btn-outline-primary"
+        class="btn btn-outline-primary export-code-btn"
         :class="{ isCopied: isCodeCopied }"
         @click="copyExportCode"
       >
@@ -17,7 +17,7 @@
     </div>
     <div class="export-text">
       <textarea
-        class="export-text-input form-control"
+        class="form-control export-text-input"
         placeholder="Nothing has been selected yet ..."
         :value="exportText"
       />
@@ -30,7 +30,7 @@
         <label class="form-check-label">Add Section Titles</label>
       </div>
       <button
-        class="export-text-btn btn btn-outline-primary"
+        class="btn btn-outline-primary export-text-btn"
         :class="{ isCopied: isTextCopied }"
         @click="copyExportText"
       >

@@ -12,7 +12,7 @@
     <div v-if="error" class="alert alert-danger mb-3" role="alert">
       {{ error }}
     </div>
-    <div class="d-flex gap-2 justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center gap-2">
       <button
         class="btn btn-primary"
         :class="{ disabled: !canLoad }"

@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="navbar sticky-top navbar-expand-lg bg-dark-subtle text-white navbar-dark"
+    class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark-subtle text-white"
   >
     <div class="container-fluid">
       <div class="d-flex flex-row items-center">

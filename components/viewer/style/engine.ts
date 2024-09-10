@@ -9,6 +9,7 @@ export abstract class StyleGenerator<T> {
 }
 
 type TransformT<S, O> = (styles: S) => O;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TransformR<S, TR extends Record<string, TransformT<S, any>>> = {
   [K in keyof TR]: ReturnType<TR[K]>;
 };
@@ -20,6 +21,7 @@ const StyleUtils = {
 
   applyTransforms: <
     S extends object,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     TR extends Record<string, TransformT<S, any>>,
   >(
     styles: S,

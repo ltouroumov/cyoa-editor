@@ -2,10 +2,10 @@
   <div class="import-code-wrapper">
     <textarea
       v-model="importCode"
-      class="import-code form-control"
+      class="form-control import-code"
       placeholder="Will delete all selected items if empty!!"
     />
-    <button class="import-btn btn btn-outline-primary" @click="readImportCode">
+    <button class="btn btn-outline-primary import-btn" @click="readImportCode">
       Import Build
     </button>
   </div>

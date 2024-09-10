@@ -1,8 +1,8 @@
 <template>
-  <nav class="navbar fixed-bottom navbar-dark bg-dark">
+  <nav class="navbar navbar-dark fixed-bottom bg-dark">
     <div class="container-fluid justify-content-between">
       <div>
-        <button class="btn btn-dark btn-lg i-solar-book-bold" />
+        <button class="btn btn-lg btn-dark i-solar-book-bold" />
       </div>
       <ViewScoreStatus />
       <div class="d-flex gap-2">
