@@ -8,16 +8,16 @@
       />
       <div class="form-check form-switch">
         <input
+          id="useNewStyleCodesSwitch"
+          v-model="exportNewCodeStyle"
           class="form-check-input"
           type="checkbox"
           role="switch"
-          id="flexSwitchCheckChecked"
-          v-model="exportNewCodeStyle"
           checked
         />
-        <label class="form-check-label" for="flexSwitchCheckChecked"
-          >Use new style of build codes</label
-        >
+        <label class="form-check-label" for="useNewStyleCodesSwitch">
+          Use new style of build codes
+        </label>
       </div>
       <button
         class="btn btn-outline-primary export-code-btn"
@@ -34,13 +34,17 @@
         placeholder="Nothing has been selected yet ..."
         :value="exportText"
       />
-      <div class="export-text-toggle form-check">
+      <div class="export-text-toggle form-check form-switch">
         <input
+          id="sectionTitleSwitch"
           v-model="exportTextHeaders"
           class="form-check-input"
           type="checkbox"
+          role="switch"
         />
-        <label class="form-check-label">Add Section Titles</label>
+        <label class="form-check-label" for="sectionTitleSwitch">
+          Add Section Titles
+        </label>
       </div>
       <button
         class="btn btn-outline-primary export-text-btn"
