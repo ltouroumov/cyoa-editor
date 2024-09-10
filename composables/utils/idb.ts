@@ -67,6 +67,7 @@ export class Transaction {
   }
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export class ObjectStore {
   constructor(private readonly os: IDBObjectStore) {}
 
@@ -92,7 +93,7 @@ export class ObjectStore {
 }
 
 function request2promise(request: IDBRequest): Promise<any> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     request.onsuccess = () => {
       resolve(request.result);
     };
@@ -101,3 +102,4 @@ function request2promise(request: IDBRequest): Promise<any> {
     };
   });
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */

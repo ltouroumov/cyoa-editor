@@ -21,6 +21,7 @@
   "plugins": ["@typescript-eslint", "nuxt", "import", "unused-imports"],
   "rules": {
     "no-console": "off",
+    "vue/multi-word-component-names": "off",
     "sort-imports": [
       "error",
       {

@@ -92,7 +92,7 @@ const addStuff = async () => {
   });
 };
 
-const saveBuild = async (build: any) => {
+const saveBuild = async (build: BuildData) => {
   await db.transaction('builds', 'readwrite', async (tx) => {
     const store = tx.objectStore('builds');
     await store.put({
@@ -104,7 +104,7 @@ const saveBuild = async (build: any) => {
   });
 };
 
-const deleteBuild = async (id: any) => {
+const deleteBuild = async (id: number) => {
   await db.transaction('builds', 'readwrite', async (tx) => {
     const store = tx.objectStore('builds');
     await store.delete(id);
@@ -112,7 +112,7 @@ const deleteBuild = async (id: any) => {
   });
 };
 
-const loadBuild = (build: any) => {
+const loadBuild = (build: BuildData) => {
   selected.value = build.selected;
 };
 </script>
