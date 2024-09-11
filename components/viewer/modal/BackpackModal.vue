@@ -14,7 +14,7 @@
         </button>
         <div
           v-if="isLoading"
-          class="d-flex align-items-center justify-content-start mb-3 gap-3 pt-3"
+          class="d-flex align-items-center justify-content-start mb-3 gap-3"
         >
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
