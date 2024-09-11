@@ -22,7 +22,11 @@
           }}</strong>
         </div>
 
-        <div ref="backpackRef" class="backpack-container">
+        <div
+          ref="backpackRef"
+          class="backpack-container"
+          :class="{ backpackRender: isLoading }"
+        >
           <div class="pack-info-container">
             <div class="pack-scores">
               <ViewScoreStatus vertical />
@@ -146,6 +150,7 @@ const backpackToImage = async () => {
     await pause;
     const url = await domToDataUrl(backpackRef.value, {
       backgroundColor: project?.data.styling.backgroundColor,
+      width: 1280,
       async progress(current: number, total: number) {
         await nextTick(() => {
           progress.value = `Downloading images... ${Math.round(
@@ -165,6 +170,7 @@ const backpackToImage = async () => {
     });
 
     URL.revokeObjectURL(url);
+    element.remove();
   } else if (packRows.value.length === 0) {
     alert(
       'No objects selected to create a backpack image, select at least one object to create a image.',
@@ -216,6 +222,10 @@ const backpackToImage = async () => {
       padding-right: 0;
     }
   }
+}
+
+.backpackRender {
+  width: 1280px !important;
 }
 
 .pack-import-export {
