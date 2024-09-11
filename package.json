@@ -44,6 +44,7 @@
     "@vueuse/nuxt": "^11.0.3",
     "bootstrap": "5.3.*",
     "handlebars": "^4.7.8",
+    "modern-screenshot": "^4.4.39",
     "perfect-debounce": "^1.0.0",
     "pinia": "^2.2.2",
     "ramda": "^0.30.1",

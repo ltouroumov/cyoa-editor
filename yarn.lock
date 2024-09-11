@@ -8381,6 +8381,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"modern-screenshot@npm:^4.4.39":
+  version: 4.4.39
+  resolution: "modern-screenshot@npm:4.4.39"
+  checksum: 9db308f2f0be8275afb52320008124c32b3ab43e20e9477a42f7f93f2a2e87933dcd378aea5b3a7fe38608ae3d9650dcca0040033d05aeffcde21a9e358299d2
+  languageName: node
+  linkType: hard
+
 "mri@npm:^1.2.0":
   version: 1.2.0
   resolution: "mri@npm:1.2.0"
@@ -8812,6 +8819,7 @@ __metadata:
     eslint-plugin-prettier: ^5.2.1
     eslint-plugin-unused-imports: ^4.1.3
     handlebars: ^4.7.8
+    modern-screenshot: ^4.4.39
     nuxt: ^3.13.0
     perfect-debounce: ^1.0.0
     pinia: ^2.2.2
