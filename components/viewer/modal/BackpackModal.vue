@@ -5,12 +5,16 @@
     </template>
     <template #default>
       <div class="pack-content flex-grow-1 bg-dark">
-        <button type="button" class="btn btn-primary" @click="backpackToImage">
+        <button
+          type="button"
+          class="btn btn-primary mb-3"
+          @click="backpackToImage"
+        >
           Download backpack as Image
         </button>
         <div
           v-if="isLoading"
-          class="d-flex align-items-center justify-content-start mb-3 gap-3"
+          class="d-flex align-items-center justify-content-start mb-3 gap-3 pt-3"
         >
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
