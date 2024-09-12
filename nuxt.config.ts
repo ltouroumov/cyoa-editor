@@ -14,10 +14,11 @@ export default defineNuxtConfig({
   css: [
     '@unocss/reset/normalize.css',
     '~/assets/css/bootstrap/global.scss',
+    '~/assets/css/toast.scss',
     '~/assets/css/main.css',
   ],
 
-  plugins: ['~/plugins/vue-toastify.ts'],
+  plugins: ['~/plugins/toast.client.ts'],
   devtools: { enabled: true },
   typescript: { typeCheck: true },
 

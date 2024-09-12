@@ -14,9 +14,11 @@
 <script setup lang="ts">
 import * as R from 'ramda';
 import { ref } from 'vue';
+import { useToast } from 'vue-toastification';
 
 import { Selections, useProjectRefs } from '~/composables/store/project';
 
+const $toast = useToast();
 const { selected } = useProjectRefs();
 const importCode = ref<string>();
 
@@ -27,6 +29,8 @@ function readImportCode() {
   console.log(`Import Code ${_code}`);
   if (!_code) {
     console.log(`No import code provided. Clearing Selections...`);
+    console.log('Toast Client', $toast);
+    $toast.info('Build Cleared');
     selected.value = {};
     return;
   }
@@ -57,6 +61,7 @@ function readImportCode() {
   }
   selected.value = selections;
   importCode.value = '';
+  $toast.info('Build Code Loaded');
 }
 </script>
 
