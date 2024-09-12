@@ -13,20 +13,6 @@
           Download backpack as Image
         </button>
         <div
-          v-if="isLoading"
-          class="d-flex align-items-center justify-content-start mb-3 gap-3"
-        >
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-          <strong>{{
-            !progress
-              ? 'Generating image... (This might take a while)'
-              : progress
-          }}</strong>
-        </div>
-
-        <div
           ref="backpackRef"
           class="backpack-container"
           :class="{ backpackRender: isLoading }"
@@ -98,6 +84,7 @@
 import { domToDataUrl } from 'modern-screenshot';
 import * as R from 'ramda';
 import { computed } from 'vue';
+import { useToast } from 'vue-toastification';
 
 import ModalDialog from '~/components/utils/ModalDialog.vue';
 import ExportCode from '~/components/viewer/utils/ExportCode.vue';
@@ -145,36 +132,52 @@ const objectMode = computed(() => {
 
 const backpackRef = ref<HTMLDivElement>();
 const isLoading = ref(false);
-const progress = ref<string | null>(null);
 const backpackToImage = async () => {
   if (backpackRef.value && packRows.value.length >= 1) {
     isLoading.value = true;
+    const $toast = useToast();
+    const toastId = $toast.info(
+      'Generating image...\n(This can take while, especially with large builds)',
+      {
+        timeout: false,
+      },
+    );
     // A hack, the DOM won't update until after html2canvas is called otherwise
-    const pause = new Promise((resolve) => setTimeout(resolve, 100));
+    const pause = new Promise((resolve) => setTimeout(resolve, 200));
     await pause;
     const url = await domToDataUrl(backpackRef.value, {
       backgroundColor: project?.data.styling.backgroundColor,
       width: 1280,
       async progress(current: number, total: number) {
+      includeStyleProperties: ['project-obj'],
+      async progress(current, total) {
         await nextTick(() => {
-          progress.value = `Downloading images... ${Math.round(
-            (current / total) * 100,
-          )}%`;
+          $toast.update(toastId, {
+            content: `Downloading object images... ${Math.round((current / total) * 100)}%`,
+          });
         });
       },
     });
-    progress.value = null;
     isLoading.value = false;
-    const element = document.createElement('a');
-    element.href = url;
-    element.download = `backpack-${new Date().toLocaleString()}.png`;
+    $toast.dismiss(toastId);
 
-    await nextTick(() => {
-      element.click();
-    });
+    // Ensure the URL is valid before trying to download it
+    if (!url.startsWith('data:image/png')) {
+      $toast.error('Failed to generate backpack image.');
+      console.log(url);
+    } else {
+      $toast.success('Backpack image generated');
+      const element = document.createElement('a');
+      element.href = url;
+      element.download = `backpack-${new Date().toLocaleString()}.png`;
+
+      await nextTick(() => {
+        element.click();
+      });
+      element.remove();
+    }
 
     URL.revokeObjectURL(url);
-    element.remove();
   } else if (packRows.value.length === 0) {
     alert(
       'No objects selected to create a backpack image, select at least one object to create a image.',
