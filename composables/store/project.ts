@@ -133,12 +133,30 @@ export const useProjectStore = defineStore('project', () => {
       }
     };
 
-    const clearIncompatibleChoices = (): Transform => (sel: Selections) =>
-      R.pickBy((_, objectId): boolean => {
-        const object = getObject.value(objectId);
-        const pred = buildConditions(object);
-        return pred(R.keys(sel));
-      }, sel);
+    const clearIncompatibleChoices = (): Transform => (sel: Selections) => {
+      let sel0 = R.clone(sel);
+      let sel1 = R.clone(sel);
+
+      // Required to handle transitive dependencies
+      // TODO: Use graph traversal instead
+      let changed = true;
+      let depth = 0;
+      while (changed && depth < 5) {
+        sel1 = R.pickBy((_, objectId): boolean => {
+          const object = getObject.value(objectId);
+          const pred = buildConditions(object);
+          return pred(R.keys(sel));
+        }, sel0);
+
+        changed = R.isNotEmpty(
+          R.symmetricDifference(R.keys(sel1), R.keys(sel0)),
+        );
+        sel0 = R.clone(sel1);
+        depth++;
+      }
+
+      return sel1;
+    };
 
     const enforceRowLimits =
       (addedIds: string[]): Transform =>
