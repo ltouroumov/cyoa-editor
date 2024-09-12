@@ -1,6 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
 import { ComputedRef, computed } from 'vue';
+import { useToast } from 'vue-toastification';
 
 import { buildConditions } from '~/composables/conditions';
 import {
@@ -16,6 +17,8 @@ export type Selections = Record<string, number>;
 type Transform = (sel: Selections) => Selections;
 
 export const useProjectStore = defineStore('project', () => {
+  const $toast = useToast();
+
   const project = shallowRef<ProjectFile | null>(null);
   const selected = ref<Selections>({});
   const selectedIds = computed(() => R.keys(selected.value));
@@ -206,7 +209,7 @@ export const useProjectStore = defineStore('project', () => {
       };
 
     // Compute the set of new selections
-    const newSelected: Selections = R.pipe(
+    const newSelected0: Selections = R.pipe(
       // Add or remove the objectId to the selection array
       addOrRemove(id, isSelected),
       // Toggle the choices that depend on this object
@@ -218,12 +221,24 @@ export const useProjectStore = defineStore('project', () => {
     )(oldSelected);
 
     // Compute which elements were added (if any)
-    const addedIds = R.difference(R.keys(newSelected), R.keys(oldSelected));
+    const addedIds = R.difference(R.keys(newSelected0), R.keys(oldSelected));
+    const removedIds = R.filter(
+      (objId) => objId !== id,
+      R.difference(R.keys(oldSelected), R.keys(newSelected0)),
+    );
+    let newSelected = newSelected0;
     if (addedIds.length > 0) {
-      selected.value = enforceRowLimits(addedIds)(newSelected);
-    } else {
-      selected.value = newSelected;
+      newSelected = enforceRowLimits(addedIds)(newSelected);
     }
+    if (removedIds.length > 0) {
+      const removedNames = R.map((objId: string): string => {
+        const obj: ProjectObj = getObject.value(objId);
+        return obj.title;
+      }, removedIds);
+      $toast.info(`Removed selections: ${R.join(', ', removedNames)}`);
+    }
+
+    selected.value = newSelected;
   };
 
   const incSelected = (id: string, incValue: number = 1) => {
