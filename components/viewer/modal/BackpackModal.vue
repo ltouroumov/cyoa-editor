@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { domToDataUrl } from 'modern-screenshot';
+import { elementToSVG, inlineResources } from 'dom-to-svg';
 import * as R from 'ramda';
 import { computed } from 'vue';
 import { useToast } from 'vue-toastification';
@@ -142,22 +142,44 @@ const backpackToImage = async () => {
         timeout: false,
       },
     );
-    // A hack, the DOM won't update until after html2canvas is called otherwise
+    // A hack, the DOM won't update until after the image is generated otherwise
     const pause = new Promise((resolve) => setTimeout(resolve, 200));
     await pause;
-    const url = await domToDataUrl(backpackRef.value, {
-      backgroundColor: project?.data.styling.backgroundColor,
-      width: 1280,
-      async progress(current: number, total: number) {
-      includeStyleProperties: ['project-obj'],
-      async progress(current, total) {
-        await nextTick(() => {
-          $toast.update(toastId, {
-            content: `Downloading object images... ${Math.round((current / total) * 100)}%`,
-          });
-        });
-      },
-    });
+
+    // Set background color for svg to project background color if it exists
+    const currentBackground = backpackRef.value.style.backgroundColor;
+    backpackRef.value.style.backgroundColor =
+      project?.data.styling.backgroundColor ?? currentBackground;
+    // Convert backpack to SVG
+    const svgDocument = elementToSVG(backpackRef.value);
+    // Inline external resources (fonts, images, etc) as data: URIs
+    await inlineResources(svgDocument.documentElement);
+    // Restore background color
+    backpackRef.value.style.backgroundColor = currentBackground;
+    // Get SVG string
+    const svgString = new XMLSerializer().serializeToString(svgDocument);
+    // Create a Blob from the SVG string
+    const svg = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    // Create a downloadable link for img src
+    const svgUrl = URL.createObjectURL(svg);
+    const img = new Image();
+    // set the image src to the URL of the Blob
+    img.src = svgUrl;
+    // Wait until the image has loaded
+    await img.decode();
+    // Create a canvas to draw the image to
+    const canvas = document.createElement('canvas');
+    // Set canvas dimensions to match the image
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext('2d')!;
+    // Draw the image to the canvas
+    ctx.drawImage(img, 0, 0);
+    // Get the image data as a PNG string
+    const url = canvas.toDataURL('image/png');
+    // Remove the canvas
+    canvas.remove();
+
     isLoading.value = false;
     $toast.dismiss(toastId);
 
@@ -167,16 +189,21 @@ const backpackToImage = async () => {
       console.log(url);
     } else {
       $toast.success('Backpack image generated');
+      // Create a element to download the image
       const element = document.createElement('a');
+      // Set the download link href and download attribute
       element.href = url;
       element.download = `backpack-${new Date().toLocaleString()}.png`;
 
+      // Click the link to download the image
       await nextTick(() => {
         element.click();
       });
+      // Remove the element once downloaded
       element.remove();
     }
 
+    // Clean up the URL after download
     URL.revokeObjectURL(url);
   } else if (packRows.value.length === 0) {
     alert(

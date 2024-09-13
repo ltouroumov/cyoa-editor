@@ -23,6 +23,7 @@
             class="obj-image"
             loading="lazy"
             :src="obj.image"
+            :href="objImageIsURL ? obj.image : ''"
             :alt="obj.title"
           />
         </div>
@@ -127,6 +128,10 @@ const objTemplateClass = computed(() => {
   }
 
   return 'obj-template-top';
+});
+
+const objImageIsURL = computed(() => {
+  return R.match(/^https?:\/\//, $props.obj.image);
 });
 
 const store = useProjectStore();

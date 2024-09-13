@@ -1,0 +1,15 @@
+diff --git a/lib/inline.js b/lib/inline.js
+index 10970092d2efa9c5c120b4843b17ebc359fe1360..66ce98d611f0556fa644141296750e48a39c1371 100644
+--- a/lib/inline.js
++++ b/lib/inline.js
+@@ -18,7 +18,9 @@ export async function inlineResources(element) {
+         (async () => {
+             var _a;
+             if (isSVGImageElement(element)) {
+-                const blob = await withTimeout(10000, `Timeout fetching ${element.href.baseVal}`, () => fetchResource(element.href.baseVal));
++                const elementHref = element.getAttribute('href') || element.getAttribute('xlink:href');
++                assert(elementHref, '<image> element must have href or xlink:href attribute');
++                const blob = await withTimeout(10000, `Timeout fetching ${elementHref}`, () => fetchResource(elementHref));
+                 if (blob.type === 'image/svg+xml') {
+                     // If the image is an SVG, inline it into the output SVG.
+                     // Some tools (e.g. Figma) do not support nested SVG.

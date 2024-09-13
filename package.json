@@ -43,6 +43,7 @@
     "@vueuse/core": "^11.0.3",
     "@vueuse/nuxt": "^11.0.3",
     "bootstrap": "5.3.*",
+    "dom-to-svg": "^0.12.2",
     "handlebars": "^4.7.8",
     "modern-screenshot": "^4.4.39",
     "perfect-debounce": "^1.0.0",
@@ -54,5 +55,8 @@
   "packageManager": "yarn@3.6.3",
   "engines": {
     "node": "^20.16.3"
+  },
+  "resolutions": {
+    "dom-to-svg@^0.12.2": "patch:dom-to-svg@npm%3A0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch"
   }
 }
