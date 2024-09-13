@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" :class="{ show: show }" @click="$emit('close')">
+  <div class="modal fade" :class="{ show: show }">
     <div class="modal-dialog modal-xl">
       <div v-if="show" class="modal-content">
         <div class="modal-header">
@@ -17,7 +17,11 @@
       </div>
     </div>
   </div>
-  <div v-show="show" class="modal-backdrop fade show"></div>
+  <div
+    v-show="show"
+    class="modal-backdrop fade show"
+    @click="$emit('close')"
+  ></div>
 </template>
 
 <script setup lang="ts">
@@ -32,6 +36,8 @@ defineProps<{
 
 <style scoped lang="scss">
 div.modal {
+  pointer-events: none;
+
   &.show {
     display: flex;
     align-items: stretch;
@@ -44,6 +50,7 @@ div.modal {
     justify-content: stretch;
 
     flex: 1 1 100%;
+    pointer-events: auto;
   }
 
   .modal-body {
