@@ -47,7 +47,6 @@ html {
 
 .project {
   font-family: sans-serif;
-  padding: 0 1em;
 
   .rows {
     // Prevents collapsing margins
