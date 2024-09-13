@@ -90,8 +90,4 @@ const loadProjectFile = () => {
 };
 </script>
 
-<style lang="scss">
-.load-project {
-  min-width: 500px;
-}
-</style>
+<style lang="scss"></style>
