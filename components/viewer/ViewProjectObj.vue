@@ -21,7 +21,8 @@
           <img
             v-if="obj.image"
             class="obj-image"
-            loading="lazy"
+            :decoding="alwaysEnable ? `sync` : `auto`"
+            :loading="alwaysEnable ? `eager` : `lazy`"
             :src="obj.image"
             :href="objImageIsURL ? obj.image : ''"
             :alt="obj.title"
@@ -147,6 +148,15 @@ const isEnabled = computed<boolean>(() => {
       return true;
     default:
       return condition.value(selectedIds.value);
+  }
+});
+const alwaysEnable = computed<boolean>(() => {
+  switch ($props.viewObject) {
+    case ViewContext.BackpackEnabled:
+    case ViewContext.BackpackDisabled:
+      return true;
+    default:
+      return false;
   }
 });
 const canToggle = computed<boolean>(() => {
