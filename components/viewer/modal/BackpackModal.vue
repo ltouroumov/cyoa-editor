@@ -136,12 +136,9 @@ const backpackToImage = async () => {
   if (backpackRef.value && packRows.value.length >= 1) {
     isLoading.value = true;
     const $toast = useToast();
-    const toastId = $toast.info(
-      'Generating image...\n(This can take while, especially with large builds)',
-      {
-        timeout: false,
-      },
-    );
+    const toastGenerateImage = $toast.info('Generating image...', {
+      timeout: false,
+    });
     // A hack, the DOM won't update until after the image is generated otherwise
     const pause = new Promise((resolve) => setTimeout(resolve, 200));
     await pause;
@@ -181,7 +178,7 @@ const backpackToImage = async () => {
     canvas.remove();
 
     isLoading.value = false;
-    $toast.dismiss(toastId);
+    $toast.dismiss(toastGenerateImage);
 
     // Ensure the URL is valid before trying to download it
     if (!url.startsWith('data:image/png')) {
