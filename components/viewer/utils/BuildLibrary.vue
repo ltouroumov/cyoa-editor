@@ -118,10 +118,6 @@ const loadBuild = (build: BuildData) => {
 </script>
 
 <style scoped lang="scss">
-.build-library {
-  min-width: 500px;
-}
-
 .build-list {
   display: flex;
   flex-direction: column;

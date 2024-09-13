@@ -71,4 +71,11 @@ html {
     padding: 10px;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .dialog {
+    width: 100% !important;
+    max-width: 100%;
+  }
+}
 </style>
