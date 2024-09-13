@@ -45,7 +45,6 @@
     "bootstrap": "5.3.*",
     "dom-to-svg": "^0.12.2",
     "handlebars": "^4.7.8",
-    "modern-screenshot": "^4.4.39",
     "perfect-debounce": "^1.0.0",
     "pinia": "^2.2.2",
     "ramda": "^0.30.1",
