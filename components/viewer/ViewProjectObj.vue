@@ -80,27 +80,26 @@ import { buildConditions } from '~/composables/conditions';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
+import { ViewObject } from '~/composables/viewer';
 
 const {
   row,
   obj,
-  preview = false,
+  viewObject,
   width = null,
   forceWidth = null,
-  alwaysEnable = false,
   template = null,
 } = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
-  preview?: boolean;
+  viewObject: ViewObject;
   width?: string;
   forceWidth?: string;
-  alwaysEnable?: boolean;
   template?: string;
 }>();
 
 const objClass = computed(() => {
-  if (preview) return ['obj-preview'];
+  if (viewObject === ViewObject.Preview) return ['obj-preview'];
   if (forceWidth) return ['col', { [forceWidth]: true }];
 
   let objectSize = row.objectWidth;
@@ -140,10 +139,16 @@ const { selectedIds, selected } = useProjectRefs();
 
 const condition = computed(() => buildConditions(obj));
 const isEnabled = computed<boolean>(() => {
-  // always enable when alwaysEnable prop is set to true
-  // Used for the backpack, as objects should always be selectable when viewing the backpack
-  if (alwaysEnable) return true;
-  return condition.value(selectedIds.value);
+  // Whether the object is always enabled or disabled based on the viewObject
+  // Otherwise check the object conditions
+  switch (viewObject) {
+    case ViewObject.AlwaysEnabled:
+      return true;
+    case ViewObject.AlwaysDisabled:
+      return false;
+    default:
+      return condition.value(selectedIds.value);
+  }
 });
 const isSelected = computed<boolean>(() => R.has(obj.id, selected.value));
 

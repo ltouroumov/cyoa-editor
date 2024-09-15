@@ -37,7 +37,7 @@
             :key="searchView.obj.id"
             :obj="searchView.obj"
             :row="searchView.row"
-            preview
+            :view-object="ViewObject.Preview"
             template="1"
           />
         </div>
@@ -53,6 +53,7 @@ import { all, any, includes, isEmpty } from 'ramda';
 import { Project, ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
+import { ViewObject } from '~/composables/viewer';
 
 const { toggleSearch } = useViewerStore();
 const { isSearchVisible } = useViewerRefs();

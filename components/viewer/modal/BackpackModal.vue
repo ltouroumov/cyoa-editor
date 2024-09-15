@@ -24,7 +24,7 @@
                 :obj="obj"
                 :row="row"
                 :width="packRow.objectWidth"
-                :always-enable="true"
+                :view-object="ViewObject.AlwaysEnabled"
               />
             </div>
           </div>
@@ -48,6 +48,7 @@ import ImportCode from '~/components/viewer/utils/ImportCode.vue';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
+import { ViewObject } from '~/composables/viewer';
 
 const { getObject, getObjectRow, getRow } = useProjectStore();
 const { selected, backpack } = useProjectRefs();
