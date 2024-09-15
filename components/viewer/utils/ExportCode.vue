@@ -34,7 +34,7 @@
         placeholder="Nothing has been selected yet ..."
         :value="exportText"
       />
-      <div class="export-text-toggle form-check form-switch">
+      <div class="form-check form-switch export-text-toggle">
         <input
           id="sectionTitleSwitch"
           v-model="exportTextHeaders"
