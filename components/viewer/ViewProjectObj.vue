@@ -92,7 +92,7 @@ const {
 } = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
-  viewObject: ViewObject;
+  viewObject?: ViewObject;
   width?: string;
   forceWidth?: string;
   template?: string;

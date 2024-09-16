@@ -13,11 +13,26 @@
           :key="packRow.id"
           class="pack-row"
         >
-          <div class="pack-row-title">
-            {{ packRow.title }}
+          <div class="pack-row-title-container">
+            <div class="pack-row-title">
+              {{ packRow.title }}
+            </div>
+            <div class="form-check form-switch pack-row-controls">
+              <input
+                id="packRowDisabledSwitch"
+                v-model="disabledPackRowSwitch"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                @change="toggleRowSelectable(packRow)"
+              />
+              <label class="form-check-label" for="packRowDisabledSwitch">
+                Disable Row
+              </label>
+            </div>
           </div>
           <div class="container-fluid p-0">
-            <div class="row g-2">
+            <div v-if="!disabledSelected.includes(packRow.id)" class="row g-2">
               <ViewProjectObj
                 v-for="{ obj, row } in choices"
                 :key="obj.id"
@@ -25,6 +40,16 @@
                 :row="row"
                 :width="packRow.objectWidth"
                 :view-object="ViewObject.AlwaysEnabled"
+              />
+            </div>
+            <div v-else class="row g-2">
+              <ViewProjectObj
+                v-for="{ obj, row } in choices"
+                :key="obj.id"
+                :obj="obj"
+                :row="row"
+                :width="packRow.objectWidth"
+                :view-object="ViewObject.AlwaysDisabled"
               />
             </div>
           </div>
@@ -79,6 +104,16 @@ const packRows = computed(() => {
     backpack.value,
   );
 });
+
+const disabledSelected = ref<string[]>([]);
+const disabledPackRowSwitch = ref(false);
+const toggleRowSelectable = (packRow: ProjectRow) => {
+  if (R.includes(packRow.id, disabledSelected.value)) {
+    disabledSelected.value = R.without([packRow.id], disabledSelected.value);
+  } else {
+    disabledSelected.value = R.concat(disabledSelected.value, [packRow.id]);
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -101,11 +136,24 @@ const packRows = computed(() => {
     padding: 0;
     margin-bottom: 0.5rem;
 
+    .pack-row-title-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
     .pack-row-title {
       font-size: 1.2rem;
       font-weight: bolder;
       text-align: center;
       margin-bottom: 0.2rem;
+      flex: 1;
+    }
+
+    .pack-row-controls {
+      position: absolute;
+      right: 0;
     }
 
     .choice {
@@ -131,6 +179,15 @@ const packRows = computed(() => {
 @media screen and (max-width: 768px) {
   .pack-import-export {
     flex-direction: column;
+  }
+
+  .pack-row .pack-row-title-container {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .pack-row-controls {
+      position: unset;
+    }
   }
 }
 </style>
