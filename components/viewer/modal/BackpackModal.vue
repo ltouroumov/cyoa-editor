@@ -20,7 +20,7 @@
             <div class="form-check form-switch pack-row-controls">
               <input
                 id="packRowDisabledSwitch"
-                v-model="disabledPackRowSwitch"
+                v-model="disabledPackRowSwitch[packRow.id]"
                 class="form-check-input"
                 type="checkbox"
                 role="switch"
@@ -106,7 +106,19 @@ const packRows = computed(() => {
 });
 
 const disabledSelected = ref<string[]>([]);
-const disabledPackRowSwitch = ref(false);
+type PackRowSwitchStates = Record<string, boolean>;
+const disabledPackRowSwitch = ref<PackRowSwitchStates>(
+  R.reduce(
+    (acc, obj) =>
+      R.assoc(
+        obj.packRow.id,
+        R.includes(obj.packRow.id, disabledSelected.value),
+        acc,
+      ),
+    {},
+    packRows.value,
+  ),
+);
 const toggleRowSelectable = (packRow: ProjectRow) => {
   if (R.includes(packRow.id, disabledSelected.value)) {
     disabledSelected.value = R.without([packRow.id], disabledSelected.value);
