@@ -1,7 +1,12 @@
 <template>
   <div class="build-library">
     <div class="input-group">
-      <input v-model="buildName" type="text" class="form-control" />
+      <input
+        v-model="buildName"
+        type="text"
+        class="form-control"
+        placeholder="Name of build"
+      />
       <button class="btn btn-outline-primary" @click="addStuff">Save</button>
     </div>
     <div v-show="loading" class="spinner-border" role="status">
@@ -29,7 +34,7 @@
           </button>
           <button
             class="btn btn-sm btn-outline-danger"
-            @click="deleteBuild(build.id)"
+            @click="deleteBuild(build)"
           >
             Delete
           </button>
@@ -41,11 +46,13 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
+import { useToast } from 'vue-toastification';
 
 import BuildChoices from '~/components/viewer/utils/BuildChoices.vue';
 import { Selections, useProjectRefs } from '~/composables/store/project';
 import { IndexedDB } from '~/composables/utils/idb';
 
+const $toast = useToast();
 const { selected } = useProjectRefs();
 let db: IndexedDB;
 
@@ -88,6 +95,7 @@ const addStuff = async () => {
       selected: R.clone(selected.value),
     });
     builds.value = await store.getAll();
+    $toast.success(`Saved build: ${buildName.value}`);
     buildName.value = '';
   });
 };
@@ -101,19 +109,22 @@ const saveBuild = async (build: BuildData) => {
       selected: R.clone(selected.value),
     });
     builds.value = await store.getAll();
+    $toast.success(`Updated Build: ${build.name}`);
   });
 };
 
-const deleteBuild = async (id: number) => {
+const deleteBuild = async (build: BuildData) => {
   await db.transaction('builds', 'readwrite', async (tx) => {
     const store = tx.objectStore('builds');
-    await store.delete(id);
+    await store.delete(build.id);
     builds.value = await store.getAll();
   });
+  $toast.success(`Deleted Build: ${build.name}`);
 };
 
 const loadBuild = (build: BuildData) => {
   selected.value = build.selected;
+  $toast.info(`Loaded Build: ${build.name}`);
 };
 </script>
 
