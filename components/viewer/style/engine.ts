@@ -198,7 +198,9 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
 
         {{#if objectImgObjectFillIsOn}}
         object-fit: {{objectImgObjectFillStyle}};
-        height: {{objectImgObjectFillHeight}}px;
+        {{#if objectImgObjectFillHeight}}
+        height: {{objectImgObjectFillHeight}}px; /* this can be empty while objectImgObjectFillIsOn :) */
+        {{/if}}
         {{/if}}
       }
       .addon {
