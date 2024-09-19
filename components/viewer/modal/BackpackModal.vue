@@ -16,7 +16,6 @@
               class="form-check-input"
               type="checkbox"
               role="switch"
-              @change="toggleRowSelectable"
             />
             <label class="form-check-label" for="packRowDisabledSwitch">
               Disable Backpack Selection
@@ -106,9 +105,6 @@ const packRows = computed(() => {
 });
 
 const disableBackpackSelectionSwitch = ref(false);
-const toggleRowSelectable = () => {
-  return !disableBackpackSelectionSwitch.value;
-};
 </script>
 
 <style scoped lang="scss">
