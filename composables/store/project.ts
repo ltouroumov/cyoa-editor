@@ -85,15 +85,21 @@ export const useProjectStore = defineStore('project', () => {
     selected.value = {};
   };
 
-  const setSelected = (id: string, isSelected: boolean): void => {
+  const setSelected = (
+    selectObj: string | Selections,
+    isSelected: boolean,
+  ): void => {
     const oldSelected: Selections = R.clone(selected.value);
-    const obj = getObject.value(id);
 
     // Add or remove object from selection based on isSelected
     // function for reuse
-    const addOrRemove = (objId: string, addToSelected: boolean) => {
+    const addOrRemove = (
+      objId: string,
+      addToSelected: boolean,
+      count?: number,
+    ) => {
       if (addToSelected) {
-        return R.assoc(objId, 1);
+        return R.assoc(objId, count ?? 1);
       } else {
         return R.dissoc(objId);
       }
@@ -227,21 +233,45 @@ export const useProjectStore = defineStore('project', () => {
       };
 
     // Compute the set of new selections
-    const newSelected0: Selections = R.pipe(
-      // Add or remove the objectId to the selection array
-      addOrRemove(id, isSelected),
-      // Toggle the choices that depend on this object
-      addActivateOtherChoice(obj, isSelected),
-      // Disable the choices that depend on this object
-      addDeactivateOtherChoice(obj, isSelected),
-      // Remove incompatible objects
-      clearIncompatibleChoices(),
-    )(oldSelected);
+    let newSelected0: Selections;
+    if (typeof selectObj === 'object') {
+      // Add or remove all the provided objects
+      const validSelections = R.filter(
+        ([objId, _count]) => R.isNotNil(getObject.value(objId)),
+        R.toPairs(selectObj),
+      );
+      const newSelected_ = R.reduce(
+        (acc, [objId, count]) => {
+          const obj = getObject.value(objId);
+          return R.pipe(
+            addOrRemove(objId, isSelected, count),
+            addActivateOtherChoice(obj, isSelected),
+            addDeactivateOtherChoice(obj, isSelected),
+          )(acc);
+        },
+        oldSelected,
+        validSelections,
+      );
+      // Apply incompatibility rules after the objects are selected
+      newSelected0 = clearIncompatibleChoices()(newSelected_);
+    } else {
+      const obj = getObject.value(selectObj);
+      newSelected0 = R.pipe(
+        // Add or remove the objectId to the selection array
+        addOrRemove(selectObj, isSelected),
+        // Toggle the choices that depend on this object
+        addActivateOtherChoice(obj, isSelected),
+        // Disable the choices that depend on this object
+        addDeactivateOtherChoice(obj, isSelected),
+        // Remove incompatible objects
+        clearIncompatibleChoices(),
+      )(oldSelected);
+    }
 
     // Compute which elements were added (if any)
     const addedIds = R.difference(R.keys(newSelected0), R.keys(oldSelected));
     const removedIds = R.filter(
-      (objId) => objId !== id,
+      (objId) => objId !== objId,
       R.difference(R.keys(oldSelected), R.keys(newSelected0)),
     );
     let newSelected = newSelected0;

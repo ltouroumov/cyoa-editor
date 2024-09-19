@@ -16,10 +16,15 @@ import * as R from 'ramda';
 import { ref } from 'vue';
 import { useToast } from 'vue-toastification';
 
-import { Selections, useProjectRefs } from '~/composables/store/project';
+import {
+  Selections,
+  useProjectRefs,
+  useProjectStore,
+} from '~/composables/store/project';
 
 const $toast = useToast();
 const { selected } = useProjectRefs();
+const { setSelected } = useProjectStore();
 const importCode = ref<string>();
 
 const LEGACY_RX =
@@ -68,7 +73,8 @@ function readImportCode() {
       }
     });
   }
-  selected.value = selections;
+
+  setSelected(selections, true);
   importCode.value = '';
   $toast.info('Build Code Loaded');
 }

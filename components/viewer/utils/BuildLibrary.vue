@@ -49,11 +49,16 @@ import * as R from 'ramda';
 import { useToast } from 'vue-toastification';
 
 import BuildChoices from '~/components/viewer/utils/BuildChoices.vue';
-import { Selections, useProjectRefs } from '~/composables/store/project';
+import {
+  Selections,
+  useProjectRefs,
+  useProjectStore,
+} from '~/composables/store/project';
 import { IndexedDB } from '~/composables/utils/idb';
 
 const $toast = useToast();
 const { selected } = useProjectRefs();
+const { setSelected } = useProjectStore();
 let db: IndexedDB;
 
 type BuildData = {
@@ -123,7 +128,7 @@ const deleteBuild = async (build: BuildData) => {
 };
 
 const loadBuild = (build: BuildData) => {
-  selected.value = build.selected;
+  setSelected(build.selected, true);
   $toast.info(`Loaded Build: ${build.name}`);
 };
 </script>
@@ -153,14 +158,17 @@ const loadBuild = (build: BuildData) => {
       font-size: 1.25em;
       font-weight: bold;
     }
+
     .date {
       grid-area: date;
       font-style: italic;
       color: gray;
     }
+
     .choices {
       grid-area: choices;
     }
+
     .actions {
       grid-area: actions;
       display: flex;
