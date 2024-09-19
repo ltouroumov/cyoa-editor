@@ -175,11 +175,11 @@ const toggleRowSelectable = () => {
     flex-direction: column;
   }
 
-  .pack-row .pack-row-title-container {
+  .pack-content .pack-info-container {
     flex-direction: column;
     align-items: flex-start;
 
-    .pack-row-controls {
+    .pack-selection-controls {
       position: unset;
     }
   }
