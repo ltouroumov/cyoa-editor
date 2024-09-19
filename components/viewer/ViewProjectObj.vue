@@ -141,18 +141,19 @@ const isEnabled = computed<boolean>(() => {
   // Whether the object is always enabled or disabled based on the viewObject
   // Otherwise check the object conditions
   switch (viewObject) {
-    case ViewContext.Viewer:
-      return condition.value(selectedIds.value);
-    case ViewContext.Editor:
-      // TODO: Future implementation for editor-specific conditions
-      return true;
     case ViewContext.BackpackEnabled:
       return true;
-    case ViewContext.BackpackDisabled:
-      return false;
     default:
       return condition.value(selectedIds.value);
   }
+});
+const isSelectable = computed<boolean>(() => {
+  return (
+    isEnabled.value &&
+    !obj.isNotSelectable &&
+    !row.isInfoRow &&
+    viewObject !== ViewContext.BackpackDisabled
+  );
 });
 const isSelected = computed<boolean>(() => R.has(obj.id, selected.value));
 
@@ -169,23 +170,18 @@ const maxSelectedAmount = computed(() =>
 );
 
 const toggle = () => {
-  if (
-    isEnabled.value &&
-    !obj.isSelectableMultiple &&
-    !obj.isNotSelectable &&
-    !row.isInfoRow
-  ) {
+  if (isSelectable.value && !obj.isSelectableMultiple) {
     store.setSelected(obj.id, !isSelected.value);
   }
 };
 
 const increment = () => {
-  if (isEnabled.value) {
+  if (isSelectable.value) {
     store.incSelected(obj.id);
   }
 };
 const decrement = () => {
-  if (isEnabled.value) {
+  if (isSelectable.value) {
     store.decSelected(obj.id);
   }
 };

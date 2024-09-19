@@ -5,34 +5,34 @@
     </template>
     <template #default>
       <div class="pack-content flex-grow-1 bg-dark">
-        <div class="pack-scores">
-          <ViewScoreStatus vertical />
+        <div class="pack-info-container">
+          <div class="pack-scores">
+            <ViewScoreStatus vertical />
+          </div>
+          <div class="form-check form-switch pack-selection-controls">
+            <input
+              id="packRowDisabledSwitch"
+              v-model="disableBackpackSelectionSwitch"
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              @change="toggleRowSelectable"
+            />
+            <label class="form-check-label" for="packRowDisabledSwitch">
+              Disable Backpack Selection
+            </label>
+          </div>
         </div>
         <div
           v-for="{ packRow, choices } in packRows"
           :key="packRow.id"
           class="pack-row"
         >
-          <div class="pack-row-title-container">
-            <div class="pack-row-title">
-              {{ packRow.title }}
-            </div>
-            <div class="form-check form-switch pack-row-controls">
-              <input
-                id="packRowDisabledSwitch"
-                v-model="disabledPackRowSwitch[packRow.id]"
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                @change="toggleRowSelectable(packRow)"
-              />
-              <label class="form-check-label" for="packRowDisabledSwitch">
-                Disable Row
-              </label>
-            </div>
+          <div class="pack-row-title">
+            {{ packRow.title }}
           </div>
           <div class="container-fluid p-0">
-            <div v-if="!disabledSelected.includes(packRow.id)" class="row g-2">
+            <div v-if="!disableBackpackSelectionSwitch" class="row g-2">
               <ViewProjectObj
                 v-for="{ obj, row } in choices"
                 :key="obj.id"
@@ -105,26 +105,9 @@ const packRows = computed(() => {
   );
 });
 
-const disabledSelected = ref<string[]>([]);
-type PackRowSwitchStates = Record<string, boolean>;
-const disabledPackRowSwitch = ref<PackRowSwitchStates>(
-  R.reduce(
-    (acc, obj) =>
-      R.assoc(
-        obj.packRow.id,
-        R.includes(obj.packRow.id, disabledSelected.value),
-        acc,
-      ),
-    {},
-    packRows.value,
-  ),
-);
-const toggleRowSelectable = (packRow: ProjectRow) => {
-  if (R.includes(packRow.id, disabledSelected.value)) {
-    disabledSelected.value = R.without([packRow.id], disabledSelected.value);
-  } else {
-    disabledSelected.value = R.concat(disabledSelected.value, [packRow.id]);
-  }
+const disableBackpackSelectionSwitch = ref(false);
+const toggleRowSelectable = () => {
+  return !disableBackpackSelectionSwitch.value;
 };
 </script>
 
@@ -140,32 +123,31 @@ const toggleRowSelectable = (packRow: ProjectRow) => {
   overflow-x: hidden;
   overflow-y: auto;
 
-  .pack-scores {
-    margin-bottom: 0.5rem;
+  .pack-info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+
+    .pack-scores {
+      margin-bottom: 0.5rem;
+    }
+
+    .pack-selection-controls {
+      position: absolute;
+      right: 0;
+    }
   }
 
   .pack-row {
     padding: 0;
     margin-bottom: 0.5rem;
 
-    .pack-row-title-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-    }
-
     .pack-row-title {
       font-size: 1.2rem;
       font-weight: bolder;
       text-align: center;
       margin-bottom: 0.2rem;
-      flex: 1;
-    }
-
-    .pack-row-controls {
-      position: absolute;
-      right: 0;
     }
 
     .choice {
