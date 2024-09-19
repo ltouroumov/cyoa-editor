@@ -7,9 +7,9 @@ export type ViewerProjectList = {
   items: ViewerProject[];
 };
 
-export enum ViewObject {
-  Preview,
+export enum ViewContext {
+  Viewer,
   Editor, // Future use case
-  AlwaysEnabled,
-  AlwaysDisabled,
+  BackpackEnabled,
+  BackpackDisabled,
 }

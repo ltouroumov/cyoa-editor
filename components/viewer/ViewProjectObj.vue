@@ -80,7 +80,7 @@ import { buildConditions } from '~/composables/conditions';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
-import { ViewObject } from '~/composables/viewer';
+import { ViewContext } from '~/composables/viewer';
 
 const {
   row,
@@ -92,14 +92,13 @@ const {
 } = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
-  viewObject?: ViewObject;
+  viewObject?: ViewContext;
   width?: string;
   forceWidth?: string;
   template?: string;
 }>();
 
 const objClass = computed(() => {
-  if (viewObject === ViewObject.Preview) return ['obj-preview'];
   if (forceWidth) return ['col', { [forceWidth]: true }];
 
   let objectSize = row.objectWidth;
@@ -142,9 +141,14 @@ const isEnabled = computed<boolean>(() => {
   // Whether the object is always enabled or disabled based on the viewObject
   // Otherwise check the object conditions
   switch (viewObject) {
-    case ViewObject.AlwaysEnabled:
+    case ViewContext.Viewer:
+      return condition.value(selectedIds.value);
+    case ViewContext.Editor:
+      // TODO: Future implementation for editor-specific conditions
       return true;
-    case ViewObject.AlwaysDisabled:
+    case ViewContext.BackpackEnabled:
+      return true;
+    case ViewContext.BackpackDisabled:
       return false;
     default:
       return condition.value(selectedIds.value);

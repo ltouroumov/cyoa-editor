@@ -39,7 +39,7 @@
                 :obj="obj"
                 :row="row"
                 :width="packRow.objectWidth"
-                :view-object="ViewObject.AlwaysEnabled"
+                :view-object="ViewContext.BackpackEnabled"
               />
             </div>
             <div v-else class="row g-2">
@@ -49,7 +49,7 @@
                 :obj="obj"
                 :row="row"
                 :width="packRow.objectWidth"
-                :view-object="ViewObject.AlwaysDisabled"
+                :view-object="ViewContext.BackpackDisabled"
               />
             </div>
           </div>
@@ -73,7 +73,7 @@ import ImportCode from '~/components/viewer/utils/ImportCode.vue';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
-import { ViewObject } from '~/composables/viewer';
+import { ViewContext } from '~/composables/viewer';
 
 const { getObject, getObjectRow, getRow } = useProjectStore();
 const { selected, backpack } = useProjectRefs();
