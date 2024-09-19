@@ -22,15 +22,13 @@
         />
         <!-- eslint-enable vue/no-v-html -->
       </div>
-      <div class="container-fluid p-0">
-        <div class="row g-2">
-          <ViewProjectObj
-            v-for="obj in row.objects"
-            :key="obj.id"
-            :obj="obj"
-            :row="row"
-          />
-        </div>
+      <div class="row g-2 w-100">
+        <ViewProjectObj
+          v-for="obj in row.objects"
+          :key="obj.id"
+          :obj="obj"
+          :row="row"
+        />
       </div>
     </div>
   </div>
@@ -60,6 +58,7 @@ const isVisible = computed(() => condition(selectedIds.value));
   // Prevents collapsing margins with .row-body
   display: flex;
   flex-direction: column;
+  align-items: stretch;
 
   &.hidden {
     display: none;

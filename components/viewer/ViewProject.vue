@@ -34,11 +34,6 @@ const { project } = defineProps<{
 
     .project-row-wrapper {
       flex: 1 1 100%;
-
-      &:has(.project-row.hidden) {
-        flex: 0 0 auto;
-        display: none;
-      }
     }
   }
 }
