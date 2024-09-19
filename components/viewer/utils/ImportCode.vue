@@ -25,16 +25,25 @@ const importCode = ref<string>();
 const LEGACY_RX =
   /^(?:[a-zA-Z0-9-]+(?:\/ON#\d+)?)(?:,[a-zA-Z0-9-]+(?:\/ON#\d+)?)*$/;
 function readImportCode() {
-  const _code = importCode.value?.trim();
-  console.log(`Import Code ${_code}`);
+  let _code = importCode.value?.trim();
+
   if (!_code) {
     console.log(`No import code provided. Clearing Selections...`);
-    console.log('Toast Client', $toast);
-    $toast.info('Build Cleared');
     selected.value = {};
+    $toast.info('Build Cleared');
     return;
   }
 
+  // Trim any trailing comma/semicolon, if present.
+  if (_code.endsWith(',') || _code.endsWith(';')) {
+    _code = _code.substring(0, _code.length - 1);
+  }
+  // Trim any leading comma/semicolon, if present.
+  if (_code.startsWith(',') || _code.startsWith(';')) {
+    _code = _code.substring(1);
+  }
+
+  console.log(`Import Code ${_code}`);
   const selections: Selections = {};
   if (LEGACY_RX.test(_code)) {
     console.log(`Legacy Import Mode`);
