@@ -30,7 +30,8 @@
 <script setup lang="ts">
 import { useProjectStore } from '~/composables/store/project';
 
-const { loadProject } = useProjectStore();
+const { loadProject, unloadProject } = useProjectStore();
+const { isLoaded } = useProjectStore();
 const fileInput = ref<HTMLInputElement>();
 const isLoading = ref<boolean>(false);
 const canLoad = ref<boolean>(false);
@@ -70,6 +71,9 @@ const loadProjectFile = () => {
       if (reader.result && typeof reader.result === 'string') {
         const data = JSON.parse(reader.result);
         isLoading.value = false;
+        if (isLoaded) {
+          unloadProject();
+        }
         loadProject(data, file.name);
       }
     });
