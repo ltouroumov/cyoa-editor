@@ -125,8 +125,6 @@ const toggleRowSelectable = () => {
 
   .pack-info-container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     position: relative;
 
     .pack-scores {
