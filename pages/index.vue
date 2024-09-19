@@ -1,20 +1,5 @@
 <template>
-  <div v-if="project" class="text-light">
-    <ViewMenuBar />
-    <div class="project">
-      <div class="rows">
-        <ViewProjectRow
-          v-for="row in project.data.rows"
-          :key="row.id"
-          :row="row"
-        />
-      </div>
-    </div>
-    <StyleProject :styles="project.data.styling" />
-    <BackpackModal />
-    <SearchModal />
-    <MenuModal />
-  </div>
+  <ViewProject v-if="project" :project="project.data" />
   <div v-else class="dialog-container">
     <div class="bg-dark-subtle dialog text-light">
       <ProjectMenu :project-list="projectList" />
@@ -23,12 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import BackpackModal from '~/components/viewer/modal/BackpackModal.vue';
-import MenuModal from '~/components/viewer/modal/MenuModal.vue';
-import SearchModal from '~/components/viewer/modal/SearchModal.vue';
+import { definePageMeta } from '#imports';
 import ProjectMenu from '~/components/viewer/ProjectMenu.vue';
-import StyleProject from '~/components/viewer/style/StyleProject.vue';
-import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
+import ViewProject from '~/components/viewer/ViewProject.vue';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 
@@ -36,6 +18,15 @@ const { project } = useProjectRefs();
 const { viewerProjectList } = useViewerRefs();
 
 const projectList = computed(() => viewerProjectList.value);
+
+definePageMeta({
+  layout: false,
+});
+useHead({
+  bodyAttrs: {
+    'data-bs-theme': 'dark',
+  },
+});
 </script>
 
 <style lang="scss">
@@ -43,16 +34,6 @@ const projectList = computed(() => viewerProjectList.value);
 
 html {
   font-size: 16px;
-}
-
-.project {
-  font-family: sans-serif;
-
-  .rows {
-    // Prevents collapsing margins
-    display: flex;
-    flex-direction: column;
-  }
 }
 
 .dialog-container {
