@@ -1,4 +1,18 @@
+html {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   margin: 0;
   padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+div#__nuxt {
+  flex: 1 1 100%;
 }
