@@ -22,7 +22,7 @@
         />
         <!-- eslint-enable vue/no-v-html -->
       </div>
-      <div class="row g-2 w-100">
+      <div class="row g-2">
         <ViewProjectObj
           v-for="obj in row.objects"
           :key="obj.id"
