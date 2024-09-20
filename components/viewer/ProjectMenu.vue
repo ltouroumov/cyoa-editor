@@ -16,15 +16,6 @@
         </a>
       </li>
     </ul>
-    <div
-      v-if="isLoading"
-      class="d-flex align-items-center justify-content-start mb-3 gap-3"
-    >
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <strong>{{ !progress ? 'Loading ...' : progress }}</strong>
-    </div>
   </div>
   <div>
     <h5>Load File</h5>
@@ -33,13 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
 import { bufferToString, sleep } from '~/composables/utils';
 import { ViewerProjectList } from '~/composables/viewer';
-
-const isLoading = ref<boolean>(false);
-const progress = ref<string | null>(null);
 
 const { projectList } = defineProps<{
   projectList: ViewerProjectList;
@@ -47,7 +35,6 @@ const { projectList } = defineProps<{
 
 const { loadProject, unloadProject } = useProjectStore();
 const { toggleProjectMenu } = useViewerStore();
-const { isLoaded } = useProjectRefs();
 
 const loadRemoteFile = async ({ target }: MouseEvent) => {
   if (target && target instanceof HTMLAnchorElement) {

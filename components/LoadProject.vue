@@ -20,9 +20,6 @@
       >
         Load Project
       </button>
-      <div v-if="isLoading" class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
     </div>
   </div>
 </template>
@@ -35,7 +32,6 @@ import { readFileContents } from '~/composables/utils';
 const { loadProject } = useProjectStore();
 const { toggleProjectMenu } = useViewerStore();
 const fileInput = ref<HTMLInputElement>();
-const isLoading = ref<boolean>(false);
 const canLoad = ref<boolean>(false);
 const error = ref<string | null>(null);
 
