@@ -50,7 +50,7 @@ export default defineNuxtConfig({
     },
   },
 
-  ssr: true,
+  ssr: false,
   imports: { autoImport: true },
 
   css: [
