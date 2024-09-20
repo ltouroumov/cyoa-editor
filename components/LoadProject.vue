@@ -29,9 +29,11 @@
 
 <script setup lang="ts">
 import { useProjectStore } from '~/composables/store/project';
+import { useViewerStore } from '~/composables/store/viewer';
 import { readFileContents } from '~/composables/utils';
 
 const { loadProject } = useProjectStore();
+const { toggleProjectMenu } = useViewerStore();
 const fileInput = ref<HTMLInputElement>();
 const isLoading = ref<boolean>(false);
 const canLoad = ref<boolean>(false);
@@ -64,6 +66,7 @@ const loadProjectFile = async () => {
       return;
     }
 
+    toggleProjectMenu(false);
     await loadProject(async () => {
       const data = await readFileContents(file);
       if (data && typeof data === 'string') {
