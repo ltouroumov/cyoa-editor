@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { definePageMeta } from '#imports';
+import ProjectViewWrapper from '~/components/viewer/ProjectViewWrapper.vue';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 

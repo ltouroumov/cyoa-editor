@@ -7,7 +7,7 @@ body {
 
 // Black Magic
 // https://stackoverflow.com/a/77722504
-body:has(dialog[open]),
+body:has(div.modal.show),
 body:has(div.offcanvas.show) {
   overflow: hidden;
 }

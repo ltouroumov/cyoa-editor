@@ -39,6 +39,7 @@
             :row="searchView.row"
             :view-object="ViewContext.Viewer"
             template="1"
+            force-width="col-12"
           />
         </div>
       </div>
