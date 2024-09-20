@@ -21,7 +21,7 @@
   </div>
   <div
     v-if="show"
-    class="offcanvas-backdrop fade show"
+    class="fade show offcanvas-backdrop"
     @click="$emit('close')"
   ></div>
 </template>

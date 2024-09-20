@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" :class="{ show: show }">
+  <div class="fade modal" :class="{ show: show }">
     <div class="modal-dialog modal-xl">
       <div v-if="show" class="modal-content">
         <div class="modal-header">
@@ -19,7 +19,7 @@
   </div>
   <div
     v-show="show"
-    class="modal-backdrop fade show"
+    class="fade show modal-backdrop"
     @click="$emit('close')"
   ></div>
 </template>

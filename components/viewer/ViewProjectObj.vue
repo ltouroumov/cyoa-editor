@@ -80,27 +80,25 @@ import { buildConditions } from '~/composables/conditions';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
+import { ViewContext } from '~/composables/viewer';
 
 const {
   row,
   obj,
-  preview = false,
+  viewObject,
   width = null,
   forceWidth = null,
-  alwaysEnable = false,
   template = null,
 } = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
-  preview?: boolean;
+  viewObject?: ViewContext;
   width?: string;
   forceWidth?: string;
-  alwaysEnable?: boolean;
   template?: string;
 }>();
 
 const objClass = computed(() => {
-  if (preview) return ['obj-preview'];
   if (forceWidth) return ['col', { [forceWidth]: true }];
 
   let objectSize = row.objectWidth;
@@ -140,10 +138,22 @@ const { selectedIds, selected } = useProjectRefs();
 
 const condition = computed(() => buildConditions(obj));
 const isEnabled = computed<boolean>(() => {
-  // always enable when alwaysEnable prop is set to true
-  // Used for the backpack, as objects should always be selectable when viewing the backpack
-  if (alwaysEnable) return true;
-  return condition.value(selectedIds.value);
+  // Whether the object is always enabled or disabled based on the viewObject
+  // Otherwise check the object conditions
+  switch (viewObject) {
+    case ViewContext.BackpackEnabled:
+      return true;
+    default:
+      return condition.value(selectedIds.value);
+  }
+});
+const isSelectable = computed<boolean>(() => {
+  return (
+    isEnabled.value &&
+    !obj.isNotSelectable &&
+    !row.isInfoRow &&
+    viewObject !== ViewContext.BackpackDisabled
+  );
 });
 const isSelected = computed<boolean>(() => R.has(obj.id, selected.value));
 
@@ -160,23 +170,18 @@ const maxSelectedAmount = computed(() =>
 );
 
 const toggle = () => {
-  if (
-    isEnabled.value &&
-    !obj.isSelectableMultiple &&
-    !obj.isNotSelectable &&
-    !row.isInfoRow
-  ) {
+  if (isSelectable.value && !obj.isSelectableMultiple) {
     store.setSelected(obj.id, !isSelected.value);
   }
 };
 
 const increment = () => {
-  if (isEnabled.value) {
+  if (isSelectable.value) {
     store.incSelected(obj.id);
   }
 };
 const decrement = () => {
-  if (isEnabled.value) {
+  if (isSelectable.value) {
     store.decSelected(obj.id);
   }
 };

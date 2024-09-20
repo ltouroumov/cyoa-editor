@@ -5,8 +5,22 @@
     </template>
     <template #default>
       <div class="pack-content flex-grow-1 bg-dark">
-        <div class="pack-scores">
-          <ViewScoreStatus vertical />
+        <div class="pack-info-container">
+          <div class="pack-scores">
+            <ViewScoreStatus vertical />
+          </div>
+          <div class="form-check form-switch pack-selection-controls">
+            <input
+              id="packRowDisabledSwitch"
+              v-model="disableBackpackSelectionSwitch"
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+            />
+            <label class="form-check-label" for="packRowDisabledSwitch">
+              Disable Backpack Selection
+            </label>
+          </div>
         </div>
         <div
           v-for="{ packRow, choices } in packRows"
@@ -17,14 +31,24 @@
             {{ packRow.title }}
           </div>
           <div class="container-fluid p-0">
-            <div class="row g-2">
+            <div v-if="!disableBackpackSelectionSwitch" class="row g-2">
               <ViewProjectObj
                 v-for="{ obj, row } in choices"
                 :key="obj.id"
                 :obj="obj"
                 :row="row"
                 :width="packRow.objectWidth"
-                :always-enable="true"
+                :view-object="ViewContext.BackpackEnabled"
+              />
+            </div>
+            <div v-else class="row g-2">
+              <ViewProjectObj
+                v-for="{ obj, row } in choices"
+                :key="obj.id"
+                :obj="obj"
+                :row="row"
+                :width="packRow.objectWidth"
+                :view-object="ViewContext.BackpackDisabled"
               />
             </div>
           </div>
@@ -48,6 +72,7 @@ import ImportCode from '~/components/viewer/utils/ImportCode.vue';
 import { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
+import { ViewContext } from '~/composables/viewer';
 
 const { getObject, getObjectRow, getRow } = useProjectStore();
 const { selected, backpack } = useProjectRefs();
@@ -78,6 +103,8 @@ const packRows = computed(() => {
     backpack.value,
   );
 });
+
+const disableBackpackSelectionSwitch = ref(false);
 </script>
 
 <style scoped lang="scss">
@@ -92,8 +119,18 @@ const packRows = computed(() => {
   overflow-x: hidden;
   overflow-y: auto;
 
-  .pack-scores {
-    margin-bottom: 0.5rem;
+  .pack-info-container {
+    display: flex;
+    position: relative;
+
+    .pack-scores {
+      margin-bottom: 0.5rem;
+    }
+
+    .pack-selection-controls {
+      position: absolute;
+      right: 0;
+    }
   }
 
   .pack-row {
@@ -130,6 +167,15 @@ const packRows = computed(() => {
 @media screen and (max-width: 768px) {
   .pack-import-export {
     flex-direction: column;
+  }
+
+  .pack-content .pack-info-container {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .pack-selection-controls {
+      position: unset;
+    }
   }
 }
 </style>
