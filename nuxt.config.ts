@@ -71,6 +71,6 @@ export default defineNuxtConfig({
     },
   ],
 
-  modules: ['@unocss/nuxt', '@pinia/nuxt', '@vueuse/nuxt'],
+  modules: ['@unocss/nuxt', '@pinia/nuxt', '@vueuse/nuxt', '@nuxt/image'],
   compatibilityDate: '2024-09-04',
 });

@@ -1,34 +1,15 @@
 <template>
-  <ProjectView v-if="isNotNil($store.project)" :project="$store.project.data" />
-  <div v-if="$store.store.status === 'loading'" class="loading-overlay">
-    <div class="spinner-border text-primary me-2" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <strong>
-      {{ !$store.store.progress ? 'Loading ...' : $store.store.progress }}
-    </strong>
-  </div>
+  <ProjectView v-if="isNotNil(project)" :project="project.data" />
+  <ProjectLoadOverlay />
 </template>
 
 <script setup lang="ts">
 import { isNotNil } from 'ramda';
 
-import ProjectView from '~/components/viewer/ProjectView.vue';
-import { useProjectStore } from '~/composables/store/project';
+import ProjectLoadOverlay from '~/components/viewer/ProjectLoadOverlay.vue';
+import { useProjectRefs } from '~/composables/store/project';
 
-const $store = useProjectStore();
+const { project } = useProjectRefs();
 </script>
 
-<style lang="scss" scoped>
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>
+<style lang="scss" scoped></style>
