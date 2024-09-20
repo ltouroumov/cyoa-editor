@@ -6,12 +6,12 @@ import { useToast } from 'vue-toastification';
 import { buildConditions } from '~/composables/conditions';
 import {
   PointType,
-  Project,
   ProjectFile,
   ProjectObj,
   ProjectRow,
   Score,
 } from '~/composables/project';
+import { bufferToHex, stringToBuffer } from '~/composables/utils';
 
 export type Selections = Record<string, number>;
 type Transform = (sel: Selections) => Selections;
@@ -77,8 +77,24 @@ export const useProjectStore = defineStore('project', () => {
   });
 
   const isLoaded = computed(() => !!project.value);
-  const loadProject = (data: Project, file: string) => {
-    project.value = { data, file };
+  const loadProject = async (fileContents: string, fileName: string) => {
+    const hashBytes = await crypto.subtle.digest(
+      'SHA-1',
+      stringToBuffer(fileContents),
+    );
+    const hashHex = bufferToHex(hashBytes);
+
+    const data: Project = JSON.parse(fileContents);
+    const projectFile: ProjectFile = {
+      data: data,
+      fileName: fileName,
+      projectId: data?.$projectId ?? hashHex,
+      projectName: data.rows[0].title,
+      projectHash: hashHex,
+    };
+    console.log(projectFile);
+    project.value = projectFile;
+    selected.value = {};
   };
   const unloadProject = () => {
     project.value = null;

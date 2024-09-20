@@ -21,6 +21,8 @@
   ],
   "plugins": ["@typescript-eslint", "nuxt", "import", "unused-imports"],
   "rules": {
+    // Interferes with unused-import
+    "@typescript-eslint/no-unused-vars": "off",
     "no-console": "off",
     "vue/multi-word-component-names": "off",
     "sort-imports": [

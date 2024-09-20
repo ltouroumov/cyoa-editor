@@ -33,9 +33,9 @@
 </template>
 
 <script setup lang="ts">
-import { Project } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
+import { bufferToString } from '~/composables/utils';
 import { ViewerProjectList } from '~/composables/viewer';
 
 const isLoading = ref<boolean>(false);
@@ -57,7 +57,7 @@ const loadRemoteFile = async ({ target }: MouseEvent) => {
 
     const response = await fetch(fileURL);
 
-    let result: Project;
+    let result: string;
     if (response.ok) {
       const reader = response.body!.getReader();
 
@@ -91,21 +91,16 @@ const loadRemoteFile = async ({ target }: MouseEvent) => {
         pos += chunk.length;
       }
 
-      const bodyText = new TextDecoder('utf-8').decode(bodyBytes);
-      result = JSON.parse(bodyText);
+      const bodyText = bufferToString(bodyBytes);
+      result = bodyText;
     } else {
       return;
     }
 
-    if (isLoaded.value) {
-      unloadProject();
-    }
-    // Wait for the unloadProject to finish before loading the new project
-    await nextTick(() => {
-      loadProject(result, fileURL);
-      toggleProjectMenu(false);
-      isLoading.value = false;
-    });
+    unloadProject();
+    await loadProject(result, fileURL);
+    toggleProjectMenu(false);
+    isLoading.value = false;
   }
 };
 </script>

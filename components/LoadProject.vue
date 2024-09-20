@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { useProjectStore } from '~/composables/store/project';
+import { readFileContents } from '~/composables/utils';
 
 const { loadProject, unloadProject } = useProjectStore();
 const { isLoaded } = useProjectStore();
@@ -56,7 +57,7 @@ const checkCanLoad = () => {
 
 checkCanLoad();
 
-const loadProjectFile = () => {
+const loadProjectFile = async () => {
   if (fileInput.value && fileInput.value.files) {
     const [file] = fileInput.value.files;
     if (!file) {
@@ -66,25 +67,14 @@ const loadProjectFile = () => {
 
     isLoading.value = true;
 
-    const reader = new FileReader();
-    reader.addEventListener('load', () => {
-      if (reader.result && typeof reader.result === 'string') {
-        const data = JSON.parse(reader.result);
-        isLoading.value = false;
-        if (isLoaded) {
-          unloadProject();
-        }
-        loadProject(data, file.name);
-      }
-    });
-    reader.addEventListener('error', () => {
-      error.value = reader.error?.message ?? 'An error occurred';
-      isLoading.value = false;
-    });
-
     try {
-      reader.readAsText(file);
-    } catch (e: unknown) {
+      const data = await readFileContents(file);
+      if (data && typeof data === 'string') {
+        isLoading.value = false;
+        unloadProject();
+        await loadProject(data, file.name);
+      }
+    } catch (e) {
       isLoading.value = false;
       if (e instanceof Error) {
         error.value = e.message;

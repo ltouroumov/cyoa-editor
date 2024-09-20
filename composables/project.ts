@@ -210,6 +210,7 @@ export type PointType = {
 };
 
 export type Project = {
+  $projectId?: string;
   rows: ProjectRow[];
   backpack: ProjectRow[];
   pointTypes: PointType[];
@@ -218,5 +219,8 @@ export type Project = {
 
 export type ProjectFile = {
   data: Project;
-  file: string;
+  fileName: string;
+  projectId: string;
+  projectName: string;
+  projectHash: string;
 };
