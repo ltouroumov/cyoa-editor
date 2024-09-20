@@ -12,13 +12,13 @@
           <div class="form-check form-switch pack-selection-controls">
             <input
               id="packRowDisabledSwitch"
-              v-model="disableBackpackSelectionSwitch"
+              v-model="lockBackpackObjects"
               class="form-check-input"
               type="checkbox"
               role="switch"
             />
             <label class="form-check-label" for="packRowDisabledSwitch">
-              Disable Backpack Selection
+              Lock Objects in the Backpack
             </label>
           </div>
         </div>
@@ -31,24 +31,14 @@
             {{ packRow.title }}
           </div>
           <div class="container-fluid p-0">
-            <div v-if="!disableBackpackSelectionSwitch" class="row g-2">
+            <div class="row g-2">
               <ViewProjectObj
                 v-for="{ obj, row } in choices"
                 :key="obj.id"
                 :obj="obj"
                 :row="row"
                 :width="packRow.objectWidth"
-                :view-object="ViewContext.BackpackEnabled"
-              />
-            </div>
-            <div v-else class="row g-2">
-              <ViewProjectObj
-                v-for="{ obj, row } in choices"
-                :key="obj.id"
-                :obj="obj"
-                :row="row"
-                :width="packRow.objectWidth"
-                :view-object="ViewContext.BackpackDisabled"
+                :view-object="objectMode"
               />
             </div>
           </div>
@@ -104,7 +94,11 @@ const packRows = computed(() => {
   );
 });
 
-const disableBackpackSelectionSwitch = ref(false);
+const lockBackpackObjects = ref(true);
+const objectMode = computed(() => {
+  if (lockBackpackObjects.value) return ViewContext.BackpackDisabled;
+  else return ViewContext.BackpackEnabled;
+});
 </script>
 
 <style scoped lang="scss">

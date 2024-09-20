@@ -11,6 +11,7 @@
         selected: isSelected,
         disabled: !isEnabled,
         notSelectable: obj.isNotSelectable || row.isInfoRow,
+        canToggle: canToggle,
       }"
       @click="toggle"
     >
@@ -82,14 +83,7 @@ import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';
 
-const {
-  row,
-  obj,
-  viewObject,
-  width = null,
-  forceWidth = null,
-  template = null,
-} = defineProps<{
+const $props = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
   viewObject?: ViewContext;
@@ -99,14 +93,14 @@ const {
 }>();
 
 const objClass = computed(() => {
-  if (forceWidth) return ['col', { [forceWidth]: true }];
+  if ($props.forceWidth) return ['col', { [$props.forceWidth]: true }];
 
-  let objectSize = row.objectWidth;
-  if (obj.objectWidth) {
-    objectSize = obj.objectWidth;
+  let objectSize = $props.row.objectWidth;
+  if ($props.obj.objectWidth) {
+    objectSize = $props.obj.objectWidth;
   }
-  if (width) {
-    objectSize = width;
+  if ($props.width) {
+    objectSize = $props.width;
   }
 
   if (objectSize in ObjectSizes) {
@@ -121,7 +115,7 @@ const objClass = computed(() => {
 const objTemplateClass = computed(() => {
   // Allow to override the template
   // Used in the search results since the object view is always single-column
-  switch (template ?? obj.template) {
+  switch ($props.template ?? $props.obj.template) {
     case '1':
       return 'obj-template-top';
     case '2':
@@ -136,53 +130,56 @@ const objTemplateClass = computed(() => {
 const store = useProjectStore();
 const { selectedIds, selected } = useProjectRefs();
 
-const condition = computed(() => buildConditions(obj));
+const condition = computed(() => buildConditions($props.obj));
 const isEnabled = computed<boolean>(() => {
   // Whether the object is always enabled or disabled based on the viewObject
   // Otherwise check the object conditions
-  switch (viewObject) {
+  switch ($props.viewObject) {
     case ViewContext.BackpackEnabled:
       return true;
     default:
       return condition.value(selectedIds.value);
   }
 });
-const isSelectable = computed<boolean>(() => {
+const canToggle = computed<boolean>(() => {
   return (
     isEnabled.value &&
-    !obj.isNotSelectable &&
-    !row.isInfoRow &&
-    viewObject !== ViewContext.BackpackDisabled
+    !$props.obj.isNotSelectable &&
+    !$props.row.isInfoRow &&
+    $props.viewObject !== ViewContext.BackpackDisabled
   );
 });
-const isSelected = computed<boolean>(() => R.has(obj.id, selected.value));
+const isSelected = computed<boolean>(() =>
+  R.has($props.obj.id, selected.value),
+);
 
 const selectedAmount = computed(() => {
-  if (obj.isSelectableMultiple) return selected.value[obj.id] ?? 0;
+  if ($props.obj.isSelectableMultiple)
+    return selected.value[$props.obj.id] ?? 0;
   else return 0;
 });
 
 const minSelectedAmount = computed(() =>
-  Number.parseInt(obj.numMultipleTimesMinus),
+  Number.parseInt($props.obj.numMultipleTimesMinus),
 );
 const maxSelectedAmount = computed(() =>
-  Number.parseInt(obj.numMultipleTimesPluss),
+  Number.parseInt($props.obj.numMultipleTimesPluss),
 );
 
 const toggle = () => {
-  if (isSelectable.value && !obj.isSelectableMultiple) {
-    store.setSelected(obj.id, !isSelected.value);
+  if (canToggle.value && !$props.obj.isSelectableMultiple) {
+    store.setSelected($props.obj.id, !isSelected.value);
   }
 };
 
 const increment = () => {
-  if (isSelectable.value) {
-    store.incSelected(obj.id);
+  if (canToggle.value) {
+    store.incSelected($props.obj.id);
   }
 };
 const decrement = () => {
-  if (isSelectable.value) {
-    store.decSelected(obj.id);
+  if (canToggle.value) {
+    store.decSelected($props.obj.id);
   }
 };
 </script>
