@@ -23,14 +23,14 @@ const { store } = useProjectRefs();
 
 const background = ref<string | null>(null);
 const BACKGROUNDS = [
-  { url: '/bgs/load-01.jpg' },
-  { url: '/bgs/load-02.jpg' },
-  { url: '/bgs/load-04.jpg' },
-  { url: '/bgs/load-05.png' },
-  { url: '/bgs/load-06.jpg' },
-  { url: '/bgs/load-07.webp' },
-  { url: '/bgs/load-08.jpg' },
-  { url: '/bgs/load-09.jpg' },
+  { url: 'bgs/load-01.jpg' },
+  { url: 'bgs/load-02.jpg' },
+  { url: 'bgs/load-04.jpg' },
+  { url: 'bgs/load-05.png' },
+  { url: 'bgs/load-06.jpg' },
+  { url: 'bgs/load-07.webp' },
+  { url: 'bgs/load-08.jpg' },
+  { url: 'bgs/load-09.jpg' },
 ];
 
 const randomizeBackground = () => {
