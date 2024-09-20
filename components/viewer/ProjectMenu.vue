@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
-import { bufferToString } from '~/composables/utils';
+import { bufferToString, sleep } from '~/composables/utils';
 import { ViewerProjectList } from '~/composables/viewer';
 
 const isLoading = ref<boolean>(false);
@@ -53,54 +53,50 @@ const loadRemoteFile = async ({ target }: MouseEvent) => {
   if (target && target instanceof HTMLAnchorElement) {
     const fileURL = target.dataset.fileurl;
     if (!fileURL) return;
-    isLoading.value = true;
 
-    const response = await fetch(fileURL);
+    toggleProjectMenu(false);
+    await loadProject(async (setProgress) => {
+      const response = await fetch(fileURL);
+      if (response.ok) {
+        const reader = response.body!.getReader();
 
-    let result: string;
-    if (response.ok) {
-      const reader = response.body!.getReader();
+        let received = 0;
+        const chunks = [];
 
-      let received = 0;
-      const chunks = [];
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+          chunks.push(value);
+          received += value.length;
 
-        chunks.push(value);
-        received += value.length;
-
-        await nextTick(() => {
           const receivedMB = received / (1024 * 1024);
           const neat = Math.round(receivedMB * 100) / 100;
-          progress.value = `Downloaded ${neat} Mb`;
-        });
+          await setProgress(`Downloaded ${neat} Mb`);
+        }
+
+        await setProgress(`Loading ${target.text}...`);
+        // A hack, but otherwise the progress value never updates before loadProject is called
+        await sleep(100);
+
+        const bodyBytes = new Uint8Array(received);
+        let pos = 0;
+        for (const chunk of chunks) {
+          bodyBytes.set(chunk, pos);
+          pos += chunk.length;
+        }
+
+        return {
+          fileContents: bufferToString(bodyBytes),
+          fileName: fileURL.toString(),
+        };
+      } else {
+        throw new Error(
+          `HTTP Request failed with ${response.status}: ${response.statusText}`,
+        );
       }
-
-      progress.value = `Loading ${target.text}...`;
-      // A hack, but otherwise the progress value never updates before loadProject is called
-      const pause = new Promise((resolve) => setTimeout(resolve, 100));
-      await pause;
-
-      const bodyBytes = new Uint8Array(received);
-      let pos = 0;
-      for (const chunk of chunks) {
-        bodyBytes.set(chunk, pos);
-        pos += chunk.length;
-      }
-
-      const bodyText = bufferToString(bodyBytes);
-      result = bodyText;
-    } else {
-      return;
-    }
-
-    unloadProject();
-    await loadProject(result, fileURL);
-    toggleProjectMenu(false);
-    isLoading.value = false;
+    });
   }
 };
 </script>

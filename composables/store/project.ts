@@ -9,6 +9,7 @@ import {
   ProjectFile,
   ProjectObj,
   ProjectRow,
+  ProjectStore,
   Score,
 } from '~/composables/project';
 import { bufferToHex, stringToBuffer } from '~/composables/utils';
@@ -16,10 +17,28 @@ import { bufferToHex, stringToBuffer } from '~/composables/utils';
 export type Selections = Record<string, number>;
 type Transform = (sel: Selections) => Selections;
 
+export type LoadProjectData = {
+  fileContents: string;
+  fileName: string;
+};
+
+type SetProgressF = (progress: string) => Promise<void>;
+type ProjectProvider = (
+  setProgress: SetProgressF,
+) => Promise<LoadProjectData | undefined>;
+
 export const useProjectStore = defineStore('project', () => {
   const $toast = useToast();
 
-  const project = shallowRef<ProjectFile | null>(null);
+  const store = shallowRef<ProjectStore>({
+    status: 'empty',
+  });
+
+  const project = computed<ProjectFile | null>(() => {
+    if (store.value.status === 'loaded') return store.value.file;
+    else return null;
+  });
+
   const selected = ref<Selections>({});
   const selectedIds = computed(() => R.keys(selected.value));
 
@@ -77,27 +96,55 @@ export const useProjectStore = defineStore('project', () => {
   });
 
   const isLoaded = computed(() => !!project.value);
-  const loadProject = async (fileContents: string, fileName: string) => {
-    const hashBytes = await crypto.subtle.digest(
-      'SHA-1',
-      stringToBuffer(fileContents),
-    );
-    const hashHex = bufferToHex(hashBytes);
 
-    const data: Project = JSON.parse(fileContents);
-    const projectFile: ProjectFile = {
-      data: data,
-      fileName: fileName,
-      projectId: data?.$projectId ?? hashHex,
-      projectName: data.rows[0].title,
-      projectHash: hashHex,
-    };
-    console.log(projectFile);
-    project.value = projectFile;
+  const loadProject = async (provider: ProjectProvider) => {
+    store.value = { status: 'loading' };
     selected.value = {};
+
+    const setProgress = (progress: string): Promise<void> =>
+      nextTick(() => {
+        (store.value as LoadingProjectStore).progress = progress;
+        triggerRef(store);
+      });
+
+    try {
+      const result = await provider(setProgress);
+      if (!result) {
+        store.value = { status: 'empty' };
+        return;
+      }
+
+      const { fileContents, fileName } = result;
+
+      const hashBytes = await crypto.subtle.digest(
+        'SHA-1',
+        stringToBuffer(fileContents),
+      );
+      const hashHex = bufferToHex(hashBytes);
+
+      const data: Project = JSON.parse(fileContents);
+      const projectFile: ProjectFile = {
+        data: data,
+        fileName: fileName,
+        projectId: data?.$projectId ?? hashHex,
+        projectName: data.rows[0].title,
+        projectHash: hashHex,
+      };
+      console.log(projectFile);
+
+      store.value = {
+        status: 'loaded',
+        file: projectFile,
+      };
+      triggerRef(store);
+    } catch (e) {
+      $toast.error('Failed to load the project :(');
+      console.log(e);
+      store.value = { status: 'empty' };
+    }
   };
   const unloadProject = () => {
-    project.value = null;
+    store.value = { status: 'empty' };
     selected.value = {};
   };
 
@@ -376,6 +423,7 @@ export const useProjectStore = defineStore('project', () => {
   });
 
   return {
+    store,
     project,
     projectRows,
     backpack,

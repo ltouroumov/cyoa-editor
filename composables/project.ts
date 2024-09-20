@@ -224,3 +224,20 @@ export type ProjectFile = {
   projectName: string;
   projectHash: string;
 };
+
+export type EmptyProjectStore = {
+  status: 'empty';
+};
+export type LoadingProjectStore = {
+  status: 'loading';
+  progress?: string;
+};
+export type LoadedProjectStore = {
+  status: 'loaded';
+  file: ProjectFile;
+};
+
+export type ProjectStore =
+  | EmptyProjectStore
+  | LoadingProjectStore
+  | LoadedProjectStore;

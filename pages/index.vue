@@ -1,6 +1,6 @@
 <template>
-  <ViewProject v-if="project" :project="project.data" />
-  <div v-else class="dialog-container">
+  <ProjectViewWrapper />
+  <div v-if="store.status === 'empty'" class="dialog-container">
     <div class="bg-dark-subtle dialog text-light">
       <ProjectMenu :project-list="projectList" />
     </div>
@@ -9,12 +9,10 @@
 
 <script setup lang="ts">
 import { definePageMeta } from '#imports';
-import ProjectMenu from '~/components/viewer/ProjectMenu.vue';
-import ViewProject from '~/components/viewer/ViewProject.vue';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 
-const { project } = useProjectRefs();
+const { store } = useProjectRefs();
 const { viewerProjectList } = useViewerRefs();
 
 const projectList = computed(() => viewerProjectList.value);

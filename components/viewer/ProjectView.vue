@@ -18,7 +18,7 @@ import SearchModal from '~/components/viewer/modal/SearchModal.vue';
 import StyleProject from '~/components/viewer/style/StyleProject.vue';
 import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
 
-const { project } = defineProps<{
+defineProps<{
   project: Project;
 }>();
 </script>

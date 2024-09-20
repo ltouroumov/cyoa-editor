@@ -31,8 +31,7 @@
 import { useProjectStore } from '~/composables/store/project';
 import { readFileContents } from '~/composables/utils';
 
-const { loadProject, unloadProject } = useProjectStore();
-const { isLoaded } = useProjectStore();
+const { loadProject } = useProjectStore();
 const fileInput = ref<HTMLInputElement>();
 const isLoading = ref<boolean>(false);
 const canLoad = ref<boolean>(false);
@@ -65,21 +64,15 @@ const loadProjectFile = async () => {
       return;
     }
 
-    isLoading.value = true;
-
-    try {
+    await loadProject(async () => {
       const data = await readFileContents(file);
       if (data && typeof data === 'string') {
-        isLoading.value = false;
-        unloadProject();
-        await loadProject(data, file.name);
+        return {
+          fileContents: data,
+          fileName: file.name,
+        };
       }
-    } catch (e) {
-      isLoading.value = false;
-      if (e instanceof Error) {
-        error.value = e.message;
-      }
-    }
+    });
   }
 };
 </script>
