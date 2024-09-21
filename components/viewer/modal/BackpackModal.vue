@@ -21,7 +21,10 @@
             <div class="pack-scores">
               <ViewScoreStatus vertical />
             </div>
-            <div class="d-flex flex-column pack-selection-controls">
+            <div
+              v-show="!isLoading"
+              class="flex-column pack-selection-controls"
+            >
               <div class="form-check form-switch">
                 <input
                   id="packRowDisabledSwitch"
@@ -231,6 +234,7 @@ const backpackToImage = async () => {
     }
 
     .pack-selection-controls {
+      display: flex;
       position: absolute;
       right: 0;
       padding-right: 0.5rem;
