@@ -17,6 +17,9 @@
           class="backpack-container"
           :class="{ backpackRender: isLoading }"
         >
+          <div v-if="isLoading" class="project-title">
+            {{ project?.projectName }}
+          </div>
           <div class="pack-info-container">
             <div class="pack-scores">
               <ViewScoreStatus :vertical="!isLoading" />
@@ -274,6 +277,13 @@ const backpackToImage = async () => {
 }
 .backpackRender .score-text {
   font-weight: normal;
+}
+
+.project-title {
+  font-weight: bold;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 .pack-import-export {
