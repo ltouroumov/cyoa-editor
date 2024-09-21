@@ -9,11 +9,7 @@
       </strong>
     </div>
     <div class="loading-background">
-      <NuxtImg
-        v-if="isNotNil(background)"
-        :src="background"
-        alt="Background ..."
-      />
+      <img v-if="isNotNil(background)" :src="background" alt="Background ..." />
     </div>
   </div>
 </template>
@@ -24,22 +20,23 @@ import { isNotNil } from 'ramda';
 import { useProjectRefs } from '~/composables/store/project';
 
 const { store } = useProjectRefs();
+const config = useRuntimeConfig();
 
 const background = ref<string | null>(null);
 const BACKGROUNDS = [
-  { url: '/bgs/load-01.jpg' },
-  { url: '/bgs/load-02.jpg' },
-  { url: '/bgs/load-04.jpg' },
-  { url: '/bgs/load-05.png' },
-  { url: '/bgs/load-06.jpg' },
-  { url: '/bgs/load-07.webp' },
-  { url: '/bgs/load-08.jpg' },
-  { url: '/bgs/load-09.jpg' },
+  { url: 'bgs/load-01.jpg' },
+  { url: 'bgs/load-02.jpg' },
+  { url: 'bgs/load-04.jpg' },
+  { url: 'bgs/load-05.png' },
+  { url: 'bgs/load-06.jpg' },
+  { url: 'bgs/load-07.webp' },
+  { url: 'bgs/load-08.jpg' },
+  { url: 'bgs/load-09.jpg' },
 ];
 
 const randomizeBackground = () => {
   const idx = Math.floor(Math.random() * BACKGROUNDS.length);
-  background.value = BACKGROUNDS[idx].url;
+  background.value = `${config.app.baseURL}${BACKGROUNDS[idx].url}`;
 };
 
 randomizeBackground();
