@@ -136,6 +136,7 @@ const isEnabled = computed<boolean>(() => {
   // Otherwise check the object conditions
   switch ($props.viewObject) {
     case ViewContext.BackpackEnabled:
+    case ViewContext.BackpackDisabled:
       return true;
     default:
       return condition.value(selectedIds.value);
