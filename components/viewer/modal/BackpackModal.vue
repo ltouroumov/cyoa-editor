@@ -19,7 +19,7 @@
         >
           <div class="pack-info-container">
             <div class="pack-scores">
-              <ViewScoreStatus vertical />
+              <ViewScoreStatus :vertical="!isLoading" />
             </div>
             <div
               v-show="!isLoading"
@@ -261,6 +261,19 @@ const backpackToImage = async () => {
 
 .backpackRender {
   width: 1280px !important;
+}
+.backpackRender .pack-info-container {
+  position: unset;
+  align-items: center;
+  justify-content: center;
+}
+.backpackRender .pack-scores {
+  align-self: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.backpackRender .score-text {
+  font-weight: normal;
 }
 
 .pack-import-export {
