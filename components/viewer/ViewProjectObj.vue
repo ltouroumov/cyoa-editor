@@ -12,6 +12,7 @@
         disabled: !isEnabled,
         notSelectable: obj.isNotSelectable || row.isInfoRow,
         canToggle: canToggle,
+        hideDisabledAddons: $props.hideDisabledAddons,
       }"
       @click="toggle"
     >
@@ -90,6 +91,7 @@ const $props = defineProps<{
   width?: string;
   forceWidth?: string;
   template?: string;
+  hideDisabledAddons?: boolean;
 }>();
 
 const objClass = computed(() => {
@@ -191,6 +193,12 @@ const decrement = () => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+
+  &.hideDisabledAddons {
+    .addon.disabled {
+      display: none;
+    }
+  }
 
   .project-obj-content {
     overflow: auto;

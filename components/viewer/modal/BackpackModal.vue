@@ -9,17 +9,31 @@
           <div class="pack-scores">
             <ViewScoreStatus vertical />
           </div>
-          <div class="form-check form-switch pack-selection-controls">
-            <input
-              id="packRowDisabledSwitch"
-              v-model="lockBackpackObjects"
-              class="form-check-input"
-              type="checkbox"
-              role="switch"
-            />
-            <label class="form-check-label" for="packRowDisabledSwitch">
-              Lock Objects in the Backpack
-            </label>
+          <div class="d-flex flex-column pack-selection-controls">
+            <div class="form-check form-switch">
+              <input
+                id="packRowDisabledSwitch"
+                v-model="lockBackpackObjects"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+              />
+              <label class="form-check-label" for="packRowDisabledSwitch">
+                Lock Objects in the Backpack
+              </label>
+            </div>
+            <div class="form-check form-switch">
+              <input
+                id="hideDisabledAddons"
+                v-model="hideDisabledAddons"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+              />
+              <label class="form-check-label" for="hideDisabledAddons">
+                Hide Disabled Addons
+              </label>
+            </div>
           </div>
         </div>
         <div
@@ -39,6 +53,7 @@
                 :row="row"
                 :width="packRow.objectWidth"
                 :view-object="objectMode"
+                :hide-disabled-addons="hideDisabledAddons"
               />
             </div>
           </div>
@@ -93,7 +108,7 @@ const packRows = computed(() => {
     backpack.value,
   );
 });
-
+const hideDisabledAddons = ref(true);
 const lockBackpackObjects = ref(true);
 const objectMode = computed(() => {
   if (lockBackpackObjects.value) return ViewContext.BackpackDisabled;
