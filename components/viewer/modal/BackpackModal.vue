@@ -139,6 +139,7 @@ const objectMode = computed(() => {
     .pack-selection-controls {
       position: absolute;
       right: 0;
+      padding-right: 0.5rem;
     }
   }
 
