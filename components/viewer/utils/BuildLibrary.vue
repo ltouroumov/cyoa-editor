@@ -106,6 +106,10 @@ const addStuff = async () => {
 };
 
 const saveBuild = async (build: BuildData) => {
+  if (R.isEmpty(selected.value)) {
+    $toast.error("No selections are made,\nThere's nothing to save.");
+    return;
+  }
   await db.transaction('builds', 'readwrite', async (tx) => {
     const store = tx.objectStore('builds');
     await store.put({
