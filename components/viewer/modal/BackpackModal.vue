@@ -145,9 +145,8 @@ const backpackToImage = async () => {
     const toastGenerateImage = $toast.info('Generating image...', {
       timeout: false,
     });
-    // A hack, the DOM won't update until after the image is generated otherwise
-    const pause = new Promise((resolve) => setTimeout(resolve, 200));
-    await pause;
+    // Wait for the next tick to ensure DOM is updated before getting the element.
+    await nextTick();
 
     // Set background color for svg to project background color if it exists
     const currentBackground = backpackRef.value.style.backgroundColor;
