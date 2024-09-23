@@ -1,43 +1,62 @@
 <template>
   <div class="build-details">
     <div class="name">{{ build.name }}</div>
-    <div class="project-name">
-      <span v-if="isCompatible === ProjectMatch.Hash" class="compat">
-        <div class="i-solar:check-circle-outline h-1em w-1em text-green"></div>
-      </span>
-      <span v-if="isCompatible === ProjectMatch.Name" class="compat">
-        <div class="i-solar:check-circle-outline h-1em w-1em text-orange"></div>
-      </span>
-      <span v-if="isCompatible === ProjectMatch.None" class="compat">
-        <div class="i-solar:danger-triangle-bold text-danger h-1em w-1em"></div>
-      </span>
-      <span class="flex-grow-1">{{ build.project.name }}</span>
+    <div v-if="build.selected">
+      Build Code:
+      {{ buildCode(build.selected) }}
     </div>
-    <div class="date">
-      <span>{{ build.updatedAt.toLocaleDateString() }}</span>
-    </div>
-    <div class="choices">
-      <BuildChoices :groups="build.groups" />
-    </div>
-    <div class="actions">
-      <button class="btn btn-outline-primary btn-sm" @click="loadBuild(build)">
-        Load
-      </button>
-      <button
-        class="btn btn-outline-primary btn-sm"
-        @click="updateBuild(build)"
-      >
-        Save
-      </button>
-      <button class="btn btn-sm btn-outline-danger" @click="deleteBuild(build)">
-        Delete
-      </button>
-    </div>
+    <template v-else>
+      <div class="project-name">
+        <span v-if="isCompatible === ProjectMatch.Hash" class="compat">
+          <div
+            class="i-solar:check-circle-outline h-1em w-1em text-green"
+          ></div>
+        </span>
+        <span v-if="isCompatible === ProjectMatch.Name" class="compat">
+          <div
+            class="i-solar:check-circle-outline h-1em w-1em text-orange"
+          ></div>
+        </span>
+        <span v-if="isCompatible === ProjectMatch.None" class="compat">
+          <div
+            class="i-solar:danger-triangle-bold text-danger h-1em w-1em"
+          ></div>
+        </span>
+        <span class="flex-grow-1">{{ build.project.name }}</span>
+      </div>
+      <div class="date">
+        <span>{{ build.updatedAt.toLocaleDateString() }}</span>
+      </div>
+      <div class="choices">
+        <BuildChoices :groups="build.groups" />
+      </div>
+      <div class="actions">
+        <button
+          class="btn btn-outline-primary btn-sm"
+          @click="loadBuild(build)"
+        >
+          Load
+        </button>
+        <button
+          class="btn btn-outline-primary btn-sm"
+          @click="updateBuild(build)"
+        >
+          Save
+        </button>
+        <button
+          class="btn btn-sm btn-outline-danger"
+          @click="deleteBuild(build)"
+        >
+          Delete
+        </button>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as R from 'ramda';
+import { join, map, toPairs } from 'ramda';
 import { useToast } from 'vue-toastification';
 
 import {
@@ -69,6 +88,12 @@ const $props = defineProps<{
 const $emit = defineEmits<{
   (e: 'change'): void;
 }>();
+
+const buildCode = (selected: Selections) =>
+  join(
+    ';',
+    map(([id, amt]) => (amt > 1 ? `${id}:${amt}` : id), toPairs(selected)),
+  );
 
 const isCompatible = computed(() => {
   const _project = project.value;

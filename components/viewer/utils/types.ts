@@ -1,3 +1,5 @@
+import type { Selections } from '~/composables/store/project';
+
 export type SavedBuildProject = {
   projectId?: string;
   name: string;
@@ -20,6 +22,7 @@ export type SavedBuildData = {
   updatedAt: Date;
   project: SavedBuildProject;
   groups: SavedBuildGroup[];
+  selected?: Selections;
 };
 
 export enum ProjectMatch {
