@@ -1,7 +1,7 @@
 <template>
   <div class="build-details">
     <div class="name">{{ build.name }}</div>
-    <div v-if="build.selected">
+    <div v-if="build.selected" class="build-code">
       Build Code:
       {{ buildCode(build.selected) }}
     </div>
@@ -202,6 +202,10 @@ const loadBuild = (build: SavedBuildData) => {
     flex-direction: row;
     gap: 0.5rem;
     align-items: flex-start;
+  }
+
+  .build-code {
+    grid-area: choices;
   }
 }
 </style>
