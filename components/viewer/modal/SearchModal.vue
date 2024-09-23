@@ -51,7 +51,7 @@
 import { debounce } from 'perfect-debounce';
 import { all, any, includes, isEmpty } from 'ramda';
 
-import { Project, ProjectObj, ProjectRow } from '~/composables/project';
+import type { Project, ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';

@@ -1,7 +1,11 @@
 import Handlebars from 'handlebars';
 import { join, map, mergeRight, multiply, pipe, prop } from 'ramda';
 
-import { ObjStyles, ProjectStyles, RowStyles } from '~/composables/project';
+import type {
+  ObjStyles,
+  ProjectStyles,
+  RowStyles,
+} from '~/composables/project';
 
 export abstract class StyleGenerator<T> {
   abstract name: string;

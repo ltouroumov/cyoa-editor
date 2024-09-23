@@ -39,7 +39,7 @@ import { computed } from 'vue';
 
 import StyleRow from '~/components/viewer/style/StyleRow.vue';
 import { buildConditions } from '~/composables/conditions';
-import { ProjectRow } from '~/composables/project';
+import type { ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
 

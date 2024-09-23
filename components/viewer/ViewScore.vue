@@ -16,7 +16,7 @@
 import { computed } from 'vue';
 
 import { buildConditions } from '~/composables/conditions';
-import { Score } from '~/composables/project';
+import type { Score } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 
 const { score } = defineProps<{ score: Score }>();

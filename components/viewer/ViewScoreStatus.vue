@@ -21,7 +21,7 @@
 import * as R from 'ramda';
 import { computed } from 'vue';
 
-import { PointType } from '~/composables/project';
+import type { PointType } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 
 const { vertical, short = false } = defineProps<{

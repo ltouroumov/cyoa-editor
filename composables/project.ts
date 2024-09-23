@@ -220,7 +220,7 @@ export type Project = {
 export type ProjectFile = {
   data: Project;
   fileName: string;
-  projectId: string;
+  projectId?: string;
   projectName: string;
   projectHash: string;
 };

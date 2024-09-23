@@ -1,10 +1,11 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
-import { ComputedRef, computed } from 'vue';
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue';
 import { useToast } from 'vue-toastification';
 
 import { buildConditions } from '~/composables/conditions';
-import {
+import type {
   PointType,
   ProjectFile,
   ProjectObj,
@@ -126,7 +127,7 @@ export const useProjectStore = defineStore('project', () => {
       const projectFile: ProjectFile = {
         data: data,
         fileName: fileName,
-        projectId: data?.$projectId ?? hashHex,
+        projectId: data?.$projectId,
         projectName: data.rows[0].title,
         projectHash: hashHex,
       };

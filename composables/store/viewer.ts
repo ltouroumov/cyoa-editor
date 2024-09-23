@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia';
 
-import { ViewerProjectList } from '~/composables/viewer';
+import type { ViewerProjectList } from '~/composables/viewer';
 
 export const useViewerStore = defineStore('viewer', () => {
   const isBackpackVisible = ref<boolean>(false);

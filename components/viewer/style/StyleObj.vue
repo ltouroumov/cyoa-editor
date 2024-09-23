@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import DynamicStyles from '~/components/utils/DynamicStyles.vue';
 import { ObjStylesGen, createStyles } from '~/components/viewer/style/engine';
-import { ObjStyles } from '~/composables/project';
+import type { ObjStyles } from '~/composables/project';
 
 const { styles, objId } = defineProps<{ styles: ObjStyles; objId: string }>();
 

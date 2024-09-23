@@ -41,6 +41,12 @@
         </li>
       </ul>
       <div v-if="selected === 'project'">
+        <div v-if="store.status === 'loaded'" class="mb-2">
+          <div class="fw-bold">{{ store.file.projectName }}</div>
+          <div class="font-monospace text-gray">
+            Hash: {{ store.file.projectHash }}
+          </div>
+        </div>
         <ProjectMenu :project-list="viewerProjectList" />
       </div>
       <div v-if="selected === 'save-load'">
@@ -57,10 +63,12 @@
 
 <script setup lang="ts">
 import ProjectMenu from '~/components/viewer/ProjectMenu.vue';
+import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 
 const { toggleProjectMenu, viewerProjectList } = useViewerStore();
 const { isProjectMenuVisible } = useViewerRefs();
+const { store } = useProjectRefs();
 
 const selected = ref<string>('project');
 </script>

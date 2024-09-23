@@ -74,7 +74,7 @@ import { computed } from 'vue';
 import ModalDialog from '~/components/utils/ModalDialog.vue';
 import ExportCode from '~/components/viewer/utils/ExportCode.vue';
 import ImportCode from '~/components/viewer/utils/ImportCode.vue';
-import { ProjectObj, ProjectRow } from '~/composables/project';
+import type { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';

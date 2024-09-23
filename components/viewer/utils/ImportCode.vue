@@ -16,11 +16,8 @@ import * as R from 'ramda';
 import { ref } from 'vue';
 import { useToast } from 'vue-toastification';
 
-import {
-  Selections,
-  useProjectRefs,
-  useProjectStore,
-} from '~/composables/store/project';
+import type { Selections } from '~/composables/store/project';
+import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
 const $toast = useToast();
 const { selected } = useProjectRefs();

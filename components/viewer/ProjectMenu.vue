@@ -27,7 +27,7 @@
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
 import { bufferToString, sleep } from '~/composables/utils';
-import { ViewerProjectList } from '~/composables/viewer';
+import type { ViewerProjectList } from '~/composables/viewer';
 
 const { projectList } = defineProps<{
   projectList: ViewerProjectList;

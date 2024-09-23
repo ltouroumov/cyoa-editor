@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import ViewRequirement from '~/components/viewer/ViewRequirement.vue';
-import { ConditionTerm } from '~/composables/project';
+import type { ConditionTerm } from '~/composables/project';
 
 defineProps<{ requireds: ConditionTerm[]; showAlways?: boolean }>();
 </script>

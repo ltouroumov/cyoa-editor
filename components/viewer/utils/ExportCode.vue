@@ -62,7 +62,7 @@
 import * as R from 'ramda';
 import { computed, ref } from 'vue';
 
-import { ProjectObj, ProjectRow } from '~/composables/project';
+import type { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
 const { getObject, getObjectRow, getRow } = useProjectStore();

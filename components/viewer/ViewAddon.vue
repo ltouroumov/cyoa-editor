@@ -11,7 +11,7 @@
 import { ref, watch } from 'vue';
 
 import { buildConditions } from '~/composables/conditions';
-import { ObjAddon } from '~/composables/project';
+import type { ObjAddon } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 
 const { addon } = defineProps<{ addon: ObjAddon }>();
