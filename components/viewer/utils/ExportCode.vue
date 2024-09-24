@@ -34,17 +34,31 @@
         placeholder="Nothing has been selected yet ..."
         :value="exportText"
       />
-      <div class="form-check form-switch export-text-toggle">
-        <input
-          id="sectionTitleSwitch"
-          v-model="exportTextHeaders"
-          class="form-check-input"
-          type="checkbox"
-          role="switch"
-        />
-        <label class="form-check-label" for="sectionTitleSwitch">
-          Add Section Titles
-        </label>
+      <div class="d-flex export-text-toggle column-gap-4">
+        <div class="form-check form-switch">
+          <input
+            id="sectionTitleSwitch"
+            v-model="exportTextHeaders"
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+          />
+          <label class="form-check-label" for="sectionTitleSwitch">
+            Add Section Titles
+          </label>
+        </div>
+        <div class="form-check form-switch">
+          <input
+            id="includeAddonsSwitch"
+            v-model="exportAddons"
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+          />
+          <label class="form-check-label" for="includeNotesSwitch">
+            Add Active Addons to Export
+          </label>
+        </div>
       </div>
       <button
         class="btn btn-outline-primary export-text-btn"
@@ -66,7 +80,7 @@ import type { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
 const { getObject, getObjectRow, getRow } = useProjectStore();
-const { selected, backpack } = useProjectRefs();
+const { selected, selectedIds, backpack } = useProjectRefs();
 
 type PackRowChoice = { row: ProjectRow; obj: ProjectObj; count: number };
 type PackRow = { packRow: ProjectRow; choices: PackRowChoice[] };
@@ -110,10 +124,23 @@ const exportCode = computed<string>(() => {
   )(R.toPairs(selected.value));
 });
 const exportTextHeaders = ref<boolean>(false);
+const exportAddons = ref<boolean>(false);
 const exportText = computed<string>(() => {
   return R.pipe(
     R.map(({ packRow, choices }: PackRow): string => {
       const choiceTitles = R.map(({ obj, count }) => {
+        if (R.isNotEmpty(obj.addons) && exportAddons.value) {
+          const activeAddons = R.filter((addon) => {
+            const condition = buildConditions(addon);
+            return condition(selectedIds.value);
+          }, obj.addons);
+          if (R.isNotEmpty(activeAddons)) {
+            const addonTitles = R.map((addon) => addon.title, activeAddons);
+            if (count > 1 || obj.isSelectableMultiple)
+              return `${obj.title} x ${count} ( ${R.join(' , ', addonTitles)} )`;
+            else return `${obj.title} ( ${R.join(' , ', addonTitles)} )`;
+          }
+        }
         if (count > 1 || obj.isSelectableMultiple)
           return `${obj.title} x ${count}`;
         else return obj.title;
