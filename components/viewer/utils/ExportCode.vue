@@ -129,6 +129,10 @@ const exportText = computed<string>(() => {
   return R.pipe(
     R.map(({ packRow, choices }: PackRow): string => {
       const choiceTitles = R.map(({ obj, count }) => {
+        let result = obj.title;
+        if (count > 1 || obj.isSelectableMultiple) {
+          result += ` x ${count}`;
+        }
         if (R.isNotEmpty(obj.addons) && exportAddons.value) {
           const activeAddons = R.filter((addon) => {
             const condition = buildConditions(addon);
@@ -136,14 +140,10 @@ const exportText = computed<string>(() => {
           }, obj.addons);
           if (R.isNotEmpty(activeAddons)) {
             const addonTitles = R.map((addon) => addon.title, activeAddons);
-            if (count > 1 || obj.isSelectableMultiple)
-              return `${obj.title} x ${count} ( ${R.join(' , ', addonTitles)} )`;
-            else return `${obj.title} ( ${R.join(' , ', addonTitles)} )`;
+            result += ` (${R.join(' , ', addonTitles)})`;
           }
         }
-        if (count > 1 || obj.isSelectableMultiple)
-          return `${obj.title} x ${count}`;
-        else return obj.title;
+        return result;
       }, choices);
       if (exportTextHeaders.value) {
         return R.concat(`**${packRow.title}**\n`, R.join(', ', choiceTitles));
