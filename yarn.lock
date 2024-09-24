@@ -5088,6 +5088,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dom-to-svg@npm:0.12.2":
+  version: 0.12.2
+  resolution: "dom-to-svg@npm:0.12.2"
+  dependencies:
+    gradient-parser: ^1.0.2
+    postcss: ^8.2.9
+    postcss-value-parser: ^4.1.0
+  checksum: c7ff413c99e190c06db1aadb7137a408b7f78cb44c85d8d48e15203e79d471c37b538cafbc31617e96ba8749cf09bb23adaaf91d49c5cac05cebfb2c57a875fc
+  languageName: node
+  linkType: hard
+
+"dom-to-svg@patch:dom-to-svg@npm%3A0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch::locator=nuxt-app%40workspace%3A.":
+  version: 0.12.2
+  resolution: "dom-to-svg@patch:dom-to-svg@npm%3A0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch::version=0.12.2&hash=f1f7fe&locator=nuxt-app%40workspace%3A."
+  dependencies:
+    gradient-parser: ^1.0.2
+    postcss: ^8.2.9
+    postcss-value-parser: ^4.1.0
+  checksum: e1ac775d8dc96fea41b0dadec500747854c431a0373fc14722c91feaa498c39497855011facc5496e3a1c1a846da265247765fd1e7c7a3bfefe19f616c9773ea
+  languageName: node
+  linkType: hard
+
 "domelementtype@npm:^2.3.0":
   version: 2.3.0
   resolution: "domelementtype@npm:2.3.0"
@@ -6795,6 +6817,13 @@ __metadata:
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: ac85f94da92d8eb6b7f5a8b20ce65e43d66761c55ce85ac96df6865308390da45a8d3f0296dd3a663de65d30ba497bd46c696cc1e248c72b13d6d567138a4fc7
+  languageName: node
+  linkType: hard
+
+"gradient-parser@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "gradient-parser@npm:1.0.2"
+  checksum: 6669639363faeb8c65718c73b44f4af570df79cd6b9bccce067765b9e33daed39b0b8534878e3fe8cf52cf83a3b38a80de295114d0ff2993d12982652c33fe47
   languageName: node
   linkType: hard
 
@@ -8804,6 +8833,7 @@ __metadata:
     "@vueuse/core": ^11.0.3
     "@vueuse/nuxt": ^11.0.3
     bootstrap: 5.3.*
+    dom-to-svg: ^0.12.2
     eslint: ^8.57.0
     eslint-config-prettier: ^8.10.0
     eslint-import-resolver-typescript: ^3.6.3
@@ -9714,10 +9744,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-value-parser@npm:^4.2.0":
+"postcss-value-parser@npm:^4.1.0, postcss-value-parser@npm:^4.2.0":
   version: 4.2.0
   resolution: "postcss-value-parser@npm:4.2.0"
   checksum: 819ffab0c9d51cf0acbabf8996dffbfafbafa57afc0e4c98db88b67f2094cb44488758f06e5da95d7036f19556a4a732525e84289a425f4f6fd8e412a9d7442f
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.2.9":
+  version: 8.4.45
+  resolution: "postcss@npm:8.4.45"
+  dependencies:
+    nanoid: ^3.3.7
+    picocolors: ^1.0.1
+    source-map-js: ^1.2.0
+  checksum: 3223cdad4a9392c0b334ee3ee7e4e8041c631cb6160609cef83c18d2b2580e931dd8068ab13cc6000c1a254d57492ac6c38717efc397c5dcc9756d06bc9c44f3
   languageName: node
   linkType: hard
 

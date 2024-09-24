@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex gap-2" :class="{ 'flex-column': vertical }">
+  <div class="d-flex gap-2" :class="{ 'flex-column': $props.vertical }">
     <span
       v-for="{ score, value } in activeScores"
       :key="score.id"
@@ -7,12 +7,14 @@
     >
       <span
         v-if="score.beforeText"
-        :class="short ? ['d-none', 'd-sm-block'] : []"
+        :class="$props.short ? ['d-none', 'd-sm-block'] : []"
       >
         {{ score.beforeText }}
       </span>
-      <span>{{ -value }}</span>
-      <span v-if="score.afterText">{{ score.afterText }}</span>
+      <span class="score-text">{{ -value }}</span>
+      <span v-if="score.afterText" class="score-text">{{
+        score.afterText
+      }}</span>
     </span>
   </div>
 </template>
@@ -24,7 +26,7 @@ import { computed } from 'vue';
 import type { PointType } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 
-const { vertical, short = false } = defineProps<{
+const $props = defineProps<{
   vertical?: boolean;
   short?: boolean;
 }>();
@@ -45,7 +47,7 @@ const activeScores = computed<{ score: PointType; value: number }[]>(() => {
 });
 </script>
 <style scoped lang="scss">
-.score {
-  // padding-right: 25px;
+.backpackRender .score-text {
+  font-weight: normal;
 }
 </style>

@@ -13,11 +13,11 @@
       <div class="d-flex gap-1">
         <button
           class="btn btn-light btn-lg i-solar-magnifer-outline"
-          @click="toggleSearch(true)"
+          @click="toggleSearch()"
         />
         <button
           class="btn btn-light btn-lg i-solar-backpack-outline"
-          @click="toggleBackpack(true)"
+          @click="toggleBackpack()"
         />
       </div>
     </div>
