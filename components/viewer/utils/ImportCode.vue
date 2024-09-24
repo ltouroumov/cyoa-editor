@@ -71,7 +71,7 @@ function readImportCode() {
     });
   }
 
-  setSelected(selections, true);
+  setSelected(selections, true, true);
   importCode.value = '';
   $toast.info('Build Code Loaded');
 }

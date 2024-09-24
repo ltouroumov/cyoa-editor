@@ -163,7 +163,7 @@ const deleteBuild = async (build: SavedBuildData) => {
 
 const loadBuild = (build: SavedBuildData) => {
   if (build.selected) {
-    setSelected(build.selected, true);
+    setSelected(build.selected, true, true);
   } else {
     const selections: Selections = R.reduceRight(
       (sel: SavedBuildItem, acc: Selections) =>
@@ -171,7 +171,7 @@ const loadBuild = (build: SavedBuildData) => {
       {},
       R.chain(R.prop('items'), build.groups),
     );
-    setSelected(selections, true);
+    setSelected(selections, true, true);
   }
   $toast.info(`Loaded Build: ${build.name}`);
 };

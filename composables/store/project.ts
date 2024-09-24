@@ -152,8 +152,9 @@ export const useProjectStore = defineStore('project', () => {
   const setSelected = (
     selectObj: string | Selections,
     isSelected: boolean,
+    clearChoices: boolean = false,
   ): void => {
-    const oldSelected: Selections = R.clone(selected.value);
+    const oldSelected: Selections = clearChoices ? {} : R.clone(selected.value);
 
     // Add or remove object from selection based on isSelected
     // function for reuse
