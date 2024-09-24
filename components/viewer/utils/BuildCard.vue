@@ -1,10 +1,25 @@
 <template>
   <div class="build-details">
     <div class="name">{{ build.name }}</div>
-    <div v-if="build.selected" class="build-code">
-      Build Code:
-      {{ buildCode(build.selected) }}
-    </div>
+    <template v-if="build.selected">
+      <div class="actions">
+        <button
+          class="btn btn-outline-primary btn-sm"
+          @click="loadBuild(build)"
+        >
+          Load
+        </button>
+        <button
+          class="btn btn-sm btn-outline-danger"
+          @click="deleteBuild(build)"
+        >
+          Delete
+        </button>
+      </div>
+      <div v-if="build.selected" class="choices">
+        {{ buildCode(build.selected) }}
+      </div>
+    </template>
     <template v-else>
       <div class="project-name">
         <span v-if="isCompatible === ProjectMatch.Hash" class="compat">
@@ -147,13 +162,17 @@ const deleteBuild = async (build: SavedBuildData) => {
 };
 
 const loadBuild = (build: SavedBuildData) => {
-  const selections: Selections = R.reduceRight(
-    (sel: SavedBuildItem, acc: Selections) =>
-      R.assoc(sel.objId, sel.count, acc),
-    {},
-    R.chain(R.prop('items'), build.groups),
-  );
-  setSelected(selections, true);
+  if (build.selected) {
+    setSelected(build.selected, true);
+  } else {
+    const selections: Selections = R.reduceRight(
+      (sel: SavedBuildItem, acc: Selections) =>
+        R.assoc(sel.objId, sel.count, acc),
+      {},
+      R.chain(R.prop('items'), build.groups),
+    );
+    setSelected(selections, true);
+  }
   $toast.info(`Loaded Build: ${build.name}`);
 };
 </script>
@@ -177,6 +196,7 @@ const loadBuild = (build: SavedBuildData) => {
     font-size: 1.25em;
     font-weight: bold;
   }
+
   .project-name {
     grid-area: pname;
 
