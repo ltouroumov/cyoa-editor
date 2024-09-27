@@ -25,12 +25,17 @@ defineProps<{
 <style lang="scss">
 .project {
   font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   .rows {
     // Prevents collapsing margins
     display: flex;
     flex-direction: column;
     align-items: stretch;
+
+    max-width: 1200px;
 
     .project-row-wrapper {
       flex: 1 1 100%;

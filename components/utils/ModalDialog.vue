@@ -1,6 +1,6 @@
 <template>
   <div class="fade modal" :class="{ show: show }">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog" :class="size ?? 'modal-lg'">
       <div v-if="show" class="modal-content">
         <div class="modal-header">
           <slot name="header" />
@@ -31,6 +31,7 @@ defineEmits<{
 
 defineProps<{
   show: boolean;
+  size?: string;
 }>();
 </script>
 
@@ -57,6 +58,10 @@ div.modal {
     display: flex;
     overflow: auto;
     flex-direction: column;
+  }
+
+  .modal-80 {
+    --bs-modal-width: 80%;
   }
 }
 

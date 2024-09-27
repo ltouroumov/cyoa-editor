@@ -1,5 +1,9 @@
 <template>
-  <ModalDialog :show="isBackpackVisible" @close="toggleBackpack(false)">
+  <ModalDialog
+    :show="isBackpackVisible"
+    size="modal-80"
+    @close="toggleBackpack(false)"
+  >
     <template #header>
       <h5 class="m-0">Choices</h5>
     </template>

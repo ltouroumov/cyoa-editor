@@ -1,5 +1,9 @@
 <template>
-  <ModalDialog :show="isSearchVisible" @close="toggleSearch(false)">
+  <ModalDialog
+    :show="isSearchVisible"
+    size="modal-80"
+    @close="toggleSearch(false)"
+  >
     <template #header>
       <h5 class="m-0">Search</h5>
     </template>
@@ -51,6 +55,7 @@
 import { debounce } from 'perfect-debounce';
 import { all, any, includes, isEmpty } from 'ramda';
 
+import ModalDialog from '~/components/utils/ModalDialog.vue';
 import type { Project, ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
@@ -169,6 +174,10 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 <style scoped lang="scss">
 @import '~/assets/css/bootstrap/config';
 
+.modal-80 {
+  width: 80%;
+}
+
 .search-modal {
   flex: 1 1 auto;
   display: grid;
@@ -184,7 +193,7 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
   &.show-view {
     grid-template:
       'header header' auto
-      'list view' auto
+      'list view' 1fr
       / 2fr 1fr;
   }
 
