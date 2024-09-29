@@ -91,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+import canvasSize from 'canvas-size';
 import { elementToSVG, inlineResources } from 'dom-to-svg';
 import * as R from 'ramda';
 import { computed } from 'vue';
@@ -140,6 +141,14 @@ const objectMode = computed(() => {
   else return ViewContext.BackpackEnabled;
 });
 
+const maxCanvasSize = async (size: number) => {
+  const { width, height } = await canvasSize.maxArea({
+    max: size,
+    usePromise: true,
+  });
+  return { width, height };
+};
+
 const backpackRef = ref<HTMLDivElement>();
 const isLoading = ref(false);
 const backpackToImage = async () => {
@@ -182,9 +191,13 @@ const backpackToImage = async () => {
   await img.decode();
   // Create a canvas to draw the image to
   const canvas = document.createElement('canvas');
+  // Ensure the image size is not too large for the canvas
+  const { width, height } = await maxCanvasSize(
+    Math.max(img.naturalWidth, img.naturalHeight),
+  );
   // Set canvas dimensions to match the image
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
+  canvas.width = Math.min(width, img.naturalWidth);
+  canvas.height = Math.min(height, img.naturalHeight);
   const ctx = canvas.getContext('2d')!;
   // Draw the image to the canvas
   ctx.drawImage(img, 0, 0);
@@ -268,7 +281,7 @@ const backpackToImage = async () => {
 }
 
 .backpackRender {
-  width: 1280px !important;
+  width: 2000px !important;
 }
 .backpackRender .pack-info-container {
   position: unset;
