@@ -35,7 +35,7 @@ defineProps<{
     flex-direction: column;
     align-items: stretch;
 
-    max-width: 1200px;
+    max-width: 2000px;
 
     .project-row-wrapper {
       flex: 1 1 100%;
