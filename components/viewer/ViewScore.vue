@@ -1,14 +1,12 @@
 <template>
   <div class="obj-score" :class="{ disabled: !isEnabled }">
-    <span v-if="score.beforeText" class="score-before">{{
-      score.beforeText
-    }}</span>
-    <span class="score-value">{{
-      Math.abs(Number.parseInt(score.value))
-    }}</span>
-    <span v-if="score.afterText" class="score-after">{{
+    {{
+      score.beforeText +
+      ' ' +
+      Math.abs(Number.parseInt(score.value)) +
+      ' ' +
       score.afterText
-    }}</span>
+    }}
   </div>
 </template>
 
