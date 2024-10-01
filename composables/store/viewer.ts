@@ -6,6 +6,7 @@ export const useViewerStore = defineStore('viewer', () => {
   const isBackpackVisible = ref<boolean>(false);
   const isSearchVisible = ref<boolean>(false);
   const isProjectMenuVisible = ref<boolean>(false);
+  const hideDisabledAddons = ref<boolean>(false);
 
   const viewerProjectList = ref<ViewerProjectList>({
     items: [
@@ -45,14 +46,20 @@ export const useViewerStore = defineStore('viewer', () => {
     isProjectMenuVisible.value = set ?? !isProjectMenuVisible.value;
   };
 
+  const toggleHideDisabledAddons = (set?: boolean) => {
+    hideDisabledAddons.value = set ?? !hideDisabledAddons.value;
+  };
+
   return {
     isBackpackVisible,
     isSearchVisible,
     isProjectMenuVisible,
+    hideDisabledAddons,
     viewerProjectList,
     toggleBackpack,
     toggleSearch,
     toggleProjectMenu,
+    toggleHideDisabledAddons,
   };
 });
 

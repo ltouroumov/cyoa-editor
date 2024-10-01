@@ -28,6 +28,7 @@
           :key="obj.id"
           :obj="obj"
           :row="row"
+          :hide-disabled-addons="hideDisabledAddons"
         />
       </div>
     </div>
@@ -41,6 +42,7 @@ import StyleRow from '~/components/viewer/style/StyleRow.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
+import { useViewerRefs } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
 
 const { row } = defineProps<{
@@ -48,6 +50,7 @@ const { row } = defineProps<{
 }>();
 
 const { selectedIds } = useProjectRefs();
+const { hideDisabledAddons } = useViewerRefs();
 
 const condition = buildConditions(row);
 const isVisible = computed(() => condition(selectedIds.value));
