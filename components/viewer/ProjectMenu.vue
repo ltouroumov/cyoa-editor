@@ -33,7 +33,7 @@ const { projectList } = defineProps<{
   projectList: ViewerProjectList;
 }>();
 
-const { loadProject, unloadProject } = useProjectStore();
+const { loadProject } = useProjectStore();
 const { toggleProjectMenu } = useViewerStore();
 
 const loadRemoteFile = async ({ target }: MouseEvent) => {
