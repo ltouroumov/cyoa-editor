@@ -96,6 +96,75 @@ export const useProjectStore = defineStore('project', () => {
     return (id: string) => mapping[id];
   });
 
+  // Takes any id as string, and returns either a ProjectRow or ProjectObj
+  const getObjectOrRow = computed(() => {
+    const getItem = (itemId: string) => {
+      const row = R.find(R.propEq(itemId, 'id'), projectRows.value);
+      if (R.isNotNil(row)) {
+        return row;
+      } else {
+        return getObject.value(itemId);
+      }
+    };
+
+    return getItem;
+  });
+
+  // Transversely, build a condition tree for a given row or object
+  const getParentConditions = computed(() => {
+    const parentConditions = (node: string) => {
+      if (R.isEmpty(node)) {
+        return [];
+      }
+
+      const queue = [node];
+      const results = [];
+      const visited = new Set();
+
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        if (visited.has(current)) continue;
+        visited.add(current);
+
+        const item = getObjectOrRow.value(current);
+        let children = null;
+        if (item && item.requireds) {
+          children = buildRootCondition(item.requireds);
+        } else {
+          if (!item) {
+            console.warn(
+              `Invalid object ID: ${current}, skipping...\n(HINT: This may be a sign of a deleted object or row)`,
+            );
+          }
+          continue;
+        }
+
+        results.push(current);
+        queue.push(...children.deps);
+      }
+      return results;
+    };
+
+    return parentConditions;
+  });
+
+  // Check if a given row or object is sastified by the current selection
+  const getParentConditionsIsSastified = computed(() => {
+    const isSastified = (id: string) => {
+      const parentConditions = getParentConditions.value(id);
+      for (const item in parentConditions) {
+        const pred = buildConditions(
+          getObjectOrRow.value(parentConditions[item]),
+        );
+        const preds = pred(selectedIds.value);
+        if (!preds) return false;
+      }
+      return true;
+    };
+
+    return isSastified;
+  });
+
   const isLoaded = computed(() => !!project.value);
 
   const loadProject = async (provider: ProjectProvider) => {
@@ -438,6 +507,9 @@ export const useProjectStore = defineStore('project', () => {
     getRow,
     getObject,
     getObjectRow,
+    getObjectOrRow,
+    getParentConditions,
+    getParentConditionsIsSastified,
     setSelected,
     incSelected,
     decSelected,
