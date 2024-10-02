@@ -35,10 +35,11 @@
               <div class="form-check form-switch">
                 <input
                   id="packRowDisabledSwitch"
-                  v-model="lockBackpackObjects"
                   class="form-check-input"
                   type="checkbox"
                   role="switch"
+                  :checked="lockBackpackObjects"
+                  @change="toggleLockBackpackObjects()"
                 />
                 <label class="form-check-label" for="packRowDisabledSwitch">
                   Lock Objects in the Backpack
@@ -47,10 +48,11 @@
               <div class="form-check form-switch">
                 <input
                   id="hideDisabledAddons"
-                  v-model="hideDisabledAddons"
                   class="form-check-input"
                   type="checkbox"
                   role="switch"
+                  :checked="disabledAddonsInBackpack"
+                  @change="toggleDisabledAddonsInBackpack()"
                 />
                 <label class="form-check-label" for="hideDisabledAddons">
                   Hide Disabled Addons
@@ -75,7 +77,7 @@
                   :row="row"
                   :width="packRow.objectWidth"
                   :view-object="objectMode"
-                  :hide-disabled-addons="hideDisabledAddons"
+                  :hide-disabled-addons="!disabledAddonsInBackpack"
                 />
               </div>
             </div>
@@ -102,13 +104,17 @@ import ExportCode from '~/components/viewer/utils/ExportCode.vue';
 import ImportCode from '~/components/viewer/utils/ImportCode.vue';
 import type { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';
 
 const { getObject, getObjectRow, getRow, project } = useProjectStore();
 const { selected, backpack } = useProjectRefs();
 const { toggleBackpack } = useViewerStore();
+const { toggleDisabledAddonsInBackpack, toggleLockBackpackObjects } =
+  useSettingStore();
 const { isBackpackVisible } = useViewerRefs();
+const { disabledAddonsInBackpack, lockBackpackObjects } = useSettingRefs();
 
 type PackRowChoice = { row: ProjectRow; obj: ProjectObj; count: number };
 type PackRow = { packRow: ProjectRow; choices: PackRowChoice[] };
@@ -134,8 +140,6 @@ const packRows = computed(() => {
     backpack.value,
   );
 });
-const hideDisabledAddons = ref(true);
-const lockBackpackObjects = ref(true);
 const objectMode = computed(() => {
   if (lockBackpackObjects.value) return ViewContext.BackpackDisabled;
   else return ViewContext.BackpackEnabled;

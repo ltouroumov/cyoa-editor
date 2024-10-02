@@ -39,6 +39,15 @@
             Library
           </a>
         </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            :class="{ active: selected === 'viewer-settings' }"
+            @click="selected = 'viewer-settings'"
+          >
+            Viewer Settings
+          </a>
+        </li>
       </ul>
       <div v-if="selected === 'project'">
         <div v-if="store.status === 'loaded'" class="mb-2">
@@ -56,6 +65,9 @@
       </div>
       <div v-if="selected === 'library'">
         <BuildLibrary />
+      </div>
+      <div v-if="selected === 'viewer-settings'">
+        <ViewerSettings />
       </div>
     </template>
   </OffCanvas>

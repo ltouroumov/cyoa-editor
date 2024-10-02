@@ -71,6 +71,12 @@ export default defineNuxtConfig({
     },
   ],
 
-  modules: ['@unocss/nuxt', '@pinia/nuxt', '@vueuse/nuxt', '@nuxt/image'],
+  modules: [
+    '@unocss/nuxt',
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
+    '@vueuse/nuxt',
+    '@nuxt/image',
+  ],
   compatibilityDate: '2024-09-04',
 });
