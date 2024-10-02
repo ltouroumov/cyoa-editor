@@ -1,6 +1,7 @@
 export type ViewerProject = {
   remoteFileUrl: string;
   title: string;
+  id: string;
 };
 
 export type ViewerProjectList = {
