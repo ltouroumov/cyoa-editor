@@ -146,6 +146,8 @@ const isEnabled = computed<boolean>(() => {
     case ViewContext.BackpackEnabled:
     case ViewContext.BackpackDisabled:
       return true;
+    case ViewContext.Viewer:
+      return store.getParentConditionsIsSastified($props.row.id);
     default:
       return condition.value(selectedIds.value);
   }
