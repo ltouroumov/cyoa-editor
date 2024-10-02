@@ -22,6 +22,24 @@
           </label>
         </div>
       </li>
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
+        <select
+          v-model="cyoaPreferences"
+          class="form-select"
+          aria-label="Default CYOA to load at Startup"
+        >
+          <option selected value="">No CYOA Loaded at Startup</option>
+          <option
+            v-for="projects in projectList.items"
+            :key="projects.id"
+            :value="projects.id"
+          >
+            {{ projects.title }}
+          </option>
+        </select>
+      </li>
     </ul>
     <h5 class="text-center">Backpack</h5>
     <ul class="list-group mb-5 shadow">
@@ -68,6 +86,17 @@
 
 <script setup lang="ts">
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
+import { useViewerRefs } from '~/composables/store/viewer';
+
+const { viewerProjectList } = useViewerRefs();
+const { cyoaPreference } = useSettingRefs();
+
+const cyoaPreferences = computed({
+  get: () => cyoaPreference.value,
+  set: (value) => (cyoaPreference.value = value),
+});
+
+const projectList = computed(() => viewerProjectList.value);
 
 const { disabledAddons, disabledAddonsInBackpack, lockBackpackObjects } =
   useSettingRefs();

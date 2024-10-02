@@ -1,4 +1,5 @@
 import { defineStore, storeToRefs } from 'pinia';
+import * as R from 'ramda';
 
 export const useSettingStore = defineStore(
   'viewer-settings',
@@ -6,6 +7,11 @@ export const useSettingStore = defineStore(
     const disabledAddons = ref<boolean>(false);
     const disabledAddonsInBackpack = ref<boolean>(true);
     const lockBackpackObjects = ref<boolean>(true);
+    const cyoaPreference = ref<string>('');
+
+    const hasPreference = (): boolean => {
+      return R.isNotEmpty(cyoaPreference.value);
+    };
 
     const toggleHideDisabledAddons = (set?: boolean) => {
       disabledAddons.value = set ?? !disabledAddons.value;
@@ -23,6 +29,8 @@ export const useSettingStore = defineStore(
       disabledAddons,
       disabledAddonsInBackpack,
       lockBackpackObjects,
+      cyoaPreference,
+      hasPreference,
       toggleLockBackpackObjects,
       toggleDisabledAddonsInBackpack,
       toggleHideDisabledAddons,
