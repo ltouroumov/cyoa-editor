@@ -131,7 +131,6 @@ export const useProjectStore = defineStore('project', () => {
         projectName: data.rows[0].title,
         projectHash: hashHex,
       };
-      console.log(projectFile);
 
       store.value = {
         status: 'loaded',
