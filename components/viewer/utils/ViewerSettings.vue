@@ -14,11 +14,11 @@
             :checked="disabledAddons"
             @change="toggleHideDisabledAddons()"
           />
-          <label class="form-check-label" for="hideDisabledAddons"
-            >Hide Disabled Addons
-            <small class="text-body-secondary ms-3"
-              >When enabled hides addons whose conditions are unmet</small
-            >
+          <label class="form-check-label" for="hideDisabledAddons">
+            Hide Disabled Addons
+            <small class="text-body-secondary ms-3">
+              When enabled hides addons whose conditions are unmet
+            </small>
           </label>
         </div>
       </li>
@@ -55,12 +55,12 @@
             :checked="disabledAddonsInBackpack"
             @change="toggleDisabledAddonsInBackpack()"
           />
-          <label class="form-check-label"
-            >Show Disabled Addons
-            <small class="text-body-secondary ms-3"
-              >When disabled shows addons whose conditions are met</small
-            ></label
-          >
+          <label class="form-check-label">
+            Show Disabled Addons
+            <small class="text-body-secondary ms-3">
+              When disabled shows addons whose conditions are met
+            </small>
+          </label>
         </div>
       </li>
       <li
@@ -75,9 +75,9 @@
             :checked="lockBackpackObjects"
             @change="toggleLockBackpackObjects()"
           />
-          <label class="form-check-label" for="lockBackpackObjects"
-            >Lock Objects in Backpack</label
-          >
+          <label class="form-check-label" for="lockBackpackObjects">
+            Lock Objects in Backpack
+          </label>
         </div>
       </li>
     </ul>
