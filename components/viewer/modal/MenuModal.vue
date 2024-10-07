@@ -75,6 +75,7 @@
 
 <script setup lang="ts">
 import ProjectMenu from '~/components/viewer/ProjectMenu.vue';
+import ViewerSettings from '~/components/viewer/utils/ViewerSettings.vue';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 

@@ -55,7 +55,7 @@
                   @change="toggleDisabledAddonsInBackpack()"
                 />
                 <label class="form-check-label" for="hideDisabledAddons">
-                  Hide Disabled Addons
+                  Show Disabled Addons
                 </label>
               </div>
             </div>
