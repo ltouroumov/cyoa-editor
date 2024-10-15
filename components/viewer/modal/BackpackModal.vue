@@ -9,80 +9,53 @@
     </template>
     <template #default>
       <div class="pack-content flex-grow-1 bg-dark">
-        <button
-          type="button"
-          class="btn btn-primary mb-3"
-          @click="backpackToImage"
-        >
-          Download backpack as Image
-        </button>
-        <div
-          ref="backpackRef"
-          class="backpack-container"
-          :class="{ backpackRender: isLoading }"
-        >
-          <div v-if="isLoading" class="project-title">
-            {{ project?.projectName }}
-          </div>
-          <div class="pack-info-container">
-            <div class="pack-scores">
-              <ViewScoreStatus :vertical="!isLoading" />
-            </div>
-            <div
-              v-show="!isLoading"
-              class="flex-column pack-selection-controls"
+        <div class="pack-actions mb-3">
+          <div class="pack-actions-download">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="backpackToImage"
             >
-              <div class="form-check form-switch">
-                <input
-                  id="packRowDisabledSwitch"
-                  class="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  :checked="lockBackpackObjects"
-                  @change="toggleLockBackpackObjects()"
-                />
-                <label class="form-check-label" for="packRowDisabledSwitch">
-                  Lock Objects in the Backpack
-                </label>
-              </div>
-              <div class="form-check form-switch">
-                <input
-                  id="hideDisabledAddons"
-                  class="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  :checked="disabledAddonsInBackpack"
-                  @change="toggleDisabledAddonsInBackpack()"
-                />
-                <label class="form-check-label" for="hideDisabledAddons">
-                  Show Disabled Addons
-                </label>
-              </div>
-            </div>
+              Download Image (Beta)
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="backpackToHtml"
+            >
+              Download HTML (Beta)
+            </button>
           </div>
-          <div
-            v-for="{ packRow, choices } in packRows"
-            :key="packRow.id"
-            class="pack-row"
-          >
-            <div class="pack-row-title">
-              {{ packRow.title }}
+          <div v-show="!isLoading" class="flex-column pack-actions-options">
+            <div class="form-check form-switch">
+              <input
+                id="packRowDisabledSwitch"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                :checked="lockBackpackObjects"
+                @change="toggleLockBackpackObjects()"
+              />
+              <label class="form-check-label" for="packRowDisabledSwitch">
+                Lock Objects in the Backpack
+              </label>
             </div>
-            <div class="container-fluid p-0">
-              <div class="row g-2">
-                <ViewProjectObj
-                  v-for="{ obj, row } in choices"
-                  :key="obj.id"
-                  :obj="obj"
-                  :row="row"
-                  :width="packRow.objectWidth"
-                  :view-object="objectMode"
-                  :hide-disabled-addons="!disabledAddonsInBackpack"
-                />
-              </div>
+            <div class="form-check form-switch">
+              <input
+                id="hideDisabledAddons"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                :checked="disabledAddonsInBackpack"
+                @change="toggleDisabledAddonsInBackpack()"
+              />
+              <label class="form-check-label" for="hideDisabledAddons">
+                Show Disabled Addons
+              </label>
             </div>
           </div>
         </div>
+        <BackpackView ref="backpackRef" :is-loading="isLoading" />
         <div class="pack-import-export">
           <ImportCode />
           <ExportCode />
@@ -95,55 +68,23 @@
 <script setup lang="ts">
 import canvasSize from 'canvas-size';
 import { elementToSVG, inlineResources } from 'dom-to-svg';
-import * as R from 'ramda';
-import { computed } from 'vue';
 import { useToast } from 'vue-toastification';
 
 import ModalDialog from '~/components/utils/ModalDialog.vue';
+import BackpackView from '~/components/viewer/utils/BackpackView.vue';
 import ExportCode from '~/components/viewer/utils/ExportCode.vue';
 import ImportCode from '~/components/viewer/utils/ImportCode.vue';
-import type { ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
-import { ViewContext } from '~/composables/viewer';
 
-const { getObject, getObjectRow, getRow, project } = useProjectStore();
-const { selected, backpack } = useProjectRefs();
+const { project } = useProjectStore();
+const { selected } = useProjectRefs();
 const { toggleBackpack } = useViewerStore();
 const { toggleDisabledAddonsInBackpack, toggleLockBackpackObjects } =
   useSettingStore();
 const { isBackpackVisible } = useViewerRefs();
 const { disabledAddonsInBackpack, lockBackpackObjects } = useSettingRefs();
-
-type PackRowChoice = { row: ProjectRow; obj: ProjectObj; count: number };
-type PackRow = { packRow: ProjectRow; choices: PackRowChoice[] };
-const packRows = computed(() => {
-  const selectedChoices = R.map(
-    ([id, count]): PackRowChoice => ({
-      obj: getObject(id),
-      row: getRow(getObjectRow(id)),
-      count,
-    }),
-    R.toPairs(selected.value),
-  );
-  const choicesByGroup: Partial<Record<string, PackRowChoice[]>> = R.groupBy(
-    ({ obj, row }) => R.head(obj.groups)?.id ?? row.resultGroupId,
-    selectedChoices,
-  );
-
-  return R.chain(
-    (row: ProjectRow): PackRow[] =>
-      row.resultGroupId in choicesByGroup
-        ? [{ packRow: row, choices: choicesByGroup[row.resultGroupId] ?? [] }]
-        : [],
-    backpack.value,
-  );
-});
-const objectMode = computed(() => {
-  if (lockBackpackObjects.value) return ViewContext.BackpackDisabled;
-  else return ViewContext.BackpackEnabled;
-});
 
 const maxCanvasSize = async (size: number) => {
   const { width, height } = await canvasSize.maxArea({
@@ -153,16 +94,17 @@ const maxCanvasSize = async (size: number) => {
   return { width, height };
 };
 
-const backpackRef = ref<HTMLDivElement>();
+const backpackRef = ref<InstanceType<typeof BackpackView>>();
 const isLoading = ref(false);
 const backpackToImage = async () => {
-  if (packRows.value.length <= 0) {
-    alert(
-      'No objects selected to create a backpack image, select at least one object to create a image.',
-    );
-    return;
-  }
-  if (!backpackRef.value) return;
+  // if (packRows.value.length <= 0) {
+  //   alert(
+  //     'No objects selected to create a backpack image, select at least one object to create a image.',
+  //   );
+  //   return;
+  // }
+  const backpackNode = backpackRef.value?.$el;
+  if (!backpackNode) return;
 
   isLoading.value = true;
   const $toast = useToast();
@@ -173,15 +115,15 @@ const backpackToImage = async () => {
   await nextTick();
 
   // Set background color for svg to project background color if it exists
-  const currentBackground = backpackRef.value.style.backgroundColor;
-  backpackRef.value.style.backgroundColor =
+  const currentBackground = backpackNode.style.backgroundColor;
+  backpackNode.style.backgroundColor =
     project?.data.styling.backgroundColor ?? currentBackground;
   // Convert backpack to SVG
-  const svgDocument = elementToSVG(backpackRef.value);
+  const svgDocument = elementToSVG(backpackNode);
   // Inline external resources (fonts, images, etc) as data: URIs
   await inlineResources(svgDocument.documentElement);
   // Restore background color
-  backpackRef.value.style.backgroundColor = currentBackground;
+  backpackNode.style.backgroundColor = currentBackground;
   // Get SVG string
   const svgString = new XMLSerializer().serializeToString(svgDocument);
   // Create a Blob from the SVG string
@@ -236,6 +178,46 @@ const backpackToImage = async () => {
   // Clean up the URL after download
   URL.revokeObjectURL(url);
 };
+
+const copyStyles = (sourceDoc: Document, targetDoc: Document): void => {
+  // eslint-disable-next-line unicorn/prefer-spread
+  for (const styleSheet of Array.from(sourceDoc.styleSheets)) {
+    if (styleSheet.cssRules) {
+      // for <style> elements
+      const nwStyleElement = sourceDoc.createElement('style');
+
+      // eslint-disable-next-line unicorn/prefer-spread
+      for (const cssRule of Array.from(styleSheet.cssRules)) {
+        // write the text of each rule into the body of the style element
+        nwStyleElement.append(sourceDoc.createTextNode(cssRule.cssText));
+      }
+
+      targetDoc.head.append(nwStyleElement);
+    } else if (styleSheet.href) {
+      // for <link> elements loading CSS from a URL
+      const nwLinkElement = sourceDoc.createElement('link');
+
+      nwLinkElement.rel = 'stylesheet';
+      nwLinkElement.href = styleSheet.href;
+      targetDoc.head.append(nwLinkElement);
+    }
+  }
+};
+
+const backpackToHtml = async () => {
+  const vNode = backpackRef.value;
+  if (!vNode) return;
+  const wRef = window.open('', '_blank', 'popup=yes,width=1200,height=1000');
+  if (!wRef) return;
+
+  console.log(vNode.$el);
+
+  const wDoc = wRef.window.document;
+  copyStyles(window.document, wDoc);
+  const wNode = vNode.$el.cloneNode(true);
+  wDoc.body.setAttribute('data-bs-theme', 'dark');
+  wDoc.body.appendChild(wNode);
+};
 </script>
 
 <style scoped lang="scss">
@@ -249,39 +231,6 @@ const backpackToImage = async () => {
 .pack-content {
   overflow-x: hidden;
   overflow-y: auto;
-
-  .pack-info-container {
-    display: flex;
-    position: relative;
-
-    .pack-scores {
-      margin-bottom: 0.5rem;
-    }
-
-    .pack-selection-controls {
-      display: flex;
-      position: absolute;
-      right: 0;
-      padding-right: 0.5rem;
-    }
-  }
-
-  .pack-row {
-    padding: 0;
-    margin-bottom: 0.5rem;
-
-    .pack-row-title {
-      font-size: 1.2rem;
-      font-weight: bolder;
-      text-align: center;
-      margin-bottom: 0.2rem;
-    }
-
-    .choice {
-      padding-left: 0;
-      padding-right: 0;
-    }
-  }
 }
 
 .backpackRender {
@@ -318,6 +267,19 @@ const backpackToImage = async () => {
   }
   .export-code-wrapper {
     flex-grow: 1;
+  }
+}
+
+.pack-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .pack-actions-download {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: start;
   }
 }
 
