@@ -23,7 +23,7 @@
               class="btn btn-primary"
               @click="backpackToHtml"
             >
-              Download HTML (Beta)
+              Download HTML
             </button>
           </div>
           <div v-show="!isLoading" class="flex-column pack-actions-options">
@@ -55,7 +55,11 @@
             </div>
           </div>
         </div>
-        <BackpackView ref="backpackRef" :is-loading="isLoading" />
+        <BackpackView
+          ref="backpackRef"
+          :vertical-score="!isLoading"
+          :show-title="isLoading"
+        />
         <div class="pack-import-export">
           <ImportCode />
           <ExportCode />
@@ -68,9 +72,11 @@
 <script setup lang="ts">
 import canvasSize from 'canvas-size';
 import { elementToSVG, inlineResources } from 'dom-to-svg';
+import { h, render } from 'vue';
 import { useToast } from 'vue-toastification';
 
 import ModalDialog from '~/components/utils/ModalDialog.vue';
+import BackpackExportWrapper from '~/components/viewer/utils/BackpackExportWrapper.vue';
 import BackpackView from '~/components/viewer/utils/BackpackView.vue';
 import ExportCode from '~/components/viewer/utils/ExportCode.vue';
 import ImportCode from '~/components/viewer/utils/ImportCode.vue';
@@ -205,18 +211,15 @@ const copyStyles = (sourceDoc: Document, targetDoc: Document): void => {
 };
 
 const backpackToHtml = async () => {
-  const vNode = backpackRef.value;
-  if (!vNode) return;
   const wRef = window.open('', '_blank', 'popup=yes,width=1200,height=1000');
   if (!wRef) return;
 
-  console.log(vNode.$el);
-
   const wDoc = wRef.window.document;
   copyStyles(window.document, wDoc);
-  const wNode = vNode.$el.cloneNode(true);
   wDoc.body.setAttribute('data-bs-theme', 'dark');
-  wDoc.body.appendChild(wNode);
+
+  const vNode = h(BackpackExportWrapper, {});
+  render(vNode, wDoc.body);
 };
 </script>
 

@@ -1,15 +1,11 @@
 <template>
-  <div
-    ref="backpackRef"
-    class="backpack-container"
-    :class="{ backpackRender: isLoading }"
-  >
-    <div v-if="isLoading" class="project-title">
+  <div ref="backpackRef" class="backpack-container">
+    <div v-if="showTitle" class="project-title">
       {{ project?.projectName }}
     </div>
     <div class="pack-info-container">
       <div class="pack-scores">
-        <ViewScoreStatus :vertical="!isLoading" />
+        <ViewScoreStatus :vertical="verticalScore" />
       </div>
     </div>
     <div
@@ -29,7 +25,9 @@
             :row="row"
             :width="packRow.objectWidth"
             :view-object="objectMode"
-            :hide-disabled-addons="!disabledAddonsInBackpack"
+            :hide-disabled-addons="
+              !disabledAddonsInBackpack || hideDisabledAddons
+            "
           />
         </div>
       </div>
@@ -46,8 +44,11 @@ import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs } from '~/composables/store/settings';
 import { ViewContext } from '~/composables/viewer';
 
-defineProps<{
-  isLoading: boolean;
+const $props = defineProps<{
+  showTitle: boolean;
+  verticalScore: boolean;
+  lockBackpack?: boolean;
+  hideDisabledAddons?: boolean;
 }>();
 
 const { getObject, getObjectRow, getRow, project } = useProjectStore();
@@ -79,7 +80,8 @@ const packRows = computed(() => {
   );
 });
 const objectMode = computed(() => {
-  if (lockBackpackObjects.value) return ViewContext.BackpackDisabled;
+  if ($props.lockBackpack || lockBackpackObjects.value)
+    return ViewContext.BackpackDisabled;
   else return ViewContext.BackpackEnabled;
 });
 </script>
