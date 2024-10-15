@@ -211,7 +211,7 @@ const copyStyles = (sourceDoc: Document, targetDoc: Document): void => {
 };
 
 const backpackToHtml = async () => {
-  const wRef = window.open('', '_blank', 'popup=yes,width=1200,height=1000');
+  const wRef = window.open('', '_blank');
   if (!wRef) return;
 
   const wDoc = wRef.window.document;
