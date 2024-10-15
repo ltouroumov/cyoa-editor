@@ -1,3 +1,4 @@
+import type { ProjectNote } from '~/composables/project';
 import type { Selections } from '~/composables/store/project';
 
 export type SavedBuildProject = {
@@ -23,6 +24,7 @@ export type SavedBuildData = {
   project: SavedBuildProject;
   groups: SavedBuildGroup[];
   selected?: Selections;
+  notes?: Record<string, ProjectNote>;
 };
 
 export enum ProjectMatch {

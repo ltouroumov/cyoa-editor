@@ -71,11 +71,11 @@ export class Transaction {
 export class ObjectStore {
   constructor(private readonly os: IDBObjectStore) {}
 
-  public add(data: any, key?: any): Promise<void> {
+  public add(data: any, key?: any): Promise<any> {
     return request2promise(this.os.add(data, key));
   }
 
-  public put(data: any, key?: any): Promise<void> {
+  public put(data: any, key?: any): Promise<any> {
     return request2promise(this.os.put(data, key));
   }
 

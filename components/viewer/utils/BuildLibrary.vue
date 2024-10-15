@@ -26,19 +26,12 @@
 <script setup lang="ts">
 import { useToast } from 'vue-toastification';
 
-import {
-  getProjectInfo,
-  getSelectedItems,
-} from '~/components/viewer/utils/build';
 import type { SavedBuildData } from '~/components/viewer/utils/types';
-import { useProjectRefs } from '~/composables/store/project';
-import { IndexedDB } from '~/composables/utils/idb';
-import { useIndexedDB } from '~/composables/viewer/useIndexedDB';
+import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
 const $toast = useToast();
-const { selected, backpack, getObject, getObjectRow, getRow, store } =
-  useProjectRefs();
-const db: IndexedDB = useIndexedDB()!;
+
+const $lib = useBuildLibrary();
 
 const loading = ref<boolean>(false);
 const builds = ref<SavedBuildData[]>([]);
@@ -51,34 +44,14 @@ onMounted(async () => {
 });
 
 const saveBuild = async () => {
-  await db.transaction('builds', 'readwrite', async (tx) => {
-    const table = tx.objectStore('builds');
-    const today = new Date();
-    const entry: Omit<SavedBuildData, 'id'> = {
-      name: buildName.value,
-      createdAt: today,
-      updatedAt: today,
-      project: getProjectInfo(store.value),
-      groups: getSelectedItems(
-        selected.value,
-        backpack.value,
-        getObject.value,
-        getObjectRow.value,
-        getRow.value,
-      ),
-    };
-    await table.add(entry);
-    builds.value = await table.getAll();
-    $toast.success(`Saved build: ${buildName.value}`);
-    buildName.value = '';
-  });
+  await $lib.saveBuild(buildName.value);
+  $toast.success(`Saved build: ${buildName.value}`);
+  buildName.value = '';
+  await loadBuilds();
 };
 
 const loadBuilds = async () => {
-  await db.transaction('builds', 'readonly', async (tx) => {
-    const store = tx.objectStore('builds');
-    builds.value = await store.getAll();
-  });
+  builds.value = await $lib.loadBuilds();
 };
 </script>
 
