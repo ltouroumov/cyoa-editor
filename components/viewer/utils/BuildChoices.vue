@@ -32,9 +32,6 @@ defineProps<{
   flex-wrap: wrap;
   gap: 0.1rem;
 
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--bs-border-color);
-
   .choice-group-title {
     margin-right: 0.2rem;
   }

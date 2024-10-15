@@ -43,7 +43,25 @@
         <span>{{ build.updatedAt.toLocaleDateString() }}</span>
       </div>
       <div class="choices">
-        <BuildChoices :groups="build.groups" />
+        <div class="choices-header">
+          <div>Choices</div>
+          <div>
+            <button
+              class="btn btn-sm btn-outline-secondary"
+              @click="toggleChoices"
+            >
+              <div
+                v-if="showChoices"
+                class="i-solar:alt-arrow-down-linear h-1em w-1em"
+              ></div>
+              <div
+                v-if="!showChoices"
+                class="i-solar:alt-arrow-right-linear h-1em w-1em"
+              ></div>
+            </button>
+          </div>
+        </div>
+        <BuildChoices v-show="showChoices" :groups="build.groups" />
       </div>
       <div class="actions">
         <button
@@ -103,6 +121,12 @@ const $props = defineProps<{
 const $emit = defineEmits<{
   (e: 'change'): void;
 }>();
+
+const showChoices = ref<boolean>(false);
+
+const toggleChoices = () => {
+  showChoices.value = !showChoices.value;
+};
 
 const buildCode = (selected: Selections) =>
   join(
@@ -214,6 +238,15 @@ const loadBuild = (build: SavedBuildData) => {
 
   .choices {
     grid-area: choices;
+
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--bs-border-color);
+
+    .choices-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
   }
 
   .actions {

@@ -186,13 +186,11 @@ const backpackToImage = async () => {
 };
 
 const copyStyles = (sourceDoc: Document, targetDoc: Document): void => {
-  // eslint-disable-next-line unicorn/prefer-spread
   for (const styleSheet of Array.from(sourceDoc.styleSheets)) {
     if (styleSheet.cssRules) {
       // for <style> elements
       const nwStyleElement = sourceDoc.createElement('style');
 
-      // eslint-disable-next-line unicorn/prefer-spread
       for (const cssRule of Array.from(styleSheet.cssRules)) {
         // write the text of each rule into the body of the style element
         nwStyleElement.append(sourceDoc.createTextNode(cssRule.cssText));
