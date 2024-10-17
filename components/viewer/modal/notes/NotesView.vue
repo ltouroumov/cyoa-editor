@@ -49,7 +49,6 @@ const visiblePackRows = computed((): PackRow[] => {
         return has(`obj:${obj.id}`, _buildNotes);
       }, item.choices);
 
-      console.log(item.packRow.id, hasNote, choices);
       if (isEmpty(choices) && !hasNote) {
         return [];
       } else {

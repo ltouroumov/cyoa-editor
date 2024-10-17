@@ -84,6 +84,7 @@ import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 
+const config = useRuntimeConfig();
 const { project } = useProjectStore();
 const { selected } = useProjectRefs();
 const { toggleBackpack } = useViewerStore();
@@ -209,15 +210,18 @@ const copyStyles = (sourceDoc: Document, targetDoc: Document): void => {
 };
 
 const backpackToHtml = async () => {
-  const wRef = window.open('', '_blank');
+  const exportPage = `${config.app.baseURL}export.html`;
+  const wRef = window.open(exportPage, '_blank');
   if (!wRef) return;
 
-  const wDoc = wRef.window.document;
-  copyStyles(window.document, wDoc);
-  wDoc.body.setAttribute('data-bs-theme', 'dark');
+  wRef.addEventListener('load', () => {
+    const wDoc = wRef.window.document;
+    copyStyles(window.document, wDoc);
+    wDoc.body.setAttribute('data-bs-theme', 'dark');
 
-  const vNode = h(BackpackExportWrapper, {});
-  render(vNode, wDoc.body);
+    const vNode = h(BackpackExportWrapper, {});
+    render(vNode, wDoc.body);
+  });
 };
 </script>
 
