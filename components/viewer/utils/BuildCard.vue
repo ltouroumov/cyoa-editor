@@ -92,28 +92,15 @@ import * as R from 'ramda';
 import { join, map, toPairs } from 'ramda';
 import { useToast } from 'vue-toastification';
 
-import {
-  getProjectInfo,
-  getSelectedItems,
-} from '~/components/viewer/utils/build';
 import BuildChoices from '~/components/viewer/utils/BuildChoices.vue';
 import {
   ProjectMatch,
   type SavedBuildData,
-  type SavedBuildItem,
 } from '~/components/viewer/utils/types';
-import {
-  type Selections,
-  useProjectRefs,
-  useProjectStore,
-} from '~/composables/store/project';
-import { IndexedDB } from '~/composables/utils/idb';
-import { useIndexedDB } from '~/composables/viewer/useIndexedDB';
+import { type Selections, useProjectRefs } from '~/composables/store/project';
+import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
-const { selected, backpack, getObject, getObjectRow, getRow, store, project } =
-  useProjectRefs();
-const { setSelected } = useProjectStore();
-const db: IndexedDB = useIndexedDB()!;
+const { selected, project } = useProjectRefs();
 const $toast = useToast();
 const $props = defineProps<{
   build: SavedBuildData;
@@ -150,53 +137,27 @@ const isCompatible = computed(() => {
   }
 });
 
+const $lib = useBuildLibrary();
+
 const updateBuild = async (build: SavedBuildData) => {
   if (R.isEmpty(selected.value)) {
     $toast.error("No selections are made,\nThere's nothing to save.");
     return;
   }
-  await db.transaction('builds', 'readwrite', async (tx) => {
-    const table = tx.objectStore('builds');
 
-    const entry: SavedBuildData = {
-      ...build,
-      updatedAt: new Date(),
-      project: getProjectInfo(store.value),
-      groups: getSelectedItems(
-        selected.value,
-        backpack.value,
-        getObject.value,
-        getObjectRow.value,
-        getRow.value,
-      ),
-    };
-    await table.put(entry);
-    $emit('change');
-    $toast.success(`Updated Build: ${build.name}`);
-  });
+  await $lib.updateBuild(build);
+  $emit('change');
+  $toast.success(`Updated Build: ${build.name}`);
 };
 
 const deleteBuild = async (build: SavedBuildData) => {
-  await db.transaction('builds', 'readwrite', async (tx) => {
-    const store = tx.objectStore('builds');
-    await store.delete(build.id);
-    $emit('change');
-  });
+  await $lib.deleteBuild(build);
+  $emit('change');
   $toast.success(`Deleted Build: ${build.name}`);
 };
 
 const loadBuild = (build: SavedBuildData) => {
-  if (build.selected) {
-    setSelected(build.selected, true, true);
-  } else {
-    const selections: Selections = R.reduceRight(
-      (sel: SavedBuildItem, acc: Selections) =>
-        R.assoc(sel.objId, sel.count, acc),
-      {},
-      R.chain(R.prop('items'), build.groups),
-    );
-    setSelected(selections, true, true);
-  }
+  $lib.loadBuild(build);
   $toast.info(`Loaded Build: ${build.name}`);
 };
 </script>

@@ -4,10 +4,12 @@ import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 import { useToast } from 'vue-toastification';
 
+import type { SavedBuildData } from '~/components/viewer/utils/types';
 import { buildConditions } from '~/composables/conditions';
 import type {
   PointType,
   ProjectFile,
+  ProjectNote,
   ProjectObj,
   ProjectRow,
   ProjectStore,
@@ -42,6 +44,10 @@ export const useProjectStore = defineStore('project', () => {
 
   const selected = ref<Selections>({});
   const selectedIds = computed(() => R.keys(selected.value));
+
+  const buildData = ref<SavedBuildData | null>(null);
+  const buildNotes = ref<Record<string, ProjectNote>>({});
+  const buildModified = ref<boolean>(false);
 
   const backpack: ComputedRef<ProjectRow[]> = computed(
     () => project.value?.data.backpack ?? [],
@@ -352,6 +358,7 @@ export const useProjectStore = defineStore('project', () => {
     }
 
     selected.value = newSelected;
+    buildModified.value = true;
   };
 
   const incSelected = (id: string, incValue: number = 1) => {
@@ -432,6 +439,9 @@ export const useProjectStore = defineStore('project', () => {
     pointTypes,
     selected,
     selectedIds,
+    buildData,
+    buildNotes,
+    buildModified,
     points,
     isLoaded,
     loadProject,

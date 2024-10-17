@@ -13,7 +13,7 @@ import ProjectViewWrapper from '~/components/viewer/ProjectViewWrapper.vue';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 
-const { store } = useProjectRefs();
+const { store, buildModified } = useProjectRefs();
 const { viewerProjectList } = useViewerRefs();
 
 const projectList = computed(() => viewerProjectList.value);
@@ -25,6 +25,17 @@ useHead({
   bodyAttrs: {
     'data-bs-theme': 'dark',
   },
+});
+
+onMounted(() => {
+  window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+    if (buildModified.value) {
+      event.preventDefault();
+      return true;
+    } else {
+      return false;
+    }
+  });
 });
 </script>
 

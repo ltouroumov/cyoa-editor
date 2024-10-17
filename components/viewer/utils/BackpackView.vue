@@ -36,13 +36,12 @@
 </template>
 
 <script setup lang="ts">
-import * as R from 'ramda';
 import { computed } from 'vue';
 
-import type { ProjectObj, ProjectRow } from '~/composables/project';
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { useProjectStore } from '~/composables/store/project';
 import { useSettingRefs } from '~/composables/store/settings';
 import { ViewContext } from '~/composables/viewer';
+import { useBackpack } from '~/composables/viewer/useBackpack';
 
 const $props = defineProps<{
   showTitle: boolean;
@@ -51,34 +50,10 @@ const $props = defineProps<{
   hideDisabledAddons?: boolean;
 }>();
 
-const { getObject, getObjectRow, getRow, project } = useProjectStore();
-const { selected, backpack } = useProjectRefs();
+const { project } = useProjectStore();
 const { disabledAddonsInBackpack, lockBackpackObjects } = useSettingRefs();
+const { packRows } = useBackpack();
 
-type PackRowChoice = { row: ProjectRow; obj: ProjectObj; count: number };
-type PackRow = { packRow: ProjectRow; choices: PackRowChoice[] };
-const packRows = computed(() => {
-  const selectedChoices = R.map(
-    ([id, count]): PackRowChoice => ({
-      obj: getObject(id),
-      row: getRow(getObjectRow(id)),
-      count,
-    }),
-    R.toPairs(selected.value),
-  );
-  const choicesByGroup: Partial<Record<string, PackRowChoice[]>> = R.groupBy(
-    ({ obj, row }) => R.head(obj.groups)?.id ?? row.resultGroupId,
-    selectedChoices,
-  );
-
-  return R.chain(
-    (row: ProjectRow): PackRow[] =>
-      row.resultGroupId in choicesByGroup
-        ? [{ packRow: row, choices: choicesByGroup[row.resultGroupId] ?? [] }]
-        : [],
-    backpack.value,
-  );
-});
 const objectMode = computed(() => {
   if ($props.lockBackpack || lockBackpackObjects.value)
     return ViewContext.BackpackDisabled;

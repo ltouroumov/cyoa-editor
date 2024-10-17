@@ -4,6 +4,7 @@ import type { ViewerProjectList } from '~/composables/viewer';
 
 export const useViewerStore = defineStore('viewer', () => {
   const isBackpackVisible = ref<boolean>(false);
+  const isNotesVisible = ref<boolean>(false);
   const isSearchVisible = ref<boolean>(false);
   const isProjectMenuVisible = ref<boolean>(false);
 
@@ -41,6 +42,10 @@ export const useViewerStore = defineStore('viewer', () => {
     isBackpackVisible.value = set ?? !isBackpackVisible.value;
   };
 
+  const toggleNotes = (set?: boolean) => {
+    isNotesVisible.value = set ?? !isNotesVisible.value;
+  };
+
   const toggleSearch = (set?: boolean) => {
     isSearchVisible.value = set ?? !isSearchVisible.value;
   };
@@ -51,10 +56,12 @@ export const useViewerStore = defineStore('viewer', () => {
 
   return {
     isBackpackVisible,
+    isNotesVisible,
     isSearchVisible,
     isProjectMenuVisible,
     viewerProjectList,
     toggleBackpack,
+    toggleNotes,
     toggleSearch,
     toggleProjectMenu,
   };

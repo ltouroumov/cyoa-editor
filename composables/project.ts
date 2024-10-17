@@ -241,3 +241,9 @@ export type ProjectStore =
   | EmptyProjectStore
   | LoadingProjectStore
   | LoadedProjectStore;
+
+export type ProjectNote = {
+  id: string;
+  title: string;
+  text: string;
+};

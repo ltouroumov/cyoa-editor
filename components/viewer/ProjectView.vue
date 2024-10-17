@@ -7,6 +7,7 @@
   </div>
   <StyleProject :styles="project.styling" />
   <BackpackModal />
+  <NotesModal />
   <SearchModal />
   <MenuModal />
 </template>
@@ -14,6 +15,7 @@
 <script setup lang="ts">
 import BackpackModal from '~/components/viewer/modal/BackpackModal.vue';
 import MenuModal from '~/components/viewer/modal/MenuModal.vue';
+import NotesModal from '~/components/viewer/modal/NotesModal.vue';
 import SearchModal from '~/components/viewer/modal/SearchModal.vue';
 import StyleProject from '~/components/viewer/style/StyleProject.vue';
 import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
