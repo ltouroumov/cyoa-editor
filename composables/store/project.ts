@@ -1,5 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
+import { isNil } from 'ramda';
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 import { useToast } from 'vue-toastification';
@@ -29,6 +30,11 @@ type SetProgressF = (progress: string) => Promise<void>;
 type ProjectProvider = (
   setProgress: SetProgressF,
 ) => Promise<LoadProjectData | undefined>;
+
+export type IndexMapT = Record<
+  string,
+  { index: number; objects: Record<string, number> }
+>;
 
 export const useProjectStore = defineStore('project', () => {
   const $toast = useToast();
@@ -100,6 +106,30 @@ export const useProjectStore = defineStore('project', () => {
     );
 
     return (id: string) => mapping[id];
+  });
+
+  const indexMap: ComputedRef<IndexMapT> = computed((): IndexMapT => {
+    const _project = project.value?.data;
+    if (isNil(_project)) return {};
+
+    return R.fromPairs(
+      _project.rows.map(
+        (
+          row: ProjectRow,
+          idx0: number,
+        ): [string, { index: number; objects: Record<string, number> }] => {
+          const objIndexMap = R.fromPairs(
+            row.objects.map(
+              (obj: ProjectObj, idx1: number): [string, number] => {
+                return [obj.id, idx1];
+              },
+            ),
+          );
+
+          return [row.id, { index: idx0, objects: objIndexMap }];
+        },
+      ),
+    );
   });
 
   const isLoaded = computed(() => !!project.value);
@@ -449,6 +479,7 @@ export const useProjectStore = defineStore('project', () => {
     getRow,
     getObject,
     getObjectRow,
+    indexMap,
     setSelected,
     incSelected,
     decSelected,

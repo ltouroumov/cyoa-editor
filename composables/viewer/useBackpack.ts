@@ -1,16 +1,37 @@
 import * as R from 'ramda';
+import { sortWith } from 'ramda';
 import { computed } from 'vue';
 
 import type { ProjectObj, ProjectRow } from '~/composables/project';
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import {
+  type IndexMapT,
+  useProjectRefs,
+  useProjectStore,
+} from '~/composables/store/project';
 
 export type PackRowChoice = { row: ProjectRow; obj: ProjectObj; count: number };
 export type PackRow = { packRow: ProjectRow; choices: PackRowChoice[] };
 export function useBackpack() {
   const { getObject, getObjectRow, getRow } = useProjectStore();
-  const { selected, backpack } = useProjectRefs();
+  const { selected, backpack, indexMap } = useProjectRefs();
 
   const packRows = computed(() => {
+    const _indexMap: IndexMapT = indexMap.value;
+
+    const cmp = (a: number, b: number): number => {
+      return a === b ? 0 : a > b ? 1 : -1;
+    };
+    const cmpRowIndex = (itemA: PackRowChoice, itemB: PackRowChoice) => {
+      const idxA = _indexMap[itemA.row.id].index;
+      const idxB = _indexMap[itemB.row.id].index;
+      return cmp(idxA, idxB);
+    };
+    const cmpObjIndex = (itemA: PackRowChoice, itemB: PackRowChoice) => {
+      const idxA = _indexMap[itemA.row.id].objects[itemA.obj.id];
+      const idxB = _indexMap[itemB.row.id].objects[itemB.obj.id];
+      return cmp(idxA, idxB);
+    };
+
     const selectedChoices = R.map(
       ([id, count]): PackRowChoice => ({
         obj: getObject(id),
@@ -24,13 +45,20 @@ export function useBackpack() {
       selectedChoices,
     );
 
-    return R.chain(
-      (row: ProjectRow): PackRow[] =>
-        row.resultGroupId in choicesByGroup
-          ? [{ packRow: row, choices: choicesByGroup[row.resultGroupId] ?? [] }]
-          : [],
-      backpack.value,
-    );
+    return R.chain((row: ProjectRow): PackRow[] => {
+      if (row.resultGroupId in choicesByGroup) {
+        const entry = {
+          packRow: row,
+          choices: sortWith(
+            [cmpRowIndex, cmpObjIndex],
+            choicesByGroup[row.resultGroupId] ?? [],
+          ),
+        };
+        return [entry];
+      } else {
+        return [];
+      }
+    }, backpack.value);
   });
 
   return { packRows };
