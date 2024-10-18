@@ -1,18 +1,14 @@
 <template>
   <div class="build-details">
-    <div class="name">{{ build.name }}</div>
+    <div class="name">
+      <BuildName :name="build.name" class="me-2" @change="updateBuildName" />
+    </div>
     <template v-if="build.selected">
       <div class="actions">
-        <button
-          class="btn btn-outline-primary btn-sm"
-          @click="loadBuild(build)"
-        >
+        <button class="btn btn-outline-primary btn-sm" @click="loadBuild()">
           Load
         </button>
-        <button
-          class="btn btn-sm btn-outline-danger"
-          @click="deleteBuild(build)"
-        >
+        <button class="btn btn-sm btn-outline-danger" @click="deleteBuild()">
           Delete
         </button>
       </div>
@@ -64,22 +60,13 @@
         <BuildChoices v-show="showChoices" :groups="build.groups" />
       </div>
       <div class="actions">
-        <button
-          class="btn btn-outline-primary btn-sm"
-          @click="loadBuild(build)"
-        >
+        <button class="btn btn-outline-primary btn-sm" @click="loadBuild()">
           Load
         </button>
-        <button
-          class="btn btn-outline-primary btn-sm"
-          @click="updateBuild(build)"
-        >
+        <button class="btn btn-outline-primary btn-sm" @click="updateBuild()">
           Save
         </button>
-        <button
-          class="btn btn-sm btn-outline-danger"
-          @click="deleteBuild(build)"
-        >
+        <button class="btn btn-sm btn-outline-danger" @click="deleteBuild()">
           Delete
         </button>
       </div>
@@ -92,7 +79,7 @@ import * as R from 'ramda';
 import { join, map, toPairs } from 'ramda';
 import { useToast } from 'vue-toastification';
 
-import BuildChoices from '~/components/viewer/utils/BuildChoices.vue';
+import BuildChoices from '~/components/viewer/library/BuildChoices.vue';
 import {
   ProjectMatch,
   type SavedBuildData,
@@ -139,26 +126,31 @@ const isCompatible = computed(() => {
 
 const $lib = useBuildLibrary();
 
-const updateBuild = async (build: SavedBuildData) => {
+const updateBuild = async () => {
   if (R.isEmpty(selected.value)) {
     $toast.error("No selections are made,\nThere's nothing to save.");
     return;
   }
 
-  await $lib.updateBuild(build);
+  await $lib.updateBuild($props.build, { $choices: true, $notes: true });
   $emit('change');
-  $toast.success(`Updated Build: ${build.name}`);
+  $toast.success(`Updated Build: ${$props.build.name}`);
 };
 
-const deleteBuild = async (build: SavedBuildData) => {
-  await $lib.deleteBuild(build);
+const updateBuildName = async (name: string) => {
+  await $lib.updateBuild($props.build, { name: name });
   $emit('change');
-  $toast.success(`Deleted Build: ${build.name}`);
 };
 
-const loadBuild = (build: SavedBuildData) => {
-  $lib.loadBuild(build);
-  $toast.info(`Loaded Build: ${build.name}`);
+const deleteBuild = async () => {
+  await $lib.deleteBuild($props.build);
+  $emit('change');
+  $toast.success(`Deleted Build: ${$props.build.name}`);
+};
+
+const loadBuild = () => {
+  $lib.loadBuild($props.build);
+  $toast.info(`Loaded Build: ${$props.build.name}`);
 };
 </script>
 

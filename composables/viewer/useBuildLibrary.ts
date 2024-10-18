@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { clone } from 'ramda';
+import { clone, isNotEmpty } from 'ramda';
 
 import {
   getProjectInfo,
@@ -15,6 +15,11 @@ import {
   useProjectStore,
 } from '~/composables/store/project';
 import { useIndexedDB } from '~/composables/viewer/useIndexedDB';
+
+type UpdateBuildOptions = Partial<Omit<SavedBuildData, 'id'>> & {
+  $choices?: boolean;
+  $notes?: boolean;
+};
 
 export function useBuildLibrary() {
   const db = useIndexedDB()!;
@@ -59,29 +64,37 @@ export function useBuildLibrary() {
 
   const updateBuild = async (
     build: SavedBuildData,
+    { $notes, $choices, ...rest }: UpdateBuildOptions = {},
   ): Promise<SavedBuildData> => {
-    if (R.isEmpty($store.selected.value)) {
+    // Do not accidentally write an empty build
+    if ($choices && R.isEmpty($store.selected.value)) {
       return build;
     }
 
     return db.transaction('builds', 'readwrite', async (tx) => {
       const table = tx.objectStore('builds');
 
-      const notes = clone($store.buildNotes.value);
-      console.log(notes);
-      const entry: SavedBuildData = {
-        ...build,
-        updatedAt: new Date(),
-        project: getProjectInfo($store.store.value),
-        groups: getSelectedItems(
+      const entry: SavedBuildData = clone(build);
+      entry.updatedAt = new Date();
+
+      console.log('props', rest);
+      if (isNotEmpty(rest)) {
+        // Copy the updated properties into the object
+        Object.assign(entry, rest);
+      }
+      if ($notes) {
+        entry.notes = clone($store.buildNotes.value);
+      }
+      if ($choices) {
+        entry.project = getProjectInfo($store.store.value);
+        entry.groups = getSelectedItems(
           $store.selected.value,
           $store.backpack.value,
           $store.getObject.value,
           $store.getObjectRow.value,
           $store.getRow.value,
-        ),
-        notes: notes,
-      };
+        );
+      }
       await table.put(entry);
 
       return entry;
