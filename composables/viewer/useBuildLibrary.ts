@@ -14,7 +14,7 @@ import {
   useProjectRefs,
   useProjectStore,
 } from '~/composables/store/project';
-import { useIndexedDB } from '~/composables/viewer/useIndexedDB';
+import { useDexie } from '~/composables/viewer/useDexie';
 
 type UpdateBuildOptions = Partial<Omit<SavedBuildData, 'id'>> & {
   $choices?: boolean;
@@ -22,44 +22,33 @@ type UpdateBuildOptions = Partial<Omit<SavedBuildData, 'id'>> & {
 };
 
 export function useBuildLibrary() {
-  const db = useIndexedDB()!;
+  const db = useDexie()!;
 
   const { setSelected } = useProjectStore();
   const $store = useProjectRefs();
 
   const loadBuilds = async (): Promise<SavedBuildData[]> => {
-    return db.transaction('builds', 'readonly', async (tx) => {
-      const store = tx.objectStore('builds');
-      return store.getAll();
-    });
+    return db.builds.toArray();
   };
 
   const saveBuild = async (buildName: string): Promise<SavedBuildData> => {
-    return db.transaction('builds', 'readwrite', async (tx) => {
-      const table = tx.objectStore('builds');
-      const today = new Date();
-      const entry: Omit<SavedBuildData, 'id'> = {
-        name: buildName,
-        createdAt: today,
-        updatedAt: today,
-        project: getProjectInfo($store.store.value),
-        groups: getSelectedItems(
-          $store.selected.value,
-          $store.backpack.value,
-          $store.getObject.value,
-          $store.getObjectRow.value,
-          $store.getRow.value,
-        ),
-        notes: clone($store.buildNotes.value),
-      };
-      const entryId = await table.add(entry);
-      const savedEntry: SavedBuildData = {
-        ...entry,
-        id: entryId,
-      };
-
-      return savedEntry;
-    });
+    const today = new Date();
+    const entry: Omit<SavedBuildData, 'id'> = {
+      name: buildName,
+      createdAt: today,
+      updatedAt: today,
+      project: getProjectInfo($store.store.value),
+      groups: getSelectedItems(
+        $store.selected.value,
+        $store.backpack.value,
+        $store.getObject.value,
+        $store.getObjectRow.value,
+        $store.getRow.value,
+      ),
+      notes: clone($store.buildNotes.value),
+    };
+    const entryId = await db.builds.add(entry);
+    return R.assoc('id', entryId, entry);
   };
 
   const updateBuild = async (
@@ -71,41 +60,34 @@ export function useBuildLibrary() {
       return build;
     }
 
-    return db.transaction('builds', 'readwrite', async (tx) => {
-      const table = tx.objectStore('builds');
+    const entry: SavedBuildData = clone(build);
+    entry.updatedAt = new Date();
 
-      const entry: SavedBuildData = clone(build);
-      entry.updatedAt = new Date();
+    console.log('props', rest);
+    if (isNotEmpty(rest)) {
+      // Copy the updated properties into the object
+      Object.assign(entry, rest);
+    }
+    if ($notes) {
+      entry.notes = clone($store.buildNotes.value);
+    }
+    if ($choices) {
+      entry.project = getProjectInfo($store.store.value);
+      entry.groups = getSelectedItems(
+        $store.selected.value,
+        $store.backpack.value,
+        $store.getObject.value,
+        $store.getObjectRow.value,
+        $store.getRow.value,
+      );
+    }
+    await db.builds.put(entry);
 
-      console.log('props', rest);
-      if (isNotEmpty(rest)) {
-        // Copy the updated properties into the object
-        Object.assign(entry, rest);
-      }
-      if ($notes) {
-        entry.notes = clone($store.buildNotes.value);
-      }
-      if ($choices) {
-        entry.project = getProjectInfo($store.store.value);
-        entry.groups = getSelectedItems(
-          $store.selected.value,
-          $store.backpack.value,
-          $store.getObject.value,
-          $store.getObjectRow.value,
-          $store.getRow.value,
-        );
-      }
-      await table.put(entry);
-
-      return entry;
-    });
+    return entry;
   };
 
   const deleteBuild = async (build: SavedBuildData) => {
-    await db.transaction('builds', 'readwrite', async (tx) => {
-      const store = tx.objectStore('builds');
-      await store.delete(build.id);
-    });
+    await db.builds.delete(build.id);
   };
 
   const loadBuild = (build: SavedBuildData) => {

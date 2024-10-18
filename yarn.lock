@@ -5137,6 +5137,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dexie@npm:^4.0.8":
+  version: 4.0.8
+  resolution: "dexie@npm:4.0.8"
+  checksum: 156e0809d5102ec0522cdee473c842e2d8c5a9b91d92792c8a17829953317f11370b34bc2418a66c5c4dec7f99306a6ae8a53d02f530af85f98d8803965bc6bb
+  languageName: node
+  linkType: hard
+
 "diff@npm:^5.2.0":
   version: 5.2.0
   resolution: "diff@npm:5.2.0"
@@ -8920,6 +8927,7 @@ __metadata:
     "@vueuse/nuxt": ^11.0.3
     bootstrap: 5.3.*
     canvas-size: ^2.0.0
+    dexie: ^4.0.8
     dom-to-svg: ^0.12.2
     eslint: ^8.57.0
     eslint-config-prettier: ^8.10.0
