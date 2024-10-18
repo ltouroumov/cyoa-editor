@@ -1,5 +1,5 @@
 <template>
-  <div class="row-note">
+  <div v-if="compact ? hasNote : true" class="row-note">
     <div class="row-note-header">
       <span class="note-label">Section Notes</span>
       <AddNoteButton v-if="!hasNote && editable" @click="createNote(noteId)" />
@@ -31,6 +31,7 @@ const {
 const $props = defineProps<{
   packRow: ProjectRow;
   editable: boolean;
+  compact: boolean;
 }>();
 
 const noteId = computed(() => {

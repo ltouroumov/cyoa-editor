@@ -16,11 +16,15 @@
             :obj="obj"
             :editable="editable"
           />
-          <RowNote :pack-row="packRow" :editable="editable" />
+          <RowNote
+            :pack-row="packRow"
+            :editable="editable"
+            :compact="compact"
+          />
         </div>
       </template>
       <div class="notes-ruler"></div>
-      <GlobalNotes :editable="editable" />
+      <GlobalNotes :editable="editable" :compact="compact" />
     </div>
   </div>
 </template>
@@ -28,7 +32,7 @@
 <script setup lang="ts">
 import { assoc, chain, filter, has, isEmpty } from 'ramda';
 
-import RowNote from '~/components/viewer/modal/notes/RowNote.vue';
+import RowNote from '~/components/viewer/notes/RowNote.vue';
 import { type PackRow, useBackpack } from '~/composables/viewer/useBackpack';
 import { useBuildNotes } from '~/composables/viewer/useBuildNotes';
 
