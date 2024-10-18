@@ -45,6 +45,7 @@
     "@vueuse/nuxt": "^11.0.3",
     "bootstrap": "5.3.*",
     "canvas-size": "^2.0.0",
+    "dexie": "^4.0.8",
     "dom-to-svg": "^0.12.2",
     "handlebars": "^4.7.8",
     "perfect-debounce": "^1.0.0",
