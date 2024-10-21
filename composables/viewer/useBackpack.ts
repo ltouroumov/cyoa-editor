@@ -9,11 +9,16 @@ import {
   useProjectStore,
 } from '~/composables/store/project';
 
-export type PackRowChoice = { row: ProjectRow; obj: ProjectObj; count: number };
+export type PackRowChoice = {
+  row: ProjectRow;
+  obj: ProjectObj;
+  addons: ObjAddon[];
+  count: number;
+};
 export type PackRow = { packRow: ProjectRow; choices: PackRowChoice[] };
 export function useBackpack() {
   const { getObject, getObjectRow, getRow } = useProjectStore();
-  const { selected, backpack, indexMap } = useProjectRefs();
+  const { selected, selectedIds, backpack, indexMap } = useProjectRefs();
 
   const packRows = computed(() => {
     const _indexMap: IndexMapT = indexMap.value;
@@ -32,14 +37,21 @@ export function useBackpack() {
       return cmp(idxA, idxB);
     };
 
-    const selectedChoices = R.map(
-      ([id, count]): PackRowChoice => ({
-        obj: getObject(id),
+    const selectedChoices = R.map(([id, count]): PackRowChoice => {
+      const obj = getObject(id);
+
+      const activeAddons = R.filter((addon) => {
+        const condition = buildConditions(addon);
+        return condition(selectedIds.value);
+      }, obj.addons);
+
+      return {
+        obj: obj,
         row: getRow(getObjectRow(id)),
+        addons: activeAddons,
         count,
-      }),
-      R.toPairs(selected.value),
-    );
+      };
+    }, R.toPairs(selected.value));
     const choicesByGroup: Partial<Record<string, PackRowChoice[]>> = R.groupBy(
       ({ obj, row }) => R.head(obj.groups)?.id ?? row.resultGroupId,
       selectedChoices,
