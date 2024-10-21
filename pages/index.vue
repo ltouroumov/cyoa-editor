@@ -11,21 +11,26 @@
 import { definePageMeta } from '#imports';
 import ProjectViewWrapper from '~/components/viewer/ProjectViewWrapper.vue';
 import { useProjectRefs } from '~/composables/store/project';
+import { useSettingRefs } from '~/composables/store/settings';
 import { useViewerRefs } from '~/composables/store/viewer';
 
 const { store, buildModified } = useProjectRefs();
 const { viewerProjectList } = useViewerRefs();
+const { lightThemeUI } = useSettingRefs();
 
 const projectList = computed(() => viewerProjectList.value);
 
 definePageMeta({
   layout: false,
 });
-useHead({
-  bodyAttrs: {
-    'data-bs-theme': 'dark',
-  },
-});
+
+function setBodyTheme(lightTheme: boolean) {
+  if (lightTheme) {
+    document.body.setAttribute('data-bs-theme', 'light');
+  } else {
+    document.body.setAttribute('data-bs-theme', 'dark');
+  }
+}
 
 onMounted(() => {
   window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
@@ -36,7 +41,18 @@ onMounted(() => {
       return false;
     }
   });
+
+  const lightTheme = lightThemeUI.value;
+  console.log('LT', lightTheme);
+  setBodyTheme(lightTheme);
 });
+
+watch(
+  () => lightThemeUI.value,
+  (newValue: boolean) => {
+    setBodyTheme(newValue);
+  },
+);
 </script>
 
 <style lang="scss">

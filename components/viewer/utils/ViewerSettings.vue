@@ -7,12 +7,30 @@
       >
         <div class="form-check form-switch">
           <input
-            id="hideDisabledAddons"
+            id="lightThemeUI"
+            v-model="lightThemeUI"
             class="form-check-input me-1"
             type="checkbox"
             role="switch"
-            :checked="disabledAddons"
-            @change="toggleHideDisabledAddons()"
+          />
+          <label class="form-check-label" for="lightThemeUI">
+            Light Theme UI
+            <small class="text-body-secondary ms-3">
+              When enabled, the viewer UI will use the light theme.
+            </small>
+          </label>
+        </div>
+      </li>
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
+        <div class="form-check form-switch">
+          <input
+            id="hideDisabledAddons"
+            v-model="disabledAddons"
+            class="form-check-input me-1"
+            type="checkbox"
+            role="switch"
           />
           <label class="form-check-label" for="hideDisabledAddons">
             Hide Disabled Addons
@@ -49,11 +67,10 @@
         <div class="form-check form-switch">
           <input
             id="showDisabledAddons"
+            v-model="disabledAddonsInBackpack"
             class="form-check-input me-1"
             type="checkbox"
             role="switch"
-            :checked="disabledAddonsInBackpack"
-            @change="toggleDisabledAddonsInBackpack()"
           />
           <label class="form-check-label">
             Show Disabled Addons
@@ -69,11 +86,10 @@
         <div class="form-check form-switch">
           <input
             id="lockBackpackObjects"
+            v-model="lockBackpackObjects"
             class="form-check-input me-1"
             type="checkbox"
             role="switch"
-            :checked="lockBackpackObjects"
-            @change="toggleLockBackpackObjects()"
           />
           <label class="form-check-label" for="lockBackpackObjects">
             Lock Objects in Backpack
@@ -85,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
+import { useSettingRefs } from '~/composables/store/settings';
 import { useViewerRefs } from '~/composables/store/viewer';
 
 const { viewerProjectList } = useViewerRefs();
@@ -98,11 +114,10 @@ const cyoaPreferences = computed({
 
 const projectList = computed(() => viewerProjectList.value);
 
-const { disabledAddons, disabledAddonsInBackpack, lockBackpackObjects } =
-  useSettingRefs();
 const {
-  toggleHideDisabledAddons,
-  toggleDisabledAddonsInBackpack,
-  toggleLockBackpackObjects,
-} = useSettingStore();
+  disabledAddons,
+  disabledAddonsInBackpack,
+  lockBackpackObjects,
+  lightThemeUI,
+} = useSettingRefs();
 </script>
