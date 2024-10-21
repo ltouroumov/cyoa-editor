@@ -2,15 +2,15 @@
   <nav
     class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark-subtle text-white"
   >
-    <div class="container-fluid">
-      <div class="d-flex flex-row items-center">
+    <div class="menu-container">
+      <div class="d-flex item-menu flex-row items-center">
         <button
           class="btn btn-light btn-lg i-solar-hamburger-menu-outline"
           @click="toggleProjectMenu()"
         />
       </div>
-      <ViewScoreStatus short />
-      <div class="d-flex gap-1">
+      <ViewScoreStatus short class="item-scores" />
+      <div class="d-flex item-tools gap-1">
         <button
           class="btn btn-light btn-lg i-solar-magnifer-outline"
           @click="toggleSearch()"
@@ -66,7 +66,42 @@ const updateCurrentBuild = async () => {
 
 .navbar {
   position: sticky;
-  height: 40px;
+}
+
+@media (min-width: 576px) {
+  .menu-container {
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 576px) {
+  .menu-container {
+    width: 100%;
+
+    display: grid;
+    grid-template:
+      'menu tools' auto
+      'scores scores' auto
+      / 1fr 1fr;
+    gap: 0.2rem;
+
+    .item-menu {
+      grid-area: menu;
+      justify-self: start;
+    }
+    .item-tools {
+      grid-area: tools;
+      justify-self: end;
+    }
+    .item-scores {
+      grid-area: scores;
+      justify-self: center;
+    }
+  }
 }
 
 body:has(.menu-modal.show) .navbar {
