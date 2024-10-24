@@ -1,5 +1,5 @@
 <template>
-  <div class="export-container" data-bs-theme="dark">
+  <div id="backpack" class="export-container project" data-bs-theme="dark">
     <BackpackView
       :vertical-score="false"
       :show-title="true"
@@ -26,5 +26,6 @@ const { buildNotes } = useBuildNotes();
 <style scoped lang="scss">
 .export-container {
   padding: 1rem;
+  max-width: 2000px;
 }
 </style>
