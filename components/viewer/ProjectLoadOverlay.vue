@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
-import { clone, isNotNil } from 'ramda';
+import { isEmpty, isNotNil } from 'ramda';
 
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
@@ -33,26 +33,32 @@ const { loadProject } = useProjectStore();
 const { hasPreference } = useSettingStore();
 const { cyoaPreference } = useSettingRefs();
 
-type BackgroundData = {
+type BackgroundImageData = {
   url: string;
+};
+type BackgroundData = {
+  enabled: boolean;
+  images: BackgroundImageData[];
 };
 
 const _config = useRuntimeConfig();
-const { data: backgrounds } = await useAsyncData(
+const { data: backgroundConfig } = await useAsyncData(
   'backgrounds',
-  (): Promise<BackgroundData[]> =>
+  (): Promise<BackgroundData> =>
     $fetch(`${_config.app.baseURL}config/viewer/backgrounds.json`),
 );
 
 const background = ref<string | null>(null);
 
 const randomizeBackground = () => {
-  const bgs = backgrounds.value;
-  if (!bgs) return;
+  const bgConf = backgroundConfig.value;
+  if (!bgConf) return;
 
-  console.log('BGS', clone(bgs));
-  const idx = Math.floor(Math.random() * bgs.length);
-  background.value = `${config.app.baseURL}${bgs[idx].url}`;
+  if (bgConf.enabled && !isEmpty(bgConf.images)) {
+    const images = bgConf.images;
+    const idx = Math.floor(Math.random() * images.length);
+    background.value = `${config.app.baseURL}${images[idx].url}`;
+  }
 };
 
 randomizeBackground();
