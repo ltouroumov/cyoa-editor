@@ -1,7 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia';
 
 import type { ViewerProjectList } from '~/composables/viewer';
-import PROJECTS from '~/config/viewer/projects.json';
 
 export const useViewerStore = defineStore('viewer', () => {
   const isBackpackVisible = ref<boolean>(false);
@@ -9,7 +8,10 @@ export const useViewerStore = defineStore('viewer', () => {
   const isSearchVisible = ref<boolean>(false);
   const isProjectMenuVisible = ref<boolean>(false);
 
-  const viewerProjectList = ref<ViewerProjectList>(PROJECTS);
+  const viewerProjectList = ref<ViewerProjectList>({
+    items: [],
+    default: null,
+  });
 
   const toggleBackpack = (set?: boolean) => {
     isBackpackVisible.value = set ?? !isBackpackVisible.value;
