@@ -20,10 +20,12 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
+import { isNotNil } from 'ramda';
 
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
 import { useViewerRefs } from '~/composables/store/viewer';
+import BACKGROUNDS from '~/config/viewer/backgrounds.json';
 
 const { store } = useProjectRefs();
 const config = useRuntimeConfig();
@@ -33,16 +35,6 @@ const { hasPreference } = useSettingStore();
 const { cyoaPreference } = useSettingRefs();
 
 const background = ref<string | null>(null);
-const BACKGROUNDS = [
-  { url: 'bgs/load-01.jpg' },
-  { url: 'bgs/load-02.jpg' },
-  { url: 'bgs/load-04.jpg' },
-  { url: 'bgs/load-05.png' },
-  { url: 'bgs/load-06.jpg' },
-  { url: 'bgs/load-07.webp' },
-  { url: 'bgs/load-08.jpg' },
-  { url: 'bgs/load-09.jpg' },
-];
 
 const randomizeBackground = () => {
   const idx = Math.floor(Math.random() * BACKGROUNDS.length);
@@ -52,22 +44,31 @@ const randomizeBackground = () => {
 randomizeBackground();
 useIntervalFn(randomizeBackground, 5000);
 
-const projectList = computed(() => viewerProjectList.value);
-
-const getCYOAPreference = () => {
-  return R.find(R.propEq(cyoaPreference.value, 'id'), projectList.value.items);
+const getProjectData = (projectId: string): ViewerProject | undefined => {
+  return R.find(R.propEq(projectId, 'id'), viewerProjectList.value.items);
 };
 
 onMounted(async () => {
+  let shouldLoadProject = false;
+  let project: ViewerProject | null = null;
+
   if (
     hasPreference() &&
     cyoaPreference.value &&
     store.value.status === 'empty'
   ) {
-    const cyoaPreference = getCYOAPreference()!;
-    const fileURL = cyoaPreference.remoteFileUrl;
+    shouldLoadProject = true;
+    project = getProjectData(cyoaPreference.value)!;
+  }
+
+  if (isNotNil(viewerProjectList.value.default)) {
+    shouldLoadProject = true;
+    project = getProjectData(viewerProjectList.value.default)!;
+  }
+
+  if (shouldLoadProject && project) {
     await loadProject(async (setProgress) => {
-      const response = await fetch(fileURL);
+      const response = await fetch(project.remoteFileUrl);
       if (response.ok) {
         const reader = response.body!.getReader();
 
@@ -87,7 +88,7 @@ onMounted(async () => {
           await setProgress(`Downloaded ${neat} Mb`);
         }
 
-        await setProgress(`Loading ${cyoaPreference.title}...`);
+        await setProgress(`Loading ${project.title}...`);
         // A hack, but otherwise the progress value never updates before loadProject is called
         await sleep(100);
 
@@ -100,7 +101,7 @@ onMounted(async () => {
 
         return {
           fileContents: bufferToString(bodyBytes),
-          fileName: fileURL.toString(),
+          fileName: project.remoteFileUrl.toString(),
         };
       } else {
         throw new Error(

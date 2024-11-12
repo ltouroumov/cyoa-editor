@@ -6,6 +6,7 @@ export type ViewerProject = {
 
 export type ViewerProjectList = {
   items: ViewerProject[];
+  default: string | null;
 };
 
 export enum ViewContext {
