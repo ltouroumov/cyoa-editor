@@ -2,12 +2,14 @@
   <ProjectViewWrapper />
   <div v-if="store.status === 'empty'" class="dialog-container">
     <div class="bg-dark-subtle dialog text-light">
-      <ProjectMenu :project-list="projectList" />
+      <ProjectMenu :project-list="viewerProjectList" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { clone } from 'ramda';
+
 import { definePageMeta } from '#imports';
 import ProjectViewWrapper from '~/components/viewer/ProjectViewWrapper.vue';
 import { useProjectRefs } from '~/composables/store/project';
@@ -18,7 +20,17 @@ const { store, buildModified } = useProjectRefs();
 const { viewerProjectList } = useViewerRefs();
 const { lightThemeUI } = useSettingRefs();
 
-const projectList = computed(() => viewerProjectList.value);
+const _config = useRuntimeConfig();
+const { data: projectList } = await useAsyncData(
+  'projects',
+  (): Promise<ViewerProjectList> =>
+    $fetch(`${_config.app.baseURL}config/viewer/projects.json`),
+);
+
+if (projectList.value) {
+  console.log('Project List', clone(projectList.value));
+  viewerProjectList.value = projectList.value;
+}
 
 definePageMeta({
   layout: false,
@@ -43,7 +55,6 @@ onMounted(() => {
   });
 
   const lightTheme = lightThemeUI.value;
-  console.log('LT', lightTheme);
   setBodyTheme(lightTheme);
 });
 
