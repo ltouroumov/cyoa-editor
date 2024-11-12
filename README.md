@@ -4,9 +4,14 @@
 
 1. Download the latest version from https://github.com/ltouroumov/cyoa-editor/releases/
 2. Update the `config/viewer/projects.json` file to add your project(s)
-3. Upload the directory
+3. Upload the **root directory** of your domain
 
-### `projects.json` file
+### Configure the viewer
+
+#### `projects.json` file
+
+This file defines the list of projects displayed on the landing page of the viewer and the side menu.
+If no value is specified in `default` (set to `null`), no CYOA will be automatically loaded.
 
 ```json5
 {
@@ -27,7 +32,7 @@
 }
 ```
 
-### `backgrounds.json` file
+#### `backgrounds.json` file
 
 Controls the loading backgrounds.
 
@@ -46,3 +51,16 @@ Controls the loading backgrounds.
   ]
 }
 ```
+### Installation is a sub-folder (advanced)
+
+It is possible to install the viewer in a sub-folder of a domain.
+
+#### Update `index.html`
+
+1) In the file `index.html`
+   1) Replace all instances of `/assets/` with `/your-folder/assets/`.
+   2) Replace `baseURL:"/"` with `baseURL:"/your-folder/"`
+
+#### Custom Build
+
+The simple way is to build the software with your custom URL with the `NUXT_APP_BASE_URL` environment variable. This requires knowledge of software development and the right environment.
