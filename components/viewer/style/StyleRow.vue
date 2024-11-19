@@ -15,7 +15,7 @@ const { styles, rowId } = defineProps<{ styles: RowStyles; rowId: string }>();
 
 const generators = [
   new RowStylesGen({ container: `#row-${rowId}` }),
-  new ObjStylesGen(),
+  new ObjStylesGen({ container: `#row-${rowId}` }),
 ];
 const stylesheet = computed(() => {
   return createStyles(styles, generators);

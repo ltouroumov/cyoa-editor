@@ -79,19 +79,19 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   gen(styling: RowStyles): string {
     // Ugly Hack but the original format is cursed
     const computed = StyleUtils.applyTransforms(styling, {
-      objectBorderRadiusUnit: (styling) =>
-        styling.objectBorderRadiusIsPixels ? 'px' : '%',
-      objectBorderRadiusTopLeft: StyleUtils.parseBorderRadius(
-        'objectBorderRadiusTopLeft',
+      rowBorderRadiusUnit: (styling) =>
+        styling.rowBorderRadiusIsPixels ? 'px' : '%',
+      rowBorderRadiusTopLeft: StyleUtils.parseBorderRadius(
+        'rowBorderRadiusTopLeft',
       ),
-      objectBorderRadiusTopRight: StyleUtils.parseBorderRadius(
-        'objectBorderRadiusTopRight',
+      rowBorderRadiusTopRight: StyleUtils.parseBorderRadius(
+        'rowBorderRadiusTopRight',
       ),
-      objectBorderRadiusBottomLeft: StyleUtils.parseBorderRadius(
-        'objectBorderRadiusBottomLeft',
+      rowBorderRadiusBottomLeft: StyleUtils.parseBorderRadius(
+        'rowBorderRadiusBottomLeft',
       ),
-      objectBorderRadiusBottomRight: StyleUtils.parseBorderRadius(
-        'objectBorderRadiusBottomRight',
+      rowBorderRadiusBottomRight: StyleUtils.parseBorderRadius(
+        'rowBorderRadiusBottomRight',
       ),
     });
 
@@ -143,10 +143,10 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
         {{#if rowBorderIsOn}}
         border: {{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}};
         
-        border-top-left-radius: {{objectBorderRadiusTopLeft}}{{objectBorderRadiusUnit}};
-        border-top-right-radius: {{objectBorderRadiusTopRight}}{{objectBorderRadiusUnit}};
-        border-bottom-left-radius: {{objectBorderRadiusBottomLeft}}{{objectBorderRadiusUnit}};
-        border-bottom-right-radius: {{objectBorderRadiusBottomRight}}{{objectBorderRadiusUnit}};
+        border-top-left-radius: {{rowBorderRadiusTopLeft}}{{rowBorderRadiusUnit}};
+        border-top-right-radius: {{rowBorderRadiusTopRight}}{{rowBorderRadiusUnit}};
+        border-bottom-left-radius: {{rowBorderRadiusBottomLeft}}{{rowBorderRadiusUnit}};
+        border-bottom-right-radius: {{rowBorderRadiusBottomRight}}{{rowBorderRadiusUnit}};
         {{else}}
         border: none;
         {{/if}}
@@ -160,7 +160,6 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       {{#if rowOverFlowIsOn}}
       overflow: hidden;
       {{/if}}
-
     }
   `;
 }

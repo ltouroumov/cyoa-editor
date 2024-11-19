@@ -240,10 +240,11 @@ const decrement = () => {
     }
   }
 
-  &.notSelectable {
-    border: none;
-    border-radius: 0;
-  }
+  // Why was this here?
+  // &.notSelectable {
+  //   border: none;
+  //   border-radius: 0;
+  // }
 
   .obj-image-wrapper {
     display: flex;

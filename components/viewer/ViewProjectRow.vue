@@ -6,13 +6,13 @@
       :row-id="row.id"
     />
     <div class="project-row" :class="{ hidden: !isVisible }">
-      <div v-if="row.image || row.title || row.titleText" class="row-header">
-        <img
-          v-if="row.image"
-          class="row-image"
-          :src="row.image"
-          :alt="row.title"
-        />
+      <img
+        v-if="row.image"
+        class="row-image"
+        :src="row.image"
+        :alt="row.title"
+      />
+      <div v-if="row.title || row.titleText" class="row-header">
         <!-- eslint-disable vue/no-v-html -->
         <div
           v-if="row.title"

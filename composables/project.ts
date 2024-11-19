@@ -93,6 +93,11 @@ export type RowStyles = ObjStyles &
     rowBorderStyle: string;
     rowBorderWidth: number;
     rowOverFlowIsOn: boolean;
+    rowBorderRadiusTopLeft: string | number;
+    rowBorderRadiusTopRight: string | number;
+    rowBorderRadiusBottomRight: string | number;
+    rowBorderRadiusBottomLeft: string | number;
+    rowBorderRadiusIsPixels: boolean;
 
     rowImageMarginTop: number;
     rowImageMarginBottom: number;
