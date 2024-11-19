@@ -77,7 +77,25 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   }
 
   gen(styling: RowStyles): string {
-    const styles = this._template(styling);
+    // Ugly Hack but the original format is cursed
+    const computed = StyleUtils.applyTransforms(styling, {
+      objectBorderRadiusUnit: (styling) =>
+        styling.objectBorderRadiusIsPixels ? 'px' : '%',
+      objectBorderRadiusTopLeft: StyleUtils.parseBorderRadius(
+        'objectBorderRadiusTopLeft',
+      ),
+      objectBorderRadiusTopRight: StyleUtils.parseBorderRadius(
+        'objectBorderRadiusTopRight',
+      ),
+      objectBorderRadiusBottomLeft: StyleUtils.parseBorderRadius(
+        'objectBorderRadiusBottomLeft',
+      ),
+      objectBorderRadiusBottomRight: StyleUtils.parseBorderRadius(
+        'objectBorderRadiusBottomRight',
+      ),
+    });
+
+    const styles = this._template(computed);
     if (this._options.container) {
       return `${this._options.container} { ${styles} }`;
     } else {
@@ -117,9 +135,20 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
         border: {{rowImgBorderWidth}}px {{rowImgBorderStyle}} {{rowImgBorderColor}};
         {{/if}}
       }
-      .row-body {
+      .row-header {
         margin-left: {{rowMargin}}%;
         margin-right: {{rowMargin}}%;
+        
+        {{#if rowBorderIsOn}}
+        border: {{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}};
+        
+        border-top-left-radius: {{objectBorderRadiusTopLeft}}{{objectBorderRadiusUnit}};
+        border-top-right-radius: {{objectBorderRadiusTopRight}}{{objectBorderRadiusUnit}};
+        border-bottom-left-radius: {{objectBorderRadiusBottomLeft}}{{objectBorderRadiusUnit}};
+        border-bottom-right-radius: {{objectBorderRadiusBottomRight}}{{objectBorderRadiusUnit}};
+        {{else}}
+        border: none;
+        {{/if}}
       }
 
       margin-top: {{rowBodyMarginTop}}px;
@@ -131,9 +160,6 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       overflow: hidden;
       {{/if}}
 
-      {{#if rowBorderIsOn}}
-      border: {{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}};
-      {{/if}}
     }
   `;
 }

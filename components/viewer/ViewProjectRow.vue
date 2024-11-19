@@ -6,15 +6,15 @@
       :row-id="row.id"
     />
     <div class="project-row" :class="{ hidden: !isVisible }">
-      <img
-        v-if="row.image"
-        class="row-image"
-        :src="row.image"
-        :alt="row.title"
-      />
-      <div class="row-body">
-        <div class="row-title">{{ row.title }}</div>
+      <div class="row-header">
+        <img
+          v-if="row.image"
+          class="row-image"
+          :src="row.image"
+          :alt="row.title"
+        />
         <!-- eslint-disable vue/no-v-html -->
+        <div class="row-title" v-html="formatText(row.title)" />
         <div
           v-if="row.titleText"
           class="row-text"
