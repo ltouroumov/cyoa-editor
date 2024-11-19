@@ -76,5 +76,9 @@ const isVisible = computed(() => condition(selectedIds.value));
     display: flex;
     flex-direction: column;
   }
+
+  .row-header {
+    overflow: auto;
+  }
 }
 </style>

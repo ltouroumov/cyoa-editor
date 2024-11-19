@@ -105,9 +105,6 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
 
   static TEMPLATE: string = `
     .project-row {
-      {{#if rowBgColorIsOn}}
-      background-color: {{rowBgColor}};
-      {{/if}}
       
       .row-title {
         font-family: {{rowTitle}};
@@ -136,6 +133,10 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
         {{/if}}
       }
       .row-header {
+        {{#if rowBgColorIsOn}}
+        background-color: {{rowBgColor}};
+        {{/if}}
+      
         margin-left: {{rowMargin}}%;
         margin-right: {{rowMargin}}%;
         
