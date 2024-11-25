@@ -16,5 +16,7 @@
       "id": "worm-v6-lt"
     }
   ],
-  "default": null
+  "default": null,
+  "show_load_file": true,
+  "show_project_sidebar": true
 }

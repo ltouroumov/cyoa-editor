@@ -12,7 +12,7 @@
     </template>
     <template #default>
       <ul class="nav nav-pills mb-3">
-        <li class="nav-item">
+        <li v-if="viewerProjectList.show_project_sidebar" class="nav-item">
           <a
             class="nav-link"
             :class="{ active: selected === 'project' }"

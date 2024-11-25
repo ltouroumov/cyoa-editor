@@ -41,6 +41,7 @@
         </div>
       </li>
       <li
+        v-if="isNil(viewerProjectList.default)"
         class="list-group-item d-flex justify-content-between align-items-center"
       >
         <select
@@ -101,6 +102,8 @@
 </template>
 
 <script setup lang="ts">
+import { isNil } from 'ramda';
+
 import { useSettingRefs } from '~/composables/store/settings';
 import { useViewerRefs } from '~/composables/store/viewer';
 

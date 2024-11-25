@@ -11,6 +11,8 @@ export const useViewerStore = defineStore('viewer', () => {
   const viewerProjectList = ref<ViewerProjectList>({
     items: [],
     default: null,
+    show_load_file: true,
+    show_project_sidebar: true,
   });
 
   const toggleBackpack = (set?: boolean) => {

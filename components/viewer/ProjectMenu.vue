@@ -17,7 +17,7 @@
       </li>
     </ul>
   </div>
-  <div>
+  <div v-if="projectList.show_load_file">
     <h5>Load File</h5>
     <LoadProject />
   </div>
