@@ -83,7 +83,7 @@ const { toggleProjectMenu, viewerProjectList } = useViewerStore();
 const { isProjectMenuVisible } = useViewerRefs();
 const { store } = useProjectRefs();
 
-const selected = ref<string>('project');
+const selected = ref<string>('save-load');
 </script>
 
 <style scoped lang="scss">
