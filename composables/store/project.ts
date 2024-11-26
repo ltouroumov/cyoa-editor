@@ -68,26 +68,18 @@ export const useProjectStore = defineStore('project', () => {
   );
 
   const getRow: ComputedRef<(id: string) => ProjectRow> = computed(() => {
-    const rows: Record<string, ProjectRow> = R.fromPairs(
-      R.map(
-        (row: ProjectRow): [string, ProjectRow] => [row.id, row],
-        project.value?.data.rows ?? [],
-      ),
+    const rows: Record<string, ProjectRow> = R.indexBy(
+      R.prop('id'),
+      project.value?.data.rows ?? [],
     );
 
     return (id: string) => rows[id];
   });
 
   const getObject: ComputedRef<(id: string) => ProjectObj> = computed(() => {
-    const objects: Record<string, ProjectObj> = R.fromPairs(
-      R.chain(
-        (row: ProjectRow) =>
-          R.map(
-            (obj: ProjectObj): [string, ProjectObj] => [obj.id, obj],
-            row.objects,
-          ),
-        project.value?.data.rows ?? [],
-      ),
+    const objects: Record<string, ProjectObj> = R.indexBy(
+      R.prop('id'),
+      R.chain(R.prop('objects'), project.value?.data.rows ?? []),
     );
 
     return (id: string) => objects[id];
@@ -106,6 +98,15 @@ export const useProjectStore = defineStore('project', () => {
     );
 
     return (id: string) => mapping[id];
+  });
+
+  const getPointType: ComputedRef<(id: string) => PointType> = computed(() => {
+    const pointTypes: Record<string, PointType> = R.indexBy(
+      R.prop('id'),
+      project.value?.data.pointTypes ?? [],
+    );
+
+    return (id: string) => pointTypes[id];
   });
 
   const indexMap: ComputedRef<IndexMapT> = computed((): IndexMapT => {
@@ -441,8 +442,13 @@ export const useProjectStore = defineStore('project', () => {
       R.chain(({ obj, count }) => {
         return R.pipe(
           R.filter((score: Score) => {
+            const pointType = getPointType.value(score.id);
             const cond = buildConditions(score);
-            return cond(_selectedIds);
+            return (
+              cond(_selectedIds) &&
+              (R.isEmpty(pointType.activatedId) ||
+                R.includes(pointType.activatedId, _selectedIds))
+            );
           }),
           R.map(({ id, value }: Score): { id: string; value: number } => {
             return {
@@ -479,6 +485,7 @@ export const useProjectStore = defineStore('project', () => {
     getRow,
     getObject,
     getObjectRow,
+    getPointType,
     indexMap,
     setSelected,
     incSelected,

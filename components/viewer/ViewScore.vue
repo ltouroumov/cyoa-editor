@@ -11,6 +11,7 @@
 </template>
 
 <script setup lang="ts">
+import * as R from 'ramda';
 import { computed } from 'vue';
 
 import { buildConditions } from '~/composables/conditions';
@@ -19,10 +20,17 @@ import { useProjectRefs } from '~/composables/store/project';
 
 const { score } = defineProps<{ score: Score }>();
 
-const { selectedIds } = useProjectRefs();
+const { selectedIds, getPointType } = useProjectRefs();
 
 const condition = buildConditions(score);
-const isEnabled = computed<boolean>(() => condition(selectedIds.value));
+const isEnabled = computed<boolean>(() => {
+  const pointType = getPointType.value(score.id);
+  return (
+    condition(selectedIds.value) &&
+    (R.isEmpty(pointType.activatedId) ||
+      R.includes(pointType.activatedId, selectedIds.value))
+  );
+});
 </script>
 
 <style lang="scss">
