@@ -25,7 +25,8 @@ const { setSelected } = useProjectStore();
 const importCode = ref<string>();
 
 const LEGACY_RX =
-  /^(?:[a-zA-Z0-9-]+(?:\/ON#\d+)?)(?:,[a-zA-Z0-9-]+(?:\/ON#\d+)?)*$/;
+  /^(?:[a-zA-Z0-9-_!@&.]+(?:\/ON#\d+)?)(?:,[a-zA-Z0-9-_!@&.]+(?:\/ON#\d+)?)*$/;
+
 function readImportCode() {
   let _code = importCode.value?.trim();
 
