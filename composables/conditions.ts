@@ -24,7 +24,6 @@ export const buildRootCondition = (terms: ConditionTerm[]): ConditionExec => {
   const { code, deps } =
     terms.length === 0 ? ALWAYS : AND(R.map(buildCondition, terms));
 
-  // eslint-disable-next-line no-new-func
   const func = Function('sel', `return ${code}`);
   return {
     exec: func as Term,

@@ -1,3 +1,5 @@
+import Aura from '@primevue/themes/aura';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
@@ -55,12 +57,7 @@ export default defineNuxtConfig({
   ssr: false,
   imports: { autoImport: true },
 
-  css: [
-    '@unocss/reset/normalize.css',
-    '~/assets/css/bootstrap/global.scss',
-    '~/assets/css/toast.scss',
-    '~/assets/css/main.css',
-  ],
+  css: ['@unocss/reset/normalize.css'],
 
   plugins: ['~/plugins/toast.client.ts'],
   devtools: { enabled: true },
@@ -74,11 +71,30 @@ export default defineNuxtConfig({
   ],
 
   modules: [
-    '@unocss/nuxt',
+    '@nuxt/eslint',
     '@pinia/nuxt',
-    'pinia-plugin-persistedstate/nuxt',
+    '@primevue/nuxt-module',
+    '@unocss/nuxt',
     '@vueuse/nuxt',
-    '@nuxt/image',
+    'pinia-plugin-persistedstate/nuxt',
   ],
+
+  primevue: {
+    autoImport: true,
+    components: {
+      prefix: 'Prime',
+    },
+    options: {
+      theme: {
+        preset: Aura,
+        options: {
+          prefix: 'p',
+          darkModeSelector: 'system',
+          cssLayer: false,
+        },
+      },
+    },
+  },
+
   compatibilityDate: '2024-09-04',
 });

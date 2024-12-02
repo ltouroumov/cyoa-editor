@@ -36,7 +36,7 @@ import RowNote from '~/components/viewer/notes/RowNote.vue';
 import { type PackRow, useBackpack } from '~/composables/viewer/useBackpack';
 import { useBuildNotes } from '~/composables/viewer/useBuildNotes';
 
-const { buildNotes, globalNotes } = useBuildNotes();
+const { buildNotes } = useBuildNotes();
 const { packRows } = useBackpack();
 
 const $props = defineProps<{

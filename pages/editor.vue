@@ -1,3 +1,6 @@
 <template>
-  <h1>Editor</h1>
+  <PrimeCard>
+    <template #title>Editor</template>
+    <template #content>Projects ...</template>
+  </PrimeCard>
 </template>

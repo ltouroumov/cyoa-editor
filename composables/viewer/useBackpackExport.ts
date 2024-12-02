@@ -13,7 +13,7 @@ type ExportCodeOptions = {
 
 export function useBackpackExport() {
   const { packRows } = useBackpack();
-  const { getObject, getRow } = useProjectStore();
+  const { getObject } = useProjectStore();
   const { selected } = useProjectRefs();
 
   const formatObject = (obj: ProjectObj, count: number): string => {

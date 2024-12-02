@@ -67,7 +67,10 @@ watch(
 </script>
 
 <style lang="scss">
+@import '~/assets/css/bootstrap/global';
 @import '~/assets/css/bootstrap/config';
+@import '~/assets/css/toast';
+@import '~/assets/css/main';
 
 html {
   font-size: 16px;

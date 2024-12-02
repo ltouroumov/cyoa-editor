@@ -5,7 +5,7 @@
     </div>
     <template v-if="build.selected">
       <div class="actions">
-        <button class="btn btn-outline-primary btn-sm" @click="loadBuild()">
+        <button class="btn btn-sm btn-outline-primary" @click="loadBuild()">
           Load
         </button>
         <button class="btn btn-sm btn-outline-danger" @click="deleteBuild()">
