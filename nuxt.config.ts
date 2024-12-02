@@ -1,6 +1,6 @@
-import Aura from '@primevue/themes/aura';
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { GoldenMorning } from './prime/golden-morning.style.mjs';
+
 export default defineNuxtConfig({
   app: {
     baseURL:
@@ -57,7 +57,13 @@ export default defineNuxtConfig({
   ssr: false,
   imports: { autoImport: true },
 
-  css: ['@unocss/reset/normalize.css'],
+  css: [
+    '@unocss/reset/normalize.css',
+    '~/assets/css/bootstrap/global.scss',
+    '~/assets/css/toast.scss',
+    '~/assets/css/main.css',
+    'primeicons/primeicons.css',
+  ],
 
   plugins: ['~/plugins/toast.client.ts'],
   devtools: { enabled: true },
@@ -81,12 +87,10 @@ export default defineNuxtConfig({
 
   primevue: {
     autoImport: true,
-    components: {
-      prefix: 'Prime',
-    },
+    components: {},
     options: {
       theme: {
-        preset: Aura,
+        preset: GoldenMorning,
         options: {
           prefix: 'p',
           darkModeSelector: 'system',
