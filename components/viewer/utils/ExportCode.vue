@@ -34,7 +34,7 @@
         placeholder="Nothing has been selected yet ..."
         :value="exportText"
       />
-      <div class="d-flex export-text-toggle column-gap-4">
+      <div class="flex export-text-toggle column-gap-4">
         <div class="form-check form-switch">
           <input
             id="sectionTitleSwitch"

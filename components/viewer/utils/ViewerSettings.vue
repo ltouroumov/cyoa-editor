@@ -1,10 +1,8 @@
 <template>
   <div>
     <h5 class="text-center">Viewer</h5>
-    <ul class="list-group mb-5 shadow">
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-      >
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item flex items-center">
         <div class="form-check form-switch">
           <input
             id="lightThemeUI"
@@ -21,9 +19,7 @@
           </label>
         </div>
       </li>
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-      >
+      <li class="list-group-item flex items-center">
         <div class="form-check form-switch">
           <input
             id="hideDisabledAddons"
@@ -42,7 +38,7 @@
       </li>
       <li
         v-if="isNil(viewerProjectList.default)"
-        class="list-group-item d-flex justify-content-between align-items-center"
+        class="list-group-item flex items-center"
       >
         <select
           v-model="cyoaPreferences"
@@ -61,10 +57,8 @@
       </li>
     </ul>
     <h5 class="text-center">Backpack</h5>
-    <ul class="list-group mb-5 shadow">
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-      >
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item flex items-center">
         <div class="form-check form-switch">
           <input
             id="showDisabledAddons"
@@ -81,9 +75,7 @@
           </label>
         </div>
       </li>
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-      >
+      <li class="list-group-item flex items-center">
         <div class="form-check form-switch">
           <input
             id="lockBackpackObjects"

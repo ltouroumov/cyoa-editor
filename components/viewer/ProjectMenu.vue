@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h5>Default Files</h5>
+    <h2 class="text-xl font-bold text-primary">Default Files</h2>
     <ul class="list-group mb-3">
       <li
         v-for="projects in projectList.items"
@@ -18,7 +18,7 @@
     </ul>
   </div>
   <div v-if="projectList.show_load_file">
-    <h5>Load File</h5>
+    <h2 class="text-xl font-bold text-primary">Load File</h2>
     <LoadProject />
   </div>
 </template>

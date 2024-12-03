@@ -58,8 +58,6 @@ export default defineNuxtConfig({
   imports: { autoImport: true },
 
   css: [
-    '@unocss/reset/normalize.css',
-    '~/assets/css/bootstrap/global.scss',
     '~/assets/css/toast.scss',
     '~/assets/css/main.css',
     'primeicons/primeicons.css',
@@ -68,6 +66,13 @@ export default defineNuxtConfig({
   plugins: ['~/plugins/toast.client.ts'],
   devtools: { enabled: true },
   typescript: { typeCheck: true },
+
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
 
   components: [
     {
@@ -80,7 +85,6 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@pinia/nuxt',
     '@primevue/nuxt-module',
-    '@unocss/nuxt',
     '@vueuse/nuxt',
     'pinia-plugin-persistedstate/nuxt',
   ],
@@ -94,7 +98,10 @@ export default defineNuxtConfig({
         options: {
           prefix: 'p',
           darkModeSelector: 'system',
-          cssLayer: false,
+          cssLayer: {
+            name: 'primevue',
+            order: 'tailwind-base, primevue, tailwind-utilities',
+          },
         },
       },
     },

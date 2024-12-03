@@ -1,5 +1,4 @@
 import eslint from '@eslint/js';
-import unocss from '@unocss/eslint-config/flat';
 import importX from 'eslint-plugin-import-x';
 import prettier from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
@@ -18,7 +17,6 @@ export default withNuxt(
     ...tslint.configs.recommended,
     ...vue.configs['flat/recommended'],
     prettier,
-    unocss,
     {
       languageOptions: {
         parser: vueParser,

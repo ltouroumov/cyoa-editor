@@ -5,6 +5,8 @@
     accept="application/json"
     :max-file-size="100 * 1024 * 1024"
     :auto="true"
+    choose-icon="pi pi-file-plus"
+    choose-label="Upload Project"
     @select="onFileSelect"
   />
 </template>

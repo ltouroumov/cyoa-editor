@@ -1,25 +1,22 @@
 <template>
   <div class="load-project">
-    <div class="mb-3">
-      <label class="form-label">Project File</label>
+    <div class="flex flex-row gap-1">
       <input
         ref="fileInput"
-        class="form-control"
+        class="form-control size-auto grow"
         type="file"
         @change="checkCanLoad"
       />
-    </div>
-    <div v-if="error" class="alert alert-danger mb-3" role="alert">
-      {{ error }}
-    </div>
-    <div class="d-flex justify-content-between align-items-center gap-2">
       <button
-        class="btn btn-primary"
+        class="btn btn-primary size-fit"
         :class="{ disabled: !canLoad }"
         @click="loadProjectFile"
       >
         Load Project
       </button>
+    </div>
+    <div v-if="error" class="alert alert-danger mt-2" role="alert">
+      {{ error }}
     </div>
   </div>
 </template>
