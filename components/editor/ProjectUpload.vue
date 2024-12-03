@@ -4,24 +4,28 @@
     :custom-upload="true"
     accept="application/json"
     :max-file-size="100 * 1024 * 1024"
+    :auto="true"
     @select="onFileSelect"
-  >
-  </FileUpload>
+  />
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { useProjectStore } from '~/composables/store/project';
+import { readFileContents } from '~/composables/utils';
 
-const src = ref(null);
+const { loadProject } = useProjectStore();
 
-function onFileSelect(event) {
+async function onFileSelect(event) {
   const file = event.files[0];
-  const reader = new FileReader();
 
-  reader.onload = async (e) => {
-    console.log(e.target.result);
-  };
-
-  reader.readAsDataURL(file);
+  await loadProject(async () => {
+    const data = await readFileContents(file);
+    if (data && typeof data === 'string') {
+      return {
+        fileContents: data,
+        fileName: file.name,
+      };
+    }
+  });
 }
 </script>
