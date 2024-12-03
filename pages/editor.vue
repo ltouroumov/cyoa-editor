@@ -11,6 +11,7 @@
     </div>
     Project Loaded
   </div>
+  <DynamicDialog />
 </template>
 
 <script setup lang="ts">

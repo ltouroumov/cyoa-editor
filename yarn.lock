@@ -3920,12 +3920,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vueuse/rxjs@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "@vueuse/rxjs@npm:12.0.0"
+  dependencies:
+    "@vueuse/shared": 12.0.0
+    vue: ^3.5.13
+  peerDependencies:
+    rxjs: ">=6.0.0"
+  checksum: 74f626ad6e2562d6761ddf45d3e66722c617f8c561dcead50e76c0ee3d6f3be9bcf704af1f59939d187d2360532825a41876453f4326c142a3105a23ee95f5f4
+  languageName: node
+  linkType: hard
+
 "@vueuse/shared@npm:11.0.3":
   version: 11.0.3
   resolution: "@vueuse/shared@npm:11.0.3"
   dependencies:
     vue-demi: ">=0.14.10"
   checksum: cc6e0a585277f5ab04d8abe54121d80086b7666ecfa03ef00cf0c3a11c6944c13a1b282bc55b775b04edde2e433cdda491eabb1eccd04c9fe186c39ce1382bb0
+  languageName: node
+  linkType: hard
+
+"@vueuse/shared@npm:12.0.0":
+  version: 12.0.0
+  resolution: "@vueuse/shared@npm:12.0.0"
+  dependencies:
+    vue: ^3.5.13
+  checksum: 1c150c6936deaba32d87de8097bbcf4fe65b7796828e2f198ae5eeb3af4e7d6c2fe1c67757211cc1e2442c2228a9cfe6bafdfd478dd3d5202c6cff5362047b54
   languageName: node
   linkType: hard
 
@@ -8720,6 +8741,7 @@ __metadata:
     "@types/ramda": ^0.30.2
     "@vueuse/core": ^11.0.3
     "@vueuse/nuxt": ^11.0.3
+    "@vueuse/rxjs": ^12.0.0
     autoprefixer: ^10.4.20
     bootstrap: 5.3.*
     canvas-size: ^2.0.0
@@ -8741,6 +8763,7 @@ __metadata:
     primeicons: ^7.0.0
     primevue: ^4.2.4
     ramda: ^0.30.1
+    rxjs: ^7.8.1
     sass: 1.64.*
     tailwindcss: ^3.4.15
     tailwindcss-primeui: ^0.3.4
@@ -10388,6 +10411,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rxjs@npm:^7.8.1":
+  version: 7.8.1
+  resolution: "rxjs@npm:7.8.1"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: de4b53db1063e618ec2eca0f7965d9137cabe98cf6be9272efe6c86b47c17b987383df8574861bcced18ebd590764125a901d5506082be84a8b8e364bf05f119
+  languageName: node
+  linkType: hard
+
 "safe-buffer@npm:^5.1.0, safe-buffer@npm:~5.2.0":
   version: 5.2.1
   resolution: "safe-buffer@npm:5.2.1"
@@ -11269,6 +11301,13 @@ __metadata:
   version: 9.6.0
   resolution: "ts-toolbelt@npm:9.6.0"
   checksum: 9f35fd95d895a5d32ea9fd2e532a695b0bae6cbff6832b77292efa188a0ed1ed6e54f63f74a8920390f3d909a7a3adb20a144686372a8e78b420246a9bd3d58a
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.1.0":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: e4aba30e632b8c8902b47587fd13345e2827fa639e7c3121074d5ee0880723282411a8838f830b55100cbe4517672f84a2472667d355b81e8af165a55dc6203a
   languageName: node
   linkType: hard
 

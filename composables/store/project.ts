@@ -5,7 +5,6 @@ import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 import { useToast } from 'vue-toastification';
 
-import type { SavedBuildData } from '~/components/viewer/utils/types';
 import { buildConditions } from '~/composables/conditions';
 import type {
   PointType,
@@ -16,6 +15,7 @@ import type {
   ProjectStore,
   Score,
 } from '~/composables/project';
+import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import { bufferToHex, stringToBuffer } from '~/composables/utils';
 
 export type Selections = Record<string, number>;

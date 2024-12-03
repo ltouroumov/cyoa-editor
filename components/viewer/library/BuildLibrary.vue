@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { useToast } from 'vue-toastification';
 
-import type { SavedBuildData } from '~/components/viewer/utils/types';
+import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
 const $toast = useToast();

@@ -80,10 +80,8 @@ import { join, map, toPairs } from 'ramda';
 import { useToast } from 'vue-toastification';
 
 import BuildChoices from '~/components/viewer/library/BuildChoices.vue';
-import {
-  ProjectMatch,
-  type SavedBuildData,
-} from '~/components/viewer/utils/types';
+import { ProjectMatch } from '~/components/viewer/utils/types';
+import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import { type Selections, useProjectRefs } from '~/composables/store/project';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
