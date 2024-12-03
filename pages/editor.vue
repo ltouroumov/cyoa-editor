@@ -41,6 +41,19 @@ const menu = [
   {
     label: 'Project',
     icon: 'iconify solar--file-bold-duotone',
+    items: [
+      {
+        label: 'Save',
+        icon: 'iconify solar--file-download-bold-duotone',
+      },
+      {
+        label: 'Close',
+        icon: 'iconify solar--file-remove-bold-duotone',
+        command: () => {
+          unloadProject();
+        },
+      },
+    ],
   },
   {
     label: 'Features',
@@ -83,10 +96,6 @@ const menu = [
     icon: 'pi pi-envelope',
   },
 ];
-
-const doUnload = () => {
-  unloadProject();
-};
 </script>
 
 <style>
