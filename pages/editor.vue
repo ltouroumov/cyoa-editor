@@ -10,6 +10,9 @@
       <Menubar />
     </div>
     Project Loaded
+    <div v-for="row in project.data.rows" :key="row.id">
+      <div>{{ row.title }}</div>
+    </div>
   </div>
   <DynamicDialog />
 </template>

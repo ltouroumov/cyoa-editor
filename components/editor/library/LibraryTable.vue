@@ -1,6 +1,6 @@
 <template>
   <div class="row pt-2">
-    <div :class="showSidebar ? ['col-8'] : ['col-12']">
+    <div class="col-12">
       <InputGroup>
         <InputGroupAddon>
           <i class="iconify solar--magnifer-line-duotone"></i>
@@ -26,6 +26,7 @@
                     <div class="flex flex-col grow gap-1">
                       <h2
                         class="text-amber-500 text-2xl bold hover:underline hover:cursor-pointer"
+                        @click="doLoad(item.id)"
                       >
                         {{ item.name }}
                       </h2>
@@ -37,6 +38,13 @@
                       </div>
                     </div>
                     <div class="flex flex-row gap-1 items-start">
+                      <Button
+                        v-if="item.currentVersionId"
+                        severity="danger"
+                        size="small"
+                        icon="iconify solar--file-download-bold-duotone"
+                        @click="doDownload(item.id)"
+                      />
                       <Button
                         severity="danger"
                         size="small"
@@ -63,36 +71,97 @@
         </template>
       </DataView>
     </div>
-    <div v-if="showSidebar" class="col-4"></div>
   </div>
 </template>
 <script setup lang="ts">
-import { useObservable } from '@vueuse/rxjs';
-import { liveQuery } from 'dexie';
-import { assoc, includes, isEmpty, isNotNil, omit, pipe } from 'ramda';
-import { from } from 'rxjs';
+import {
+  assoc,
+  clone,
+  includes,
+  isEmpty,
+  isNil,
+  isNotNil,
+  omit,
+  pipe,
+} from 'ramda';
 
-import type { EditorProject } from '~/composables/shared/tables/projects';
+import { EMPTY_PROJECT } from '~/composables/project';
+import type {
+  EditorProject,
+  EditorProjectVersion,
+} from '~/composables/shared/tables/projects';
 import { useDexie } from '~/composables/shared/useDexie';
+import { useLiveQuery } from '~/composables/shared/useLiveQuery';
+import { useProjectStore } from '~/composables/store/project';
 
+const { loadProject } = useProjectStore();
 const dexie = useDexie();
 
-const showSidebar = ref<boolean>(false);
 const search = ref<string>('');
-const projects = useObservable<EditorProject[]>(
-  from(
-    liveQuery(() => {
-      return dexie.projects
-        .filter(
-          (project) =>
-            !project.deleted &&
-            (isEmpty(search.value) ||
-              includes(search.value.toLowerCase(), project.name.toLowerCase())),
-        )
-        .toArray();
-    }),
-  ),
-);
+const projects = useLiveQuery<EditorProject[]>(() => {
+  return dexie.projects
+    .filter(
+      (project) =>
+        !project.deleted &&
+        (isEmpty(search.value) ||
+          includes(search.value.toLowerCase(), project.name.toLowerCase())),
+    )
+    .toArray();
+});
+
+const doLoad = async (id: number) => {
+  const project = (await dexie.projects.get(id))!;
+  if (isNil(project.currentVersionId)) {
+    await loadProject(async () => {
+      const firstVersion: Omit<EditorProjectVersion, 'id'> = {
+        projectId: project.id,
+        data: clone(EMPTY_PROJECT),
+        createdAt: project.createdAt,
+      };
+      const versionId = await dexie.projects_versions.add(firstVersion);
+      const firstVersionWithId: EditorProjectVersion = assoc(
+        'id',
+        versionId,
+        firstVersion,
+      );
+      await dexie.projects.update(project.id, {
+        currentVersionId: versionId,
+      });
+
+      return { project: project, version: firstVersionWithId };
+    });
+  } else {
+    await loadProject(async () => {
+      const version = (await dexie.projects_versions.get(
+        project.currentVersionId!,
+      ))!;
+
+      return { project: project, version: version };
+    });
+  }
+};
+
+const doDownload = async (id: number) => {
+  const project = (await dexie.projects.get(id))!;
+  if (project.currentVersionId) {
+    const version = (await dexie.projects_versions.get(
+      project.currentVersionId,
+    ))!;
+    const projectData = JSON.stringify(version?.data);
+    const projectBlob = new Blob([projectData], { type: 'application/json' });
+    const dataURL = URL.createObjectURL(projectBlob);
+
+    const linkEl = document.createElement('a');
+    linkEl.style.display = 'none';
+    linkEl.download = `project-${version.id}.json`;
+    linkEl.href = dataURL;
+
+    document.body.appendChild(linkEl);
+    linkEl.click();
+
+    URL.revokeObjectURL(dataURL);
+  }
+};
 
 const doDelete = async (id: number) => {
   // Soft-delete the project

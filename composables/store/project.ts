@@ -16,15 +16,24 @@ import type {
   Score,
 } from '~/composables/project';
 import type { SavedBuildData } from '~/composables/shared/tables/builds';
+import type {
+  EditorProject,
+  EditorProjectVersion,
+} from '~/composables/shared/tables/projects';
 import { bufferToHex, stringToBuffer } from '~/composables/utils';
 
 export type Selections = Record<string, number>;
 type Transform = (sel: Selections) => Selections;
 
-export type LoadProjectData = {
-  fileContents: string;
-  fileName: string;
-};
+export type LoadProjectData =
+  | {
+      fileContents: string;
+      fileName: string;
+    }
+  | {
+      project: EditorProject;
+      version: EditorProjectVersion;
+    };
 
 type SetProgressF = (progress: string) => Promise<void>;
 type ProjectProvider = (
@@ -152,29 +161,49 @@ export const useProjectStore = defineStore('project', () => {
         return;
       }
 
-      const { fileContents, fileName } = result;
+      if ('fileContents' in result) {
+        const { fileContents, fileName } = result;
 
-      const hashBytes = await crypto.subtle.digest(
-        'SHA-1',
-        stringToBuffer(fileContents),
-      );
-      const hashHex = bufferToHex(hashBytes);
+        const hashBytes = await crypto.subtle.digest(
+          'SHA-1',
+          stringToBuffer(fileContents),
+        );
+        const hashHex = bufferToHex(hashBytes);
 
-      const data: Project = JSON.parse(fileContents);
-      const projectFile: ProjectFile = {
-        data: data,
-        fileName: fileName,
-        projectId: data?.$projectId,
-        projectName: data.rows[0].title,
-        projectHash: hashHex,
-      };
-      console.log(projectFile);
+        const data: Project = JSON.parse(fileContents);
+        const projectFile: ProjectFile = {
+          data: data,
+          fileName: fileName,
+          projectId: data?.$projectId,
+          projectName: data.rows[0].title,
+          projectHash: hashHex,
+        };
 
-      store.value = {
-        status: 'loaded',
-        file: projectFile,
-      };
-      triggerRef(store);
+        store.value = {
+          status: 'loaded',
+          file: projectFile,
+        };
+        triggerRef(store);
+      } else if ('project' in result) {
+        const { project, version } = result;
+
+        const projectFile: ProjectFile = {
+          data: version.data,
+          projectId: project.id,
+          projectName: project.name,
+          projectHash: `${version.id}`,
+        };
+
+        console.log('Loaded from library', projectFile);
+        store.value = {
+          status: 'loaded',
+          file: projectFile,
+        };
+        triggerRef(store);
+      } else {
+        $toast.error('Failed to load the project :(');
+        store.value = { status: 'empty' };
+      }
     } catch (e) {
       $toast.error('Failed to load the project :(');
       console.log(e);

@@ -15,4 +15,5 @@ export interface EditorProjectVersion {
   projectId: number;
 
   data: Project;
+  createdAt: Date;
 }

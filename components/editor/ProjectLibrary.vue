@@ -16,8 +16,7 @@
               <i class="pi pi-plus"></i>
               New Project
             </Button>
-            <ProjectUpload v-if="store.status === 'empty'" />
-            <ProgressSpinner v-if="store.status === 'loading'" />
+            <ProjectUpload />
           </div>
         </div>
         <LibraryTable />
@@ -29,14 +28,11 @@
 <script setup lang="ts">
 import CreateProjectDialog from '~/components/editor/library/CreateProjectDialog.vue';
 import { useDexie } from '~/composables/shared/useDexie';
-import { useProjectRefs } from '~/composables/store/project';
 
 const dexie = useDexie();
 const dialog = useDialog();
-const { store, project } = useProjectRefs();
 
-const doNewProject = async (event: any) => {
-  console.log('New Project');
+const doNewProject = async () => {
   dialog.open(CreateProjectDialog, {
     props: {
       modal: true,
