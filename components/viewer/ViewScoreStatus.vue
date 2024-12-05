@@ -1,13 +1,14 @@
 <template>
-  <div class="d-flex gap-2" :class="{ 'flex-column': $props.vertical }">
+  <div class="flex gap-2" :class="{ 'flex-column': $props.vertical }">
     <span
       v-for="{ score, value } in activeScores"
       :key="score.id"
-      class="d-flex score flex-row gap-2"
+      class="flex score flex-row"
     >
       <span
         v-if="score.beforeText"
         :class="$props.short ? ['d-none', 'd-sm-block'] : []"
+        class="me-1"
       >
         {{ score.beforeText }}
       </span>

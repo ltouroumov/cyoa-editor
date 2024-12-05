@@ -1,31 +1,29 @@
 <template>
-  <nav
-    class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark-subtle text-white"
-  >
+  <nav class="navbar sticky-top sticky top-0 navbar-expand-lg navbar-dark">
     <div class="menu-container">
-      <div class="d-flex item-menu flex-row items-center">
+      <div class="flex item-menu flex-row items-center">
         <button
-          class="btn btn-light btn-lg i-solar-hamburger-menu-outline"
+          class="btn btn-dark btn-lg iconify solar--hamburger-menu-outline"
           @click="toggleProjectMenu()"
         />
       </div>
       <ViewScoreStatus short class="item-scores" />
-      <div class="d-flex item-tools gap-1">
+      <div class="flex item-tools gap-1 items-center">
         <button
-          class="btn btn-light btn-lg i-solar-magnifer-outline"
+          class="btn btn-dark btn-lg iconify solar--magnifer-outline"
           @click="toggleSearch()"
         />
         <button
-          class="btn btn-light btn-lg i-solar-backpack-outline"
+          class="btn btn-dark btn-lg iconify solar--backpack-outline"
           @click="toggleBackpack()"
         />
         <button
-          class="btn btn-light btn-lg i-solar-notes-outline"
+          class="btn btn-dark btn-lg iconify solar--notes-outline"
           @click="toggleNotes()"
         />
         <button
           v-if="hasLoadedBuild"
-          class="btn btn-lg i-solar-diskette-outline"
+          class="btn btn-dark btn-lg iconify solar--diskette-outline"
           @click="updateCurrentBuild()"
         />
       </div>
@@ -65,7 +63,7 @@ const updateCurrentBuild = async () => {
 @import '~/assets/css/bootstrap/config';
 
 .navbar {
-  position: sticky;
+  background: $dark-bg-subtle-dark;
 }
 
 @media (min-width: 576px) {
