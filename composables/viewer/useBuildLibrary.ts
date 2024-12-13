@@ -8,13 +8,13 @@ import {
 import type {
   SavedBuildData,
   SavedBuildItem,
-} from '~/components/viewer/utils/types';
+} from '~/composables/shared/tables/builds';
+import { useDexie } from '~/composables/shared/useDexie';
 import {
   type Selections,
   useProjectRefs,
   useProjectStore,
 } from '~/composables/store/project';
-import { useDexie } from '~/composables/viewer/useDexie';
 
 type UpdateBuildOptions = Partial<Omit<SavedBuildData, 'id'>> & {
   $choices?: boolean;

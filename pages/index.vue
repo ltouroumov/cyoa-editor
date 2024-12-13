@@ -67,6 +67,7 @@ watch(
 </script>
 
 <style lang="scss">
+@import '~/assets/css/bootstrap/all';
 @import '~/assets/css/bootstrap/config';
 
 html {

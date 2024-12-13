@@ -21,7 +21,7 @@ import { isNotEmpty } from 'ramda';
 import AddNoteButton from '~/components/viewer/notes/AddNoteButton.vue';
 import { useBuildNotes } from '~/composables/viewer/useBuildNotes';
 
-const { globalNotes, createNote, removeNote } = useBuildNotes();
+const { globalNotes, createNote } = useBuildNotes();
 
 defineProps<{
   editable: boolean;
