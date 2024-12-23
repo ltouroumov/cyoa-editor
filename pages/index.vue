@@ -1,9 +1,11 @@
 <template>
   <ProjectViewWrapper />
   <div v-if="store.status === 'empty'" class="dialog-container">
-    <div class="bg-dark-subtle dialog text-light">
-      <ProjectMenu :project-list="viewerProjectList" />
-    </div>
+    <Card class="w-[40%] border border-slate-300">
+      <template #content>
+        <ProjectMenu :project-list="viewerProjectList" />
+      </template>
+    </Card>
   </div>
 </template>
 
@@ -67,8 +69,7 @@ watch(
 </script>
 
 <style lang="scss">
-@import '~/assets/css/bootstrap/all';
-@import '~/assets/css/bootstrap/config';
+@import '~/assets/css/bootstrap/grid';
 
 html {
   font-size: 16px;

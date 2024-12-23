@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { GoldenMorning } from './prime/golden-morning.style.mjs';
+import { GoldMorning } from './prime/gold-morning.style.mjs';
 
 export default defineNuxtConfig({
   app: {
@@ -94,7 +94,7 @@ export default defineNuxtConfig({
     components: {},
     options: {
       theme: {
-        preset: GoldenMorning,
+        preset: GoldMorning,
         options: {
           prefix: 'p',
           darkModeSelector: 'system',
