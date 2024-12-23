@@ -45,7 +45,7 @@
           variant="text"
           severity="contrast"
           :dt="MenuButtonDT"
-          class="iconify solar--diskette-outline"
+          icon="iconify solar--diskette-outline"
           @click="updateCurrentBuild()"
         />
       </div>
