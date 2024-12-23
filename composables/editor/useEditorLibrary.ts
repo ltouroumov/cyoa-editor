@@ -64,17 +64,21 @@ export function useEditorLibrary() {
       version = (await dexie.projects_versions.get(project.currentVersionId!))!;
     }
 
-    editorStore.project = project;
     editorStore.status = 'loading';
+    await nextTick();
+    editorStore.project = project;
     projectStore.loadData(version.data);
+    await nextTick();
     editorStore.status = 'ready';
   }
 
   async function unloadProject() {
-    editorStore.project = null;
     editorStore.status = 'loading';
+    await nextTick();
     projectStore.clearData();
-    editorStore.status = 'ready';
+    editorStore.project = null;
+    await nextTick();
+    editorStore.status = 'empty';
   }
 
   return {

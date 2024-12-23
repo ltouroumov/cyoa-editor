@@ -14,7 +14,7 @@ import type {
   ProjectStyles,
 } from '~/composables/project/types/v2';
 
-export const useProjectStore = defineStore('project', () => {
+export const useProjectStore = defineStore('project-v2', () => {
   const content = ref<ProjectContent>(DefaultProjectContent);
   const config = ref<ProjectConfig>(DefaultProjectConfig);
   const styles = ref<ProjectStyles>(DefaultProjectStyles);

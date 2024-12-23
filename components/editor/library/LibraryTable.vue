@@ -74,6 +74,7 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { assoc, includes, isEmpty, isNotNil, omit, pipe } from 'ramda';
 
@@ -131,7 +132,6 @@ const doDelete = async (id: number) => {
 };
 
 const doClone = async (id: number) => {
-  // Soft-delete the project
   const project = await dexie.projects.get(id);
   if (isNotNil(project)) {
     const newProject = pipe(
