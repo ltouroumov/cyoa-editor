@@ -34,13 +34,16 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
   };
 
   const data = clone(DefaultProject);
+  data.content.children['@root'] = ['@default'];
   data.content.entries['@default'] = {
     id: '@default',
     type: ObjectType.page,
     name: 'Default',
   };
 
+  data.content.children['@default'] = [];
   for (const row of legacy.rows) {
+    data.content.children['@default'].push(row.id);
     data.content.entries[row.id] = {
       id: row.id,
       type: ObjectType.row,

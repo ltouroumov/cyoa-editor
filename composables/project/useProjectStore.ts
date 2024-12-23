@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { prop } from 'ramda';
 
 import {
   DefaultProjectConfig,
@@ -32,6 +33,10 @@ export const useProjectStore = defineStore('project-v2', () => {
     config.value = DefaultProjectConfig;
     styles.value = DefaultProjectStyles;
     media.value = DefaultProjectMedia;
+  }
+
+  function getChildrenIds(id: string): string[] {
+    return prop(id, content.value.children) ?? [];
   }
 
   return {

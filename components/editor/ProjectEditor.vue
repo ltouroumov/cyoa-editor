@@ -29,7 +29,9 @@
         </div>
         <div class="border-t border-surface-700"></div>
       </template>
-      <template #content> </template>
+      <template #content>
+        <component :is="screen.component" v-bind="screen.props ?? {}" />
+      </template>
     </Card>
   </div>
 </template>
@@ -37,29 +39,33 @@
 <script setup lang="ts">
 import type { MenuItem } from 'primevue/menuitem';
 
+import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
+import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const { unloadProject } = useEditorLibrary();
 const editorStore = useEditorStore();
+const projectStore = useProjectStore();
+const { screen } = useScreenDispatch();
 
-const bcHome: MenuItem = {
+const bcHome: MenuItem = ref<MenuItem>({
   label: 'Pages',
   icon: 'iconify solar--documents-line-duotone',
-};
+});
 const bcStack = ref<MenuItem[]>([
-  {
-    label: 'Main',
-    icon: 'iconify solar--document-text-line-duotone',
-  },
-  {
-    label: 'Meta',
-    icon: 'iconify solar--list-line-duotone',
-  },
-  {
-    label: 'You',
-    icon: 'iconify solar--check-square-line-duotone',
-  },
+  // {
+  //   label: 'Main',
+  //   icon: 'iconify solar--document-text-line-duotone',
+  // },
+  // {
+  //   label: 'Meta',
+  //   icon: 'iconify solar--list-line-duotone',
+  // },
+  // {
+  //   label: 'You',
+  //   icon: 'iconify solar--check-square-line-duotone',
+  // },
 ]);
 
 const preview = ref<boolean>(false);
