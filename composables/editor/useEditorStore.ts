@@ -14,6 +14,18 @@ export const useEditorStore = defineStore('editor', () => {
     stack.value = append(screen, stack.value);
   }
 
+  function clearStack() {
+    stack.value = [];
+  }
+
+  function popStack(index?: number) {
+    if (index) {
+      stack.value = stack.value.slice(0, index);
+    } else {
+      stack.value = stack.value.slice(0, -2);
+    }
+  }
+
   return {
     // Data
     status,
@@ -22,5 +34,7 @@ export const useEditorStore = defineStore('editor', () => {
     stack,
     // Functions
     pushScreen,
+    clearStack,
+    popStack,
   };
 });

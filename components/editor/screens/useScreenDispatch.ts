@@ -5,11 +5,11 @@ import { useEditorStore } from '~/composables/editor/useEditorStore';
 
 type ScreenComponent = { component: any; props?: any };
 
-const ContentRoot = defineAsyncComponent(
-  () => import('~/components/editor/screens/content/ContentRoot.vue'),
+const ContentScreen = defineAsyncComponent(
+  () => import('~/components/editor/screens/content/ContentScreen.vue'),
 );
-const ContentPage = defineAsyncComponent(
-  () => import('~/components/editor/screens/content/ContentPage.vue'),
+const PageScreen = defineAsyncComponent(
+  () => import('~/components/editor/screens/content/PageScreen.vue'),
 );
 
 export function useScreenDispatch() {
@@ -18,7 +18,7 @@ export function useScreenDispatch() {
   function dispatchContentScreen(top: any): ScreenComponent {
     switch (top.type) {
       case 'edit-page':
-        return { component: ContentPage, props: { pageId: top.pageId } };
+        return { component: PageScreen, props: { pageId: top.pageId } };
       default:
         return { component: BlankScreen, props: {} };
     }
@@ -28,7 +28,7 @@ export function useScreenDispatch() {
     switch (editorStore.mode) {
       case 'content':
         if (isEmpty(editorStore.stack)) {
-          return { component: ContentRoot };
+          return { component: ContentScreen };
         } else {
           const top = last(editorStore.stack);
           return dispatchContentScreen(top);

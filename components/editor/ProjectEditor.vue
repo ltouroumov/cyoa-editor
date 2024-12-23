@@ -23,8 +23,8 @@
             :model="bcStack"
             :dt="{ background: 'none' }"
           />
-          <div class="flex flex-row items-center pe-4">
-            <Button>New Row</Button>
+          <div>
+            <ScreenActions />
           </div>
         </div>
         <div class="border-t border-surface-700"></div>
@@ -42,18 +42,34 @@ import type { MenuItem } from 'primevue/menuitem';
 import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
-import { useProjectStore } from '~/composables/project/useProjectStore';
+import { mapWithIndex } from '~/composables/utils/mapWithIndex';
 
 const { unloadProject } = useEditorLibrary();
 const editorStore = useEditorStore();
-const projectStore = useProjectStore();
 const { screen } = useScreenDispatch();
 
 const bcHome: MenuItem = ref<MenuItem>({
   label: 'Pages',
   icon: 'iconify solar--documents-line-duotone',
+  command: () => editorStore.clearStack(),
 });
-const bcStack = ref<MenuItem[]>([
+const bcStack = computed<MenuItem[]>(
+  () => {
+    return mapWithIndex((item: any, index: number) => {
+      switch (item.type) {
+        case 'edit-page':
+          return {
+            label: 'Main',
+            icon: 'iconify solar--document-text-line-duotone',
+            command: () => editorStore.popStack(index),
+          };
+        default:
+          return {
+            label: '???',
+          };
+      }
+    }, editorStore.stack ?? []);
+  },
   // {
   //   label: 'Main',
   //   icon: 'iconify solar--document-text-line-duotone',
@@ -66,7 +82,7 @@ const bcStack = ref<MenuItem[]>([
   //   label: 'You',
   //   icon: 'iconify solar--check-square-line-duotone',
   // },
-]);
+);
 
 const preview = ref<boolean>(false);
 const menu = [
