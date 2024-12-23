@@ -1,9 +1,9 @@
 <template>
-  <div class="flex gap-2" :class="{ 'flex-column': $props.vertical }">
+  <div class="flex gap-2" :class="{ 'flex-col': $props.vertical }">
     <span
       v-for="{ score, value } in activeScores"
       :key="score.id"
-      class="flex score flex-row"
+      class="flex score gap-1 flex-row"
     >
       <span
         v-if="score.beforeText"

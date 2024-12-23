@@ -1,86 +1,72 @@
 <template>
-  <ModalDialog
-    :show="isBackpackVisible"
-    size="modal-80"
-    @close="toggleBackpack(false)"
+  <Dialog
+    :visible="isBackpackVisible"
+    modal
+    dismissable-mask
+    class="w-full h-full mx-[2rem]"
+    :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
+    @hide="toggleBackpack(false)"
   >
     <template #header>
-      <h5 class="m-0">Choices</h5>
+      <h5 class="text-primary text-xl">Choices</h5>
     </template>
-    <template #default>
-      <div class="pack-content flex-grow-1 bg-dark">
-        <div class="pack-actions mb-3">
-          <div class="pack-actions-download">
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="exportToImage()"
-            >
-              Download Image (Beta)
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="exportToHtml()"
-            >
-              Download HTML
-            </button>
-          </div>
-          <div v-show="!isLoading" class="flex-column pack-actions-options">
-            <div class="form-check form-switch">
-              <input
-                id="packRowDisabledSwitch"
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                :checked="lockBackpackObjects"
-                @change="toggleLockBackpackObjects()"
-              />
-              <label class="form-check-label" for="packRowDisabledSwitch">
-                Lock Objects in the Backpack
-              </label>
-            </div>
-            <div class="form-check form-switch">
-              <input
-                id="hideDisabledAddons"
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                :checked="disabledAddonsInBackpack"
-                @change="toggleDisabledAddonsInBackpack()"
-              />
-              <label class="form-check-label" for="hideDisabledAddons">
-                Show Disabled Addons
-              </label>
-            </div>
-          </div>
+    <div class="pack-content flex-grow-1 bg-dark">
+      <div class="pack-actions mb-3">
+        <div class="pack-actions-download">
+          <Button @click="exportToImage()"> Download Image (Beta) </Button>
+          <Button @click="exportToHtml()"> Download HTML </Button>
         </div>
-        <BackpackView
-          ref="backpackRef"
-          :vertical-score="!isLoading"
-          :show-title="isLoading"
-        />
-        <div class="pack-import-export">
-          <ImportCode />
-          <ExportCode />
+        <div
+          v-show="!isLoading"
+          class="flex flex-col gap-1 pack-actions-options"
+        >
+          <div class="flex flex-row items-center gap-1">
+            <ToggleSwitch
+              v-model="lockBackpackObjects"
+              input-id="packRowDisabledSwitch"
+            />
+            <label class="form-check-label" for="packRowDisabledSwitch">
+              Lock Objects in the Backpack
+            </label>
+          </div>
+          <div class="flex flex-row items-center gap-1">
+            <ToggleSwitch
+              v-model="disabledAddonsInBackpack"
+              input-id="hideDisabledAddons"
+            />
+            <label class="form-check-label" for="hideDisabledAddons">
+              Show Disabled Addons
+            </label>
+          </div>
         </div>
       </div>
-    </template>
-  </ModalDialog>
+      <BackpackView
+        ref="backpackRef"
+        :vertical-score="!isLoading"
+        :show-title="isLoading"
+      />
+      <div class="flex flex-row gap-2 justify-stretch">
+        <div class="flex flex-col gap-2 grow basis-0">
+          <ImportCode class="grow basis-0" />
+          <div class="my-1 border-t border-surface-700"></div>
+          <ExportCode class="grow basis-0" />
+        </div>
+        <div class="mx-1 border-l border-surface-700"></div>
+        <ExportText class="grow basis-0" />
+      </div>
+    </div>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
-import ModalDialog from '~/components/utils/ModalDialog.vue';
 import BackpackView from '~/components/viewer/utils/BackpackView.vue';
 import ExportCode from '~/components/viewer/utils/ExportCode.vue';
 import ImportCode from '~/components/viewer/utils/ImportCode.vue';
-import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
+import { useSettingRefs } from '~/composables/store/settings';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 import { useBackpackRender } from '~/composables/viewer/useBackpackRender';
 
 const { toggleBackpack } = useViewerStore();
-const { toggleDisabledAddonsInBackpack, toggleLockBackpackObjects } =
-  useSettingStore();
 const { isBackpackVisible } = useViewerRefs();
 const { disabledAddonsInBackpack, lockBackpackObjects } = useSettingRefs();
 const { exportToImage, exportToHtml } = useBackpackRender();
