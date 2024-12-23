@@ -5,26 +5,7 @@
   >
     <ProjectLibrary class="grow w-[80%]" />
   </div>
-  <div v-if="isNotNil(project)" class="container-fluid">
-    <div class="row p-1">
-      <Menubar :model="menu">
-        <template #end>
-          <div class="flex flex-row items-center">
-            <div class="flex flex-row items-center">
-              <label class="me-2">Preview</label>
-              <ToggleSwitch v-model="preview" size="small" variant="outlined" />
-            </div>
-            <Divider layout="vertical" />
-            <h1 class="text-amber-500 text-xl">
-              {{ project.projectName }}
-            </h1>
-          </div>
-        </template>
-      </Menubar>
-    </div>
-    <div v-if="preview">PREVIEW</div>
-    <div v-if="!preview">EDITOR</div>
-  </div>
+  <LazyProjectEditor v-if="isNotNil(project)" />
   <DynamicDialog />
 </template>
 

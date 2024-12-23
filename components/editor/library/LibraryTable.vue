@@ -19,7 +19,7 @@
                 }"
               >
                 <div>
-                  <Skeleton size="5rem" animation="none" />
+                  <Skeleton width="10rem" height="6rem" animation="none" />
                 </div>
                 <div class="flex flex-col grow gap-3">
                   <div class="flex flex-row">
@@ -42,7 +42,7 @@
                         v-if="item.currentVersionId"
                         severity="danger"
                         size="small"
-                        icon="iconify solar--file-download-bold-duotone"
+                        icon="iconify solar--file-download-line-duotone"
                         @click="doDownload(item.id)"
                       />
                       <Button
