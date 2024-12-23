@@ -1,25 +1,27 @@
 <template>
   <div class="build-library">
-    <div class="input-group">
-      <input
-        v-model="buildName"
-        type="text"
-        class="form-control"
-        placeholder="Name of build"
-      />
-      <button class="btn btn-outline-primary" @click="saveBuild">Save</button>
-    </div>
-    <div v-show="loading" class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <div class="build-list">
-      <BuildCard
-        v-for="build in builds"
-        :key="build.id"
-        :build="build"
-        @change="loadBuilds"
-      />
-    </div>
+    <DataView
+      :value="builds"
+      data-key="id"
+      :dt="{ header: { padding: '0 0.5rem 1rem 0.5rem' } }"
+    >
+      <template #header>
+        <div class="flex flex-row gap-1">
+          <InputText v-model="buildName" placeholder="Name of build" fluid />
+          <Button @click="saveBuild"> Save </Button>
+        </div>
+      </template>
+      <template #list="{ items }">
+        <div class="flex flex-col gap-1">
+          <BuildCard
+            v-for="build in items"
+            :key="build.id"
+            :build="build"
+            @change="loadBuilds"
+          />
+        </div>
+      </template>
+    </DataView>
   </div>
 </template>
 

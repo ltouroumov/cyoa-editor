@@ -5,10 +5,8 @@
     </div>
     <template v-if="build.selected">
       <div class="actions">
-        <button class="btn btn-sm btn-outline-primary" @click="loadBuild()">
-          Load
-        </button>
-        <button class="btn btn-sm btn-outline-danger" @click="deleteBuild()">
+        <Button size="small" @click="loadBuild()"> Load </Button>
+        <button size="small" severity="danger" @click="deleteBuild()">
           Delete
         </button>
       </div>
@@ -20,17 +18,17 @@
       <div class="project-name">
         <span v-if="isCompatible === ProjectMatch.Hash" class="compat">
           <div
-            class="i-solar:check-circle-outline h-1em w-1em text-green"
+            class="iconify solar--check-circle-outline h-1em w-1em text-green-500"
           ></div>
         </span>
         <span v-if="isCompatible === ProjectMatch.Name" class="compat">
           <div
-            class="i-solar:check-circle-outline h-1em w-1em text-orange"
+            class="iconify solar--check-circle-outline h-1em w-1em text-orange-500"
           ></div>
         </span>
         <span v-if="isCompatible === ProjectMatch.None" class="compat">
           <div
-            class="i-solar:danger-triangle-bold text-danger h-1em w-1em"
+            class="iconify solar--danger-triangle-bold text-red-500 h-1em w-1em"
           ></div>
         </span>
         <span class="flex-grow-1">{{ build.project.name }}</span>
@@ -42,33 +40,40 @@
         <div class="choices-header">
           <div>Choices</div>
           <div>
-            <button
-              class="btn btn-sm btn-outline-secondary"
+            <Button
+              size="small"
+              variant="text"
+              severity="secondary"
               @click="toggleChoices"
             >
               <div
                 v-if="showChoices"
-                class="i-solar:alt-arrow-down-linear h-1em w-1em"
+                class="iconify solar--alt-arrow-down-linear h-1em w-1em"
               ></div>
               <div
                 v-if="!showChoices"
-                class="i-solar:alt-arrow-right-linear h-1em w-1em"
+                class="iconify solar--alt-arrow-right-linear h-1em w-1em"
               ></div>
-            </button>
+            </Button>
           </div>
         </div>
         <BuildChoices v-show="showChoices" :groups="build.groups" />
       </div>
       <div class="actions">
-        <button class="btn btn-outline-primary btn-sm" @click="loadBuild()">
+        <Button size="small" variant="outlined" @click="loadBuild()">
           Load
-        </button>
-        <button class="btn btn-outline-primary btn-sm" @click="updateBuild()">
+        </Button>
+        <Button size="small" variant="outlined" @click="updateBuild()">
           Save
-        </button>
-        <button class="btn btn-sm btn-outline-danger" @click="deleteBuild()">
+        </Button>
+        <Button
+          size="small"
+          variant="outlined"
+          severity="danger"
+          @click="deleteBuild()"
+        >
           Delete
-        </button>
+        </Button>
       </div>
     </template>
   </div>
