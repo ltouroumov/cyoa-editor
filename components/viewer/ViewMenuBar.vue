@@ -1,34 +1,56 @@
 <template>
-  <nav class="navbar sticky-top sticky top-0 navbar-expand-lg navbar-dark">
-    <div class="menu-container">
-      <div class="flex item-menu flex-row items-center">
-        <button
-          class="btn btn-dark btn-lg iconify solar--hamburger-menu-outline"
+  <Toolbar
+    class="sticky-top sticky top-0"
+    :dt="{ padding: '0.3rem', border: { radius: 0, color: null } }"
+  >
+    <template #start>
+      <div class="flex flex-row items-center">
+        <Button
+          variant="text"
+          icon="iconify solar--hamburger-menu-outline"
+          severity="contrast"
+          :dt="MenuButtonDT"
           @click="toggleProjectMenu()"
         />
       </div>
+    </template>
+    <template #center>
       <ViewScoreStatus short class="item-scores" />
-      <div class="flex item-tools gap-1 items-center">
-        <button
-          class="btn btn-dark btn-lg iconify solar--magnifer-outline"
+    </template>
+    <template #end>
+      <div class="flex gap-1 items-center">
+        <Button
+          variant="text"
+          severity="contrast"
+          icon="iconify solar--magnifer-outline"
+          :dt="MenuButtonDT"
           @click="toggleSearch()"
         />
-        <button
-          class="btn btn-dark btn-lg iconify solar--backpack-outline"
+        <Button
+          variant="text"
+          severity="contrast"
+          :dt="MenuButtonDT"
+          icon="iconify solar--backpack-outline"
           @click="toggleBackpack()"
         />
-        <button
-          class="btn btn-dark btn-lg iconify solar--notes-outline"
+        <Button
+          variant="text"
+          severity="contrast"
+          :dt="MenuButtonDT"
+          icon="iconify solar--notes-outline"
           @click="toggleNotes()"
         />
-        <button
+        <Button
           v-if="hasLoadedBuild"
-          class="btn btn-dark btn-lg iconify solar--diskette-outline"
+          variant="text"
+          severity="contrast"
+          :dt="MenuButtonDT"
+          class="iconify solar--diskette-outline"
           @click="updateCurrentBuild()"
         />
       </div>
-    </div>
-  </nav>
+    </template>
+  </Toolbar>
 </template>
 
 <script setup lang="ts">
@@ -45,6 +67,12 @@ const { toggleBackpack, toggleSearch, toggleProjectMenu, toggleNotes } =
 const { buildData, buildModified } = useProjectRefs();
 const $lib = useBuildLibrary();
 const $toast = useToast();
+
+const MenuButtonDT = {
+  padding: { x: 0, y: 0 },
+  border: { radius: 0 },
+  icon: { only: { width: '2rem' } },
+};
 
 const hasLoadedBuild = computed(() => {
   return isNotNil(buildData.value);
