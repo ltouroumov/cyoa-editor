@@ -1,11 +1,10 @@
 <template>
   <Dialog
-    :visible="isBackpackVisible"
+    v-model:visible="isBackpackVisible"
     modal
     dismissable-mask
     class="w-full h-full mx-[2rem]"
     :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
-    @hide="toggleBackpack(false)"
   >
     <template #header>
       <h5 class="text-primary text-xl">Choices</h5>

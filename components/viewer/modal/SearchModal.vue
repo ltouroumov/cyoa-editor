@@ -1,61 +1,60 @@
 <template>
-  <ModalDialog
-    :show="isSearchVisible"
-    size="modal-80"
-    @close="toggleSearch(false)"
+  <Dialog
+    v-model:visible="isSearchVisible"
+    modal
+    dismissable-mask
+    class="w-full h-full mx-[2rem]"
+    :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
   >
     <template #header>
-      <h5 class="m-0">Search</h5>
+      <h5 class="text-primary text-xl">Search</h5>
     </template>
-    <template #default>
-      <div class="search-modal" :class="{ 'show-view': !!searchView }">
-        <div class="search-header">
-          <input
-            ref="searchInput"
-            v-model="searchText"
-            class="form-control"
-            placeholder="Search CYOA"
-            @input="search"
-          />
-        </div>
-        <div class="search-result-list text-light">
+    <div class="search-modal" :class="{ 'show-view': !!searchView }">
+      <div class="search-header">
+        <InputText
+          ref="searchInput"
+          v-model="searchText"
+          placeholder="Search CYOA"
+          fluid
+          @input="search"
+        />
+      </div>
+      <div class="search-result-list text-light">
+        <div
+          v-for="group in searchResults"
+          :key="group.row.id"
+          class="result-group"
+        >
+          <div class="group-title">{{ group.row.title }}</div>
           <div
-            v-for="group in searchResults"
-            :key="group.row.id"
-            class="result-group"
+            v-for="obj in group.items"
+            :key="obj.id"
+            class="result-item"
+            :class="{ selected: searchView?.obj.id === obj.id }"
+            @click="preview(obj, group.row)"
           >
-            <div class="group-title">{{ group.row.title }}</div>
-            <div
-              v-for="obj in group.items"
-              :key="obj.id"
-              class="result-item"
-              :class="{ selected: searchView?.obj.id === obj.id }"
-              @click="preview(obj, group.row)"
-            >
-              {{ obj.title }}
-            </div>
+            {{ obj.title }}
           </div>
         </div>
-        <div v-if="!!searchView" class="search-result-view text-light">
-          <ViewProjectObj
-            :key="searchView.obj.id"
-            :obj="searchView.obj"
-            :row="searchView.row"
-            :view-object="ViewContext.Viewer"
-            template="1"
-            force-width="col-12"
-          />
-        </div>
       </div>
-    </template>
-  </ModalDialog>
+      <div v-if="!!searchView" class="search-result-view text-light">
+        <ViewProjectObj
+          :key="searchView.obj.id"
+          :obj="searchView.obj"
+          :row="searchView.row"
+          :view-object="ViewContext.Viewer"
+          template="1"
+          force-width="col-12"
+        />
+      </div>
+    </div>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
 import { debounce } from 'perfect-debounce';
 import { all, any, includes, isEmpty } from 'ramda';
 
-import ModalDialog from '~/components/utils/ModalDialog.vue';
 import type { Project, ProjectObj, ProjectRow } from '~/composables/project';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
