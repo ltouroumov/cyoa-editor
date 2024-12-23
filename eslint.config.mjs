@@ -33,6 +33,7 @@ export default withNuxt(
       rules: {
         // Interferes with unused-import
         '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
         'no-console': 'off',
         'vue/multi-word-component-names': 'off',
         'vue/no-multiple-template-root': 'off',

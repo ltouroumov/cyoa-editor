@@ -27,27 +27,22 @@
 
 <script setup lang="ts">
 import CreateProjectDialog from '~/components/editor/library/CreateProjectDialog.vue';
-import { useDexie } from '~/composables/shared/useDexie';
+import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 
-const dexie = useDexie();
+const { createEmptyProject } = useEditorLibrary();
 const dialog = useDialog();
 
 const doNewProject = async () => {
   dialog.open(CreateProjectDialog, {
     props: {
       modal: true,
-      header: 'New Project',
+      header: 'New Index',
       style: {
         width: '50vw',
       },
     },
-    onClose: (opt: any) => {
-      dexie.projects.put({
-        name: opt.data.name,
-        tags: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+    onClose: async (opt: any) => {
+      await createEmptyProject(opt.data.name);
     },
   });
 };

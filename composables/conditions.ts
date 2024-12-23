@@ -2,7 +2,10 @@ import * as R from 'ramda';
 import { isEmpty, map } from 'ramda';
 import { P, match } from 'ts-pattern';
 
-import type { ConditionTerm, HasRequirements } from '~/composables/project';
+import type {
+  ConditionTerm,
+  HasRequirements,
+} from '~/composables/project/types/v1';
 
 export type Term = (selected: string[]) => boolean;
 export type Condition = {

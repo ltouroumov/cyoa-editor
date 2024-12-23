@@ -1,4 +1,4 @@
-import type { ProjectNote } from '~/composables/project';
+import type { ProjectNote } from '~/composables/project/types/v1';
 import type { Selections } from '~/composables/store/project';
 
 export type SavedBuildProject = {

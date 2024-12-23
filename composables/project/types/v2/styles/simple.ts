@@ -1,8 +1,8 @@
-import type { StyleType } from '~/composables/project/types/styles/base';
+import type { StyleType } from '~/composables/project/types/v2/styles/base';
 import type {
   BaseStyle,
   StyleTarget,
-} from '~/composables/project/types/styles/index';
+} from '~/composables/project/types/v2/styles/index';
 
 export interface SimpleTextStyle {
   fontFamily?: string;

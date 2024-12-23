@@ -1,6 +1,11 @@
 import { chain, groupBy, head, map, prop, toPairs } from 'ramda';
 
 import type {
+  ProjectObj,
+  ProjectRow,
+  ProjectStore,
+} from '~/composables/project/types/v1';
+import type {
   SavedBuildGroup,
   SavedBuildItem,
   SavedBuildProject,

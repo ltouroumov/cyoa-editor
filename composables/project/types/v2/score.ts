@@ -1,4 +1,4 @@
-import type { ConditionTerm } from '~/composables/project/types/condition';
+import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 
 export enum ScoreType {
   Gain = 'gain',

@@ -3,7 +3,7 @@
     <Fluid>
       <IftaLabel>
         <InputText v-model="props.name" />
-        <label>Project Name</label>
+        <label>Index Name</label>
       </IftaLabel>
     </Fluid>
     <div class="flex flex-row justify-end">

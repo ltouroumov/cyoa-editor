@@ -1,7 +1,7 @@
 <template>
   <div v-if="compact ? hasNotes : true" class="notes-build">
     <div class="notes-build-header">
-      <div class="notes-build-title">Project Notes</div>
+      <div class="notes-build-title">Index Notes</div>
       <AddNoteButton v-if="editable" @click="createNote(`build`, true)" />
     </div>
     <div class="notes-build-list">

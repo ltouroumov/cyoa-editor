@@ -44,7 +44,7 @@ import { computed } from 'vue';
 
 import StyleRow from '~/components/viewer/style/StyleRow.vue';
 import { buildConditions } from '~/composables/conditions';
-import type { ProjectRow } from '~/composables/project';
+import type { ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import { useSettingRefs } from '~/composables/store/settings';
 import { formatText } from '~/composables/text';

@@ -1,9 +1,9 @@
-import type { ConditionTerm } from '~/composables/project/types/condition';
+import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 import type {
   ObjectBase,
   ObjectType,
-} from '~/composables/project/types/objects/base';
-import type { RowHeader } from '~/composables/project/types/objects/components/header';
+} from '~/composables/project/types/v2/objects/base';
+import type { RowHeader } from '~/composables/project/types/v2/objects/components/header';
 
 export interface RowObject extends ObjectBase {
   type: ObjectType.row;

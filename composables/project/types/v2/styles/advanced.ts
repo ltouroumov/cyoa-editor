@@ -1,11 +1,11 @@
 import type {
   StyleTarget,
   StyleType,
-} from '~/composables/project/types/styles/base';
+} from '~/composables/project/types/v2/styles/base';
 import type {
   BaseStyle,
   SimpleStyle,
-} from '~/composables/project/types/styles/index';
+} from '~/composables/project/types/v2/styles/index';
 
 export type ComponentStyle = string[] | { add?: string[]; remove?: string[] };
 

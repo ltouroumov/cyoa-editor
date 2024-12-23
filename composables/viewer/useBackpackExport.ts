@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 
+import type { ProjectObj } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { type PackRow, useBackpack } from '~/composables/viewer/useBackpack';
 

@@ -4,7 +4,7 @@
       mode="basic"
       custom-upload
       accept="application/json"
-      choose-label="Upload Project"
+      choose-label="Upload Index"
       @select="loadProjectFile"
     />
   </div>

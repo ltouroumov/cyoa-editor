@@ -52,6 +52,7 @@
     "dexie": "^4.0.8",
     "dom-to-svg": "^0.12.2",
     "handlebars": "^4.7.8",
+    "nanoid": "^5.0.9",
     "nuxt": "^3.14.0",
     "perfect-debounce": "^1.0.0",
     "pinia": "^2.2.2",
@@ -64,7 +65,8 @@
     "ts-pattern": "^5.3.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vue-toastification": "next"
+    "vue-toastification": "next",
+    "yup": "^1.6.1"
   },
   "packageManager": "yarn@3.6.3",
   "engines": {

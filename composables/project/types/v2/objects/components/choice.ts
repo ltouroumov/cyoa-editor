@@ -1,6 +1,6 @@
-import type { ConditionTerm } from '~/composables/project/types/condition';
-import type { ObjectCondition } from '~/composables/project/types/objects/components/condition';
-import type { ObjectScore } from '~/composables/project/types/score';
+import type { ConditionTerm } from '~/composables/project/types/v2/condition';
+import type { ObjectCondition } from '~/composables/project/types/v2/objects/components/condition';
+import type { ObjectScore } from '~/composables/project/types/v2/score';
 
 export enum ComponentType {
   Visibility = 'visibility',

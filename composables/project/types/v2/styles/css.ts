@@ -2,7 +2,7 @@ import type {
   BaseStyle,
   StyleTarget,
   StyleType,
-} from '~/composables/project/types/styles/base';
+} from '~/composables/project/types/v2/styles/base';
 
 export interface CSSRules {
   [key: string]: string;

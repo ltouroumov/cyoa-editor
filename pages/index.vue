@@ -30,7 +30,7 @@ const { data: projectList } = await useAsyncData(
 );
 
 if (projectList.value) {
-  console.log('Project List', clone(projectList.value));
+  console.log('Index List', clone(projectList.value));
   viewerProjectList.value = projectList.value;
 }
 

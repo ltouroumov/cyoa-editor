@@ -1,12 +1,12 @@
 import type {
   ObjectBase,
   ObjectType,
-} from '~/composables/project/types/objects/base';
-import type { ComponentMap } from '~/composables/project/types/objects/components/choice';
+} from '~/composables/project/types/v2/objects/base';
+import type { ComponentMap } from '~/composables/project/types/v2/objects/components/choice';
 import type {
   AddonHeader,
   ChoiceHeader,
-} from '~/composables/project/types/objects/components/header';
+} from '~/composables/project/types/v2/objects/components/header';
 
 export interface ChoiceObject extends ObjectBase {
   type: ObjectType.choice;

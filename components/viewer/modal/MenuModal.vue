@@ -10,7 +10,7 @@
         <Tabs value="save-load" :dt="{ tabpanel: { padding: '1rem 0 0 0' } }">
           <TabList>
             <Tab v-if="viewerProjectList.show_project_sidebar" value="project">
-              Project
+              Index
             </Tab>
             <Tab value="save-load">Save / Load</Tab>
             <Tab value="library">Library</Tab>

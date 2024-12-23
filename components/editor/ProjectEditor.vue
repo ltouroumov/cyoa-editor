@@ -9,7 +9,7 @@
           </div>
           <Divider layout="vertical" />
           <h1 class="text-amber-500 text-xl">
-            {{ project!.projectName }}
+            {{ editorStore.project!.name }}
           </h1>
         </div>
       </template>
@@ -37,10 +37,11 @@
 <script setup lang="ts">
 import type { MenuItem } from 'primevue/menuitem';
 
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
+import { useEditorStore } from '~/composables/editor/useEditorStore';
 
-const { unloadProject } = useProjectStore();
-const { project } = useProjectRefs();
+const { unloadProject } = useEditorLibrary();
+const editorStore = useEditorStore();
 
 const bcHome: MenuItem = {
   label: 'Pages',

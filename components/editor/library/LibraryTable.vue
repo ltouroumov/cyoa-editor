@@ -31,7 +31,8 @@
                         {{ item.name }}
                       </h2>
                       <span class="text-sm text-surface-500">
-                        Last Modified: 2024-01-01
+                        <span>Last Modified: 2024-01-01</span> /
+                        <span>Version: {{ item.currentVersionId }}</span>
                       </span>
                       <div>
                         <Tag>Worm</Tag>
@@ -74,27 +75,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import {
-  assoc,
-  clone,
-  includes,
-  isEmpty,
-  isNil,
-  isNotNil,
-  omit,
-  pipe,
-} from 'ramda';
+import { assoc, includes, isEmpty, isNotNil, omit, pipe } from 'ramda';
 
-import { EMPTY_PROJECT } from '~/composables/project';
-import type {
-  EditorProject,
-  EditorProjectVersion,
-} from '~/composables/shared/tables/projects';
+import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
+import type { EditorProject } from '~/composables/shared/tables/projects';
 import { useDexie } from '~/composables/shared/useDexie';
 import { useLiveQuery } from '~/composables/shared/useLiveQuery';
-import { useProjectStore } from '~/composables/store/project';
 
-const { loadProject } = useProjectStore();
+const { loadProject } = useEditorLibrary();
 const dexie = useDexie();
 
 const search = ref<string>('');
@@ -110,35 +98,7 @@ const projects = useLiveQuery<EditorProject[]>(() => {
 });
 
 const doLoad = async (id: number) => {
-  const project = (await dexie.projects.get(id))!;
-  if (isNil(project.currentVersionId)) {
-    await loadProject(async () => {
-      const firstVersion: Omit<EditorProjectVersion, 'id'> = {
-        projectId: project.id,
-        data: clone(EMPTY_PROJECT),
-        createdAt: project.createdAt,
-      };
-      const versionId = await dexie.projects_versions.add(firstVersion);
-      const firstVersionWithId: EditorProjectVersion = assoc(
-        'id',
-        versionId,
-        firstVersion,
-      );
-      await dexie.projects.update(project.id, {
-        currentVersionId: versionId,
-      });
-
-      return { project: project, version: firstVersionWithId };
-    });
-  } else {
-    await loadProject(async () => {
-      const version = (await dexie.projects_versions.get(
-        project.currentVersionId!,
-      ))!;
-
-      return { project: project, version: version };
-    });
-  }
+  await loadProject(id);
 };
 
 const doDownload = async (id: number) => {

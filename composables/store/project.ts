@@ -7,14 +7,16 @@ import { useToast } from 'vue-toastification';
 
 import { buildConditions } from '~/composables/conditions';
 import type {
+  LoadingProjectStore,
   PointType,
+  Project,
   ProjectFile,
   ProjectNote,
   ProjectObj,
   ProjectRow,
   ProjectStore,
   Score,
-} from '~/composables/project';
+} from '~/composables/project/types/v1';
 import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import type {
   EditorProject,
@@ -179,22 +181,6 @@ export const useProjectStore = defineStore('project', () => {
           projectHash: hashHex,
         };
 
-        store.value = {
-          status: 'loaded',
-          file: projectFile,
-        };
-        triggerRef(store);
-      } else if ('project' in result) {
-        const { project, version } = result;
-
-        const projectFile: ProjectFile = {
-          data: version.data,
-          projectId: project.id,
-          projectName: project.name,
-          projectHash: `${version.id}`,
-        };
-
-        console.log('Loaded from library', projectFile);
         store.value = {
           status: 'loaded',
           file: projectFile,
