@@ -31,7 +31,7 @@ const config = useRuntimeConfig();
 const { viewerProjectList } = useViewerRefs();
 const { loadProject } = useProjectStore();
 const { hasPreference } = useSettingStore();
-const { cyoaPreference } = useSettingRefs();
+const { loadProjectOnStartup } = useSettingRefs();
 
 type BackgroundImageData = {
   url: string;
@@ -74,11 +74,11 @@ onMounted(async () => {
 
   if (
     hasPreference() &&
-    cyoaPreference.value &&
+    loadProjectOnStartup.value &&
     store.value.status === 'empty'
   ) {
     shouldLoadProject = true;
-    project = getProjectData(cyoaPreference.value)!;
+    project = getProjectData(loadProjectOnStartup.value)!;
   }
 
   if (isNotNil(viewerProjectList.value.default)) {
