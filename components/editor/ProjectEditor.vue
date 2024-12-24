@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col p-2 gap-2 h-full">
+  <div class="flex flex-col p-2 gap-2 h-full w-full">
     <Menubar :model="menu" class="rounded">
       <template #end>
         <div class="flex flex-row items-center">

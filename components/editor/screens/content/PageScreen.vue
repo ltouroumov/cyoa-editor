@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 grow">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
       <div class="grid grid-cols-form gap-2 items-center">
         <label class="font-bold" for="pageName">Name</label>
         <InputText v-model="page.name" fluid />
@@ -33,15 +33,15 @@
       </template>
       <template #list="{ items }">
         <div class="flex flex-col">
-          <div v-for="(item, index) in items" :key="index">
-            <RowCard
-              :row-id="item.id"
-              :class="{
-                'border-t border-surface-200 dark:border-surface-700':
-                  index !== 0,
-              }"
-            />
-          </div>
+          <RowCard
+            v-for="(item, index) in items"
+            :key="index"
+            :row-id="item.id"
+            :class="{
+              'border-t border-surface-200 dark:border-surface-700':
+                index !== 0,
+            }"
+          />
         </div>
       </template>
     </DataView>

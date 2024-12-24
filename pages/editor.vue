@@ -15,7 +15,6 @@ const editorStore = useEditorStore();
 
 body {
   background: var(--p-stone-700);
-  width: 100vw;
   height: 100vh;
 }
 </style>
