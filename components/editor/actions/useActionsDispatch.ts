@@ -18,6 +18,7 @@ export function useActionsDispatch() {
           {
             label: 'New Row',
             icon: 'iconify solar--list-line-duotone',
+            severity: 'secondary',
           },
         ];
       default:
@@ -26,13 +27,14 @@ export function useActionsDispatch() {
   }
 
   const actions = computed((): ActionItem[] => {
-    switch (editorStore.mode) {
+    switch (editorStore.root) {
       case 'content':
         if (isEmpty(editorStore.stack)) {
           return [
             {
               label: 'New Page',
               icon: 'iconify solar--add-circle-line-duotone',
+              severity: 'secondary',
             },
           ];
         } else {

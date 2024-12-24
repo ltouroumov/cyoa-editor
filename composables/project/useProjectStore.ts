@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { prop } from 'ramda';
+import { clone, prop } from 'ramda';
 
 import {
   DefaultProjectConfig,
@@ -14,6 +14,11 @@ import type {
   ProjectMedia,
   ProjectStyles,
 } from '~/composables/project/types/v2';
+import type {
+  ChildObject,
+  ObjectMap,
+} from '~/composables/project/types/v2/objects';
+import type { ObjectType } from '~/composables/project/types/v2/objects/base';
 
 export const useProjectStore = defineStore('project-v2', () => {
   const content = ref<ProjectContent>(DefaultProjectContent);
@@ -21,11 +26,20 @@ export const useProjectStore = defineStore('project-v2', () => {
   const styles = ref<ProjectStyles>(DefaultProjectStyles);
   const media = ref<ProjectMedia>(DefaultProjectMedia);
 
-  function loadData(project: Project) {
+  function importData(project: Project) {
     content.value = project.content;
     config.value = project.config;
     styles.value = project.styles;
     media.value = project.media;
+  }
+
+  function exportData(): Project {
+    return {
+      content: clone(content.value),
+      config: clone(config.value),
+      styles: clone(styles.value),
+      media: clone(media.value),
+    };
   }
 
   function clearData() {
@@ -35,7 +49,19 @@ export const useProjectStore = defineStore('project-v2', () => {
     media.value = DefaultProjectMedia;
   }
 
-  function getChildrenIds(id: string): string[] {
+  function get<T extends ObjectType>(
+    id: string,
+    type: T,
+  ): ObjectMap[T] | undefined {
+    const object = prop(id, content.value.objects);
+    if (object.type === type) {
+      return object as ObjectMap[T];
+    } else {
+      return undefined;
+    }
+  }
+
+  function getChildren(id: string): ChildObject[] {
     return prop(id, content.value.children) ?? [];
   }
 
@@ -45,8 +71,12 @@ export const useProjectStore = defineStore('project-v2', () => {
     config,
     styles,
     media,
+    // Getters
+    get,
+    getChildren,
     // Utility Functions
-    loadData,
+    importData,
+    exportData,
     clearData,
   };
 });

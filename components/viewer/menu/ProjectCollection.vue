@@ -42,7 +42,8 @@
 <script setup lang="ts">
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
-import { bufferToString, sleep } from '~/composables/utils';
+import { bufferToString } from '~/composables/utils';
+import { sleep } from '~/composables/utils/sleep';
 import type { ViewerProjectList } from '~/composables/viewer';
 
 const { projectList } = defineProps<{

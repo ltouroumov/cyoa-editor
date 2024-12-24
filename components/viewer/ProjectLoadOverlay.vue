@@ -25,6 +25,7 @@ import { isEmpty, isNotNil } from 'ramda';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
 import { useViewerRefs } from '~/composables/store/viewer';
+import { sleep } from '~/composables/utils/sleep';
 
 const { store } = useProjectRefs();
 const config = useRuntimeConfig();
@@ -45,7 +46,9 @@ const _config = useRuntimeConfig();
 const { data: backgroundConfig } = await useAsyncData(
   'backgrounds',
   (): Promise<BackgroundData> =>
-    $fetch(`${_config.app.baseURL}config/viewer/backgrounds.json`),
+    fetch(`${_config.app.baseURL}config/viewer/backgrounds.json`).then(
+      (response) => response.json(),
+    ),
 );
 
 const background = ref<string | null>(null);

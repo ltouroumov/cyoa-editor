@@ -15,15 +15,15 @@
       </template>
     </Menubar>
     <div v-if="preview">PREVIEW</div>
-    <Card v-if="!preview" class="grow rounded">
+    <Card
+      v-if="!preview"
+      class="grow rounded"
+      :dt="{ body: { padding: '1rem' } }"
+    >
       <template #header>
         <div class="flex flex-row justify-between">
-          <Breadcrumb
-            :home="bcHome"
-            :model="bcStack"
-            :dt="{ background: 'none' }"
-          />
-          <div>
+          <EditorBreadcrumbs />
+          <div class="flex flex-row items-center">
             <ScreenActions />
           </div>
         </div>
@@ -37,52 +37,14 @@
 </template>
 
 <script setup lang="ts">
-import type { MenuItem } from 'primevue/menuitem';
-
+import EditorBreadcrumbs from '~/components/editor/screens/EditorBreadcrumbs.vue';
 import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
-import { mapWithIndex } from '~/composables/utils/mapWithIndex';
 
-const { unloadProject } = useEditorLibrary();
+const { unloadProject, saveProject } = useEditorLibrary();
 const editorStore = useEditorStore();
 const { screen } = useScreenDispatch();
-
-const bcHome: MenuItem = ref<MenuItem>({
-  label: 'Pages',
-  icon: 'iconify solar--documents-line-duotone',
-  command: () => editorStore.clearStack(),
-});
-const bcStack = computed<MenuItem[]>(
-  () => {
-    return mapWithIndex((item: any, index: number) => {
-      switch (item.type) {
-        case 'edit-page':
-          return {
-            label: 'Main',
-            icon: 'iconify solar--document-text-line-duotone',
-            command: () => editorStore.popStack(index),
-          };
-        default:
-          return {
-            label: '???',
-          };
-      }
-    }, editorStore.stack ?? []);
-  },
-  // {
-  //   label: 'Main',
-  //   icon: 'iconify solar--document-text-line-duotone',
-  // },
-  // {
-  //   label: 'Meta',
-  //   icon: 'iconify solar--list-line-duotone',
-  // },
-  // {
-  //   label: 'You',
-  //   icon: 'iconify solar--check-square-line-duotone',
-  // },
-);
 
 const preview = ref<boolean>(false);
 const menu = [
@@ -93,6 +55,9 @@ const menu = [
       {
         label: 'Save',
         icon: 'iconify solar--file-download-bold-duotone',
+        command: async () => {
+          await saveProject();
+        },
       },
       {
         label: 'Close',

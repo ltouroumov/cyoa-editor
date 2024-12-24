@@ -13,7 +13,7 @@ export const V2ProjectSchema = object({
   }),
 
   content: object({
-    entries: object(),
+    objects: object(),
     children: object(),
     scores: object(),
   }),

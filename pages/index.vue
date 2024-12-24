@@ -26,7 +26,9 @@ const _config = useRuntimeConfig();
 const { data: projectList } = await useAsyncData(
   'projects',
   (): Promise<ViewerProjectList> =>
-    $fetch(`${_config.app.baseURL}config/viewer/projects.json`),
+    fetch(`${_config.app.baseURL}config/viewer/projects.json`).then(
+      (response) => response.json(),
+    ),
 );
 
 if (projectList.value) {

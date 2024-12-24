@@ -4,6 +4,7 @@ import type {
   ObjectType,
 } from '~/composables/project/types/v2/objects/base';
 import type { RowHeader } from '~/composables/project/types/v2/objects/components/header';
+import type { RowLayoutProps } from '~/composables/project/types/v2/objects/layout';
 
 export interface RowObject extends ObjectBase {
   type: ObjectType.row;
@@ -11,6 +12,8 @@ export interface RowObject extends ObjectBase {
 
   style?: string;
   header?: RowHeader;
+
+  layout?: RowLayoutProps;
 
   requirements?: {
     // Condition to display the row

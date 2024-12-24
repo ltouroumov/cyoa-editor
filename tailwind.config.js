@@ -11,8 +11,17 @@ module.exports = {
     './app.vue',
     './error.vue',
   ],
+  safelist: [{ pattern: /col-span-(\d+)/ }],
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateColumns: {
+        form: 'max-content 1fr',
+      },
+      flexGrow: {
+        2: '2',
+        3: '3',
+      },
+    },
   },
   plugins: [tailwindPrimeUI, addIconSelectors(['carbon', 'solar'])],
 };

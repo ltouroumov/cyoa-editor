@@ -1,10 +1,11 @@
 <template>
-  <div class="flex flex-row items-center pe-4">
+  <div class="pe-4">
     <div v-for="(action, index) in actions" :key="index">
       <Button
         :label="action.label"
         :icon="action.icon"
         :severity="action.severity"
+        size="small"
       />
     </div>
   </div>

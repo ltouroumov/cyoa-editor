@@ -1,6 +1,9 @@
 import type { BackpackRow } from '~/composables/project/types/v2/backpack';
 import type { ProjectImage } from '~/composables/project/types/v2/media';
-import type { AnyObject } from '~/composables/project/types/v2/objects';
+import type {
+  AnyObject,
+  ChildObject,
+} from '~/composables/project/types/v2/objects';
 import type { ProjectScore } from '~/composables/project/types/v2/score';
 import type {
   AnyStyle,
@@ -9,9 +12,9 @@ import type {
 
 export interface ProjectContent {
   // Index objects (pages, rows, choices, etc.)
-  entries: Record<string, AnyObject>;
+  objects: Record<string, AnyObject>;
   // Links between objects (parent -> child relations)
-  children: Record<string, string[]>;
+  children: Record<string, ChildObject[]>;
   // Index scores
   scores: Record<string, ProjectScore>;
 }

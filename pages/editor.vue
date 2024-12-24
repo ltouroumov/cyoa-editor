@@ -1,11 +1,6 @@
 <template>
-  <div
-    v-if="editorStore.status !== 'ready'"
-    class="flex flex-col justify-stretch items-center py-5 h-[100%]"
-  >
-    <ProjectLibrary class="grow w-[80%]" />
-  </div>
-  <LazyProjectEditor v-if="editorStore.status === 'ready'" />
+  <LazyProjectLibrary v-if="editorStore.mode == 'library'" />
+  <LazyProjectEditor v-if="editorStore.mode === 'editor'" />
   <DynamicDialog />
 </template>
 

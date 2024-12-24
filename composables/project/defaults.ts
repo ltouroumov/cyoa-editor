@@ -8,7 +8,7 @@ import type {
 import { StyleTarget } from '~/composables/project/types/v2/styles';
 
 export const DefaultProjectContent: ProjectContent = {
-  entries: {},
+  objects: {},
   children: {},
   scores: {},
 };

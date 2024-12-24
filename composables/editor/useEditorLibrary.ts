@@ -3,6 +3,7 @@ import { assoc, clone, isNil } from 'ramda';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import { DefaultProject } from '~/composables/project/defaults';
 import { importProject } from '~/composables/project/import';
+import type { Project } from '~/composables/project/types/v2';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 import type { EditorProjectVersion } from '~/composables/shared/tables/projects';
 import { useDexie } from '~/composables/shared/useDexie';
@@ -20,23 +21,29 @@ export function useEditorLibrary() {
       updatedAt: new Date(),
     });
 
-    await createEmptyVersion(projectId);
+    const version = await createEmptyVersion(projectId);
+    await dexie.projects.update(projectId, {
+      currentVersionId: version.id,
+    });
   }
 
   async function createEmptyVersion(
     projectId: number,
   ): Promise<EditorProjectVersion> {
+    return createVersion(projectId, DefaultProject);
+  }
+
+  async function createVersion(
+    projectId: number,
+    data: Project,
+  ): Promise<EditorProjectVersion> {
     const version: Omit<EditorProjectVersion, 'id'> = {
       projectId: projectId,
       createdAt: new Date(),
-      data: clone(DefaultProject),
+      data: clone(data),
     };
 
     const versionId = await dexie.projects_versions.put(version);
-    await dexie.projects.update(projectId, {
-      currentVersionId: versionId,
-    });
-
     return assoc('id', versionId, version);
   }
 
@@ -64,28 +71,38 @@ export function useEditorLibrary() {
       version = (await dexie.projects_versions.get(project.currentVersionId!))!;
     }
 
-    editorStore.status = 'loading';
-    await nextTick();
-    editorStore.project = project;
-    projectStore.loadData(version.data);
-    await nextTick();
-    editorStore.status = 'ready';
+    await editorStore.withLoadingState(async () => {
+      editorStore.project = project;
+      editorStore.version = version;
+      projectStore.importData(version.data);
+      editorStore.mode = 'editor';
+    });
   }
 
   async function unloadProject() {
-    editorStore.status = 'loading';
-    await nextTick();
-    projectStore.clearData();
-    editorStore.project = null;
-    await nextTick();
-    editorStore.status = 'empty';
+    await editorStore.withLoadingState(async () => {
+      projectStore.clearData();
+      editorStore.project = null;
+      editorStore.version = null;
+      editorStore.mode = 'library';
+    });
+  }
+
+  async function saveProject() {
+    await editorStore.withLoadingState(async () => {
+      const projectId = editorStore.project!.id;
+      const version = await createVersion(projectId, projectStore.exportData());
+      await dexie.projects.update(projectId, {
+        currentVersionId: version.id,
+      });
+    });
   }
 
   return {
     createEmptyProject,
-    createEmptyVersion,
     importProjectFile,
     loadProject,
     unloadProject,
+    saveProject,
   };
 }
