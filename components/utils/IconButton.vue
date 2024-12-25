@@ -7,6 +7,7 @@
     pt:root:class="leading-none p-0 w-[2.5rem] h-[2.0rem]"
     pt:icon:class="leading-none text-[1.5rem] w-[1.5rem] h-[1.5rem]"
     v-bind="$props.pt?.button ?? {}"
+    @click="$emit('click')"
   />
 </template>
 

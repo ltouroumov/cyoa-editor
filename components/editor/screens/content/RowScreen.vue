@@ -29,7 +29,7 @@
           v-for="(item, index) in items"
           :key="index"
           :choice-id="item.id"
-          :class="`col-span-${item.layout?.width ?? row.layout?.defaultWidth ?? 12}`"
+          :class="`col-span-${item.layout?.width ?? row.layout?.itemWidth ?? 12}`"
         />
       </div>
     </template>

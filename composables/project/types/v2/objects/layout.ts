@@ -1,5 +1,6 @@
 export interface RowLayoutProps {
-  defaultWidth?: number;
+  itemAlign: 'left' | 'center' | 'right';
+  itemWidth: number;
 }
 
 export interface LayoutChildProps {

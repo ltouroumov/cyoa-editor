@@ -13,12 +13,14 @@ export interface RowObject extends ObjectBase {
   style?: string;
   header?: RowHeader;
 
-  layout?: RowLayoutProps;
+  layout: RowLayoutProps;
 
-  requirements?: {
+  requirements: {
     // Condition to display the row
     display?: ConditionTerm;
     // Condition that applies to all choices
     choices?: ConditionTerm;
+    // Number of allowed choices
+    allowedChoices?: number;
   };
 }

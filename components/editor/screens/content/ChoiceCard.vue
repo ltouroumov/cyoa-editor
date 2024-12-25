@@ -2,18 +2,14 @@
   <div class="flex flex-col gap-2 rounded border border-surface-700 p-3">
     <div class="flex flex-row justify-between">
       <div class="flex flex-row gap-2">
-        <Button
-          variant="outlined"
+        <IconButton
+          outlined
           severity="secondary"
-          size="small"
           icon="iconify solar--arrow-left-line-duotone"
-          pt:root:class="leading-none p-0"
-          pt:icon:class="leading-none text-[1.5rem]"
         />
-        <Button
-          variant="outlined"
+        <IconButton
+          outlined
           severity="secondary"
-          size="small"
           icon="iconify solar--arrow-right-line-duotone"
         />
       </div>

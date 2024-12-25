@@ -22,7 +22,7 @@
                   <Skeleton width="10rem" height="6rem" animation="none" />
                 </div>
                 <div class="flex flex-col grow gap-3">
-                  <div class="flex flex-row">
+                  <div class="flex flex-row items-start">
                     <div class="flex flex-col grow gap-1">
                       <h2
                         class="text-amber-500 text-2xl bold hover:underline hover:cursor-pointer"
@@ -38,7 +38,7 @@
                         <Tag>Worm</Tag>
                       </div>
                     </div>
-                    <div class="flex flex-row gap-1 items-start">
+                    <div class="flex flex-row gap-1">
                       <IconButton
                         v-if="item.currentVersionId"
                         severity="secondary"
@@ -46,14 +46,15 @@
                         @click="doDownload(item.id)"
                       />
                       <IconButton
-                        severity="danger"
-                        icon="iconify solar--trash-bin-trash-linear"
-                        @click="doDelete(item.id)"
-                      />
-                      <IconButton
                         severity="secondary"
                         icon="iconify solar--copy-bold-duotone"
                         @click="doClone(item.id)"
+                      />
+                      <div class="border-l border-surface-700 mx-1"></div>
+                      <IconButton
+                        severity="danger"
+                        icon="iconify solar--trash-bin-trash-linear"
+                        @click="doDelete(item.id)"
                       />
                     </div>
                   </div>
