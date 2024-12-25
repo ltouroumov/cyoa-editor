@@ -2,21 +2,7 @@ import { definePreset } from '@primeuix/styled';
 import Aura from '@primevue/themes/aura';
 
 export const GoldMorning = definePreset(Aura, {
-  // primitive: {
-  //   blue: {
-  //     50: '#e7f1ff',
-  //     100: '#cfe2ff',
-  //     200: '#9ec5fe',
-  //     300: '#6ea8fe',
-  //     400: '#3d8bfd',
-  //     500: '#0d6efd',
-  //     600: '#0a58ca',
-  //     700: '#084298',
-  //     800: '#052c65',
-  //     900: '#031633',
-  //     950: '#010b19',
-  //   },
-  // },
+  components: {},
   semantic: {
     primary: {
       50: '{amber.50}',

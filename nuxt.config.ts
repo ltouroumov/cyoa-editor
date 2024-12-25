@@ -64,7 +64,8 @@ export default defineNuxtConfig({
   ],
 
   plugins: ['~/plugins/toast.client.ts'],
-  devtools: { enabled: true },
+  // LT: Disabled because the performance hit on reactivity is way too high
+  devtools: { enabled: false },
   typescript: { typeCheck: true },
 
   postcss: {

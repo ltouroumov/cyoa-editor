@@ -1,29 +1,28 @@
 <template>
-  <Breadcrumb :home="bcHome" :model="bcStack" :dt="{ background: 'none' }">
-    <!-- <template #item="{ item }">
-      <a
-        href="#"
-        class="p-breadcrumb-item-link"
-        data-pc-section="itemlink"
-        @click="item.command"
-      >
-        <span
-          class="p-breadcrumb-item-icon"
-          :class="item.icon"
-          data-pc-section="itemicon"
-        />
-        <span class="p-breadcrumb-item-label" data-pc-section="itemlabel">
-          {{ item.label }}
-        </span>
-      </a>
-    </template> -->
-  </Breadcrumb>
+  <div class="flex flex-row items-center ps-2">
+    <Button
+      variant="text"
+      severity="secondary"
+      label="Back"
+      icon="iconify solar--alt-arrow-left-line-duotone"
+      :disabled="bcStack.length === 0"
+      @click="popScreen()"
+    />
+    <div class="h-1/2 mx-2 border-l border-surface-700"></div>
+    <Breadcrumb :home="bcHome" :model="bcStack" :dt="{ background: 'none' }" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
+import { useEditorStore } from '~/composables/editor/useEditorStore';
 
 const { bcHome, bcStack } = useScreenDispatch();
+const editorStore = useEditorStore();
+
+function popScreen() {
+  editorStore.popStack();
+}
 </script>
 
 <style scoped lang="scss"></style>

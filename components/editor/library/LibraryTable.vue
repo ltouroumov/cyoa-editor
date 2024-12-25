@@ -39,22 +39,19 @@
                       </div>
                     </div>
                     <div class="flex flex-row gap-1 items-start">
-                      <Button
+                      <IconButton
                         v-if="item.currentVersionId"
-                        severity="danger"
-                        size="small"
+                        severity="secondary"
                         icon="iconify solar--file-download-line-duotone"
                         @click="doDownload(item.id)"
                       />
-                      <Button
+                      <IconButton
                         severity="danger"
-                        size="small"
                         icon="iconify solar--trash-bin-trash-linear"
                         @click="doDelete(item.id)"
                       />
-                      <Button
+                      <IconButton
                         severity="secondary"
-                        size="small"
                         icon="iconify solar--copy-bold-duotone"
                         @click="doClone(item.id)"
                       />

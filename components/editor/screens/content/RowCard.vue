@@ -1,15 +1,13 @@
 <template>
   <div class="flex flex-row gap-3 py-2 items-start">
     <div class="flex flex-row gap-2">
-      <Button
-        variant="outlined"
-        size="small"
+      <IconButton
+        outlined
         severity="secondary"
         icon="iconify solar--arrow-up-line-duotone"
       />
-      <Button
-        variant="outlined"
-        size="small"
+      <IconButton
+        outlined
         severity="secondary"
         icon="iconify solar--arrow-down-line-duotone"
       />

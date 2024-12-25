@@ -1,33 +1,49 @@
 import { defineStore } from 'pinia';
-import { clone, prop } from 'ramda';
+import { clone, isNil } from 'ramda';
 
 import {
+  DefaultProject,
   DefaultProjectConfig,
-  DefaultProjectContent,
   DefaultProjectMedia,
   DefaultProjectStyles,
 } from '~/composables/project/defaults';
 import type {
   Project,
   ProjectConfig,
-  ProjectContent,
   ProjectMedia,
   ProjectStyles,
 } from '~/composables/project/types/v2';
 import type {
+  AnyObject,
   ChildObject,
   ObjectMap,
 } from '~/composables/project/types/v2/objects';
 import type { ObjectType } from '~/composables/project/types/v2/objects/base';
+import type { ProjectScore } from '~/composables/project/types/v2/score';
+
+function copyToMap<V>(data: Record<string, V>): Map<string, V> {
+  return new Map(Object.entries(data));
+}
+
+function copyToObject<V>(data: Map<string, V>): Record<string, V> {
+  return Object.fromEntries(data.entries());
+}
 
 export const useProjectStore = defineStore('project-v2', () => {
-  const content = ref<ProjectContent>(DefaultProjectContent);
+  const objects = ref<Map<string, AnyObject>>(new Map());
+  const children = ref<Map<string, ChildObject[]>>(new Map());
+  const scores = ref<Map<string, ProjectScore>>(new Map());
+
   const config = ref<ProjectConfig>(DefaultProjectConfig);
   const styles = ref<ProjectStyles>(DefaultProjectStyles);
   const media = ref<ProjectMedia>(DefaultProjectMedia);
 
   function importData(project: Project) {
-    content.value = project.content;
+    // Content Section
+    objects.value = copyToMap(project.content.objects);
+    children.value = copyToMap(project.content.children);
+    scores.value = copyToMap(project.content.scores);
+
     config.value = project.config;
     styles.value = project.styles;
     media.value = project.media;
@@ -35,7 +51,11 @@ export const useProjectStore = defineStore('project-v2', () => {
 
   function exportData(): Project {
     return {
-      content: clone(content.value),
+      content: {
+        objects: copyToObject(objects.value),
+        children: copyToObject(children.value),
+        scores: copyToObject(scores.value),
+      },
       config: clone(config.value),
       styles: clone(styles.value),
       media: clone(media.value),
@@ -43,18 +63,17 @@ export const useProjectStore = defineStore('project-v2', () => {
   }
 
   function clearData() {
-    content.value = DefaultProjectContent;
-    config.value = DefaultProjectConfig;
-    styles.value = DefaultProjectStyles;
-    media.value = DefaultProjectMedia;
+    importData(DefaultProject);
   }
 
   function get<T extends ObjectType>(
     id: string,
     type: T,
   ): ObjectMap[T] | undefined {
-    const object = prop(id, content.value.objects);
-    if (object.type === type) {
+    const object: AnyObject | undefined = objects.value.get(id);
+    if (isNil(object)) {
+      return undefined;
+    } else if (object.type === type) {
       return object as ObjectMap[T];
     } else {
       return undefined;
@@ -62,12 +81,14 @@ export const useProjectStore = defineStore('project-v2', () => {
   }
 
   function getChildren(id: string): ChildObject[] {
-    return prop(id, content.value.children) ?? [];
+    return children.value.get(id) ?? [];
   }
 
   return {
     // Reactive Data
-    content,
+    objects,
+    children,
+    scores,
     config,
     styles,
     media,
