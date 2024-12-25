@@ -70,6 +70,14 @@
           </div>
           <div class="flex flex-col gap-2 grow">
             <h3 class="font-bold text-xl">Layout</h3>
+            <IftaLabel>
+              <InputText />
+              <label class="font-bold" for="rowName">Grid Columns</label>
+            </IftaLabel>
+            <IftaLabel>
+              <InputText />
+              <label class="font-bold" for="rowName">Default Width</label>
+            </IftaLabel>
           </div>
           <div class="flex flex-col gap-2 grow">
             <h3 class="font-bold text-xl">Conditions</h3>
