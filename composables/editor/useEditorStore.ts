@@ -8,21 +8,25 @@ import type {
 
 type EditorStatus = 'empty' | 'loading' | 'ready';
 
+type EditorStackRoot = 'content' | 'styles';
 export const useEditorStore = defineStore('editor', () => {
   const status = ref<EditorStatus>('empty');
   const project = ref<EditorProject | null>(null);
   const version = ref<EditorProjectVersion | null>(null);
 
   const mode = ref<'library' | 'editor'>('library');
-  const root = ref<'content' | 'styles'>('content');
+  const root = ref<EditorStackRoot>('content');
   const stack = ref<any[]>([]);
 
   function pushScreen(screen: any) {
     stack.value = append(screen, stack.value);
   }
 
-  function clearStack() {
+  function clearStack(setRoot?: EditorStackRoot) {
     stack.value = [];
+    if (setRoot) {
+      root.value = setRoot;
+    }
   }
 
   function popStack(index?: number) {

@@ -85,6 +85,7 @@ export function useEditorLibrary() {
       editorStore.project = null;
       editorStore.version = null;
       editorStore.mode = 'library';
+      editorStore.clearStack('content');
     });
   }
 

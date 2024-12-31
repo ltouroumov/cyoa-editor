@@ -17,7 +17,23 @@ export function useActionsDispatch() {
         return [
           {
             label: 'New Row',
-            icon: 'iconify solar--list-line-duotone',
+            icon: 'iconify solar--add-circle-line-duotone',
+            severity: 'secondary',
+          },
+        ];
+      case 'edit-row':
+        return [
+          {
+            label: 'New Choice',
+            icon: 'iconify solar--add-circle-line-duotone',
+            severity: 'secondary',
+          },
+        ];
+      case 'edit-choice':
+        return [
+          {
+            label: 'New Addon',
+            icon: 'iconify solar--add-circle-line-duotone',
             severity: 'secondary',
           },
         ];

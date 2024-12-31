@@ -194,7 +194,7 @@ export type ProjectRow = HasId &
     image: string;
     imageIsLink: boolean;
     objectWidth: string;
-    rowJustify: 'left' | 'right' | 'center';
+    rowJustify?: 'left' | 'right' | 'center';
 
     resultGroupId: string;
     allowedChoices: number;

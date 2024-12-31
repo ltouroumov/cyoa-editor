@@ -18,6 +18,9 @@ const PageScreen = defineAsyncComponent(
 const RowScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/content/RowScreen.vue'),
 );
+const ChoiceScreen = defineAsyncComponent(
+  () => import('~/components/editor/screens/content/ChoiceScreen.vue'),
+);
 
 export function useScreenDispatch() {
   const editorStore = useEditorStore();
@@ -29,6 +32,8 @@ export function useScreenDispatch() {
         return { component: PageScreen, props: { pageId: top.pageId } };
       case 'edit-row':
         return { component: RowScreen, props: { rowId: top.rowId } };
+      case 'edit-choice':
+        return { component: ChoiceScreen, props: { choiceId: top.choiceId } };
       default:
         return { component: BlankScreen, props: {} };
     }
@@ -73,6 +78,14 @@ export function useScreenDispatch() {
           return {
             label: row.name,
             icon: 'iconify solar--list-line-duotone',
+            command: () => editorStore.popStack(index),
+          };
+        }
+        case 'edit-choice': {
+          const choice = projectStore.get(item.choiceId, ObjectType.choice)!;
+          return {
+            label: choice.name,
+            icon: 'iconify solar--box-minimalistic-line-duotone',
             command: () => editorStore.popStack(index),
           };
         }

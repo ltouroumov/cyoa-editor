@@ -40,25 +40,28 @@ type ImportResult = { project: Omit<EditorProject, 'id'>; data: Project };
 
 class ImportError extends Error {}
 
+// Base grid is 60 columns to handle multiples of 2, 3, 4, 5, and 6
 const ObjectSizeMap: Record<string, number> = {
-  'col-12': 12,
-  'col-sm-11': 11,
-  'col-sm-10': 10,
-  'col-sm-9': 9,
-  'col-sm-8': 8,
-  'col-sm-7': 7,
-  'col-sm-6': 6,
-  'col-sm-5': 5,
-  'col-md-4': 4,
-  'col-md-3': 3,
-  'w-20': 2, // Actually 20% or 2.4 columns
-  'col-lg-2': 2,
-  'w-14': 1,
-  'w-12': 1,
-  'w-11': 1,
-  'w-10': 1,
-  'w-9': 1,
-  'col-xl-1': 1,
+  'col-12': 60,
+  'col-sm-11': 55,
+  'col-sm-10': 50,
+  'col-sm-9': 45,
+  'col-sm-8': 40,
+  'col-sm-7': 35,
+  'col-sm-6': 30,
+  'col-sm-5': 25,
+  'col-md-4': 20,
+  'col-md-3': 15,
+  'w-20': 12,
+  'col-lg-2': 10,
+  'w-10': 6,
+  'col-xl-1': 5,
+
+  // Deprecated sizes, rounded to nearest supported value
+  'w-14': 6,
+  'w-12': 6,
+  'w-11': 6,
+  'w-9': 5,
 };
 
 function classToWidth(widthClass: string): number {
@@ -204,7 +207,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         text: row.titleText,
       },
       layout: {
-        itemAlign: row.rowJustify,
+        itemAlign: row.rowJustify ?? 'left',
         itemWidth: classToWidth(row.objectWidth),
       },
       requirements: {

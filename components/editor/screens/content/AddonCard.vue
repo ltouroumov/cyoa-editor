@@ -24,31 +24,31 @@
     </div>
     <div
       class="flex flex-row items-center cursor-pointer group"
-      @click="editChoice()"
+      @click="editAddon()"
     >
       <div class="text-primary text-xl font-bold grow group-hover:underline">
-        {{ choice.name }}
+        {{ addon.name }}
       </div>
-      <div class="text-surface-500 text-sm">{{ choice.id }}</div>
+      <div class="text-surface-500 text-sm">{{ addon.id }}</div>
     </div>
     <div class="flex flex-row gap-2">
       <div>
         <Skeleton
-          v-if="isNil(choice.header?.image)"
+          v-if="isNil(addon.header?.image)"
           width="5rem"
           height="3rem"
           animation="none"
         />
         <ChoiceImage
-          v-if="choice.header?.image"
-          :media-id="choice.header.image"
+          v-if="addon.header?.image"
+          :media-id="addon.header.image"
           width="5rem"
         />
       </div>
       <div class="flex flex-col gap-2">
-        <div class="font-bold">{{ choice.header?.title }}</div>
+        <div class="font-bold">{{ addon.header?.title }}</div>
         <div class="max-h-[10rem] overflow-hidden text-ellipsis">
-          {{ choice.header?.text }}
+          {{ addon.header?.text }}
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@ import { isNil } from 'ramda';
 
 import ChoiceImage from '~/components/editor/screens/content/ChoiceImage.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
-import type { ChoiceObject } from '~/composables/project/types/v2/objects';
+import type { AddonObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
@@ -68,17 +68,17 @@ const editorStore = useEditorStore();
 const projectStore = useProjectStore();
 
 const props = defineProps<{
-  choiceId: string;
+  addonId: string;
 }>();
 
-const choice = computed((): ChoiceObject => {
-  return projectStore.get(props.choiceId, ObjectType.choice)!;
+const addon = computed((): AddonObject => {
+  return projectStore.get(props.addonId, ObjectType.addon)!;
 });
 
-function editChoice() {
+function editAddon() {
   editorStore.pushScreen({
-    type: 'edit-choice',
-    choiceId: choice.value.id,
+    type: 'edit-addon',
+    choiceId: addon.value.id,
   });
 }
 </script>

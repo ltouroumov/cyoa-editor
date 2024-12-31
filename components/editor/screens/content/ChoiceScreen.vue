@@ -1,5 +1,20 @@
 <template>
-  <RowScreenHeader :row-id="rowId" />
+  <Fluid>
+    <div class="flex flex-col gap-2 items-stretch">
+      <div class="flex flex-row gap-2">
+        <IftaLabel class="grow">
+          <InputText v-model.lazy="choice.name" />
+          <label>Name</label>
+        </IftaLabel>
+        <IftaLabel>
+          <InputText v-model="choice.id" disabled />
+          <label>ID</label>
+        </IftaLabel>
+      </div>
+      <h3 class="text-xl text-primary font-bold">Header</h3>
+      <ChoiceHeaderForm :choice-id="choiceId" />
+    </div>
+  </Fluid>
   <DataView
     :value="children"
     data-key="id"
@@ -7,7 +22,7 @@
   >
     <template #header>
       <div class="flex flex-row justify-between items-center">
-        <h3 class="text-xl font-bold text-primary">Choices</h3>
+        <h3 class="text-xl font-bold text-primary">Addons</h3>
         <InputGroup class="w-auto min-w-8">
           <InputGroupAddon>
             <i class="iconify solar--filter-line-duotone" />
@@ -24,12 +39,11 @@
       </div>
     </template>
     <template #list="{ items }">
-      <div class="grid grid-cols-60 gap-2">
-        <ChoiceCard
+      <div class="grid grid-cols-3 gap-2">
+        <AddonCard
           v-for="(item, index) in items"
           :key="index"
-          :choice-id="item.id"
-          :class="`col-span-${item.layout?.width ?? row.layout?.itemWidth ?? 12}`"
+          :addon-id="item.id"
         />
       </div>
     </template>
@@ -39,29 +53,29 @@
 <script setup lang="ts">
 import { filter, includes, isEmpty, toLower } from 'ramda';
 
-import RowScreenHeader from '~/components/editor/screens/content/RowScreenHeader.vue';
+import type { ChoiceObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const projectStore = useProjectStore();
 const props = defineProps<{
-  rowId: string;
+  choiceId: string;
 }>();
 
-const row = computed(() => {
-  return projectStore.get(props.rowId, ObjectType.row)!;
+const choice = computed((): ChoiceObject => {
+  return projectStore.get(props.choiceId, ObjectType.choice)!;
 });
 
 const children = computed(() => {
   const _search = search.value;
   if (isEmpty(_search)) {
-    return projectStore.getChildren(props.rowId);
+    return projectStore.getChildren(props.choiceId);
   } else {
     const _searchLC = toLower(_search);
     return filter(({ id }) => {
-      const choice = projectStore.get(id, ObjectType.choice)!;
+      const choice = projectStore.get(id, ObjectType.addon)!;
       return includes(_searchLC, toLower(choice.name));
-    }, projectStore.getChildren(props.rowId));
+    }, projectStore.getChildren(props.choiceId));
   }
 });
 
