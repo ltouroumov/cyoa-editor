@@ -74,6 +74,7 @@ const projectStore = useProjectStore();
 
 const props = defineProps<{
   choiceId: string;
+  index: number;
 }>();
 
 const choice = computed((): ChoiceObject => {
