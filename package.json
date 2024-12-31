@@ -59,6 +59,7 @@
     "pinia-plugin-persistedstate": "^4.0.2",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.4",
+    "quill": "^2.0.3",
     "ramda": "^0.30.1",
     "rxjs": "^7.8.1",
     "tailwindcss-primeui": "^0.3.4",

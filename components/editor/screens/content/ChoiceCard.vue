@@ -1,20 +1,7 @@
 <template>
   <div class="flex flex-col gap-2 rounded border border-surface-700 p-3">
     <div class="flex flex-row justify-between">
-      <div class="flex flex-row gap-2">
-        <IconButton
-          outlined
-          severity="secondary"
-          icon="iconify solar--arrow-left-line-duotone"
-          @click="moveUp()"
-        />
-        <IconButton
-          outlined
-          severity="secondary"
-          icon="iconify solar--arrow-right-line-duotone"
-          @click="moveDown()"
-        />
-      </div>
+      <ChoiceMove :choice-id="choiceId" :index="index" />
       <div class="flex flex-row gap-2">
         <Button variant="outlined" size="small" severity="secondary">
           Clone
@@ -60,7 +47,8 @@
 <script setup lang="ts">
 import { clone, findIndex, isNil, propEq } from 'ramda';
 
-import ChoiceImage from '~/components/editor/screens/content/ChoiceImage.vue';
+import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
+import ChoiceMove from '~/components/editor/screens/content/choice/ChoiceMove.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import type {
   ChildObject,

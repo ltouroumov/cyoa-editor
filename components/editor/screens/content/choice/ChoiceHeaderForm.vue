@@ -34,10 +34,7 @@
         <InputText v-model="choice.header.title" />
         <label>Title</label>
       </IftaLabel>
-      <IftaLabel>
-        <Textarea v-model="choice.header.text" class="min-h-[10rem]" />
-        <label>Text</label>
-      </IftaLabel>
+      <Editor v-model="choice.header.text" class="min-h-[10rem]" />
     </div>
   </div>
   <div v-else class="flex flex-row justify-center items-center min-h-[10rem]">
@@ -53,7 +50,7 @@
 <script setup lang="ts">
 import { isNil } from 'ramda';
 
-import RowImage from '~/components/editor/screens/content/RowImage.vue';
+import RowImage from '~/components/editor/screens/content/row/RowImage.vue';
 import type { ChoiceObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';

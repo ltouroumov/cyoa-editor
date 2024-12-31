@@ -8,7 +8,10 @@
               <h1
                 class="text-primary text-3xl font-bold flex flex-row gap-1 items-center"
               >
-                <span>Interactive CYOA Creator</span>
+                <span>
+                  Interactive CYOA Creator
+                  <span class="text-rose-500 italic">Neo</span>
+                </span>
                 <span class="text-slate-500 text-base font-light">(beta)</span>
               </h1>
             </div>

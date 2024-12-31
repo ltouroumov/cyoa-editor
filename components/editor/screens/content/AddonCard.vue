@@ -1,18 +1,7 @@
 <template>
   <div class="flex flex-col gap-2 rounded border border-surface-700 p-3">
     <div class="flex flex-row justify-between">
-      <div class="flex flex-row gap-2">
-        <IconButton
-          outlined
-          severity="secondary"
-          icon="iconify solar--arrow-left-line-duotone"
-        />
-        <IconButton
-          outlined
-          severity="secondary"
-          icon="iconify solar--arrow-right-line-duotone"
-        />
-      </div>
+      <AddonMove :addon-id="addonId" :index="index" />
       <div class="flex flex-row gap-2">
         <Button variant="outlined" size="small" severity="secondary">
           Clone
@@ -58,7 +47,8 @@
 <script setup lang="ts">
 import { isNil } from 'ramda';
 
-import ChoiceImage from '~/components/editor/screens/content/ChoiceImage.vue';
+import AddonMove from '~/components/editor/screens/content/addon/AddonMove.vue';
+import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import type { AddonObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
@@ -69,6 +59,7 @@ const projectStore = useProjectStore();
 
 const props = defineProps<{
   addonId: string;
+  index: number;
 }>();
 
 const addon = computed((): AddonObject => {
