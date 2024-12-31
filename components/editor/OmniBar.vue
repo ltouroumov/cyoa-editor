@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
 import { InputText } from 'primevue';
-import { includes, isEmpty, isNotEmpty, toLower } from 'ramda';
+import { clone, includes, isEmpty, isNotEmpty, length, toLower } from 'ramda';
 
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import type { AnyObject } from '~/composables/project/types/v2/objects';
@@ -84,25 +84,35 @@ watch(
 );
 
 type SearchResults = {
+  objectsCount: number;
   objects: { objectId: string; name: string; type: ObjectType }[];
+  stylesCount: number;
   styles: { styleId: string; name: string }[];
+  mediaCount: number;
   media: { mediaId: string; name: string }[];
+};
+
+const EmptySearchResults: SearchResults = {
+  objects: [],
+  objectsCount: 0,
+  styles: [],
+  stylesCount: 0,
+  media: [],
+  mediaCount: 0,
 };
 
 const results = computed((): SearchResults => {
   const _searchLC = toLower(search.value);
   if (isEmpty(_searchLC)) {
-    return { objects: [], styles: [], media: [] };
+    return EmptySearchResults;
   }
 
-  const _results: SearchResults = {
-    objects: [],
-    styles: [],
-    media: [],
-  };
-
+  const _results: SearchResults = clone(EmptySearchResults);
   for (const object of projectStore.objects.values()) {
-    if (includes(_searchLC, toLower(object.name))) {
+    if (
+      includes(_searchLC, toLower(object.name)) ||
+      includes(_searchLC, toLower(object.id))
+    ) {
       _results.objects.push({
         objectId: object.id,
         name: object.name,
@@ -111,6 +121,7 @@ const results = computed((): SearchResults => {
     }
   }
 
+  _results.objectsCount = length(_results.objects);
   return _results;
 });
 
