@@ -18,6 +18,8 @@ export const useEditorStore = defineStore('editor', () => {
   const root = ref<EditorStackRoot>('content');
   const stack = ref<any[]>([]);
 
+  const showOmniBar = ref<boolean>(false);
+
   function pushScreen(screen: any) {
     stack.value = append(screen, stack.value);
   }
@@ -62,6 +64,7 @@ export const useEditorStore = defineStore('editor', () => {
     mode,
     root,
     stack,
+    showOmniBar,
     // Functions
     pushScreen,
     clearStack,

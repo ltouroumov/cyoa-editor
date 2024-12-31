@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { clone, isNil } from 'ramda';
+import { clone, isNil, reverse, unfold } from 'ramda';
 
 import {
   DefaultProject,
@@ -37,6 +37,17 @@ export const useProjectStore = defineStore('project-v2', () => {
   const config = ref<ProjectConfig>(DefaultProjectConfig);
   const styles = ref<ProjectStyles>(DefaultProjectStyles);
   const media = ref<ProjectMedia>(DefaultProjectMedia);
+
+  const parents = computed((): Map<string, string> => {
+    const _parents = new Map();
+    for (const [parentId, childObjects] of children.value.entries()) {
+      for (const child of childObjects) {
+        _parents.set(child.id, parentId);
+      }
+    }
+
+    return _parents;
+  });
 
   function importData(project: Project) {
     // Content Section
@@ -83,11 +94,23 @@ export const useProjectStore = defineStore('project-v2', () => {
   function getChildren(id: string): ChildObject[] {
     return children.value.get(id) ?? [];
   }
+  function getParents(objectId: string): string[] {
+    return reverse(
+      unfold((childId: string) => {
+        if (childId === '@root') return false;
+        else {
+          const parentId = parents.value.get(childId)!;
+          return [childId, parentId];
+        }
+      }, objectId),
+    );
+  }
 
   return {
     // Reactive Data
     objects,
     children,
+    parents,
     scores,
     config,
     styles,
@@ -95,6 +118,7 @@ export const useProjectStore = defineStore('project-v2', () => {
     // Getters
     get,
     getChildren,
+    getParents,
     // Utility Functions
     importData,
     exportData,

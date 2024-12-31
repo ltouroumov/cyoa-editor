@@ -34,6 +34,7 @@
       </template>
     </Card>
   </div>
+  <OmniBar />
 </template>
 
 <script setup lang="ts">
@@ -69,6 +70,18 @@ const menu = [
     ],
   },
 ];
+
+const { ctrl_k, esc } = useMagicKeys();
+watch(ctrl_k, (newValue) => {
+  if (newValue && !editorStore.showOmniBar) {
+    editorStore.showOmniBar = true;
+  }
+});
+watch(esc, (newValue) => {
+  if (newValue && editorStore.showOmniBar) {
+    editorStore.showOmniBar = false;
+  }
+});
 </script>
 
 <style scoped lang="scss"></style>
