@@ -43,8 +43,8 @@ const GridItemPositions = [
 const GridItemWidths = [
   { label: 'Full Width', value: 60 },
   { label: '1/2 Width', value: 30 },
-  { label: '1/4 Width', value: 20 },
-  { label: '1/3 Width', value: 15 },
+  { label: '1/3 Width', value: 20 },
+  { label: '1/4 Width', value: 15 },
   { label: '1/5 Width', value: 12 },
   { label: '1/10 Width', value: 6 },
   { label: '11/12 Columns', value: 55 },

@@ -94,6 +94,9 @@ export const useProjectStore = defineStore('project-v2', () => {
   function getChildren(id: string): ChildObject[] {
     return children.value.get(id) ?? [];
   }
+  function getParent(id: string): string | undefined {
+    return parents.value.get(id);
+  }
   function getParents(objectId: string): string[] {
     return reverse(
       unfold((childId: string) => {
@@ -118,6 +121,7 @@ export const useProjectStore = defineStore('project-v2', () => {
     // Getters
     get,
     getChildren,
+    getParent,
     getParents,
     // Utility Functions
     importData,

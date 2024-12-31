@@ -6,11 +6,13 @@
           outlined
           severity="secondary"
           icon="iconify solar--arrow-left-line-duotone"
+          @click="moveUp()"
         />
         <IconButton
           outlined
           severity="secondary"
           icon="iconify solar--arrow-right-line-duotone"
+          @click="moveDown()"
         />
       </div>
       <div class="flex flex-row gap-2">
@@ -56,11 +58,14 @@
 </template>
 
 <script setup lang="ts">
-import { isNil } from 'ramda';
+import { clone, findIndex, isNil, propEq } from 'ramda';
 
 import ChoiceImage from '~/components/editor/screens/content/ChoiceImage.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
-import type { ChoiceObject } from '~/composables/project/types/v2/objects';
+import type {
+  ChildObject,
+  ChoiceObject,
+} from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
@@ -80,6 +85,30 @@ function editChoice() {
     type: 'edit-choice',
     choiceId: choice.value.id,
   });
+}
+
+function moveUp() {
+  const parentId: string = projectStore.getParent(choice.value.id)!;
+  const childArr: ChildObject[] = clone(projectStore.children.get(parentId)!);
+
+  const childIndex = findIndex(propEq(choice.value.id, 'id'), childArr);
+  if (childIndex > 0) {
+    const moveArr = childArr.splice(childIndex, 1);
+    childArr.splice(childIndex - 1, 0, ...moveArr);
+    projectStore.children.set(parentId, childArr);
+  }
+}
+
+function moveDown() {
+  const parentId: string = projectStore.getParent(choice.value.id)!;
+  const childArr: ChildObject[] = clone(projectStore.children.get(parentId)!);
+
+  const childIndex = findIndex(propEq(choice.value.id, 'id'), childArr);
+  if (childIndex > -1 && childIndex < childArr.length - 1) {
+    const moveArr = childArr.splice(childIndex, 1);
+    childArr.splice(childIndex + 1, 0, ...moveArr);
+    projectStore.children.set(parentId, childArr);
+  }
 }
 </script>
 

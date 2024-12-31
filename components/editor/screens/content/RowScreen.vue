@@ -67,6 +67,14 @@ const children = computed(() => {
 
 const searchRaw = ref<string>('');
 const search = refDebounced(searchRaw, 100);
+
+const dataRows = computed(() => {
+  const itemWidth = row.value.layout.itemWidth;
+  // Compute the number of items in a row
+  const itemWidthFracInv = 60 / itemWidth;
+  // Show 4 rows of items
+  return itemWidthFracInv * 4;
+});
 </script>
 
 <style scoped lang="scss"></style>
