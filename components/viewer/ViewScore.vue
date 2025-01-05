@@ -12,6 +12,7 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
+import { isNotNil } from 'ramda';
 import { computed } from 'vue';
 
 import { buildConditions } from '~/composables/conditions';
@@ -27,8 +28,10 @@ const isEnabled = computed<boolean>(() => {
   const pointType = getPointType.value(score.id);
   return (
     condition(selectedIds.value) &&
-    (R.isEmpty(pointType.activatedId) ||
-      R.includes(pointType.activatedId, selectedIds.value))
+    (isNotNil(pointType)
+      ? R.isEmpty(pointType.activatedId) ||
+        R.includes(pointType.activatedId, selectedIds.value)
+      : true)
   );
 });
 </script>

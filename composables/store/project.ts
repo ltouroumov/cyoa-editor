@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
-import { isNil } from 'ramda';
+import { isNil, keys } from 'ramda';
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 import { useToast } from 'vue-toastification';
@@ -249,15 +249,17 @@ export const useProjectStore = defineStore('project', () => {
       // TODO: Use graph traversal instead
       let changed = true;
       let depth = 0;
-      while (changed && depth < 5) {
+      while (changed && depth < 10) {
         sel1 = R.pickBy((_, objectId): boolean => {
           const object = getObject.value(objectId);
           const pred = buildConditions(object);
-          return pred(R.keys(sel));
+          return pred(R.keys(sel0));
         }, sel0);
 
-        changed = R.isNotEmpty(
-          R.symmetricDifference(R.keys(sel1), R.keys(sel0)),
+        const diff = R.symmetricDifference(R.keys(sel1), R.keys(sel0));
+        changed = R.isNotEmpty(diff);
+        console.log(
+          `clearIncompatible(${depth}, sel0=${keys(sel0)}, sel1=${keys(sel1)}, diff=${diff}, changed=${changed}`,
         );
         sel0 = R.clone(sel1);
         depth++;
