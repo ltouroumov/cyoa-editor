@@ -19,6 +19,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import type { ProjectRow } from '~/composables/project/types/v1';
 import { useBuildNotes } from '~/composables/viewer/useBuildNotes';
 
 const {

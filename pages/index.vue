@@ -1,9 +1,11 @@
 <template>
   <ProjectViewWrapper />
   <div v-if="store.status === 'empty'" class="dialog-container">
-    <div class="bg-dark-subtle dialog text-light">
-      <ProjectMenu :project-list="viewerProjectList" />
-    </div>
+    <Card class="w-[40%] border border-slate-300">
+      <template #content>
+        <ProjectMenu :project-list="viewerProjectList" />
+      </template>
+    </Card>
   </div>
 </template>
 
@@ -24,11 +26,13 @@ const _config = useRuntimeConfig();
 const { data: projectList } = await useAsyncData(
   'projects',
   (): Promise<ViewerProjectList> =>
-    $fetch(`${_config.app.baseURL}config/viewer/projects.json`),
+    fetch(`${_config.app.baseURL}config/viewer/projects.json`).then(
+      (response) => response.json(),
+    ),
 );
 
 if (projectList.value) {
-  console.log('Project List', clone(projectList.value));
+  console.log('Index List', clone(projectList.value));
   viewerProjectList.value = projectList.value;
 }
 
@@ -67,7 +71,7 @@ watch(
 </script>
 
 <style lang="scss">
-@import '~/assets/css/bootstrap/config';
+@import '~/assets/css/bootstrap/grid';
 
 html {
   font-size: 16px;

@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { buildConditions } from '~/composables/conditions';
-import type { ConditionTerm } from '~/composables/project';
+import type { ConditionTerm } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
 const { req, showAlways } = defineProps<{

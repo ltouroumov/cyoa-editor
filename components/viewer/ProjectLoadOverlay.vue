@@ -25,13 +25,14 @@ import { isEmpty, isNotNil } from 'ramda';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
 import { useViewerRefs } from '~/composables/store/viewer';
+import { sleep } from '~/composables/utils/sleep';
 
 const { store } = useProjectRefs();
 const config = useRuntimeConfig();
 const { viewerProjectList } = useViewerRefs();
 const { loadProject } = useProjectStore();
 const { hasPreference } = useSettingStore();
-const { cyoaPreference } = useSettingRefs();
+const { loadProjectOnStartup } = useSettingRefs();
 
 type BackgroundImageData = {
   url: string;
@@ -45,7 +46,9 @@ const _config = useRuntimeConfig();
 const { data: backgroundConfig } = await useAsyncData(
   'backgrounds',
   (): Promise<BackgroundData> =>
-    $fetch(`${_config.app.baseURL}config/viewer/backgrounds.json`),
+    fetch(`${_config.app.baseURL}config/viewer/backgrounds.json`).then(
+      (response) => response.json(),
+    ),
 );
 
 const background = ref<string | null>(null);
@@ -74,11 +77,11 @@ onMounted(async () => {
 
   if (
     hasPreference() &&
-    cyoaPreference.value &&
+    loadProjectOnStartup.value &&
     store.value.status === 'empty'
   ) {
     shouldLoadProject = true;
-    project = getProjectData(cyoaPreference.value)!;
+    project = getProjectData(loadProjectOnStartup.value)!;
   }
 
   if (isNotNil(viewerProjectList.value.default)) {
@@ -95,7 +98,6 @@ onMounted(async () => {
         let received = 0;
         const chunks = [];
 
-        // eslint-disable-next-line no-constant-condition
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;

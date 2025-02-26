@@ -19,6 +19,7 @@ import NotesModal from '~/components/viewer/modal/NotesModal.vue';
 import SearchModal from '~/components/viewer/modal/SearchModal.vue';
 import StyleProject from '~/components/viewer/style/StyleProject.vue';
 import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
+import type { Project } from '~/composables/project/types/v1';
 
 defineProps<{
   project: Project;

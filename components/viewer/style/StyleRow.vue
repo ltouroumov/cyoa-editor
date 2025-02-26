@@ -9,7 +9,7 @@ import {
   RowStylesGen,
   createStyles,
 } from '~/components/viewer/style/engine';
-import type { RowStyles } from '~/composables/project';
+import type { RowStyles } from '~/composables/project/types/v1';
 
 const { styles, rowId } = defineProps<{ styles: RowStyles; rowId: string }>();
 

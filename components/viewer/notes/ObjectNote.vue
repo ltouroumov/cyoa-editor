@@ -22,6 +22,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import type { ProjectObj } from '~/composables/project/types/v1';
 import { useBuildNotes } from '~/composables/viewer/useBuildNotes';
 
 const {

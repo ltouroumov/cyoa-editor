@@ -5,11 +5,11 @@ defineEmits<{
 </script>
 
 <template>
-  <button class="btn btn-sm btn-outline-secondary" @click="$emit('click')">
-    <div class="d-flex align-items-center justify-content-center gap-1">
-      <div class="i-solar:trash-bin-minimalistic-outline h-1em w-1em"></div>
-    </div>
-  </button>
+  <Button variant="outlined" severity="secondary" @click="$emit('click')">
+    <div
+      class="iconify solar--trash-bin-minimalistic-outline h-1em w-1em"
+    ></div>
+  </Button>
 </template>
 
 <style scoped lang="scss"></style>

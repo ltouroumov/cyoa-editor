@@ -194,6 +194,7 @@ export type ProjectRow = HasId &
     image: string;
     imageIsLink: boolean;
     objectWidth: string;
+    rowJustify?: 'left' | 'right' | 'center';
 
     resultGroupId: string;
     allowedChoices: number;
@@ -224,8 +225,8 @@ export type Project = {
 
 export type ProjectFile = {
   data: Project;
-  fileName: string;
-  projectId?: string;
+  fileName?: string;
+  projectId?: string | number;
   projectName: string;
   projectHash: string;
 };
@@ -251,4 +252,11 @@ export type ProjectNote = {
   id: string;
   title: string;
   text: string;
+};
+
+export const EMPTY_PROJECT: Project = {
+  rows: [],
+  backpack: [],
+  pointTypes: [],
+  styling: {} as ProjectStyles,
 };

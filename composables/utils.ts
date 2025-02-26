@@ -47,6 +47,3 @@ export const readFileContents = (file: Blob) => {
     }
   });
 };
-
-export const sleep = (timeout: number) =>
-  new Promise((resolve) => setTimeout(resolve, timeout));

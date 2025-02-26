@@ -17,7 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import type { SavedBuildGroup } from '~/components/viewer/utils/types';
+import type { SavedBuildGroup } from '~/composables/shared/tables/builds';
+
 defineProps<{
   groups: SavedBuildGroup[];
 }>();

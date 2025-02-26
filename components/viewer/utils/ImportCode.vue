@@ -1,13 +1,13 @@
 <template>
   <div class="import-code-wrapper">
-    <textarea
+    <Textarea
       v-model="importCode"
-      class="form-control import-code"
+      class="import-code grow min-h-[6rem]"
       placeholder="Will delete all selected items if empty!!"
     />
-    <button class="btn btn-outline-primary import-btn" @click="readImportCode">
+    <Button class="import-btn" variant="outlined" @click="readImportCode">
       Import Build
-    </button>
+    </Button>
   </div>
 </template>
 

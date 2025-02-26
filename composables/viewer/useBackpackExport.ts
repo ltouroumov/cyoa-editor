@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 
+import type { ProjectObj } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { type PackRow, useBackpack } from '~/composables/viewer/useBackpack';
 
@@ -13,7 +14,7 @@ type ExportCodeOptions = {
 
 export function useBackpackExport() {
   const { packRows } = useBackpack();
-  const { getObject, getRow } = useProjectStore();
+  const { getObject } = useProjectStore();
   const { selected } = useProjectRefs();
 
   const formatObject = (obj: ProjectObj, count: number): string => {

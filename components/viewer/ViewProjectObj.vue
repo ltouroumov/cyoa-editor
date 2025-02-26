@@ -83,7 +83,7 @@ import StyleObj from './style/StyleObj.vue';
 import { ObjectSizes } from '~/components/viewer/style/sizes';
 import ViewScores from '~/components/viewer/ViewScores.vue';
 import { buildConditions } from '~/composables/conditions';
-import type { ProjectObj, ProjectRow } from '~/composables/project';
+import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';

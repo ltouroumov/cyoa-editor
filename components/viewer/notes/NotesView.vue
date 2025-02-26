@@ -23,20 +23,20 @@
           />
         </div>
       </template>
-      <div class="notes-ruler"></div>
+      <div v-if="isNotEmpty(visiblePackRows)" class="notes-ruler"></div>
       <GlobalNotes :editable="editable" :compact="compact" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { assoc, chain, filter, has, isEmpty } from 'ramda';
+import { assoc, chain, filter, has, isEmpty, isNotEmpty } from 'ramda';
 
 import RowNote from '~/components/viewer/notes/RowNote.vue';
 import { type PackRow, useBackpack } from '~/composables/viewer/useBackpack';
 import { useBuildNotes } from '~/composables/viewer/useBuildNotes';
 
-const { buildNotes, globalNotes } = useBuildNotes();
+const { buildNotes } = useBuildNotes();
 const { packRows } = useBackpack();
 
 const $props = defineProps<{
