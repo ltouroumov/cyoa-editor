@@ -25,6 +25,14 @@ export type SavedBuildData = {
   groups: SavedBuildGroup[];
   selected?: Selections;
   notes?: Record<string, ProjectNote>;
+  // 0 means root
+  folder: number;
+};
+export type SavedBuildFolder = {
+  id: number;
+  name: string;
+  // 0 means root
+  parent: number;
 };
 
 export enum ProjectMatch {

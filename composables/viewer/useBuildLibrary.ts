@@ -7,6 +7,7 @@ import {
 } from '~/components/viewer/utils/build';
 import type {
   SavedBuildData,
+  SavedBuildFolder,
   SavedBuildItem,
 } from '~/components/viewer/utils/types';
 import {
@@ -27,8 +28,31 @@ export function useBuildLibrary() {
   const { setSelected } = useProjectStore();
   const $store = useProjectRefs();
 
-  const loadBuilds = async (): Promise<SavedBuildData[]> => {
-    return db.builds.toArray();
+  const loadFolders = async (parent?: number): Promise<SavedBuildFolder[]> => {
+    return db.folders
+      .where('parent')
+      .equals(parent ?? 0)
+      .toArray();
+  };
+
+  const saveFolder = async (
+    name: string,
+    parent: number,
+  ): Promise<SavedBuildFolder> => {
+    const entry: Omit<SavedBuildFolder, 'id'> = {
+      name: name,
+      parent: parent,
+    };
+
+    const entryId = await db.folders.add(entry);
+    return R.assoc('id', entryId, entry);
+  };
+
+  const loadBuilds = async (folder?: number): Promise<SavedBuildData[]> => {
+    return db.builds
+      .where('folder')
+      .equals(folder ?? 0)
+      .toArray();
   };
 
   const saveBuild = async (buildName: string): Promise<SavedBuildData> => {
@@ -46,6 +70,7 @@ export function useBuildLibrary() {
         $store.getRow.value,
       ),
       notes: clone($store.buildNotes.value),
+      folder: 0,
     };
     const entryId = await db.builds.add(entry);
     return R.assoc('id', entryId, entry);
@@ -108,5 +133,13 @@ export function useBuildLibrary() {
     $store.buildModified.value = false;
   };
 
-  return { loadBuilds, loadBuild, saveBuild, updateBuild, deleteBuild };
+  return {
+    loadFolders,
+    saveFolder,
+    loadBuilds,
+    loadBuild,
+    saveBuild,
+    updateBuild,
+    deleteBuild,
+  };
 }
