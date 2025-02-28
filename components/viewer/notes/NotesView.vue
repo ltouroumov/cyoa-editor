@@ -2,12 +2,13 @@
   <div class="notes-table-wrapper">
     <div class="notes-table">
       <template
-        v-for="({ packRow, choices }, idx) in visiblePackRows"
+        v-for="({ packRow, choices, scores }, idx) in visiblePackRows"
         :key="packRow.id"
       >
         <div v-if="idx > 0" class="notes-ruler"></div>
         <div class="notes-row">
-          {{ packRow.title }}
+          <span class="row-title">{{ packRow.title }}</span>
+          <RowScores :scores="scores" vertical />
         </div>
         <div class="notes-object-list">
           <ObjectNote
@@ -33,10 +34,11 @@
 import { assoc, chain, filter, has, isEmpty } from 'ramda';
 
 import RowNote from '~/components/viewer/notes/RowNote.vue';
+import RowScores from '~/components/viewer/utils/RowScores.vue';
 import { type PackRow, useBackpack } from '~/composables/viewer/useBackpack';
 import { useBuildNotes } from '~/composables/viewer/useBuildNotes';
 
-const { buildNotes, globalNotes } = useBuildNotes();
+const { buildNotes } = useBuildNotes();
 const { packRows } = useBackpack();
 
 const $props = defineProps<{
@@ -77,14 +79,16 @@ const visiblePackRows = computed((): PackRow[] => {
   gap: 0.5rem;
 
   .notes-row {
-    font-weight: bolder;
-
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: start;
     align-items: start;
     gap: 0.5rem;
+
+    .row-title {
+      font-weight: bolder;
+    }
   }
 
   .notes-object-list {
