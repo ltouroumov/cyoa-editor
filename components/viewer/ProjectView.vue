@@ -5,6 +5,7 @@
       <ViewProjectRow v-for="row in project.rows" :key="row.id" :row="row" />
     </div>
   </div>
+  <ScrollToTopButton />
   <StyleProject :styles="project.styling" />
   <BackpackModal />
   <NotesModal />
