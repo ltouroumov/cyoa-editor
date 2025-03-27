@@ -21,6 +21,7 @@
             Supports: <span class="code">"corona pollentia"</span>,
             <span class="code">title:taylor</span>,
             <span class="code">text:charges</span>,
+            <span class="code">required:skitter</span>,
             <span class="code">id:3ea234</span>, and
             <span class="code">trump or tinker</span>
           </div>
@@ -60,16 +61,30 @@
 
 <script setup lang="ts">
 import { debounce } from 'perfect-debounce';
-import { all, any, includes, isEmpty, isNil, isNotEmpty, length } from 'ramda';
+import {
+  all,
+  any,
+  chain,
+  concat,
+  includes,
+  isEmpty,
+  isNil,
+  isNotEmpty,
+  length,
+  map,
+  prop,
+  reject,
+} from 'ramda';
 
 import ModalDialog from '~/components/utils/ModalDialog.vue';
 import type { Project, ProjectObj, ProjectRow } from '~/composables/project';
-import { useProjectRefs } from '~/composables/store/project';
+import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';
 
 const { toggleSearch } = useViewerStore();
 const { isSearchVisible } = useViewerRefs();
+const { getObject } = useProjectStore();
 const { project } = useProjectRefs();
 
 type ResultGroup = {
@@ -118,7 +133,6 @@ const PART_MATCH = /(?:(?<key>\S+):)?(?:"(?<quoted>[^"]+)"|(?<word>\S+))/g;
 function parseSearchTerm(parts: RegExpExecArray[]) {
   const result: SearchResult = {};
   for (const part of parts) {
-    console.log('part', part);
     const partWords = part.groups?.quoted ?? part.groups?.word;
     if (isNil(partWords) || isEmpty(partWords)) continue;
 
@@ -175,7 +189,6 @@ function createSearchFunction(searchText: string) {
   if (length(searchTerms) === 0) return () => false;
 
   const searchExpr = parseSearch(searchText);
-  console.log('search expr', searchExpr);
 
   const matchesOne = (args: string[], text: string): boolean => {
     const textLC = text.toLowerCase();
@@ -185,6 +198,29 @@ function createSearchFunction(searchText: string) {
   const matchesAll = (args: string[], text: string): boolean => {
     const textLC = text.toLowerCase();
     return all((term) => includes(term, textLC), args);
+  };
+
+  const resolveReqNames = (ids: string[]): string[] => {
+    const names = map((id) => getObject(id)?.title, ids);
+    return reject(isNil, names);
+  };
+
+  const resolveReqIds = (reqs: ConditionTerm[]): string[] => {
+    const resolveReq = (req: ConditionTerm): string[] => {
+      if (req.showRequired) {
+        return reject(
+          isEmpty,
+          concat(
+            [req.reqId, req.reqId1, req.reqId2, req.reqId3],
+            map(prop('req'), req.orRequired),
+          ),
+        );
+      } else {
+        return [];
+      }
+    };
+
+    return chain(resolveReq, reqs);
   };
 
   function compileSearchExpr(expr: SearchResult): SearchFn {
@@ -220,6 +256,16 @@ function createSearchFunction(searchText: string) {
       }
       if ('text' in kwargs) {
         searchFns.push((obj) => matchesAll(kwargs.text, obj.text));
+      }
+      if ('required' in kwargs) {
+        searchFns.push((obj) => {
+          const reqIds: string[] = resolveReqIds(obj.requireds);
+          const reqNames = resolveReqNames(reqIds);
+          return (
+            any((req) => matchesAll(kwargs.required, req), reqNames) ||
+            any((req) => matchesOne(kwargs.required, req), reqIds)
+          );
+        });
       }
 
       return (obj) => all((searchFn) => searchFn(obj), searchFns);
