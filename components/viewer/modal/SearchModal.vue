@@ -115,38 +115,55 @@ type SearchResult =
 
 const PART_MATCH = /(?:(?<key>\S+):)?(?:"(?<quoted>[^"]+)"|(?<word>\S+))/g;
 
-function parseSearch(input: string): SearchResult {
-  // Handle the "or" keyword
-  const orParts = input.split(/\s+or\s+/i);
-  if (orParts.length > 1) {
-    return { or: orParts.map(parseSearch).filter(isNotEmpty) };
-  } else {
-    const result: SearchResult = {};
-    const parts = input.matchAll(PART_MATCH);
-    for (const part of parts) {
-      console.log('part', part);
-      const partWords = part.groups?.quoted ?? part.groups?.word;
-      if (isNil(partWords) || isEmpty(partWords)) continue;
+function parseSearchTerm(parts: RegExpExecArray[]) {
+  const result: SearchResult = {};
+  for (const part of parts) {
+    console.log('part', part);
+    const partWords = part.groups?.quoted ?? part.groups?.word;
+    if (isNil(partWords) || isEmpty(partWords)) continue;
 
-      if (part.groups?.key) {
-        const key = part.groups.key;
-        if (!result.kwargs) {
-          result.kwargs = {};
-        }
-        if (!result.kwargs[key]) {
-          result.kwargs[key] = [];
-        }
-
-        result.kwargs[key].push(partWords);
-      } else {
-        if (!result.args) {
-          result.args = [];
-        }
-
-        result.args.push(partWords);
+    if (part.groups?.key) {
+      const key = part.groups.key;
+      if (!result.kwargs) {
+        result.kwargs = {};
       }
+      if (!result.kwargs[key]) {
+        result.kwargs[key] = [];
+      }
+
+      result.kwargs[key].push(partWords);
+    } else {
+      if (!result.args) {
+        result.args = [];
+      }
+
+      result.args.push(partWords);
     }
-    return result;
+  }
+  return result;
+}
+
+function parseSearch(input: string): SearchResult {
+  const parts = input.matchAll(PART_MATCH);
+
+  // Scan for the "or" keyword and split the input keywords into groups
+  const orParts: RegExpExecArray[][] = [];
+  let acc: RegExpExecArray[] = [];
+
+  for (const part of parts) {
+    if (part[0] === 'or') {
+      orParts.push(acc);
+      acc = [];
+    } else {
+      acc.push(part);
+    }
+  }
+  orParts.push(acc);
+
+  if (orParts.length > 1) {
+    return { or: orParts.map(parseSearchTerm).filter(isNotEmpty) };
+  } else {
+    return parseSearchTerm(acc);
   }
 }
 
