@@ -63,7 +63,7 @@ export default defineNuxtConfig({
   ],
 
   plugins: ['~/plugins/toast.client.ts'],
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   typescript: { typeCheck: true },
 
   components: [
