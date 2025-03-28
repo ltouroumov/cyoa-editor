@@ -22,6 +22,8 @@
             <span class="code">title:taylor</span>,
             <span class="code">text:charges</span>,
             <span class="code">required:skitter</span>,
+            <span class="code">cost:10SP</span>,
+            <span class="code">gain:"&lt;10 SP"</span>,
             <span class="code">id:3ea234</span>, and
             <span class="code">trump or tinker</span>
           </div>
@@ -66,10 +68,12 @@ import {
   any,
   chain,
   concat,
+  filter,
   includes,
   isEmpty,
   isNil,
   isNotEmpty,
+  isNotNil,
   length,
   map,
   prop,
@@ -84,7 +88,7 @@ import { ViewContext } from '~/composables/viewer';
 
 const { toggleSearch } = useViewerStore();
 const { isSearchVisible } = useViewerRefs();
-const { getObject } = useProjectStore();
+const { getObject, getPointType } = useProjectStore();
 const { project } = useProjectRefs();
 
 type ResultGroup = {
@@ -129,6 +133,7 @@ type SearchResult =
     };
 
 const PART_MATCH = /(?:(?<key>\S+):)?(?:"(?<quoted>[^"]+)"|(?<word>\S+))/g;
+const SCORE_MATCH = /^(?<operator><|>)?\s*(?<value>\d+)\s*(?<name>\w+)?$/;
 
 function parseSearchTerm(parts: RegExpExecArray[]) {
   const result: SearchResult = {};
@@ -182,6 +187,7 @@ function parseSearch(input: string): SearchResult {
 }
 
 type SearchFn = (obj: ProjectObj) => boolean;
+type ScoreMatchFn = (score: Score) => boolean;
 
 function createSearchFunction(searchText: string) {
   const searchTerms = searchText.toLowerCase().split(/\s+/);
@@ -221,6 +227,51 @@ function createSearchFunction(searchText: string) {
     };
 
     return chain(resolveReq, reqs);
+  };
+
+  const compileScoreMatcher = (
+    inputs: string[],
+    mode: 'cost' | 'gain',
+  ): SearchFn => {
+    const scoreMatch: ScoreMatchFn[] = map((search: string) => {
+      const scoreMatch = SCORE_MATCH.exec(search);
+      if (!scoreMatch) return null;
+
+      const { operator, value, name } = scoreMatch.groups!;
+      const valueInt = parseInt(value, 10);
+      if (isNaN(valueInt)) return null;
+
+      return (objScore: Score): boolean => {
+        const pointType = getPointType(objScore.id);
+        if (
+          isNotNil(name) &&
+          pointType.afterText.toLowerCase() !== name.toLowerCase()
+        ) {
+          return false;
+        }
+        const rawScoreValue = parseInt(objScore.value);
+
+        if (isNaN(rawScoreValue)) return false;
+        else if (mode === 'cost' && rawScoreValue < 0) return false;
+        else if (mode === 'gain' && rawScoreValue > 0) return false;
+
+        const scoreValue = mode === 'gain' ? -rawScoreValue : rawScoreValue;
+        if (operator === '>') {
+          return scoreValue >= valueInt;
+        }
+        if (operator === '<') {
+          return scoreValue <= valueInt;
+        }
+        return scoreValue === valueInt;
+      };
+    }, inputs).filter(isNotNil);
+
+    return (obj: ProjectObj) => {
+      return any(
+        (objScore: Score) => any((mat) => mat(objScore), scoreMatch),
+        filter((score) => isEmpty(score.requireds), obj.scores),
+      );
+    };
   };
 
   function compileSearchExpr(expr: SearchResult): SearchFn {
@@ -263,9 +314,23 @@ function createSearchFunction(searchText: string) {
           const reqNames = resolveReqNames(reqIds);
           return (
             any((req) => matchesAll(kwargs.required, req), reqNames) ||
-            any((req) => matchesOne(kwargs.required, req), reqIds)
+            any((req) => matchesOne(kwargs.required, req), reqIds) ||
+            any((addon) => {
+              const reqIds: string[] = resolveReqIds(addon.requireds);
+              const reqNames = resolveReqNames(reqIds);
+              return (
+                any((req) => matchesAll(kwargs.required, req), reqNames) ||
+                any((req) => matchesOne(kwargs.required, req), reqIds)
+              );
+            }, obj.addons)
           );
         });
+      }
+      if ('cost' in kwargs) {
+        searchFns.push(compileScoreMatcher(kwargs.cost, 'cost'));
+      }
+      if ('gain' in kwargs) {
+        searchFns.push(compileScoreMatcher(kwargs.gain, 'gain'));
       }
 
       return (obj) => all((searchFn) => searchFn(obj), searchFns);
