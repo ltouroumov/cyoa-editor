@@ -1,7 +1,8 @@
 <template>
-  <div class="flex flex-col gap-2 rounded border border-surface-700 p-3">
-    <div class="flex flex-row justify-between">
+  <div class="flex flex-col gap-2 rounded border border-surface-700 p-2">
+    <div class="flex flex-row justify-between items-center">
       <ChoiceMove :choice-id="choiceId" :index="index" />
+      <ChoiceLayout :choice-id="choiceId" :index="index" />
       <div class="flex flex-row gap-2">
         <Button variant="outlined" size="small" severity="secondary">
           Clone

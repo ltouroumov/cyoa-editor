@@ -2,7 +2,7 @@
   <div v-if="choice.header" class="grid grid-cols-3 gap-2">
     <div class="flex flex-col gap-2 items-stretch justify-center grow">
       <div
-        class="flex flex-row justify-stretch grow relative group rounded overflow-auto"
+        class="flex flex-row justify-stretch grow relative group rounded overflow-clip"
       >
         <Skeleton
           v-if="isNil(choice.header?.image)"
@@ -10,7 +10,7 @@
           class="grow"
           height="auto"
         />
-        <RowImage
+        <ChoiceImage
           v-if="choice.header.image"
           :media-id="choice.header.image"
           class="grow border border-surface-700"
@@ -34,7 +34,7 @@
         <InputText v-model="choice.header.title" />
         <label>Title</label>
       </IftaLabel>
-      <Editor v-model="choice.header.text" class="min-h-[10rem]" />
+      <Editor v-model="choice.header.text" editor-style="height: 12rem" />
     </div>
   </div>
   <div v-else class="flex flex-row justify-center items-center min-h-[10rem]">
@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { isNil } from 'ramda';
 
-import RowImage from '~/components/editor/screens/content/row/RowImage.vue';
+import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
 import type { ChoiceObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';

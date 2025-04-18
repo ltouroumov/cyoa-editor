@@ -11,8 +11,13 @@
           <label>ID</label>
         </IftaLabel>
       </div>
-      <h3 class="text-xl text-primary font-bold">Header</h3>
-      <ChoiceHeaderForm :choice-id="choiceId" />
+
+      <div class="flex flex-col">
+        <div class="border-b border-surface-700 pb-1 mb-2">
+          <div class="text-xl font-bold text-primary">Header</div>
+        </div>
+        <ChoiceHeaderForm :choice-id="choiceId" />
+      </div>
     </div>
   </Fluid>
   <DataView

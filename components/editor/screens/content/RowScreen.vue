@@ -29,6 +29,7 @@
           v-for="(item, index) in items"
           :key="index"
           :choice-id="item.id"
+          :parent-id="rowId"
           :index="index"
           :class="`col-span-${item.layout?.width ?? row.layout?.itemWidth ?? 12}`"
         />

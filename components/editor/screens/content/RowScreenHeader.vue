@@ -13,24 +13,26 @@
           </IftaLabel>
         </div>
 
-        <Tabs value="header" :dt="{ tabpanel: { padding: '1rem 0' } }">
-          <TabList>
-            <Tab value="header">Header</Tab>
-            <Tab value="layout">Layout</Tab>
-            <Tab value="requirements">Requirements</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel value="header">
-              <RowHeaderForm :row-id="rowId" />
-            </TabPanel>
-            <TabPanel value="layout">
-              <RowLayoutForm :row-id="rowId" />
-            </TabPanel>
-            <TabPanel value="requirements">
-              <RowRequirementsForm :row-id="rowId" />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+        <div class="flex flex-col">
+          <div class="border-b border-surface-700 pb-1 mb-2">
+            <div class="text-xl font-bold text-primary">Header</div>
+          </div>
+          <RowHeaderForm :row-id="rowId" />
+        </div>
+        <div class="flex flex-row gap-2">
+          <div class="flex flex-col grow">
+            <div class="border-b border-surface-700 pb-1 mb-2">
+              <div class="text-xl font-bold text-primary">Layout</div>
+            </div>
+            <RowLayoutForm :row-id="rowId" />
+          </div>
+          <div class="flex flex-col grow">
+            <div class="border-b border-surface-700 pb-1 mb-2">
+              <div class="text-xl font-bold text-primary">Requirements</div>
+            </div>
+            <RowRequirementsForm :row-id="rowId" />
+          </div>
+        </div>
       </div>
     </Fluid>
   </div>
