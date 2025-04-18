@@ -26,7 +26,7 @@ export const stringToBuffer = (value: string): Uint8Array => {
   return textEncoder.encode(value);
 };
 export const bufferToString = (buffer: ArrayBuffer) => {
-  return textDecoder.decode(buffer);
+  return textDecoder.decode();
 };
 
 export const readFileContents = (file: Blob) => {

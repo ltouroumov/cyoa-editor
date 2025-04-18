@@ -25,8 +25,6 @@ defineProps<{
 </script>
 
 <style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-
 .choices-list {
   display: inline-flex;
   flex-direction: row;

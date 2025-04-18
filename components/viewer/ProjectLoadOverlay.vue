@@ -122,7 +122,7 @@ onMounted(async () => {
         }
 
         return {
-          fileContents: bufferToString(bodyBytes),
+          fileContents: bufferToString(bodyBytes.buffer),
           fileName: project.remoteFileUrl.toString(),
         };
       } else {

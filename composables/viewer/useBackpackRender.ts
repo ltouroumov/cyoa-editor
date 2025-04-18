@@ -2,7 +2,6 @@ import canvasSize from 'canvas-size';
 import { elementToSVG, inlineResources } from 'dom-to-svg';
 import type { RuntimeConfig } from 'nuxt/schema';
 import { h, render } from 'vue';
-import { useToast } from 'vue-toastification';
 
 import BackpackExportWrapper from '~/components/viewer/utils/BackpackExportWrapper.vue';
 
@@ -136,9 +135,9 @@ export function useBackpackRender() {
   };
 
   const exportToImage = async () => {
-    const toastGenerateImage = $toast.info('Generating image...', {
-      timeout: false,
-    });
+    // const toastGenerateImage = $toast.info('Generating image...', {
+    //   timeout: false,
+    // });
 
     // Render the backpack inside a hidden iframe
     const frame = await createFrame(config);
@@ -153,14 +152,14 @@ export function useBackpackRender() {
     const img = await createImage(svgURL);
     const imgURL = await renderImage(img);
 
-    $toast.dismiss(toastGenerateImage);
+    // $toast.dismiss(toastGenerateImage);
 
     // Ensure the URL is valid before trying to download it
     if (!imgURL.startsWith('data:image/png')) {
-      $toast.error('Failed to generate backpack image.');
+      // $toast.error('Failed to generate backpack image.');
       console.log(imgURL);
     } else {
-      $toast.success('Backpack image generated');
+      // $toast.success('Backpack image generated');
       await downloadImage(imgURL);
     }
 

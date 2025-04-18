@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 import { GoldMorning } from './prime/gold-morning.style.mjs';
 
 export default defineNuxtConfig({
@@ -49,7 +50,7 @@ export default defineNuxtConfig({
       ],
       noscript: [
         // <noscript>JavaScript is required</noscript>
-        { children: 'JavaScript is required' },
+        { textContent: 'JavaScript is required' },
       ],
     },
   },
@@ -57,13 +58,9 @@ export default defineNuxtConfig({
   ssr: false,
   imports: { autoImport: true },
 
-  css: [
-    '~/assets/css/toast.scss',
-    '~/assets/css/main.css',
-    'primeicons/primeicons.css',
-  ],
+  css: ['~/assets/css/main.css', 'primeicons/primeicons.css'],
 
-  plugins: ['~/plugins/toast.client.ts'],
+  plugins: [],
   // LT: Disabled because the performance hit on reactivity is way too high
   devtools: { enabled: false },
   typescript: { typeCheck: true },
@@ -92,7 +89,9 @@ export default defineNuxtConfig({
 
   primevue: {
     autoImport: true,
-    components: {},
+    components: {
+      exclude: ['Chart', 'Form', 'FormField'],
+    },
     options: {
       theme: {
         preset: GoldMorning,

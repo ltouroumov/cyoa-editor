@@ -71,12 +71,20 @@ const menu = [
   },
 ];
 
-const { ctrl_k, esc } = useMagicKeys();
+const { ctrl_k, esc } = useMagicKeys({
+  passive: false,
+  onEventFired(e: KeyboardEvent) {
+    if (e.ctrlKey && e.key === 'k' && e.type === 'keydown') {
+      e.preventDefault()
+    }
+  }
+});
 watch(ctrl_k, (newValue) => {
   if (newValue && !editorStore.showOmniBar) {
     editorStore.showOmniBar = true;
   }
 });
+
 watch(esc, (newValue) => {
   if (newValue && editorStore.showOmniBar) {
     editorStore.showOmniBar = false;

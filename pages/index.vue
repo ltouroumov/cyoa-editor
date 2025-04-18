@@ -71,8 +71,6 @@ watch(
 </script>
 
 <style lang="scss">
-@import '~/assets/css/bootstrap/grid';
-
 html {
   font-size: 16px;
 }

@@ -11,8 +11,6 @@ const editorStore = useEditorStore();
 </script>
 
 <style>
-@import '~/assets/css/bootstrap/grid.scss';
-
 body {
   background: var(--p-stone-700);
   height: 100vh;

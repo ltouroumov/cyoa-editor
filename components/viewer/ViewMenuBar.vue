@@ -55,7 +55,6 @@
 
 <script setup lang="ts">
 import { isNotNil } from 'ramda';
-import { useToast } from 'vue-toastification';
 
 import ViewScoreStatus from '~/components/viewer/ViewScoreStatus.vue';
 import { useProjectRefs } from '~/composables/store/project';
@@ -66,7 +65,7 @@ const { toggleBackpack, toggleSearch, toggleProjectMenu, toggleNotes } =
   useViewerStore();
 const { buildData, buildModified } = useProjectRefs();
 const $lib = useBuildLibrary();
-const $toast = useToast();
+// const $toast = useToast();
 
 const MenuButtonDT = {
   padding: { x: 0, y: 0 },
@@ -82,17 +81,15 @@ const updateCurrentBuild = async () => {
   if (isNotNil(buildData.value)) {
     await $lib.updateBuild(buildData.value);
     buildModified.value = false;
-    $toast.info('Build saved');
+    // $toast.info('Build saved');
   }
 };
 </script>
 
 <style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-
-.navbar {
-  background: $dark-bg-subtle-dark;
-}
+//.navbar {
+//  background: $dark-bg-subtle-dark;
+//}
 
 @media (min-width: 576px) {
   .menu-container {
@@ -131,6 +128,6 @@ const updateCurrentBuild = async () => {
 }
 
 body:has(.menu-modal.show) .navbar {
-  z-index: $zindex-offcanvas;
+  // z-index: $zindex-offcanvas;
 }
 </style>

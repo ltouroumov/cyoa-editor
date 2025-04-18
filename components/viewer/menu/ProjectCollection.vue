@@ -92,7 +92,7 @@ const loadRemoteFile = async (project: ViewerProject) => {
       }
 
       return {
-        fileContents: bufferToString(bodyBytes),
+        fileContents: bufferToString(bodyBytes.buffer),
         fileName: fileURL.toString(),
       };
     } else {

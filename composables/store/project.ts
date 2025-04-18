@@ -3,7 +3,6 @@ import * as R from 'ramda';
 import { isNil } from 'ramda';
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
-import { useToast } from 'vue-toastification';
 
 import { buildConditions } from '~/composables/conditions';
 import type {
@@ -187,11 +186,11 @@ export const useProjectStore = defineStore('project', () => {
         };
         triggerRef(store);
       } else {
-        $toast.error('Failed to load the project :(');
+        // $toast.error('Failed to load the project :(');
         store.value = { status: 'empty' };
       }
     } catch (e) {
-      $toast.error('Failed to load the project :(');
+      // $toast.error('Failed to load the project :(');
       console.log(e);
       store.value = { status: 'empty' };
     }
@@ -400,7 +399,7 @@ export const useProjectStore = defineStore('project', () => {
         const obj: ProjectObj = getObject.value(objId);
         return obj.title;
       }, removedIds);
-      $toast.info(`Removed selections: ${R.join(', ', removedNames)}`);
+      // $toast.info(`Removed selections: ${R.join(', ', removedNames)}`);
     }
 
     selected.value = newSelected;

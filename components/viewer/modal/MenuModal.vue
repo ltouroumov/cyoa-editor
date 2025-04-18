@@ -63,10 +63,6 @@ const { store } = useProjectRefs();
 const selected = ref<string>('save-load');
 </script>
 
-<style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-</style>
-
 <style lang="scss">
 .menu-modal {
   width: 768px !important;

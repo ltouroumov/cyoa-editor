@@ -26,12 +26,10 @@
 </template>
 
 <script setup lang="ts">
-import { useToast } from 'vue-toastification';
-
 import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
-const $toast = useToast();
+// const $toast = useToast();
 
 const $lib = useBuildLibrary();
 
@@ -47,7 +45,7 @@ onMounted(async () => {
 
 const saveBuild = async () => {
   await $lib.saveBuild(buildName.value);
-  $toast.success(`Saved build: ${buildName.value}`);
+  // $toast.success(`Saved build: ${buildName.value}`);
   buildName.value = '';
   await loadBuilds();
 };

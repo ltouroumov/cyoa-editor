@@ -82,7 +82,6 @@
 <script setup lang="ts">
 import * as R from 'ramda';
 import { join, map, toPairs } from 'ramda';
-import { useToast } from 'vue-toastification';
 
 import BuildChoices from '~/components/viewer/library/BuildChoices.vue';
 import { ProjectMatch } from '~/components/viewer/utils/types';
@@ -91,7 +90,7 @@ import { type Selections, useProjectRefs } from '~/composables/store/project';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
 const { selected, project } = useProjectRefs();
-const $toast = useToast();
+// const $toast = useToast();
 const $props = defineProps<{
   build: SavedBuildData;
 }>();
@@ -131,13 +130,13 @@ const $lib = useBuildLibrary();
 
 const updateBuild = async () => {
   if (R.isEmpty(selected.value)) {
-    $toast.error("No selections are made,\nThere's nothing to save.");
+    // $toast.error("No selections are made,\nThere's nothing to save.");
     return;
   }
 
   await $lib.updateBuild($props.build, { $choices: true, $notes: true });
   $emit('change');
-  $toast.success(`Updated Build: ${$props.build.name}`);
+  // $toast.success(`Updated Build: ${$props.build.name}`);
 };
 
 const updateBuildName = async (name: string) => {
@@ -148,12 +147,12 @@ const updateBuildName = async (name: string) => {
 const deleteBuild = async () => {
   await $lib.deleteBuild($props.build);
   $emit('change');
-  $toast.success(`Deleted Build: ${$props.build.name}`);
+  // $toast.success(`Deleted Build: ${$props.build.name}`);
 };
 
 const loadBuild = () => {
   $lib.loadBuild($props.build);
-  $toast.info(`Loaded Build: ${$props.build.name}`);
+  // $toast.info(`Loaded Build: ${$props.build.name}`);
 };
 </script>
 

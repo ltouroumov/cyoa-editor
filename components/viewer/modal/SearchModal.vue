@@ -175,8 +175,6 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 </script>
 
 <style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-
 .modal-80 {
   width: 80%;
 }

@@ -22,7 +22,7 @@
           class="flex flex-col h-[20rem] overflow-y-auto bg-surface-800 rounded-md"
         >
           <div
-            v-if="isEmpty(results)"
+            v-if="isEmpty(results.objects)"
             class="flex flex-row h-full justify-center items-center"
           >
             <div class="text-stone-500">Type to start searching ...</div>

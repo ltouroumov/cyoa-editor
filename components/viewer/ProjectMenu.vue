@@ -20,7 +20,3 @@ const { projectList } = defineProps<{
   projectList: ViewerProjectList;
 }>();
 </script>
-
-<style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-</style>
