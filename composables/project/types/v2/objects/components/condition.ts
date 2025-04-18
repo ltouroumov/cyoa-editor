@@ -5,9 +5,15 @@ export enum ConditionType {
   incompatible = 'incompatible',
 }
 
+export enum ConditionMode {
+  any = 'any',
+  all = 'all',
+}
+
 export type ObjectCondition = {
   id: string;
   type: ConditionType;
+  mode: ConditionMode;
   objectIds: string[];
   activeWhen?: ConditionTerm;
 

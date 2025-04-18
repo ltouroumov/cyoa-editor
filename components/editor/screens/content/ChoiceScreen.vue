@@ -18,6 +18,12 @@
         </div>
         <ChoiceHeaderForm :choice-id="choiceId" />
       </div>
+      <div class="flex flex-col">
+        <div class="border-b border-surface-700 pb-1 mb-2">
+          <div class="text-xl font-bold text-primary">Components</div>
+        </div>
+        <ChoiceComponentsForm :choice-id="choiceId" />
+      </div>
     </div>
   </Fluid>
   <DataView
@@ -59,6 +65,7 @@
 <script setup lang="ts">
 import { filter, includes, isEmpty, toLower } from 'ramda';
 
+import ChoiceComponentsForm from '~/components/editor/screens/content/choice/ChoiceComponentsForm.vue';
 import type { ChoiceObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';

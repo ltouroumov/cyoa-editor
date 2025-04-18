@@ -4,7 +4,7 @@ import { ObjectType } from '~/composables/project/types/v2/objects/base';
 
 const genId = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 8);
 
-export function createId(type: ObjectType | 'style' | 'media'): string {
+export function createId(type?: ObjectType | 'style' | 'media'): string {
   switch (type) {
     case ObjectType.page:
       return `p.${genId()}`;

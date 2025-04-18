@@ -1,16 +1,21 @@
+import * as R from 'ramda';
 import {
   chain,
   clone,
   concat,
+  filter,
   head,
   identity,
   isEmpty,
+  isNotEmpty,
+  keys,
   map,
   omit,
   partition,
   prop,
+  reject,
+  startsWith,
 } from 'ramda';
-import * as R from 'ramda';
 import { P, match } from 'ts-pattern';
 
 import { DefaultProject } from '~/composables/project/defaults';
@@ -33,6 +38,12 @@ import type {
   RowObject,
 } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
+import { ComponentType } from '~/composables/project/types/v2/objects/components/choice';
+import {
+  ConditionMode,
+  ConditionType,
+  type ObjectCondition,
+} from '~/composables/project/types/v2/objects/components/condition';
 import type { LayoutChildProps } from '~/composables/project/types/v2/objects/layout';
 import type { EditorProject } from '~/composables/shared/tables/projects';
 
@@ -252,6 +263,42 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
 
         components: {},
       };
+
+      if (isNotEmpty(object.requireds)) {
+        const requirements: ObjectCondition[] = [];
+
+        for (const required of object.requireds) {
+          requirements.push({
+            id: createId(),
+            type: required.required
+              ? ConditionType.required
+              : ConditionType.incompatible,
+            mode:
+              required.type === 'or' ? ConditionMode.any : ConditionMode.all,
+            objectIds: reject(
+              isEmpty,
+              concat(
+                map(
+                  (key: string): string =>
+                    // This is some obscure typescript magic
+                    prop(key as `reqId${number}`, required),
+                  filter(startsWith('reqId'), keys(required)),
+                ),
+                map(prop('req'), required.orRequired),
+              ),
+            ),
+            activeWhen: isNotEmpty(required.requireds)
+              ? toConditionTerm(required.requireds)
+              : undefined,
+            display: required.showRequired,
+          });
+        }
+
+        choiceObject.components[ComponentType.Requirements] = {
+          type: ComponentType.Requirements,
+          requirements: requirements,
+        };
+      }
 
       if (object.image) {
         const mediaId = createId('media');

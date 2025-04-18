@@ -120,12 +120,14 @@ export type ProjectStyles = RowStyles &
     backgroundColor: string;
   };
 
-export type ConditionTerm = {
+type _ArbReqId = {
+  // Arbitrary number of reqId properties
+  [K in `reqId${number}`]: string;
+};
+
+export type ConditionTerm = _ArbReqId & {
   id: string;
   reqId: string;
-  reqId1: string;
-  reqId2: string;
-  reqId3: string;
   orRequired: { req: string }[];
   required: boolean;
   showRequired: boolean;

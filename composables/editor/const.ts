@@ -1,3 +1,5 @@
+import { ConditionType } from '~/composables/project/types/v2/objects/components/condition';
+
 export const GridItemPositions: { label: string; value: string }[] = [
   { label: 'Left-Aligned', value: 'left' },
   { label: 'Centered', value: 'center' },
@@ -19,4 +21,9 @@ export const GridItemWidths: { label: string; value: number }[] = [
   { label: '5/12 Columns', value: 25 },
   { label: '2/12 Columns', value: 10 },
   { label: '1/12 Columns', value: 5 },
+];
+
+export const ConditionTypes: { label: string; value: ConditionType }[] = [
+  { label: 'Required', value: ConditionType.required },
+  { label: 'Incompatible', value: ConditionType.incompatible },
 ];
