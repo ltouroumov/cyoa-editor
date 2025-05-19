@@ -1,6 +1,6 @@
 <template>
-  <div class="load-project">
-    <div class="mb-3">
+  <div class="load-project" :class="{ inline: $props.inline ?? false }">
+    <div class="load-input">
       <label class="form-label">Project File</label>
       <input
         ref="fileInput"
@@ -9,10 +9,12 @@
         @change="checkCanLoad"
       />
     </div>
-    <div v-if="error" class="alert alert-danger mb-3" role="alert">
+    <div v-if="error" class="alert alert-danger load-error mb-3" role="alert">
       {{ error }}
     </div>
-    <div class="d-flex justify-content-between align-items-center gap-2">
+    <div
+      class="d-flex justify-content-between align-items-center load-button gap-2"
+    >
       <button
         class="btn btn-primary"
         :class="{ disabled: !canLoad }"
@@ -28,6 +30,8 @@
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
 import { readFileContents } from '~/composables/utils';
+
+const $props = defineProps<{ inline?: boolean }>();
 
 const { loadProject } = useProjectStore();
 const { toggleProjectMenu } = useViewerStore();
@@ -76,4 +80,34 @@ const loadProjectFile = async () => {
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.inline {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.5rem;
+
+  .load-input {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    margin-bottom: 0 !important;
+    label {
+      display: none;
+    }
+  }
+  .load-button {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+  .load-error {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+  }
+}
+
+.load-project {
+  .load-input {
+    margin-bottom: 0.75rem;
+  }
+}
+</style>

@@ -1,10 +1,14 @@
 export type ViewerProject = {
-  remoteFileUrl: string;
+  file_url: string;
+  thumbnail_url?: string;
   title: string;
+  description?: string;
+  author?: string;
   id: string;
 };
 
 export type ViewerProjectList = {
+  remote?: string;
   items: ViewerProject[];
   default: string | null;
   show_load_file: boolean;

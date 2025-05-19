@@ -114,7 +114,7 @@ onMounted(async () => {
 
   if (shouldLoadProject && project) {
     await loadProject(async (setProgress) => {
-      const response = await fetch(project.remoteFileUrl);
+      const response = await fetch(project.file_url);
       if (response.ok) {
         const reader = response.body!.getReader();
 
@@ -147,7 +147,7 @@ onMounted(async () => {
 
         return {
           fileContents: bufferToString(bodyBytes),
-          fileName: project.remoteFileUrl.toString(),
+          fileName: project.file_url.toString(),
         };
       } else {
         throw new Error(
