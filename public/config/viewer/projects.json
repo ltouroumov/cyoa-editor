@@ -3,17 +3,23 @@
   "items": [
     {
       "file_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.0.json",
-      "title": "Worm V6.0 (Pixel's Version)",
+      "thumbnail_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/images/logo/header-v6.jpg",
+      "title": "Worm V6.0",
+      "author": "Fae Witch",
       "id": "worm-v6.0-pixel"
     },
     {
       "file_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.1.json",
-      "title": "Worm V6.1 (Pixel's Version)",
+      "thumbnail_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/images/logo/header-v6.1.png",
+      "title": "Worm V6.1",
+      "author": "Fae Witch",
       "id": "worm-v6.1-pixel"
     },
     {
       "file_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/project-v17.json",
-      "title": "Worm V6 (Lt's Fork)",
+      "thumbnail_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/images/logo/logo-v17.png",
+      "title": "Worm V17",
+      "author": "Lt. Ouroumov",
       "id": "worm-v6-lt"
     }
   ],

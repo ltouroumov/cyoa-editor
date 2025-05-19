@@ -16,6 +16,7 @@
           :key="project.id"
           class="project-list-item"
           :class="{ compact: $props.compact ?? false }"
+          @click.prevent="loadRemoteFile(project)"
         >
           <div v-if="isNotNil(project.thumbnail_url)" class="thumbnail">
             <img :src="project.thumbnail_url" class="thumbnail-img" />
@@ -24,7 +25,7 @@
             <span>No Thumbnail</span>
           </div>
           <div class="project-info">
-            <h2 class="project-title" @click.prevent="loadRemoteFile(project)">
+            <h2 class="project-title">
               {{ project.title }}
             </h2>
             <div
@@ -131,6 +132,7 @@ const loadRemoteFile = async (project: ViewerProject) => {
   flex-direction: row;
   overflow: clip;
   align-items: center;
+  cursor: pointer;
 
   .thumbnail {
     flex-grow: 0;
@@ -185,7 +187,6 @@ const loadRemoteFile = async (project: ViewerProject) => {
   }
 
   .project-title {
-    cursor: pointer;
     text-decoration: underline;
   }
   .project-description {
