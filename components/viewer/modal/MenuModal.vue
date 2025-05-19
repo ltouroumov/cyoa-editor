@@ -56,7 +56,7 @@
             Hash: {{ store.file.projectHash }}
           </div>
         </div>
-        <ProjectMenu :project-list="viewerProjectList" />
+        <ProjectMenu :project-list="viewerProjectList" :compact="true" />
       </div>
       <div v-if="selected === 'save-load'">
         <ImportCode />

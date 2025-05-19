@@ -1,14 +1,13 @@
 <template>
   <ProjectViewWrapper />
-  <div v-if="store.status === 'empty'" class="dialog-container">
-    <div class="bg-dark-subtle dialog text-light">
-      <ProjectMenu :project-list="viewerProjectList" />
-    </div>
-  </div>
+  <ProjectMenu
+    v-if="store.status === 'empty'"
+    :project-list="viewerProjectList"
+  />
 </template>
 
 <script setup lang="ts">
-import { clone } from 'ramda';
+import { assoc, clone, concat, mergeDeepRight } from 'ramda';
 
 import { definePageMeta } from '#imports';
 import ProjectViewWrapper from '~/components/viewer/ProjectViewWrapper.vue';
@@ -23,8 +22,19 @@ const { lightThemeUI } = useSettingRefs();
 const _config = useRuntimeConfig();
 const { data: projectList } = await useAsyncData(
   'projects',
-  (): Promise<ViewerProjectList> =>
-    $fetch(`${_config.app.baseURL}config/viewer/projects.json`),
+  async (): Promise<ViewerProjectList> => {
+    const response: ViewerProjectList = await $fetch(
+      `${_config.app.baseURL}config/viewer/projects.json`,
+    );
+
+    if (response.remote) {
+      const remote: ViewerProjectList = await $fetch(response.remote);
+      const items = concat(response.items, remote.items);
+      return assoc('items', items, mergeDeepRight(response, remote));
+    } else {
+      return response;
+    }
+  },
 );
 
 if (projectList.value) {

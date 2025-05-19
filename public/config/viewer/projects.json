@@ -1,17 +1,18 @@
 {
+  "remote": "https://app.cyoa.ltouroumov.ch/api/v1/neo/projects.json",
   "items": [
     {
-      "remoteFileUrl": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.0.json",
+      "file_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.0.json",
       "title": "Worm V6.0 (Pixel's Version)",
       "id": "worm-v6.0-pixel"
     },
     {
-      "remoteFileUrl": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.1.json",
+      "file_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.1.json",
       "title": "Worm V6.1 (Pixel's Version)",
       "id": "worm-v6.1-pixel"
     },
     {
-      "remoteFileUrl": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/project-v17.json",
+      "file_url": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/project-v17.json",
       "title": "Worm V6 (Lt's Fork)",
       "id": "worm-v6-lt"
     }
