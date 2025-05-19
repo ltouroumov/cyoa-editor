@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { assoc, clone, concat, mergeDeepRight } from 'ramda';
+import { assoc, concat, mergeDeepRight } from 'ramda';
 
 import { definePageMeta } from '#imports';
 import ProjectViewWrapper from '~/components/viewer/ProjectViewWrapper.vue';
@@ -38,7 +38,6 @@ const { data: projectList } = await useAsyncData(
 );
 
 if (projectList.value) {
-  console.log('Project List', clone(projectList.value));
   viewerProjectList.value = projectList.value;
 }
 

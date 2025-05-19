@@ -8,11 +8,11 @@
     </div>
     <main class="main-container">
       <div class="main-header">
-        <input class="form-control" placeholder="Search ..." />
+        <input v-model="search" class="form-control" placeholder="Search ..." />
       </div>
       <div class="project-list-container">
         <div
-          v-for="project in projectList.items"
+          v-for="project in projects"
           :key="project.id"
           class="project-list-item"
           :class="{ compact: $props.compact ?? false }"
@@ -45,7 +45,16 @@
 </template>
 
 <script setup lang="ts">
-import { isNil, isNotNil } from 'ramda';
+import {
+  __,
+  all,
+  includes,
+  isEmpty,
+  isNil,
+  isNotNil,
+  split,
+  toLower,
+} from 'ramda';
 
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
@@ -59,6 +68,21 @@ const { projectList } = defineProps<{
 
 const { loadProject } = useProjectStore();
 const { toggleProjectMenu } = useViewerStore();
+
+const search = ref<string>('');
+
+const projects = computed(() => {
+  console.log('search', search.value);
+  if (isEmpty(search.value)) return projectList.items;
+  else {
+    const searchStr = toLower(search.value);
+    const terms = split(' ', searchStr);
+    return projectList.items.filter((project) => {
+      const title = toLower(project.title);
+      return all(includes(__, title), terms);
+    });
+  }
+});
 
 const loadRemoteFile = async (project: ViewerProject) => {
   const fileURL = project.file_url;
