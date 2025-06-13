@@ -12,7 +12,7 @@
       >
         {{ score.beforeText }}
       </span>
-      <span class="score-text">{{ -value }}</span>
+      <span class="score-text">{{ value }}</span>
       <span v-if="score.afterText" class="score-text">{{
         score.afterText
       }}</span>
@@ -26,13 +26,15 @@ import { computed } from 'vue';
 
 import type { PointType } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
+import { usePoints } from '~/composables/viewer/usePoints';
 
 const $props = defineProps<{
   vertical?: boolean;
   short?: boolean;
 }>();
 
-const { selected, pointTypes, points } = useProjectRefs();
+const { selected, pointTypes } = useProjectRefs();
+const { points } = usePoints();
 
 const activeScores = computed<{ score: PointType; value: number }[]>(() => {
   const scores: PointType[] = pointTypes.value;

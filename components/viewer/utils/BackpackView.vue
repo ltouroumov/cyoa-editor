@@ -9,12 +9,16 @@
       </div>
     </div>
     <div
-      v-for="{ packRow, choices } in packRows"
+      v-for="{ packRow, choices, scores } in packRows"
       :key="packRow.id"
       class="pack-row"
     >
-      <div class="pack-row-title">
-        {{ packRow.title }}
+      <div class="pack-row-title-container">
+        <span class="pack-row-title">{{ packRow.title }}</span>
+
+        <div class="pack-row-info">
+          <RowScores :scores="scores" :horizontal="true" />
+        </div>
       </div>
       <div class="container-fluid p-0">
         <div class="row g-2">
@@ -38,6 +42,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import RowScores from '~/components/viewer/utils/RowScores.vue';
 import { useProjectStore } from '~/composables/store/project';
 import { useSettingRefs } from '~/composables/store/settings';
 import { ViewContext } from '~/composables/viewer';
@@ -82,8 +87,15 @@ const objectMode = computed(() => {
   padding: 0;
   margin-bottom: 0.5rem;
 
+  .pack-row-title-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .pack-row-title {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: bolder;
     text-align: center;
     margin-bottom: 0.2rem;

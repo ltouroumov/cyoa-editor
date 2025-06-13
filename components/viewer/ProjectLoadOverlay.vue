@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
-import { isEmpty, isNotNil } from 'ramda';
+import { isEmpty, isNotNil, map, reverse, sortBy, sum } from 'ramda';
 
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
@@ -36,6 +36,7 @@ const { loadProjectOnStartup } = useSettingRefs();
 
 type BackgroundImageData = {
   url: string;
+  weight?: number;
 };
 type BackgroundData = {
   enabled: boolean;
@@ -58,9 +59,34 @@ const randomizeBackground = () => {
   if (!bgConf) return;
 
   if (bgConf.enabled && !isEmpty(bgConf.images)) {
-    const images = bgConf.images;
-    const idx = Math.floor(Math.random() * images.length);
-    background.value = `${config.app.baseURL}${images[idx].url}`;
+    // Sort the images by weight, from highest to lowest
+    const images = reverse(sortBy((img) => img.weight ?? 1, bgConf.images));
+    // Calculate the total weight of all images
+    const totalWeight: number = sum(map((img) => img.weight ?? 1, images));
+    // Generate a random number between 0 and the total weight (rounded to the nearest integer)
+    const diceRoll = Math.round(Math.random() * totalWeight);
+
+    // Loop through the images until the dice roll is less than the running total of weights.
+    //
+    // **Example**
+    // 01.png has a weight of 10, 02.png has a weight of 2,
+    // 03.png has a weight of 1, and the total weight is 13.
+    // If the dice roll is 10 or lower, the background will be 01.png.
+    // If the dice roll is 11 or 12, the background will be 03.png.
+    // If the dice roll is 13, the background will be 02.png.
+    let acc = 0;
+    for (let i = 0; i < images.length; i++) {
+      const img = images[i];
+      acc += img.weight ?? 1;
+
+      if (diceRoll <= acc) {
+        background.value = `${config.app.baseURL}${img.url}`;
+        return;
+      }
+    }
+
+    // Pick the image with the highest weight as a fallback
+    background.value = `${config.app.baseURL}${images[0].url}`;
   }
 };
 
@@ -91,7 +117,7 @@ onMounted(async () => {
 
   if (shouldLoadProject && project) {
     await loadProject(async (setProgress) => {
-      const response = await fetch(project.remoteFileUrl);
+      const response = await fetch(project.file_url);
       if (response.ok) {
         const reader = response.body!.getReader();
 
@@ -122,8 +148,8 @@ onMounted(async () => {
         }
 
         return {
-          fileContents: bufferToString(bodyBytes.buffer),
-          fileName: project.remoteFileUrl.toString(),
+          fileContents: bufferToString(bodyBytes),
+          fileName: project.file_url.toString(),
         };
       } else {
         throw new Error(

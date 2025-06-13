@@ -1,27 +1,6 @@
 {
-  "items": [
-    {
-      "remoteFileUrl": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.0.json",
-      "preview": "/previews/worm-default.webp",
-      "author": "ElectronicWitch",
-      "title": "Worm V6.0",
-      "id": "worm-v6.0-pixel"
-    },
-    {
-      "remoteFileUrl": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.1.json",
-      "preview": "/previews/worm-default.webp",
-      "author": "ElectronicWitch",
-      "title": "Worm V6.1",
-      "id": "worm-v6.1-pixel"
-    },
-    {
-      "remoteFileUrl": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/project-v17.json",
-      "preview": "/previews/worm-default.webp",
-      "author": "LtOuroumov",
-      "title": "Worm V17",
-      "id": "worm-v6-lt"
-    }
-  ],
+  "remote": "https://app.cyoa.ltouroumov.ch/api/v1/neo/projects.json",
+  "items": [],
   "default": null,
   "show_load_file": true,
   "show_project_sidebar": true

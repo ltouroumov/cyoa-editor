@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
-import { isNil } from 'ramda';
+import { isNil, keys } from 'ramda';
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
@@ -263,15 +263,17 @@ export const useProjectStore = defineStore('project', () => {
       // TODO: Use graph traversal instead
       let changed = true;
       let depth = 0;
-      while (changed && depth < 5) {
+      while (changed && depth < 10) {
         sel1 = R.pickBy((_, objectId): boolean => {
           const object = getObject.value(objectId);
           const pred = buildConditions(object);
-          return pred(R.keys(sel));
+          return pred(R.keys(sel0));
         }, sel0);
 
-        changed = R.isNotEmpty(
-          R.symmetricDifference(R.keys(sel1), R.keys(sel0)),
+        const diff = R.symmetricDifference(R.keys(sel1), R.keys(sel0));
+        changed = R.isNotEmpty(diff);
+        console.log(
+          `clearIncompatible(${depth}, sel0=${keys(sel0)}, sel1=${keys(sel1)}, diff=${diff}, changed=${changed}`,
         );
         sel0 = R.clone(sel1);
         depth++;
@@ -433,54 +435,6 @@ export const useProjectStore = defineStore('project', () => {
     }
   };
 
-  const points = computed<Record<string, number>>(() => {
-    const _selected = R.clone(selected.value);
-    const _selectedIds = R.clone(selectedIds.value);
-
-    const startingSums: Record<string, number> = R.pipe(
-      R.map(({ id, startingSum }: PointType): [string, number] => [
-        id,
-        startingSum,
-      ]),
-      R.fromPairs,
-    )(pointTypes.value);
-
-    return R.pipe(
-      R.keys,
-      R.filter((key) => typeof key === 'string'),
-      R.map((id: string): { obj: ProjectObj; count: number } => ({
-        obj: getObject.value(id),
-        count: _selected[id],
-      })),
-
-      R.chain(({ obj, count }) => {
-        return R.pipe(
-          R.filter((score: Score) => {
-            const pointType = getPointType.value(score.id);
-            const cond = buildConditions(score);
-            return (
-              cond(_selectedIds) &&
-              (R.isEmpty(pointType.activatedId) ||
-                R.includes(pointType.activatedId, _selectedIds))
-            );
-          }),
-          R.map(({ id, value }: Score): { id: string; value: number } => {
-            return {
-              id,
-              value: Number.parseInt(value) * count,
-            };
-          }),
-        )(obj.scores);
-      }),
-      R.reduceBy(
-        (acc, { value }) => acc + value,
-        0,
-        ({ id }) => id,
-      ),
-      R.mergeWith(R.add, startingSums),
-    )(_selected);
-  });
-
   return {
     store,
     project,
@@ -492,7 +446,6 @@ export const useProjectStore = defineStore('project', () => {
     buildData,
     buildNotes,
     buildModified,
-    points,
     isLoaded,
     loadProject,
     unloadProject,
