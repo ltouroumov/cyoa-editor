@@ -29,7 +29,10 @@ export const bufferToString = (buffer: ArrayBuffer) => {
   return textDecoder.decode(buffer);
 };
 
-export const readFileContents = (file: Blob) => {
+export const readFileContents = (
+  file: Blob,
+  onProgress?: (loaded: number, total: number) => void,
+) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => {
@@ -39,6 +42,11 @@ export const readFileContents = (file: Blob) => {
       event.preventDefault();
       reject(new Error('Reader Failed'));
     });
+    if (onProgress) {
+      reader.addEventListener('progress', (event) => {
+        onProgress(event.loaded, event.total);
+      });
+    }
 
     try {
       reader.readAsText(file);
@@ -47,6 +55,3 @@ export const readFileContents = (file: Blob) => {
     }
   });
 };
-
-export const sleep = (timeout: number) =>
-  new Promise((resolve) => setTimeout(resolve, timeout));

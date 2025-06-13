@@ -5,10 +5,8 @@
     </div>
     <template v-if="build.selected">
       <div class="actions">
-        <button class="btn btn-outline-primary btn-sm" @click="loadBuild()">
-          Load
-        </button>
-        <button class="btn btn-sm btn-outline-danger" @click="deleteBuild()">
+        <Button size="small" @click="loadBuild()"> Load </Button>
+        <button size="small" severity="danger" @click="deleteBuild()">
           Delete
         </button>
       </div>
@@ -20,17 +18,17 @@
       <div class="project-name">
         <span v-if="isCompatible === ProjectMatch.Hash" class="compat">
           <div
-            class="i-solar:check-circle-outline h-1em w-1em text-green"
+            class="iconify solar--check-circle-outline h-1em w-1em text-green-500"
           ></div>
         </span>
         <span v-if="isCompatible === ProjectMatch.Name" class="compat">
           <div
-            class="i-solar:check-circle-outline h-1em w-1em text-orange"
+            class="iconify solar--check-circle-outline h-1em w-1em text-orange-500"
           ></div>
         </span>
         <span v-if="isCompatible === ProjectMatch.None" class="compat">
           <div
-            class="i-solar:danger-triangle-bold text-danger h-1em w-1em"
+            class="iconify solar--danger-triangle-bold text-red-500 h-1em w-1em"
           ></div>
         </span>
         <span class="flex-grow-1">{{ build.project.name }}</span>
@@ -42,33 +40,40 @@
         <div class="choices-header">
           <div>Choices</div>
           <div>
-            <button
-              class="btn btn-sm btn-outline-secondary"
+            <Button
+              size="small"
+              variant="text"
+              severity="secondary"
               @click="toggleChoices"
             >
               <div
                 v-if="showChoices"
-                class="i-solar:alt-arrow-down-linear h-1em w-1em"
+                class="iconify solar--alt-arrow-down-linear h-1em w-1em"
               ></div>
               <div
                 v-if="!showChoices"
-                class="i-solar:alt-arrow-right-linear h-1em w-1em"
+                class="iconify solar--alt-arrow-right-linear h-1em w-1em"
               ></div>
-            </button>
+            </Button>
           </div>
         </div>
         <BuildChoices v-show="showChoices" :groups="build.groups" />
       </div>
       <div class="actions">
-        <button class="btn btn-outline-primary btn-sm" @click="loadBuild()">
+        <Button size="small" variant="outlined" @click="loadBuild()">
           Load
-        </button>
-        <button class="btn btn-outline-primary btn-sm" @click="updateBuild()">
+        </Button>
+        <Button size="small" variant="outlined" @click="updateBuild()">
           Save
-        </button>
-        <button class="btn btn-sm btn-outline-danger" @click="deleteBuild()">
+        </Button>
+        <Button
+          size="small"
+          variant="outlined"
+          severity="danger"
+          @click="deleteBuild()"
+        >
           Delete
-        </button>
+        </Button>
       </div>
     </template>
   </div>
@@ -77,18 +82,15 @@
 <script setup lang="ts">
 import * as R from 'ramda';
 import { join, map, toPairs } from 'ramda';
-import { useToast } from 'vue-toastification';
 
 import BuildChoices from '~/components/viewer/library/BuildChoices.vue';
-import {
-  ProjectMatch,
-  type SavedBuildData,
-} from '~/components/viewer/utils/types';
+import { ProjectMatch } from '~/components/viewer/utils/types';
+import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import { type Selections, useProjectRefs } from '~/composables/store/project';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
 const { selected, project } = useProjectRefs();
-const $toast = useToast();
+// const $toast = useToast();
 const $props = defineProps<{
   build: SavedBuildData;
 }>();
@@ -128,13 +130,13 @@ const $lib = useBuildLibrary();
 
 const updateBuild = async () => {
   if (R.isEmpty(selected.value)) {
-    $toast.error("No selections are made,\nThere's nothing to save.");
+    // $toast.error("No selections are made,\nThere's nothing to save.");
     return;
   }
 
   await $lib.updateBuild($props.build, { $choices: true, $notes: true });
   $emit('change');
-  $toast.success(`Updated Build: ${$props.build.name}`);
+  // $toast.success(`Updated Build: ${$props.build.name}`);
 };
 
 const updateBuildName = async (name: string) => {
@@ -145,12 +147,12 @@ const updateBuildName = async (name: string) => {
 const deleteBuild = async () => {
   await $lib.deleteBuild($props.build);
   $emit('change');
-  $toast.success(`Deleted Build: ${$props.build.name}`);
+  // $toast.success(`Deleted Build: ${$props.build.name}`);
 };
 
 const loadBuild = () => {
   $lib.loadBuild($props.build);
-  $toast.info(`Loaded Build: ${$props.build.name}`);
+  // $toast.info(`Loaded Build: ${$props.build.name}`);
 };
 </script>
 
@@ -166,7 +168,7 @@ const loadBuild = () => {
 
   padding: 0.5rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--p-content-border-color);
 
   .name {
     grid-area: name;
@@ -193,7 +195,7 @@ const loadBuild = () => {
     grid-area: choices;
 
     padding-top: 0.5rem;
-    border-top: 1px solid var(--bs-border-color);
+    border-top: 1px solid var(--p-content-border-color);
 
     .choices-header {
       display: flex;

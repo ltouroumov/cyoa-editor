@@ -24,14 +24,14 @@
           />
         </div>
       </template>
-      <div class="notes-ruler"></div>
+      <div v-if="isNotEmpty(visiblePackRows)" class="notes-ruler"></div>
       <GlobalNotes :editable="editable" :compact="compact" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { assoc, chain, filter, has, isEmpty } from 'ramda';
+import { assoc, chain, filter, has, isEmpty, isNotEmpty } from 'ramda';
 
 import RowNote from '~/components/viewer/notes/RowNote.vue';
 import RowScores from '~/components/viewer/utils/RowScores.vue';

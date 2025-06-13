@@ -1,64 +1,65 @@
 <template>
-  <ModalDialog
-    :show="isSearchVisible"
-    size="modal-80"
-    @close="toggleSearch(false)"
+  <Dialog
+    v-model:visible="isSearchVisible"
+    modal
+    dismissable-mask
+    class="w-full h-full mx-[2rem]"
+    :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
   >
     <template #header>
-      <h5 class="m-0">Search</h5>
+      <h5 class="text-primary text-xl">Search</h5>
     </template>
-    <template #default>
-      <div class="search-modal" :class="{ 'show-view': !!searchView }">
-        <div class="search-header">
-          <input
-            ref="searchInput"
-            v-model="searchText"
-            class="form-control"
-            placeholder="Search CYOA"
-            @input="search"
-          />
-          <div class="search-help">
-            Supports: <span class="code">"corona pollentia"</span>,
-            <span class="code">title:taylor</span>,
-            <span class="code">text:charges</span>,
-            <span class="code">required:skitter</span>,
-            <span class="code">cost:10SP</span>,
-            <span class="code">gain:"&lt;10 SP"</span>,
-            <span class="code">id:3ea234</span>, and
-            <span class="code">trump or tinker</span>
-          </div>
-        </div>
-        <div class="search-result-list text-light">
-          <div
-            v-for="group in searchResults"
-            :key="group.row.id"
-            class="result-group"
-          >
-            <div class="group-title">{{ group.row.title }}</div>
-            <div
-              v-for="obj in group.items"
-              :key="obj.id"
-              class="result-item"
-              :class="{ selected: searchView?.obj.id === obj.id }"
-              @click="preview(obj, group.row)"
-            >
-              {{ obj.title }}
-            </div>
-          </div>
-        </div>
-        <div v-if="!!searchView" class="search-result-view text-light">
-          <ViewProjectObj
-            :key="searchView.obj.id"
-            :obj="searchView.obj"
-            :row="searchView.row"
-            :view-object="ViewContext.Viewer"
-            template="1"
-            force-width="col-12"
-          />
+    <div class="search-modal" :class="{ 'show-view': !!searchView }">
+      <div class="search-header">
+        <InputText
+          ref="searchInput"
+          v-model="searchText"
+          placeholder="Search CYOA"
+          fluid
+          autofocus
+          @input="search"
+        />
+        <div class="search-help">
+          Supports: <span class="code">"corona pollentia"</span>,
+          <span class="code">title:taylor</span>,
+          <span class="code">text:charges</span>,
+          <span class="code">required:skitter</span>,
+          <span class="code">cost:10SP</span>,
+          <span class="code">gain:"&lt;10 SP"</span>,
+          <span class="code">id:3ea234</span>, and
+          <span class="code">trump or tinker</span>
         </div>
       </div>
-    </template>
-  </ModalDialog>
+      <div class="search-result-list text-light">
+        <div
+          v-for="group in searchResults"
+          :key="group.row.id"
+          class="result-group"
+        >
+          <div class="group-title">{{ group.row.title }}</div>
+          <div
+            v-for="obj in group.items"
+            :key="obj.id"
+            class="result-item"
+            :class="{ selected: searchView?.obj.id === obj.id }"
+            @click="preview(obj, group.row)"
+          >
+            {{ obj.title }}
+          </div>
+        </div>
+      </div>
+      <div v-if="!!searchView" class="search-result-view text-light">
+        <ViewProjectObj
+          :key="searchView.obj.id"
+          :obj="searchView.obj"
+          :row="searchView.row"
+          :view-object="ViewContext.Viewer"
+          template="1"
+          force-width="col-12"
+        />
+      </div>
+    </div>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -80,8 +81,13 @@ import {
   reject,
 } from 'ramda';
 
-import ModalDialog from '~/components/utils/ModalDialog.vue';
-import type { Project, ProjectObj, ProjectRow } from '~/composables/project';
+import type {
+  ConditionTerm,
+  Project,
+  ProjectObj,
+  ProjectRow,
+  Score,
+} from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';
@@ -110,12 +116,6 @@ watch(isSearchVisible, (newValue) => {
     searchText.value = '';
     searchResults.value = [];
     searchView.value = null;
-  } else {
-    nextTick(() => {
-      if (searchInput.value !== undefined) {
-        searchInput.value.focus();
-      }
-    });
   }
 });
 
@@ -388,8 +388,6 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 </script>
 
 <style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-
 .modal-80 {
   width: 80%;
 }

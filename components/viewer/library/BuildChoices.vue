@@ -17,15 +17,14 @@
 </template>
 
 <script setup lang="ts">
-import type { SavedBuildGroup } from '~/components/viewer/utils/types';
+import type { SavedBuildGroup } from '~/composables/shared/tables/builds';
+
 defineProps<{
   groups: SavedBuildGroup[];
 }>();
 </script>
 
 <style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-
 .choices-list {
   display: inline-flex;
   flex-direction: row;

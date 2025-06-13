@@ -3,27 +3,37 @@ import * as R from 'ramda';
 import { isNil, keys } from 'ramda';
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
-import { useToast } from 'vue-toastification';
 
-import type { SavedBuildData } from '~/components/viewer/utils/types';
 import { buildConditions } from '~/composables/conditions';
 import type {
+  LoadingProjectStore,
   PointType,
+  Project,
   ProjectFile,
   ProjectNote,
   ProjectObj,
   ProjectRow,
   ProjectStore,
-} from '~/composables/project';
+} from '~/composables/project/types/v1';
+import type { SavedBuildData } from '~/composables/shared/tables/builds';
+import type {
+  EditorProject,
+  EditorProjectVersion,
+} from '~/composables/shared/tables/projects';
 import { bufferToHex, stringToBuffer } from '~/composables/utils';
 
 export type Selections = Record<string, number>;
 type Transform = (sel: Selections) => Selections;
 
-export type LoadProjectData = {
-  fileContents: string;
-  fileName: string;
-};
+export type LoadProjectData =
+  | {
+      fileContents: string;
+      fileName: string;
+    }
+  | {
+      project: EditorProject;
+      version: EditorProjectVersion;
+    };
 
 type SetProgressF = (progress: string) => Promise<void>;
 type ProjectProvider = (
@@ -36,8 +46,6 @@ export type IndexMapT = Record<
 >;
 
 export const useProjectStore = defineStore('project', () => {
-  const $toast = useToast();
-
   const store = shallowRef<ProjectStore>({
     status: 'empty',
   });
@@ -151,31 +159,35 @@ export const useProjectStore = defineStore('project', () => {
         return;
       }
 
-      const { fileContents, fileName } = result;
+      if ('fileContents' in result) {
+        const { fileContents, fileName } = result;
 
-      const hashBytes = await crypto.subtle.digest(
-        'SHA-1',
-        stringToBuffer(fileContents),
-      );
-      const hashHex = bufferToHex(hashBytes);
+        const hashBytes = await crypto.subtle.digest(
+          'SHA-1',
+          stringToBuffer(fileContents),
+        );
+        const hashHex = bufferToHex(hashBytes);
 
-      const data: Project = JSON.parse(fileContents);
-      const projectFile: ProjectFile = {
-        data: data,
-        fileName: fileName,
-        projectId: data?.$projectId,
-        projectName: data.rows[0].title,
-        projectHash: hashHex,
-      };
-      console.log(projectFile);
+        const data: Project = JSON.parse(fileContents);
+        const projectFile: ProjectFile = {
+          data: data,
+          fileName: fileName,
+          projectId: data?.$projectId,
+          projectName: data.rows[0].title,
+          projectHash: hashHex,
+        };
 
-      store.value = {
-        status: 'loaded',
-        file: projectFile,
-      };
-      triggerRef(store);
+        store.value = {
+          status: 'loaded',
+          file: projectFile,
+        };
+        triggerRef(store);
+      } else {
+        // $toast.error('Failed to load the project :(');
+        store.value = { status: 'empty' };
+      }
     } catch (e) {
-      $toast.error('Failed to load the project :(');
+      // $toast.error('Failed to load the project :(');
       console.log(e);
       store.value = { status: 'empty' };
     }
@@ -386,7 +398,7 @@ export const useProjectStore = defineStore('project', () => {
         const obj: ProjectObj = getObject.value(objId);
         return obj.title;
       }, removedIds);
-      $toast.info(`Removed selections: ${R.join(', ', removedNames)}`);
+      // $toast.info(`Removed selections: ${R.join(', ', removedNames)}`);
     }
 
     selected.value = newSelected;

@@ -1,25 +1,24 @@
 <template>
   <div class="import-code-wrapper">
-    <textarea
+    <Textarea
       v-model="importCode"
-      class="form-control import-code"
+      class="import-code grow min-h-[6rem]"
       placeholder="Will delete all selected items if empty!!"
     />
-    <button class="btn btn-outline-primary import-btn" @click="readImportCode">
+    <Button class="import-btn" variant="outlined" @click="readImportCode">
       Import Build
-    </button>
+    </Button>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as R from 'ramda';
 import { ref } from 'vue';
-import { useToast } from 'vue-toastification';
 
 import type { Selections } from '~/composables/store/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
-const $toast = useToast();
+// const $toast = useToast();
 const { selected } = useProjectRefs();
 const { setSelected } = useProjectStore();
 const importCode = ref<string>();
@@ -33,7 +32,7 @@ function readImportCode() {
   if (!_code) {
     console.log(`No import code provided. Clearing Selections...`);
     selected.value = {};
-    $toast.info('Build Cleared');
+    // $toast.info('Build Cleared');
     return;
   }
 
@@ -74,7 +73,7 @@ function readImportCode() {
 
   setSelected(selections, true, true);
   importCode.value = '';
-  $toast.info('Build Code Loaded');
+  // $toast.info('Build Code Loaded');
 }
 </script>
 

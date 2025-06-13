@@ -7,11 +7,11 @@ export const useSettingStore = defineStore(
     const disabledAddons = ref<boolean>(false);
     const disabledAddonsInBackpack = ref<boolean>(true);
     const lockBackpackObjects = ref<boolean>(true);
-    const cyoaPreference = ref<string>('');
+    const loadProjectOnStartup = ref<string>('');
     const lightThemeUI = ref<boolean>(false);
 
     const hasPreference = (): boolean => {
-      return R.isNotEmpty(cyoaPreference.value);
+      return R.isNotEmpty(loadProjectOnStartup.value);
     };
 
     const toggleHideDisabledAddons = (set?: boolean) => {
@@ -30,7 +30,7 @@ export const useSettingStore = defineStore(
       disabledAddons,
       disabledAddonsInBackpack,
       lockBackpackObjects,
-      cyoaPreference,
+      loadProjectOnStartup,
       lightThemeUI,
       hasPreference,
       toggleLockBackpackObjects,

@@ -1,3 +1,18 @@
 <template>
-  <h1>Editor</h1>
+  <LazyProjectLibrary v-if="editorStore.mode == 'library'" />
+  <LazyProjectEditor v-if="editorStore.mode === 'editor'" />
+  <DynamicDialog />
 </template>
+
+<script setup lang="ts">
+import { useEditorStore } from '~/composables/editor/useEditorStore';
+
+const editorStore = useEditorStore();
+</script>
+
+<style>
+body {
+  background: var(--p-stone-700);
+  height: 100vh;
+}
+</style>

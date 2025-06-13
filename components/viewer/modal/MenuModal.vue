@@ -1,76 +1,53 @@
 <template>
-  <OffCanvas
-    :show="isProjectMenuVisible"
+  <Drawer
+    v-model:visible="isProjectMenuVisible"
     position="left"
-    :close-button="false"
-    :header="false"
     class="menu-modal"
-    @close="toggleProjectMenu(false)"
+    :dt="{ border: { color: null } }"
   >
-    <template #header>
-      <h5 class="m-0">Project Menu</h5>
-    </template>
-    <template #default>
-      <ul class="nav nav-pills mb-3">
-        <li v-if="viewerProjectList.show_project_sidebar" class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: selected === 'project' }"
-            @click="selected = 'project'"
-          >
-            Project
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: selected === 'save-load' }"
-            @click="selected = 'save-load'"
-          >
-            Save / Load
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: selected === 'library' }"
-            @click="selected = 'library'"
-          >
-            Library
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: selected === 'viewer-settings' }"
-            @click="selected = 'viewer-settings'"
-          >
-            Viewer Settings
-          </a>
-        </li>
-      </ul>
-      <div v-if="selected === 'project'">
-        <div v-if="store.status === 'loaded'" class="mb-2">
-          <div class="fw-bold">{{ store.file.projectName }}</div>
-          <div class="font-monospace text-gray">
-            Hash: {{ store.file.projectHash }}
-          </div>
-        </div>
-        <ProjectMenu :project-list="viewerProjectList" :compact="true" />
-      </div>
-      <div v-if="selected === 'save-load'">
-        <ImportCode />
-        <hr />
-        <ExportCode />
-      </div>
-      <div v-if="selected === 'library'">
-        <BuildLibrary />
-      </div>
-      <div v-if="selected === 'viewer-settings'">
-        <ViewerSettings />
+    <template #container>
+      <div class="p-4">
+        <Tabs value="save-load" :dt="{ tabpanel: { padding: '1rem 0 0 0' } }">
+          <TabList>
+            <Tab v-if="viewerProjectList.show_project_sidebar" value="project">
+              Index
+            </Tab>
+            <Tab value="save-load">Save / Load</Tab>
+            <Tab value="library">Library</Tab>
+            <Tab value="settings">Settings</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel
+              v-if="viewerProjectList.show_project_sidebar"
+              value="project"
+            >
+              <div v-if="store.status === 'loaded'" class="mb-2">
+                <div class="fw-bold">{{ store.file.projectName }}</div>
+                <div class="font-monospace text-gray">
+                  Hash: {{ store.file.projectHash }}
+                </div>
+              </div>
+              <ProjectMenu :project-list="viewerProjectList" :compact="true" />
+            </TabPanel>
+            <TabPanel value="save-load">
+              <ImportCode />
+              <div class="my-2 border-t border-surface-700"></div>
+              <ExportCode />
+              <div class="my-2 border-t border-surface-700"></div>
+              <ExportText />
+            </TabPanel>
+
+            <TabPanel value="library">
+              <BuildLibrary />
+            </TabPanel>
+            <TabPanel value="settings">
+              <ViewerSettings />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </div>
     </template>
-  </OffCanvas>
+  </Drawer>
 </template>
 
 <script setup lang="ts">
@@ -86,58 +63,8 @@ const { store } = useProjectRefs();
 const selected = ref<string>('save-load');
 </script>
 
-<style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-
-.pack-import-export {
-  display: grid;
-  gap: 0.5rem;
-  grid-template:
-    'head head' auto
-    'in-txt out-txt' 1fr
-    'in-btn out-btn' auto
-    'list-txt list-txt' 2fr
-    'list-tgl list-btn' auto
-    / 1fr 1fr;
-
-  strong {
-    grid-area: head;
-    display: block;
-    text-align: center;
-  }
-  .import-code {
-    grid-area: in-txt;
-  }
-  .export-code {
-    grid-area: out-txt;
-  }
-  .export-text {
-    grid-area: list-txt;
-  }
-  .import-btn {
-    grid-area: in-btn;
-  }
-  .export-code-btn {
-    grid-area: out-btn;
-  }
-  .export-text-btn {
-    grid-area: list-btn;
-  }
-  .export-text-toggle {
-    grid-area: list-tgl;
-    justify-self: end;
-    align-self: center;
-  }
-  .isCopied {
-    color: white;
-    background-color: green;
-  }
-}
-</style>
-
 <style lang="scss">
 .menu-modal {
-  margin-top: 40px;
   width: 768px !important;
 }
 

@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import ViewScore from '~/components/viewer/ViewScore.vue';
-import type { Score } from '~/composables/project';
+import type { Score } from '~/composables/project/types/v1';
 
 const { scores } = defineProps<{ scores: Score[] }>();
 </script>

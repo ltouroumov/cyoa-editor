@@ -1,20 +1,21 @@
 <template>
-  <ModalDialog
-    :show="isNotesVisible"
-    size="modal-80"
-    @close="toggleNotes(false)"
+  <Dialog
+    v-model:visible="isNotesVisible"
+    modal
+    dismissable-mask
+    class="w-full h-full mx-[2rem]"
+    :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
   >
     <template #header>
-      <h5 class="m-0">Notes</h5>
+      <h5 class="text-primary text-xl">Notes</h5>
     </template>
     <template #default>
       <NotesView :compact="false" :editable="true" />
     </template>
-  </ModalDialog>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
-import ModalDialog from '~/components/utils/ModalDialog.vue';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 
 const { toggleNotes } = useViewerStore();

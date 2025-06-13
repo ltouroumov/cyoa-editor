@@ -20,20 +20,18 @@
           <RowScores :scores="scores" :horizontal="true" />
         </div>
       </div>
-      <div class="container-fluid p-0">
-        <div class="row g-2">
-          <ViewProjectObj
-            v-for="{ obj, row } in choices"
-            :key="obj.id"
-            :obj="obj"
-            :row="row"
-            :width="packRow.objectWidth"
-            :view-object="objectMode"
-            :hide-disabled-addons="
-              !disabledAddonsInBackpack || hideDisabledAddons
-            "
-          />
-        </div>
+      <div class="row g-2">
+        <ViewProjectObj
+          v-for="{ obj, row } in choices"
+          :key="obj.id"
+          :obj="obj"
+          :row="row"
+          :width="packRow.objectWidth"
+          :view-object="objectMode"
+          :hide-disabled-addons="
+            !disabledAddonsInBackpack || hideDisabledAddons
+          "
+        />
       </div>
     </div>
   </div>

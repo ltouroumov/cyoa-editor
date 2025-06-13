@@ -13,7 +13,11 @@ import {
 } from 'ramda';
 import { computed } from 'vue';
 
-import type { ProjectObj, ProjectRow } from '~/composables/project';
+import type {
+  ObjAddon,
+  ProjectObj,
+  ProjectRow,
+} from '~/composables/project/types/v1';
 import {
   type IndexMapT,
   type Selections,

@@ -1,41 +1,65 @@
 <template>
-  <nav
-    class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark-subtle text-white"
+  <Toolbar
+    class="sticky-top sticky top-0"
+    :dt="{ padding: '0.3rem', border: { radius: 0, color: null } }"
   >
-    <div class="menu-container">
-      <div class="d-flex item-menu flex-row items-center">
-        <button
-          class="btn btn-light btn-lg i-solar-hamburger-menu-outline"
+    <template #start>
+      <div class="flex flex-row items-center">
+        <Button
+          variant="text"
+          icon="iconify solar--hamburger-menu-outline"
+          severity="contrast"
+          :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
           @click="toggleProjectMenu()"
         />
       </div>
+    </template>
+    <template #center>
       <ViewScoreStatus short class="item-scores" />
-      <div class="d-flex item-tools gap-1">
-        <button
-          class="btn btn-light btn-lg i-solar-magnifer-outline"
+    </template>
+    <template #end>
+      <div class="flex gap-1 items-center">
+        <Button
+          variant="text"
+          severity="contrast"
+          icon="iconify solar--magnifer-outline"
+          :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
           @click="toggleSearch()"
         />
-        <button
-          class="btn btn-light btn-lg i-solar-backpack-outline"
+        <Button
+          variant="text"
+          severity="contrast"
+          :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
+          icon="iconify solar--backpack-outline"
           @click="toggleBackpack()"
         />
-        <button
-          class="btn btn-light btn-lg i-solar-notes-outline"
+        <Button
+          variant="text"
+          severity="contrast"
+          :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
+          icon="iconify solar--notes-outline"
           @click="toggleNotes()"
         />
-        <button
+        <Button
           v-if="hasLoadedBuild"
-          class="btn btn-lg i-solar-diskette-outline"
+          variant="text"
+          severity="contrast"
+          :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
+          icon="iconify solar--diskette-outline"
           @click="updateCurrentBuild()"
         />
       </div>
-    </div>
-  </nav>
+    </template>
+  </Toolbar>
 </template>
 
 <script setup lang="ts">
 import { isNotNil } from 'ramda';
-import { useToast } from 'vue-toastification';
 
 import ViewScoreStatus from '~/components/viewer/ViewScoreStatus.vue';
 import { useProjectRefs } from '~/composables/store/project';
@@ -46,7 +70,15 @@ const { toggleBackpack, toggleSearch, toggleProjectMenu, toggleNotes } =
   useViewerStore();
 const { buildData, buildModified } = useProjectRefs();
 const $lib = useBuildLibrary();
-const $toast = useToast();
+// const $toast = useToast();
+
+const MenuButtonDT = {
+  padding: { x: '0.25rem', y: '0.25rem' },
+  border: { radius: '0.10rem' },
+};
+const MenuButtonPT = {
+  icon: { class: 'size-5' },
+};
 
 const hasLoadedBuild = computed(() => {
   return isNotNil(buildData.value);
@@ -56,17 +88,15 @@ const updateCurrentBuild = async () => {
   if (isNotNil(buildData.value)) {
     await $lib.updateBuild(buildData.value);
     buildModified.value = false;
-    $toast.info('Build saved');
+    // $toast.info('Build saved');
   }
 };
 </script>
 
 <style scoped lang="scss">
-@import '~/assets/css/bootstrap/config';
-
-.navbar {
-  position: sticky;
-}
+//.navbar {
+//  background: $dark-bg-subtle-dark;
+//}
 
 @media (min-width: 576px) {
   .menu-container {
@@ -105,6 +135,6 @@ const updateCurrentBuild = async () => {
 }
 
 body:has(.menu-modal.show) .navbar {
-  z-index: $zindex-offcanvas;
+  // z-index: $zindex-offcanvas;
 }
 </style>

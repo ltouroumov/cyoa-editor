@@ -1,4 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+import { GoldMorning } from './prime/gold-morning.style.mjs';
+
 export default defineNuxtConfig({
   app: {
     baseURL:
@@ -47,7 +50,7 @@ export default defineNuxtConfig({
       ],
       noscript: [
         // <noscript>JavaScript is required</noscript>
-        { children: 'JavaScript is required' },
+        { textContent: 'JavaScript is required' },
       ],
     },
   },
@@ -55,16 +58,19 @@ export default defineNuxtConfig({
   ssr: false,
   imports: { autoImport: true },
 
-  css: [
-    '@unocss/reset/normalize.css',
-    '~/assets/css/bootstrap/global.scss',
-    '~/assets/css/toast.scss',
-    '~/assets/css/main.css',
-  ],
+  css: ['~/assets/css/main.css', 'primeicons/primeicons.css'],
 
-  plugins: ['~/plugins/toast.client.ts'],
+  plugins: [],
+  // LT: Disabled because the performance hit on reactivity is way too high
   devtools: { enabled: false },
   typescript: { typeCheck: true },
+
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
 
   components: [
     {
@@ -74,11 +80,32 @@ export default defineNuxtConfig({
   ],
 
   modules: [
-    '@unocss/nuxt',
+    '@nuxt/eslint',
     '@pinia/nuxt',
-    'pinia-plugin-persistedstate/nuxt',
+    '@primevue/nuxt-module',
     '@vueuse/nuxt',
-    '@nuxt/image',
+    'pinia-plugin-persistedstate/nuxt',
   ],
+
+  primevue: {
+    autoImport: true,
+    components: {
+      exclude: ['Chart', 'Form', 'FormField'],
+    },
+    options: {
+      theme: {
+        preset: GoldMorning,
+        options: {
+          prefix: 'p',
+          darkModeSelector: '.dark-theme',
+          cssLayer: {
+            name: 'primevue',
+            order: 'tailwind-base, primevue, tailwind-utilities',
+          },
+        },
+      },
+    },
+  },
+
   compatibilityDate: '2024-09-04',
 });

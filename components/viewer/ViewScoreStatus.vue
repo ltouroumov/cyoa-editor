@@ -1,13 +1,14 @@
 <template>
-  <div class="d-flex gap-2" :class="{ 'flex-column': $props.vertical }">
+  <div class="flex gap-2" :class="{ 'flex-col': $props.vertical }">
     <span
       v-for="{ score, value } in activeScores"
       :key="score.id"
-      class="d-flex score flex-row gap-2"
+      class="flex score gap-1 flex-row"
     >
       <span
         v-if="score.beforeText"
         :class="$props.short ? ['d-none', 'd-sm-block'] : []"
+        class="me-1"
       >
         {{ score.beforeText }}
       </span>
@@ -23,7 +24,7 @@
 import * as R from 'ramda';
 import { computed } from 'vue';
 
-import type { PointType } from '~/composables/project';
+import type { PointType } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import { usePoints } from '~/composables/viewer/usePoints';
 

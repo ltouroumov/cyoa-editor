@@ -47,9 +47,11 @@ definePageMeta({
 
 function setBodyTheme(lightTheme: boolean) {
   if (lightTheme) {
-    document.body.setAttribute('data-bs-theme', 'light');
+    document.documentElement.classList.remove('dark-theme');
+    document.documentElement.classList.add('light-theme');
   } else {
-    document.body.setAttribute('data-bs-theme', 'dark');
+    document.documentElement.classList.remove('light-theme');
+    document.documentElement.classList.add('dark-theme');
   }
 }
 
@@ -76,8 +78,6 @@ watch(
 </script>
 
 <style lang="scss">
-@import '~/assets/css/bootstrap/config';
-
 html {
   font-size: 16px;
 }

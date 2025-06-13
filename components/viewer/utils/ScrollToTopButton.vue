@@ -4,7 +4,7 @@
     :class="{ hidden: isHidden }"
     @click="scrollToTop()"
   >
-    <div class="icon i-solar-arrow-up-linear"></div>
+    <div class="iconify solar--arrow-up-linear"></div>
   </div>
 </template>
 

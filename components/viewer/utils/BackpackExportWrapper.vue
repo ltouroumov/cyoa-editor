@@ -1,5 +1,5 @@
 <template>
-  <div id="backpack" class="export-container project" data-bs-theme="dark">
+  <div id="backpack" class="project export-container" data-bs-theme="dark">
     <BackpackView
       :vertical-score="false"
       :show-title="true"

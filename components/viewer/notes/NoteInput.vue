@@ -1,24 +1,26 @@
 <template>
   <div class="build-note">
     <div class="build-note-header">
-      <input
+      <InputText
         v-if="editable && !staticTitle"
         v-model="note.title"
         type="text"
         class="form-control form-control-sm note-title"
         placeholder="Title ..."
+        fluid
       />
       <RemoveNoteButton v-if="editable" @click="removeNote(note.id)" />
       <span v-if="!editable || staticTitle" class="note-title-frozen">
         {{ staticTitle ?? note.title }}
       </span>
     </div>
-    <textarea
+    <Textarea
       v-if="editable"
       v-model="note.text"
-      class="form-control note-text"
+      class="form-control note-text min-h-[8rem]"
       placeholder="Notes go here ..."
-    ></textarea>
+      fluid
+    ></Textarea>
     <div v-if="!editable" class="note-text">
       {{ note.text }}
     </div>

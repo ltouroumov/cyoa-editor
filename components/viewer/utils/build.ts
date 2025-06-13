@@ -1,10 +1,15 @@
 import { chain, groupBy, head, map, prop, toPairs } from 'ramda';
 
 import type {
+  ProjectObj,
+  ProjectRow,
+  ProjectStore,
+} from '~/composables/project/types/v1';
+import type {
   SavedBuildGroup,
   SavedBuildItem,
   SavedBuildProject,
-} from '~/components/viewer/utils/types';
+} from '~/composables/shared/tables/builds';
 import type { Selections } from '~/composables/store/project';
 
 export const getProjectInfo = (store: ProjectStore): SavedBuildProject => {

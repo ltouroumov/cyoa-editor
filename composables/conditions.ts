@@ -2,7 +2,10 @@ import * as R from 'ramda';
 import { isEmpty, map } from 'ramda';
 import { P, match } from 'ts-pattern';
 
-import type { ConditionTerm, HasRequirements } from '~/composables/project';
+import type {
+  ConditionTerm,
+  HasRequirements,
+} from '~/composables/project/types/v1';
 
 export type Term = (selected: string[]) => boolean;
 export type Condition = {
@@ -24,7 +27,6 @@ export const buildRootCondition = (terms: ConditionTerm[]): ConditionExec => {
   const { code, deps } =
     terms.length === 0 ? ALWAYS : AND(R.map(buildCondition, terms));
 
-  // eslint-disable-next-line no-new-func
   const func = Function('sel', `return ${code}`);
   return {
     exec: func as Term,
