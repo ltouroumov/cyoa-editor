@@ -52,6 +52,9 @@ export default defineNuxtConfig({
         // <noscript>JavaScript is required</noscript>
         { textContent: 'JavaScript is required' },
       ],
+      htmlAttrs: {
+        class: 'dark-theme',
+      },
     },
   },
 
