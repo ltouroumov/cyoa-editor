@@ -5,7 +5,20 @@
     class="menu-modal"
     :dt="{ border: { color: null } }"
   >
-    <template #container>
+    <template #container="{ closeCallback }">
+      <div class="p-4 flex flex-row border-b border-surface-700">
+        <h1 class="text-primary text-2xl flex-1">
+          {{ store.status === 'loaded' ? store.file.projectName : '' }}
+        </h1>
+        <Button
+          icon="pi pi-times"
+          rounded
+          variant="outlined"
+          severity="secondary"
+          size="small"
+          @click="closeCallback()"
+        />
+      </div>
       <div class="p-4">
         <Tabs value="save-load" :dt="{ tabpanel: { padding: '1rem 0 0 0' } }">
           <TabList>
