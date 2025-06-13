@@ -36,7 +36,7 @@
             <div class="obj-select-multi">
               <div
                 v-if="canToggle"
-                class="i-carbon-subtract-alt text-xl"
+                class="iconify carbon--subtract-alt text-xl"
                 :class="{
                   'text-green-400': selectedAmount > minSelectedAmount,
                   'text-grey-400': selectedAmount <= minSelectedAmount,
@@ -46,7 +46,7 @@
               <span class="mx-1">{{ selectedAmount }}</span>
               <div
                 v-if="canToggle"
-                class="i-carbon-add-alt text-xl"
+                class="iconify carbon--add-alt text-xl"
                 :class="{
                   'text-green-400': selectedAmount < maxSelectedAmount,
                   'text-grey-400': selectedAmount >= minSelectedAmount,
