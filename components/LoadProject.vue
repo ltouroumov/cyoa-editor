@@ -1,27 +1,19 @@
 <template>
   <div class="load-project" :class="{ inline: $props.inline ?? false }">
     <div class="load-input">
-      <label class="form-label">Project File</label>
-      <input
-        ref="fileInput"
-        class="form-control"
-        type="file"
-        @change="checkCanLoad"
+      <FileUpload
+        mode="basic"
+        :custom-upload="true"
+        accept="application/json"
+        :max-file-size="100 * 1024 * 1024"
+        :auto="true"
+        choose-icon="pi pi-file-plus"
+        choose-label="Upload Project"
+        @select="onFileSelect"
       />
     </div>
     <div v-if="error" class="alert alert-danger load-error mb-3" role="alert">
       {{ error }}
-    </div>
-    <div
-      class="d-flex justify-content-between align-items-center load-button gap-2"
-    >
-      <button
-        class="btn btn-primary"
-        :class="{ disabled: !canLoad }"
-        @click="loadProjectFile"
-      >
-        Load Project
-      </button>
     </div>
   </div>
 </template>
@@ -58,50 +50,36 @@ const checkCanLoad = () => {
 
 checkCanLoad();
 
-const loadProjectFile = async () => {
-  if (fileInput.value && fileInput.value.files) {
-    const [file] = fileInput.value.files;
-    if (!file) {
-      error.value = 'No file selected';
-      return;
-    }
-
-    toggleProjectMenu(false);
-    await loadProject(async () => {
-      const data = await readFileContents(file);
-      if (data && typeof data === 'string') {
-        return {
-          fileContents: data,
-          fileName: file.name,
-        };
-      }
+const onFileSelect = async (event: any) => {
+  const file = event.files[0];
+  toggleProjectMenu(false);
+  await loadProject(async (setProgress) => {
+    await setProgress('0%');
+    const data = await readFileContents(file, (loaded, total) => {
+      setProgress(`${Math.round((loaded / total) * 100)}%`);
     });
-  }
+    await setProgress('100%');
+    if (data && typeof data === 'string') {
+      return {
+        fileContents: data,
+        fileName: file.name,
+      };
+    }
+  });
 };
 </script>
 
 <style lang="scss">
 .inline {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 
   .load-input {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
     margin-bottom: 0 !important;
     label {
       display: none;
     }
-  }
-  .load-button {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-  }
-  .load-error {
-    grid-column: 1 / 3;
-    grid-row: 2 / 3;
   }
 }
 

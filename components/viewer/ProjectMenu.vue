@@ -8,7 +8,7 @@
     </div>
     <main class="main-container">
       <div class="main-header">
-        <input v-model="search" class="form-control" placeholder="Search ..." />
+        <InputText v-model="search" placeholder="Search ..." />
       </div>
       <div class="project-list-container">
         <div

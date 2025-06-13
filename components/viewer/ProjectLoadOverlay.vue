@@ -4,8 +4,8 @@
       <div class="spinner-border text-primary me-2" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-      <strong>
-        {{ !store.progress ? 'Loading ...' : store.progress }}
+      <strong v-if="store.progress" class="font-bold">
+        {{ store.progress }}
       </strong>
     </div>
     <div class="loading-background">
