@@ -97,7 +97,7 @@ export default defineNuxtConfig({
         preset: GoldMorning,
         options: {
           prefix: 'p',
-          darkModeSelector: 'system',
+          darkModeSelector: '.dark-theme',
           cssLayer: {
             name: 'primevue',
             order: 'tailwind-base, primevue, tailwind-utilities',

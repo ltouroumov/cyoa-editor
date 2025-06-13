@@ -7659,6 +7659,7 @@ __metadata:
     ramda: 0.30.1
     rxjs: 7.8.2
     sass: 1.86.3
+    tailwind-bootstrap-grid: ^6.0.0
     tailwindcss: 3.4.17
     tailwindcss-primeui: 0.6.1
     ts-pattern: 5.7.0
@@ -12134,6 +12135,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tailwind-bootstrap-grid@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "tailwind-bootstrap-grid@npm:6.0.0"
+  dependencies:
+    zod: ^3.24.4
+  peerDependencies:
+    tailwindcss: ^4
+  checksum: b6701124cb3f310fb4be9b1da7209b46c988b013f897f6cd47269365a7d8fe91b21f9ffb36494c8a936c814a182e3c34951dcf064bf398f74804418dcb895fc9
+  languageName: node
+  linkType: hard
+
 "tailwindcss-primeui@npm:0.6.1":
   version: 0.6.1
   resolution: "tailwindcss-primeui@npm:0.6.1"
@@ -13789,5 +13801,12 @@ __metadata:
   version: 3.24.3
   resolution: "zod@npm:3.24.3"
   checksum: 9c3976e61cec25908f3405502abdf28ab1893afd5182c6739a30375c5c6bf4b9b6ea7e78735324e5ac63571c160ce607ebe320ff389b044223c357ccc2f8c94c
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.24.4":
+  version: 3.25.64
+  resolution: "zod@npm:3.25.64"
+  checksum: 9f0e86430ed52ef56930712485573454f9b8d64697e24e3139581489520993658d2dee5e939e9e820c1c720afa202fdca58a3ef096f8d91b0d04eb4285bc00ca
   languageName: node
   linkType: hard

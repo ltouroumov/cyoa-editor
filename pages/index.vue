@@ -47,9 +47,11 @@ definePageMeta({
 
 function setBodyTheme(lightTheme: boolean) {
   if (lightTheme) {
-    document.body.setAttribute('data-bs-theme', 'light');
+    document.documentElement.classList.remove('dark-theme');
+    document.documentElement.classList.add('light-theme');
   } else {
-    document.body.setAttribute('data-bs-theme', 'dark');
+    document.documentElement.classList.remove('light-theme');
+    document.documentElement.classList.add('dark-theme');
   }
 }
 

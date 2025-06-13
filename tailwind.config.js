@@ -1,4 +1,5 @@
 import { addIconSelectors } from '@iconify/tailwind';
+import tailwind_bootstrap_grid from 'tailwind-bootstrap-grid';
 import tailwindPrimeUI from 'tailwindcss-primeui';
 
 function genColSpan(start, end) {
@@ -35,5 +36,23 @@ module.exports = {
       },
     },
   },
-  plugins: [tailwindPrimeUI, addIconSelectors(['carbon', 'solar'])],
+  plugins: [
+    tailwindPrimeUI,
+    addIconSelectors(['carbon', 'solar']),
+    tailwind_bootstrap_grid({
+      container_max_widths: [
+        'sm',
+        '540px',
+        'md',
+        '720px',
+        'lg',
+        '960px',
+        'xl',
+        '1140px',
+        '2xl',
+        '1320px',
+      ],
+      grid_gutters: ['2', '0.5rem'],
+    }),
+  ],
 };

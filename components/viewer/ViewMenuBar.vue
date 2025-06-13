@@ -10,6 +10,7 @@
           icon="iconify solar--hamburger-menu-outline"
           severity="contrast"
           :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
           @click="toggleProjectMenu()"
         />
       </div>
@@ -24,12 +25,14 @@
           severity="contrast"
           icon="iconify solar--magnifer-outline"
           :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
           @click="toggleSearch()"
         />
         <Button
           variant="text"
           severity="contrast"
           :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
           icon="iconify solar--backpack-outline"
           @click="toggleBackpack()"
         />
@@ -37,6 +40,7 @@
           variant="text"
           severity="contrast"
           :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
           icon="iconify solar--notes-outline"
           @click="toggleNotes()"
         />
@@ -45,6 +49,7 @@
           variant="text"
           severity="contrast"
           :dt="MenuButtonDT"
+          :pt="MenuButtonPT"
           icon="iconify solar--diskette-outline"
           @click="updateCurrentBuild()"
         />
@@ -68,9 +73,11 @@ const $lib = useBuildLibrary();
 // const $toast = useToast();
 
 const MenuButtonDT = {
-  padding: { x: 0, y: 0 },
-  border: { radius: 0 },
-  icon: { only: { width: '2rem' } },
+  padding: { x: '0.25rem', y: '0.25rem' },
+  border: { radius: '0.10rem' },
+};
+const MenuButtonPT = {
+  icon: { class: 'size-5' },
 };
 
 const hasLoadedBuild = computed(() => {

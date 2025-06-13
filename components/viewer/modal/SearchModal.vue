@@ -16,6 +16,7 @@
           v-model="searchText"
           placeholder="Search CYOA"
           fluid
+          autofocus
           @input="search"
         />
         <div class="search-help">
@@ -115,12 +116,6 @@ watch(isSearchVisible, (newValue) => {
     searchText.value = '';
     searchResults.value = [];
     searchView.value = null;
-  } else {
-    nextTick(() => {
-      if (searchInput.value !== undefined) {
-        searchInput.value.focus();
-      }
-    });
   }
 });
 

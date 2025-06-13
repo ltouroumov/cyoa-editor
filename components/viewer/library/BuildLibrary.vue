@@ -3,7 +3,9 @@
     <DataView
       :value="builds"
       data-key="id"
-      :dt="{ header: { padding: '0 0.5rem 1rem 0.5rem' } }"
+      :dt="{
+        header: { padding: '0 0.5rem 1rem 0.5rem' },
+      }"
     >
       <template #header>
         <div class="flex flex-row gap-1">
@@ -12,7 +14,7 @@
         </div>
       </template>
       <template #list="{ items }">
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1 mt-3">
           <BuildCard
             v-for="build in items"
             :key="build.id"

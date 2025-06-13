@@ -35,7 +35,7 @@
         class="flex flex-row items-center gap-2 py-2"
       >
         <div class="flex flex-col gap-1">
-          <label class="grow" for="hideDisabledAddons"> Default Index </label>
+          <label class="grow" for="hideDisabledAddons"> Default Project </label>
           <small class="text-slate-500 text-sm">
             Automatically loads at startup
           </small>

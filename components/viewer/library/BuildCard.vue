@@ -168,7 +168,7 @@ const loadBuild = () => {
 
   padding: 0.5rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--p-content-border-color);
 
   .name {
     grid-area: name;
@@ -195,7 +195,7 @@ const loadBuild = () => {
     grid-area: choices;
 
     padding-top: 0.5rem;
-    border-top: 1px solid var(--bs-border-color);
+    border-top: 1px solid var(--p-content-border-color);
 
     .choices-header {
       display: flex;

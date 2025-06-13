@@ -25,7 +25,7 @@
             <span>No Thumbnail</span>
           </div>
           <div class="project-info">
-            <h2 class="project-title">
+            <h2 class="project-title text-xl text-primary font-bold">
               {{ project.title }}
             </h2>
             <div
