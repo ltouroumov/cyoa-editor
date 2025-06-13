@@ -54,7 +54,7 @@ const { loadProject } = useProjectStore();
 const { toggleProjectMenu } = useViewerStore();
 
 const loadRemoteFile = async (project: ViewerProject) => {
-  const fileURL = project.remoteFileUrl;
+  const fileURL = project.file_url;
   if (!fileURL) return;
 
   toggleProjectMenu(false);

@@ -14,7 +14,6 @@ import type {
   ProjectObj,
   ProjectRow,
   ProjectStore,
-  Score,
 } from '~/composables/project/types/v1';
 import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import type {
@@ -47,8 +46,6 @@ export type IndexMapT = Record<
 >;
 
 export const useProjectStore = defineStore('project', () => {
-  const $toast = useToast();
-
   const store = shallowRef<ProjectStore>({
     status: 'empty',
   });

@@ -1,7 +1,7 @@
 <template>
   <div class="container" :class="{ compact: $props.compact ?? false }">
     <div class="toolbar" :class="{ compact: $props.compact ?? false }">
-      <h1 class="title">Interactive CYOA Viewer (NEO)</h1>
+      <h1 class="title text-3xl">Interactive CYOA Viewer (NEO)</h1>
       <div v-if="projectList.show_load_file" class="load-container">
         <LoadProject :inline="true" />
       </div>
@@ -58,7 +58,8 @@ import {
 
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
-import { bufferToString, sleep } from '~/composables/utils';
+import { bufferToString } from '~/composables/utils';
+import { sleep } from '~/composables/utils/sleep';
 import type { ViewerProjectList } from '~/composables/viewer';
 
 const { projectList } = defineProps<{
@@ -97,7 +98,6 @@ const loadRemoteFile = async (project: ViewerProject) => {
       let received = 0;
       const chunks = [];
 
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -122,7 +122,7 @@ const loadRemoteFile = async (project: ViewerProject) => {
       }
 
       return {
-        fileContents: bufferToString(bodyBytes),
+        fileContents: bufferToString(bodyBytes.buffer),
         fileName: fileURL.toString(),
       };
     } else {
@@ -135,6 +135,11 @@ const loadRemoteFile = async (project: ViewerProject) => {
 </script>
 
 <style scoped lang="scss">
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .container.compact {
   padding: 0;
 }
@@ -150,7 +155,7 @@ const loadRemoteFile = async (project: ViewerProject) => {
 }
 
 .project-list-item {
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--p-content-border-color);
   border-radius: 0.75rem;
   display: flex;
   flex-direction: row;
@@ -183,14 +188,14 @@ const loadRemoteFile = async (project: ViewerProject) => {
 
     background: repeating-linear-gradient(
       45deg,
-      var(--bs-gray-800),
-      var(--bs-gray-800) 10px,
-      var(--bs-gray-700) 10px,
-      var(--bs-gray-700) 20px
+      var(--p-gray-800),
+      var(--p-gray-800) 10px,
+      var(--p-gray-700) 10px,
+      var(--p-gray-700) 20px
     );
 
     span {
-      color: var(--bs-gray-600);
+      color: var(--p-gray-600);
     }
   }
 
@@ -199,7 +204,7 @@ const loadRemoteFile = async (project: ViewerProject) => {
     padding: 0.75rem;
     display: flex;
     flex-direction: column;
-    border-left: 1px solid var(--bs-border-color);
+    border-left: 1px solid var(--p-content-border-color);
     align-self: stretch;
   }
 
@@ -232,7 +237,7 @@ const loadRemoteFile = async (project: ViewerProject) => {
     }
     .project-info {
       border-left: none;
-      border-right: 1px solid var(--bs-border-color);
+      border-right: 1px solid var(--p-content-border-color);
     }
   }
 }
@@ -244,7 +249,11 @@ const loadRemoteFile = async (project: ViewerProject) => {
   align-items: center;
   padding: 1rem 0rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid var(--bs-border-color);
+  border-bottom: 1px solid var(--p-content-border-color);
+
+  .title {
+    color: var(--p-primary-500);
+  }
 
   &.compact {
     .title {

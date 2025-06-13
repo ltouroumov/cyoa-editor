@@ -18,17 +18,17 @@
           fluid
           @input="search"
         />
-      <div class="search-help">
-            Supports: <span class="code">"corona pollentia"</span>,
-            <span class="code">title:taylor</span>,
-            <span class="code">text:charges</span>,
-            <span class="code">required:skitter</span>,
-            <span class="code">cost:10SP</span>,
-            <span class="code">gain:"&lt;10 SP"</span>,
-            <span class="code">id:3ea234</span>, and
-            <span class="code">trump or tinker</span>
-          </div>
+        <div class="search-help">
+          Supports: <span class="code">"corona pollentia"</span>,
+          <span class="code">title:taylor</span>,
+          <span class="code">text:charges</span>,
+          <span class="code">required:skitter</span>,
+          <span class="code">cost:10SP</span>,
+          <span class="code">gain:"&lt;10 SP"</span>,
+          <span class="code">id:3ea234</span>, and
+          <span class="code">trump or tinker</span>
         </div>
+      </div>
       <div class="search-result-list text-light">
         <div
           v-for="group in searchResults"
@@ -81,9 +81,11 @@ import {
 } from 'ramda';
 
 import type {
+  ConditionTerm,
   Project,
   ProjectObj,
   ProjectRow,
+  Score,
 } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';

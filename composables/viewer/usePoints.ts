@@ -2,7 +2,11 @@ import * as R from 'ramda';
 import { computed } from 'vue';
 
 import { buildConditions } from '~/composables/conditions';
-import type { PointType, ProjectObj, Score } from '~/composables/project';
+import type {
+  PointType,
+  ProjectObj,
+  Score,
+} from '~/composables/project/types/v1';
 import { type Selections, useProjectStore } from '~/composables/store/project';
 
 export type ScoreAcc = { cost: number; gain: number };
