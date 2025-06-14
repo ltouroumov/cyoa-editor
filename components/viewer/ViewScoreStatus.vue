@@ -7,7 +7,7 @@
     >
       <span
         v-if="score.beforeText"
-        :class="$props.short ? ['d-none', 'd-sm-block'] : []"
+        :class="$props.short ? ['hidden', 'md:block'] : []"
         class="me-1"
       >
         {{ score.beforeText }}
