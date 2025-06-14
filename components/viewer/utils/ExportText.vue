@@ -5,7 +5,7 @@
       placeholder="Nothing has been selected yet ..."
       :value="exportText"
     />
-    <div class="flex flex-row export-text-toggle gap-5">
+    <div class="flex md:flex-row flex-col export-text-toggle gap-5">
       <div class="flex flex-row gap-1">
         <ToggleSwitch
           v-model="exportTextHeaders"
