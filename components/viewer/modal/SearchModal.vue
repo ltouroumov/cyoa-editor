@@ -3,7 +3,7 @@
     v-model:visible="isSearchVisible"
     modal
     dismissable-mask
-    class="w-full h-full mx-[2rem]"
+    class="w-full h-full lg:mx-[2rem] mx-0"
     :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
   >
     <template #header>

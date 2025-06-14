@@ -59,9 +59,5 @@ div.modal {
     overflow: auto;
     flex-direction: column;
   }
-
-  .modal-80 {
-    --bs-modal-width: 80%;
-  }
 }
 </style>
