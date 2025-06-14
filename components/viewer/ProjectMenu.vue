@@ -223,7 +223,7 @@ const loadRemoteFile = async (project: ViewerProject) => {
   }
   .project-author {
     font-size: 0.8rem;
-    color: var(--bs-gray-600);
+    color: var(--p-stone-600);
     font-style: italic;
   }
 
