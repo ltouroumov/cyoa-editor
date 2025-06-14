@@ -3,6 +3,7 @@
     v-model:visible="isProjectMenuVisible"
     position="left"
     class="menu-modal"
+    :block-scroll="true"
     :dt="{ border: { color: null } }"
   >
     <template #container="{ closeCallback }">
@@ -19,7 +20,7 @@
           @click="closeCallback()"
         />
       </div>
-      <div class="p-4">
+      <div class="p-4 overflow-y-auto">
         <Tabs value="save-load" :dt="{ tabpanel: { padding: '1rem 0 0 0' } }">
           <TabList>
             <Tab v-if="viewerProjectList.show_project_sidebar" value="project">
