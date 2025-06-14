@@ -44,13 +44,13 @@
         :vertical-score="!isLoading"
         :show-title="isLoading"
       />
-      <div class="flex flex-row gap-2 justify-stretch">
+      <div class="flex lg:flex-row flex-col gap-2 justify-stretch">
         <div class="flex flex-col gap-2 grow basis-0">
           <ImportCode class="grow basis-0" />
           <div class="my-1 border-t border-surface-700"></div>
           <ExportCode class="grow basis-0" />
         </div>
-        <div class="mx-1 border-l border-surface-700"></div>
+        <div class="lg:mx-1 lg:border-l my-1 border-t border-surface-700"></div>
         <ExportText class="grow basis-0" />
       </div>
     </div>
