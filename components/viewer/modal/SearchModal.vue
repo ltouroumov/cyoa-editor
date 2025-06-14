@@ -89,10 +89,9 @@ import type {
   Score,
 } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
-import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
+import { useViewerRefs } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';
 
-const { toggleSearch } = useViewerStore();
 const { isSearchVisible } = useViewerRefs();
 const { getObject, getPointType } = useProjectStore();
 const { project } = useProjectRefs();
@@ -429,7 +428,7 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
     gap: 0.25rem;
 
     .search-help {
-      color: var(--bs-secondary);
+      color: var(--p-stone-500);
       font-size: 0.75rem;
 
       .code {
@@ -454,7 +453,7 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
   .result-group {
     .group-title {
       font-weight: bold;
-      border-bottom: var(--bs-border-width) solid var(--bs-border-color);
+      border-bottom: 1px solid var(--p-content-border-color);
       padding: 0.2rem 0.5rem;
     }
 
@@ -462,7 +461,7 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
       padding: 0.2rem 0.5rem;
 
       &.selected {
-        background: var(--bs-primary);
+        background: var(--p-primary-500);
       }
     }
   }
