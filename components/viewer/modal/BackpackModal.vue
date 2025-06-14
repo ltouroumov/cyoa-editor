@@ -126,8 +126,13 @@ const isLoading = ref(false);
 
 .pack-actions {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
 
   .pack-actions-download {
     display: flex;
