@@ -6,7 +6,7 @@
     <template v-if="build.selected">
       <div class="actions">
         <Button size="small" @click="loadBuild()"> Load </Button>
-        <button size="small" severity="danger" @click="deleteBuild()">
+        <button size="small" severity="danger" @click="deleteBuild($event)">
           Delete
         </button>
       </div>
@@ -63,14 +63,14 @@
         <Button size="small" variant="outlined" @click="loadBuild()">
           Load
         </Button>
-        <Button size="small" variant="outlined" @click="updateBuild()">
+        <Button size="small" variant="outlined" @click="updateBuild($event)">
           Save
         </Button>
         <Button
           size="small"
           variant="outlined"
           severity="danger"
-          @click="deleteBuild()"
+          @click="deleteBuild($event)"
         >
           Delete
         </Button>
@@ -80,6 +80,8 @@
 </template>
 
 <script setup lang="ts">
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
 import * as R from 'ramda';
 import { join, map, toPairs } from 'ramda';
 
@@ -90,7 +92,9 @@ import { type Selections, useProjectRefs } from '~/composables/store/project';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
 const { selected, project } = useProjectRefs();
-// const $toast = useToast();
+const $confirm = useConfirm();
+const $toast = useToast();
+
 const $props = defineProps<{
   build: SavedBuildData;
 }>();
@@ -128,20 +132,34 @@ const isCompatible = computed(() => {
 
 const $lib = useBuildLibrary();
 
-const updateBuild = async () => {
+const updateBuild = async ($event: any) => {
   if (R.isEmpty(selected.value)) {
     // $toast.error("No selections are made,\nThere's nothing to save.");
     return;
   }
 
-  const confirmed = window.confirm(
-    'Are you sure you want to overwrite your saved build?',
-  );
-  if (!confirmed) return;
-
-  await $lib.updateBuild($props.build, { $choices: true, $notes: true });
-  $emit('change');
-  // $toast.success(`Updated Build: ${$props.build.name}`);
+  $confirm.require({
+    target: $event.currentTarget,
+    message: 'Overwrite your saved build?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Save',
+    },
+    accept: async () => {
+      await $lib.updateBuild($props.build, { $choices: true, $notes: true });
+      $toast.add({
+        severity: 'info',
+        summary: `Build Updated ${$props.build.name}`,
+        life: 1000,
+      });
+      $emit('change');
+    },
+  });
 };
 
 const updateBuildName = async (name: string) => {
@@ -149,20 +167,38 @@ const updateBuildName = async (name: string) => {
   $emit('change');
 };
 
-const deleteBuild = async () => {
-  const confirmed = window.confirm(
-    'Are you sure you want to delete your saved build? This action cannot be undone.',
-  );
-  if (!confirmed) return;
-
-  await $lib.deleteBuild($props.build);
-  $emit('change');
-  // $toast.success(`Deleted Build: ${$props.build.name}`);
+const deleteBuild = async ($event: any) => {
+  $confirm.require({
+    target: $event.currentTarget,
+    message: 'Delete your saved build?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Delete',
+    },
+    accept: async () => {
+      await $lib.deleteBuild($props.build);
+      $emit('change');
+      $toast.add({
+        severity: 'success',
+        summary: `Build Deleted ${$props.build.name}`,
+        life: 1000,
+      });
+    },
+  });
 };
 
 const loadBuild = () => {
   $lib.loadBuild($props.build);
-  // $toast.info(`Loaded Build: ${$props.build.name}`);
+  $toast.add({
+    severity: 'info',
+    summary: `Build Loaded ${$props.build.name}`,
+    life: 1000,
+  });
 };
 </script>
 

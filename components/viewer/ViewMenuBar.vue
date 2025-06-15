@@ -2,6 +2,12 @@
   <Toolbar
     class="sticky-top sticky top-0"
     :dt="{ padding: '0.3rem', border: { radius: 0, color: null } }"
+    :pt="{
+      root: 'grid md:grid-cols-3 md:grid-rows-1 grid-cols-2 grid-rows-2 gap-2',
+      center: 'justify-self-center order-3 md:order-2 col-span-2 md:col-span-1',
+      start: 'justify-self-start order-1 md:order-1',
+      end: 'justify-self-end order-2 md:order-3',
+    }"
   >
     <template #start>
       <div class="flex flex-row items-center">
@@ -51,7 +57,7 @@
           :dt="MenuButtonDT"
           :pt="MenuButtonPT"
           icon="iconify solar--diskette-outline"
-          @click="updateCurrentBuild()"
+          @click="updateCurrentBuild($event)"
         />
       </div>
     </template>
@@ -59,6 +65,8 @@
 </template>
 
 <script setup lang="ts">
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
 import { isNotNil } from 'ramda';
 
 import ViewScoreStatus from '~/components/viewer/ViewScoreStatus.vue';
@@ -70,7 +78,8 @@ const { toggleBackpack, toggleSearch, toggleProjectMenu, toggleNotes } =
   useViewerStore();
 const { buildData, buildModified } = useProjectRefs();
 const $lib = useBuildLibrary();
-// const $toast = useToast();
+const $confirm = useConfirm();
+const $toast = useToast();
 
 const MenuButtonDT = {
   padding: { x: '0.25rem', y: '0.25rem' },
@@ -84,57 +93,32 @@ const hasLoadedBuild = computed(() => {
   return isNotNil(buildData.value);
 });
 
-const updateCurrentBuild = async () => {
+const updateCurrentBuild = async ($event: any) => {
   if (isNotNil(buildData.value)) {
-    await $lib.updateBuild(buildData.value);
-    buildModified.value = false;
-    // $toast.info('Build saved');
+    $confirm.require({
+      target: $event.currentTarget,
+      message: 'Overwrite your saved build?',
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptProps: {
+        label: 'Save',
+      },
+      accept: async () => {
+        await $lib.updateBuild(buildData.value!);
+        buildModified.value = false;
+        $toast.add({
+          severity: 'info',
+          summary: `Build Updated ${buildData.value!.name}`,
+          life: 1000,
+        });
+      },
+    });
   }
 };
 </script>
 
-<style scoped lang="scss">
-//.navbar {
-//  background: $dark-bg-subtle-dark;
-//}
-
-@media (min-width: 576px) {
-  .menu-container {
-    width: 100%;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-}
-
-@media (max-width: 576px) {
-  .menu-container {
-    width: 100%;
-
-    display: grid;
-    grid-template:
-      'menu tools' auto
-      'scores scores' auto
-      / 1fr 1fr;
-    gap: 0.2rem;
-
-    .item-menu {
-      grid-area: menu;
-      justify-self: start;
-    }
-    .item-tools {
-      grid-area: tools;
-      justify-self: end;
-    }
-    .item-scores {
-      grid-area: scores;
-      justify-self: center;
-    }
-  }
-}
-
-body:has(.menu-modal.show) .navbar {
-  // z-index: $zindex-offcanvas;
-}
-</style>
+<style scoped lang="scss"></style>

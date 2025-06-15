@@ -11,6 +11,10 @@
   <NotesModal />
   <SearchModal />
   <MenuModal />
+
+  <Toast />
+  <ConfirmPopup />
+  <ConfirmDialog />
 </template>
 
 <script setup lang="ts">

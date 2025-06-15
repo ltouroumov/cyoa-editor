@@ -5,20 +5,28 @@
       class="import-code grow min-h-[6rem]"
       placeholder="Will delete all selected items if empty!!"
     />
-    <Button class="import-btn" variant="outlined" @click="readImportCode">
+    <Button
+      class="import-btn"
+      variant="outlined"
+      @click="readImportCode($event)"
+    >
       Import Build
     </Button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
 import * as R from 'ramda';
+import { isNotEmpty } from 'ramda';
 import { ref } from 'vue';
 
 import type { Selections } from '~/composables/store/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
-// const $toast = useToast();
+const $confirm = useConfirm();
+const $toast = useToast();
 const { selected } = useProjectRefs();
 const { setSelected } = useProjectStore();
 const importCode = ref<string>();
@@ -26,13 +34,33 @@ const importCode = ref<string>();
 const LEGACY_RX =
   /^(?:[a-zA-Z0-9-_!@&.]+(?:\/ON#\d+)?)(?:,[a-zA-Z0-9-_!@&.]+(?:\/ON#\d+)?)*$/;
 
-function readImportCode() {
+function readImportCode($event: any) {
   let _code = importCode.value?.trim();
 
   if (!_code) {
-    console.log(`No import code provided. Clearing Selections...`);
-    selected.value = {};
-    // $toast.info('Build Cleared');
+    if (isNotEmpty(selected.value)) {
+      $confirm.require({
+        target: $event.currentTarget,
+        message: 'Clear choices?',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+          label: 'Cancel',
+          severity: 'secondary',
+          outlined: true,
+        },
+        acceptProps: {
+          label: 'Clear',
+        },
+        accept: async () => {
+          selected.value = {};
+          $toast.add({
+            severity: 'info',
+            summary: `Build Cleared`,
+            life: 1000,
+          });
+        },
+      });
+    }
     return;
   }
 
@@ -45,7 +73,6 @@ function readImportCode() {
     _code = _code.substring(1);
   }
 
-  console.log(`Import Code ${_code}`);
   const selections: Selections = {};
   if (LEGACY_RX.test(_code)) {
     console.log(`Legacy Import Mode`);
@@ -70,10 +97,38 @@ function readImportCode() {
       }
     });
   }
-
-  setSelected(selections, true, true);
-  importCode.value = '';
-  // $toast.info('Build Code Loaded');
+  if (isNotEmpty(selected.value)) {
+    $confirm.require({
+      header: 'Load this build?',
+      message: 'There are choices already selected.',
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptProps: {
+        label: 'Import',
+      },
+      accept: async () => {
+        setSelected(selections, true, true);
+        importCode.value = '';
+        $toast.add({
+          severity: 'info',
+          summary: `Build code loaded`,
+          life: 1000,
+        });
+      },
+    });
+  } else {
+    setSelected(selections, true, true);
+    importCode.value = '';
+    $toast.add({
+      severity: 'info',
+      summary: `Build code loaded`,
+      life: 1000,
+    });
+  }
 }
 </script>
 
