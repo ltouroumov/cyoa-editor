@@ -269,9 +269,6 @@ export const useProjectStore = defineStore('project', () => {
 
         const diff = R.symmetricDifference(R.keys(sel1), R.keys(sel0));
         changed = R.isNotEmpty(diff);
-        console.log(
-          `clearIncompatible(${depth}, sel0=${keys(sel0)}, sel1=${keys(sel1)}, diff=${diff}, changed=${changed}`,
-        );
         sel0 = R.clone(sel1);
         depth++;
       }

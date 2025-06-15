@@ -73,7 +73,6 @@ const { toggleProjectMenu } = useViewerStore();
 const search = ref<string>('');
 
 const projects = computed(() => {
-  console.log('search', search.value);
   if (isEmpty(search.value)) return projectList.items;
   else {
     const searchStr = toLower(search.value);

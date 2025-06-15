@@ -157,7 +157,6 @@ export function useBackpackRender() {
     // Ensure the URL is valid before trying to download it
     if (!imgURL.startsWith('data:image/png')) {
       // $toast.error('Failed to generate backpack image.');
-      console.log(imgURL);
     } else {
       // $toast.success('Backpack image generated');
       await downloadImage(imgURL);

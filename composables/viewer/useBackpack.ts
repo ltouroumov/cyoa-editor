@@ -97,11 +97,6 @@ export function useBackpack() {
           selectedInGroup,
           _selected,
         );
-        console.log(
-          `score for ${row.title} (${row.id})`,
-          selectedInGroup,
-          groupScores,
-        );
         const entry: PackRow = {
           packRow: row,
           choices: sortWith([cmpRowIndex, cmpObjIndex], choicesInGroup),
