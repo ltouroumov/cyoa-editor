@@ -99,6 +99,7 @@ const updateCurrentBuild = async ($event: any) => {
       target: $event.currentTarget,
       message: 'Overwrite your saved build?',
       icon: 'pi pi-exclamation-triangle',
+      group: 'popup',
       rejectProps: {
         label: 'Cancel',
         severity: 'secondary',

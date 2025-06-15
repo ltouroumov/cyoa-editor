@@ -83,7 +83,7 @@
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import * as R from 'ramda';
-import { join, map, toPairs } from 'ramda';
+import { isNotEmpty, join, map, toPairs } from 'ramda';
 
 import BuildChoices from '~/components/viewer/library/BuildChoices.vue';
 import { ProjectMatch } from '~/components/viewer/utils/types';
@@ -142,6 +142,7 @@ const updateBuild = async ($event: any) => {
     target: $event.currentTarget,
     message: 'Overwrite your saved build?',
     icon: 'pi pi-exclamation-triangle',
+    group: 'popup',
     rejectProps: {
       label: 'Cancel',
       severity: 'secondary',
@@ -172,6 +173,7 @@ const deleteBuild = async ($event: any) => {
     target: $event.currentTarget,
     message: 'Delete your saved build?',
     icon: 'pi pi-exclamation-triangle',
+    group: 'popup',
     rejectProps: {
       label: 'Cancel',
       severity: 'secondary',
@@ -193,12 +195,37 @@ const deleteBuild = async ($event: any) => {
 };
 
 const loadBuild = () => {
-  $lib.loadBuild($props.build);
-  $toast.add({
-    severity: 'info',
-    summary: `Build Loaded ${$props.build.name}`,
-    life: 1000,
-  });
+  if (isNotEmpty(selected.value)) {
+    $confirm.require({
+      header: 'Load this build?',
+      message: 'There are choices already selected.',
+      icon: 'pi pi-exclamation-triangle',
+      group: 'modal',
+      rejectProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptProps: {
+        label: 'Load Build',
+      },
+      accept: async () => {
+        $lib.loadBuild($props.build);
+        $toast.add({
+          severity: 'info',
+          summary: `Build Loaded ${$props.build.name}`,
+          life: 1000,
+        });
+      },
+    });
+  } else {
+    $lib.loadBuild($props.build);
+    $toast.add({
+      severity: 'info',
+      summary: `Build Loaded ${$props.build.name}`,
+      life: 1000,
+    });
+  }
 };
 </script>
 

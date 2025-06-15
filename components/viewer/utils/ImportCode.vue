@@ -40,16 +40,17 @@ function readImportCode($event: any) {
   if (!_code) {
     if (isNotEmpty(selected.value)) {
       $confirm.require({
-        target: $event.currentTarget,
-        message: 'Clear choices?',
+        header: 'Clear choices?',
+        message: 'There are currently selected choices.',
         icon: 'pi pi-exclamation-triangle',
+        group: 'modal',
         rejectProps: {
           label: 'Cancel',
           severity: 'secondary',
           outlined: true,
         },
         acceptProps: {
-          label: 'Clear',
+          label: 'Clear Choices',
         },
         accept: async () => {
           selected.value = {};
@@ -97,11 +98,13 @@ function readImportCode($event: any) {
       }
     });
   }
+
   if (isNotEmpty(selected.value)) {
     $confirm.require({
       header: 'Load this build?',
       message: 'There are choices already selected.',
       icon: 'pi pi-exclamation-triangle',
+      group: 'modal',
       rejectProps: {
         label: 'Cancel',
         severity: 'secondary',

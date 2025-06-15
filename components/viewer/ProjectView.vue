@@ -13,8 +13,8 @@
   <MenuModal />
 
   <Toast />
-  <ConfirmPopup />
-  <ConfirmDialog />
+  <ConfirmPopup group="popup" />
+  <ConfirmDialog group="modal" />
 </template>
 
 <script setup lang="ts">
