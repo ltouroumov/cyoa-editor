@@ -1,9 +1,7 @@
 <template>
   <div v-if="store.status === 'loading'" class="loading-overlay">
     <div class="loading-progress">
-      <div class="spinner-border text-primary me-2" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+      <ProgressSpinner class="size-8" />
       <strong v-if="store.progress" class="font-bold">
         {{ store.progress }}
       </strong>
@@ -182,6 +180,7 @@ onMounted(async () => {
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 1rem;
     padding: 1.5rem;
     background-color: rgba(0, 0, 0, 0.5);
     border-radius: 1rem;
