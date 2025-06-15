@@ -31,6 +31,21 @@
         </div>
       </li>
       <li
+        class="flex flex-row items-center gap-2 py-2 border-b border-surface-700"
+      >
+        <Checkbox
+          v-model="disableImages"
+          input-id="toggleDisplayImages"
+          binary
+        />
+        <div class="flex flex-col gap-1">
+          <label class="grow" for="toggleDisplayImages"> Disable images </label>
+          <small class="text-slate-500 text-sm">
+            When enabled disables images site wide
+          </small>
+        </div>
+      </li>
+      <li
         v-if="isNil(viewerProjectList.default)"
         class="flex flex-row items-center gap-2 py-2"
       >
@@ -99,6 +114,7 @@ const {
   disabledAddons,
   disabledAddonsInBackpack,
   lockBackpackObjects,
+  disableImages,
   lightThemeUI,
   loadProjectOnStartup,
 } = useSettingRefs();
