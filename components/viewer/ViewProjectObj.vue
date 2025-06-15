@@ -17,9 +17,9 @@
       @click="toggle"
     >
       <div class="project-obj-content" :class="objTemplateClass">
-        <div v-if="!disableImages" class="obj-image-wrapper">
+        <div class="obj-image-wrapper">
           <img
-            v-if="obj.image"
+            v-if="obj.image && !disableImages"
             class="obj-image"
             :decoding="alwaysEnable ? `sync` : `auto`"
             :loading="alwaysEnable ? `eager` : `lazy`"
