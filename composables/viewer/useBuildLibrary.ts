@@ -63,7 +63,6 @@ export function useBuildLibrary() {
     const entry: SavedBuildData = clone(build);
     entry.updatedAt = new Date();
 
-    console.log('props', rest);
     if (isNotEmpty(rest)) {
       // Copy the updated properties into the object
       Object.assign(entry, rest);

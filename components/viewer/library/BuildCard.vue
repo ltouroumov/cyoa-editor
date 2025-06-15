@@ -134,6 +134,11 @@ const updateBuild = async () => {
     return;
   }
 
+  const confirmed = window.confirm(
+    'Are you sure you want to overwrite your saved build?',
+  );
+  if (!confirmed) return;
+
   await $lib.updateBuild($props.build, { $choices: true, $notes: true });
   $emit('change');
   // $toast.success(`Updated Build: ${$props.build.name}`);
@@ -145,6 +150,11 @@ const updateBuildName = async (name: string) => {
 };
 
 const deleteBuild = async () => {
+  const confirmed = window.confirm(
+    'Are you sure you want to delete your saved build? This action cannot be undone.',
+  );
+  if (!confirmed) return;
+
   await $lib.deleteBuild($props.build);
   $emit('change');
   // $toast.success(`Deleted Build: ${$props.build.name}`);

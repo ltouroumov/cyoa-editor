@@ -9,6 +9,7 @@ export const useSettingStore = defineStore(
     const lockBackpackObjects = ref<boolean>(true);
     const loadProjectOnStartup = ref<string>('');
     const lightThemeUI = ref<boolean>(false);
+    const disableImages = ref<boolean>(false);
 
     const hasPreference = (): boolean => {
       return R.isNotEmpty(loadProjectOnStartup.value);
@@ -26,16 +27,22 @@ export const useSettingStore = defineStore(
       lockBackpackObjects.value = set ?? !lockBackpackObjects.value;
     };
 
+    const toggledisplayImages = (set?: boolean) => {
+      disableImages.value = set ?? !disableImages.value;
+    };
+
     return {
       disabledAddons,
       disabledAddonsInBackpack,
       lockBackpackObjects,
       loadProjectOnStartup,
       lightThemeUI,
+      disableImages,
       hasPreference,
       toggleLockBackpackObjects,
       toggleDisabledAddonsInBackpack,
       toggleHideDisabledAddons,
+      toggledisplayImages,
     };
   },
   {

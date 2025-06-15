@@ -17,7 +17,7 @@
       @click="toggle"
     >
       <div class="project-obj-content" :class="objTemplateClass">
-        <div class="obj-image-wrapper">
+        <div v-if="!disableImages" class="obj-image-wrapper">
           <img
             v-if="obj.image"
             class="obj-image"
@@ -85,8 +85,11 @@ import ViewScores from '~/components/viewer/ViewScores.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { useSettingRefs } from '~/composables/store/settings';
 import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';
+
+const { disableImages } = useSettingRefs();
 
 const $props = defineProps<{
   row: ProjectRow;

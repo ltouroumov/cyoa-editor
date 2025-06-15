@@ -7,7 +7,7 @@
     />
     <div class="project-row" :class="{ hidden: !isVisible }">
       <img
-        v-if="row.image"
+        v-if="row.image && !disableImages"
         class="row-image"
         :src="row.image"
         :alt="row.title"
@@ -54,7 +54,7 @@ const { row } = defineProps<{
 }>();
 
 const { selectedIds } = useProjectRefs();
-const { disabledAddons } = useSettingRefs();
+const { disabledAddons, disableImages } = useSettingRefs();
 
 const condition = buildConditions(row);
 const isVisible = computed(() => condition(selectedIds.value));
