@@ -5,7 +5,7 @@
         v-if="editable && !staticTitle"
         v-model="note.title"
         type="text"
-        class="form-control form-control-sm note-title"
+        class="note-title"
         placeholder="Title ..."
         fluid
       />
@@ -17,7 +17,7 @@
     <Textarea
       v-if="editable"
       v-model="note.text"
-      class="form-control note-text min-h-[8rem]"
+      class="note-text min-h-[8rem]"
       placeholder="Notes go here ..."
       fluid
     ></Textarea>

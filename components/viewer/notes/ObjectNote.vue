@@ -9,12 +9,12 @@
       />
     </div>
     <div v-if="hasNote" class="obj-note">
-      <textarea
+      <Textarea
         v-if="editable"
         v-model="buildNotes[noteId].text"
-        class="form-control note-text"
+        class="note-text w-full"
         placeholder="Notes go here ..."
-      ></textarea>
+      ></Textarea>
       <div v-if="!editable" class="note-text">
         {{ buildNotes[noteId].text }}
       </div>

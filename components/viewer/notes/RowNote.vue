@@ -8,11 +8,12 @@
         @click="removeNote(noteId)"
       />
     </div>
-    <textarea
+    <Textarea
       v-if="hasNote && editable"
       v-model="buildNotes[noteId].text"
-      class="form-control note-text"
-    ></textarea>
+      class="note-text w-full"
+      placeholder="Add notes here..."
+    ></Textarea>
     <div v-if="hasNote && !editable" class="note-text">
       {{ buildNotes[noteId].text }}
     </div>
