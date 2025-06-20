@@ -12,37 +12,67 @@
     <div class="pack-content flex-grow-1 bg-dark">
       <div class="pack-actions mb-3">
         <div class="pack-actions-download">
-          <Button @click="exportToImage()"> Download Image (Beta) </Button>
-          <Button @click="exportToHtml()"> Download HTML </Button>
+          <Button @click="exportToImage()"> Download Image (Beta)</Button>
+          <Button @click="exportToHtml()"> Download HTML</Button>
         </div>
-        <div
-          v-show="!isLoading"
-          class="flex flex-col gap-1 pack-actions-options"
-        >
-          <div class="flex flex-row items-center gap-1">
-            <ToggleSwitch
-              v-model="lockBackpackObjects"
-              input-id="packRowDisabledSwitch"
-            />
-            <label class="form-check-label" for="packRowDisabledSwitch">
-              Lock Objects in the Backpack
-            </label>
-          </div>
-          <div class="flex flex-row items-center gap-1">
-            <ToggleSwitch
-              v-model="disabledAddonsInBackpack"
-              input-id="hideDisabledAddons"
-            />
-            <label class="form-check-label" for="hideDisabledAddons">
-              Show Disabled Addons
-            </label>
-          </div>
+        <div v-show="!isLoading" class="flex flex-col gap-1">
+          <Button
+            icon="pi pi-cog"
+            severity="secondary"
+            label="Settings"
+            @click="toggleSettings"
+          />
+          <Popover ref="settingsPopover">
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-row items-center gap-1">
+                <ToggleSwitch
+                  v-model="lockBackpackObjects"
+                  input-id="packRowDisabledSwitch"
+                />
+                <label class="form-check-label" for="packRowDisabledSwitch">
+                  Lock Objects in the Backpack
+                </label>
+              </div>
+              <div class="flex flex-row items-center gap-1">
+                <ToggleSwitch
+                  v-model="showDisabledAddonsInBackpack"
+                  input-id="showDisabledAddonsInBackpack"
+                />
+                <label
+                  class="form-check-label"
+                  for="showDisabledAddonsInBackpack"
+                >
+                  Show Disabled Addons in the Backpack
+                </label>
+              </div>
+              <div class="flex flex-row items-center gap-1">
+                <ToggleSwitch
+                  v-model="hideImagesInBackpack"
+                  input-id="hideImagesInBackpack"
+                />
+                <label class="form-check-label" for="hideImagesInBackpack">
+                  Hide Images in the Backpack
+                </label>
+              </div>
+              <div class="flex flex-row items-center gap-1">
+                <ToggleSwitch
+                  v-model="hideTextInBackpack"
+                  input-id="hideTextInBackpack"
+                />
+                <label class="form-check-label" for="hideTextInBackpack">
+                  Hide Text in the Backpack
+                </label>
+              </div>
+            </div>
+          </Popover>
         </div>
       </div>
       <BackpackView
         ref="backpackRef"
         :vertical-score="!isLoading"
         :show-title="isLoading"
+        :display="display"
+        :lock-backpack="lockBackpackObjects"
       />
       <div class="flex lg:flex-row flex-col gap-2 justify-stretch">
         <div class="flex flex-col gap-2 grow basis-0">
@@ -61,17 +91,38 @@
 import BackpackView from '~/components/viewer/utils/BackpackView.vue';
 import ExportCode from '~/components/viewer/utils/ExportCode.vue';
 import ImportCode from '~/components/viewer/utils/ImportCode.vue';
-import { useSettingRefs } from '~/composables/store/settings';
-import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
+import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
+import { useViewerRefs } from '~/composables/store/viewer';
 import { useBackpackRender } from '~/composables/viewer/useBackpackRender';
 
-const { toggleBackpack } = useViewerStore();
+const { resolveDisplaySettings } = useSettingStore();
 const { isBackpackVisible } = useViewerRefs();
-const { disabledAddonsInBackpack, lockBackpackObjects } = useSettingRefs();
+const {
+  showDisabledAddonsInBackpack,
+  hideImagesInBackpack,
+  hideTextInBackpack,
+  lockBackpackObjects,
+} = useSettingRefs();
 const { exportToImage, exportToHtml } = useBackpackRender();
 
 const backpackRef = ref<InstanceType<typeof BackpackView>>();
+const settingsPopover = ref();
 const isLoading = ref(false);
+
+const toggleSettings = (event: any) => {
+  settingsPopover.value.toggle(event);
+};
+
+const display = computed(() => {
+  const hideImages = hideImagesInBackpack.value;
+  const hideText = hideTextInBackpack.value;
+  return resolveDisplaySettings({
+    hideObjectImages: hideImages,
+    hideObjectText: hideText,
+    hideDisabledAddons: !showDisabledAddonsInBackpack.value,
+    hideAddonText: hideText,
+  });
+});
 </script>
 
 <style scoped lang="scss">
@@ -90,16 +141,19 @@ const isLoading = ref(false);
 .backpackRender {
   width: 2000px !important;
 }
+
 .backpackRender .pack-info-container {
   position: unset;
   align-items: center;
   justify-content: center;
 }
+
 .backpackRender .pack-scores {
   align-self: center;
   font-size: 1.5rem;
   font-weight: bold;
 }
+
 .backpackRender .score-text {
   font-weight: normal;
 }
@@ -119,6 +173,7 @@ const isLoading = ref(false);
   .import-code-wrapper {
     flex-grow: 1;
   }
+
   .export-code-wrapper {
     flex-grow: 1;
   }

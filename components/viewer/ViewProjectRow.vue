@@ -7,7 +7,7 @@
     />
     <div class="project-row" :class="{ hidden: !isVisible }">
       <img
-        v-if="row.image && !disableImages"
+        v-if="row.image && !display?.hideRowImages"
         class="row-image"
         :src="row.image"
         :alt="row.title"
@@ -20,7 +20,7 @@
           v-html="formatText(row.title)"
         />
         <div
-          v-if="row.titleText"
+          v-if="row.titleText && !display?.hideRowText"
           class="row-text"
           v-html="formatText(row.titleText)"
         />
@@ -32,7 +32,7 @@
           :key="obj.id"
           :obj="obj"
           :row="row"
-          :hide-disabled-addons="disabledAddons"
+          :display="display"
         />
       </div>
     </div>
@@ -46,15 +46,15 @@ import StyleRow from '~/components/viewer/style/StyleRow.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
-import { useSettingRefs } from '~/composables/store/settings';
+import type { DisplaySettings } from '~/composables/store/settings';
 import { formatText } from '~/composables/text';
 
 const { row } = defineProps<{
   row: ProjectRow;
+  display?: DisplaySettings;
 }>();
 
 const { selectedIds } = useProjectRefs();
-const { disabledAddons, disableImages } = useSettingRefs();
 
 const condition = buildConditions(row);
 const isVisible = computed(() => condition(selectedIds.value));

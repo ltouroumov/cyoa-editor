@@ -2,7 +2,12 @@
   <ViewMenuBar />
   <div class="project">
     <div class="rows">
-      <ViewProjectRow v-for="row in project.rows" :key="row.id" :row="row" />
+      <ViewProjectRow
+        v-for="row in project.rows"
+        :key="row.id"
+        :row="row"
+        :display="display"
+      />
     </div>
   </div>
   <ScrollToTopButton />
@@ -25,10 +30,15 @@ import SearchModal from '~/components/viewer/modal/SearchModal.vue';
 import StyleProject from '~/components/viewer/style/StyleProject.vue';
 import ViewMenuBar from '~/components/viewer/ViewMenuBar.vue';
 import type { Project } from '~/composables/project/types/v1';
+import { useSettingStore } from '~/composables/store/settings';
 
 defineProps<{
   project: Project;
 }>();
+
+const { resolveDisplaySettings } = useSettingStore();
+
+const display = computed(() => resolveDisplaySettings());
 </script>
 <style lang="scss">
 .project {

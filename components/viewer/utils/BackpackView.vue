@@ -28,9 +28,7 @@
           :row="row"
           :width="packRow.objectWidth"
           :view-object="objectMode"
-          :hide-disabled-addons="
-            !disabledAddonsInBackpack || hideDisabledAddons
-          "
+          :display="display"
         />
       </div>
     </div>
@@ -42,24 +40,22 @@ import { computed } from 'vue';
 
 import RowScores from '~/components/viewer/utils/RowScores.vue';
 import { useProjectStore } from '~/composables/store/project';
-import { useSettingRefs } from '~/composables/store/settings';
+import type { DisplaySettings } from '~/composables/store/settings';
 import { ViewContext } from '~/composables/viewer';
 import { useBackpack } from '~/composables/viewer/useBackpack';
 
 const $props = defineProps<{
   showTitle: boolean;
   verticalScore: boolean;
-  lockBackpack?: boolean;
-  hideDisabledAddons?: boolean;
+  lockBackpack: boolean;
+  display: DisplaySettings;
 }>();
 
 const { project } = useProjectStore();
-const { disabledAddonsInBackpack, lockBackpackObjects } = useSettingRefs();
 const { packRows } = useBackpack();
 
 const objectMode = computed(() => {
-  if ($props.lockBackpack || lockBackpackObjects.value)
-    return ViewContext.BackpackDisabled;
+  if ($props.lockBackpack) return ViewContext.BackpackDisabled;
   else return ViewContext.BackpackEnabled;
 });
 </script>

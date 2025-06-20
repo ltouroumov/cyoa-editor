@@ -12,14 +12,14 @@
         disabled: !isEnabled,
         notSelectable: obj.isNotSelectable || row.isInfoRow,
         canToggle: canToggle,
-        hideDisabledAddons: $props.hideDisabledAddons,
+        hideDisabledAddons: $props.display?.hideDisabledAddons,
       }"
       @click="toggle"
     >
       <div class="project-obj-content" :class="objTemplateClass">
         <div class="obj-image-wrapper">
           <img
-            v-if="obj.image && !disableImages"
+            v-if="obj.image && !display?.hideObjectImages"
             class="obj-image"
             :decoding="alwaysEnable ? `sync` : `auto`"
             :loading="alwaysEnable ? `eager` : `lazy`"
@@ -55,11 +55,14 @@
               />
             </div>
           </template>
-          <ViewScores :scores="obj.scores" />
-          <ViewRequirements :requireds="obj.requireds" />
+          <ViewScores v-if="!display?.hideObjectScores" :scores="obj.scores" />
+          <ViewRequirements
+            v-if="!display?.hideObjectRequirements"
+            :requireds="obj.requireds"
+          />
           <!-- eslint-disable vue/no-v-html -->
           <div
-            v-if="obj.text"
+            v-if="obj.text && !display?.hideObjectText"
             class="obj-text"
             v-html="formatText(obj.text)"
           ></div>
@@ -69,6 +72,7 @@
           v-for="(addon, idx) in obj.addons"
           :key="idx"
           :addon="addon"
+          :display="display"
         />
       </div>
     </div>
@@ -85,11 +89,9 @@ import ViewScores from '~/components/viewer/ViewScores.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
-import { useSettingRefs } from '~/composables/store/settings';
+import type { DisplaySettings } from '~/composables/store/settings';
 import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';
-
-const { disableImages } = useSettingRefs();
 
 const $props = defineProps<{
   row: ProjectRow;
@@ -98,7 +100,7 @@ const $props = defineProps<{
   width?: string;
   forceWidth?: string;
   template?: string;
-  hideDisabledAddons?: boolean;
+  display?: DisplaySettings;
 }>();
 
 const objClass = computed(() => {

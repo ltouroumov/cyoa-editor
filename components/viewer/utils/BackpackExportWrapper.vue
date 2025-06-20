@@ -4,7 +4,7 @@
       :vertical-score="false"
       :show-title="true"
       :lock-backpack="true"
-      :hide-disabled-addons="true"
+      :display="display"
     />
 
     <div v-if="isNotEmpty(buildNotes)">
@@ -18,9 +18,23 @@
 import { isNotEmpty } from 'ramda';
 
 import BackpackView from '~/components/viewer/utils/BackpackView.vue';
+import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
 import { useBuildNotes } from '~/composables/viewer/useBuildNotes';
 
 const { buildNotes } = useBuildNotes();
+const { resolveDisplaySettings } = useSettingStore();
+const { hideTextInBackpack, hideImagesInBackpack } = useSettingRefs();
+
+const display = computed(() => {
+  const hideImages = hideImagesInBackpack.value;
+  const hideText = hideTextInBackpack.value;
+  return resolveDisplaySettings({
+    hideObjectImages: hideImages,
+    hideObjectText: hideText,
+    hideDisabledAddons: true,
+    hideAddonText: hideText,
+  });
+});
 </script>
 
 <style scoped lang="scss">

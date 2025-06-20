@@ -1,9 +1,17 @@
 <template>
   <div class="addon" :class="{ disabled: !isEnabled }">
     <div class="title">{{ addon.title }}</div>
-    <ViewRequirements :requireds="addon.requireds" :show-always="true" />
-    <!-- eslint-disable-next-line vue/no-v-html -->
-    <div class="text" v-html="formatText(addon.text)"></div>
+    <ViewRequirements
+      v-if="!display?.hideAddonRequirements"
+      :requireds="addon.requireds"
+      :show-always="true"
+    />
+    <!-- eslint-disable vue/no-v-html -->
+    <div
+      v-if="!display?.hideAddonText"
+      class="text"
+      v-html="formatText(addon.text)"
+    ></div>
   </div>
 </template>
 
@@ -13,8 +21,9 @@ import { ref, watch } from 'vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ObjAddon } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
+import type { DisplaySettings } from '~/composables/store/settings';
 
-const { addon } = defineProps<{ addon: ObjAddon }>();
+const { addon } = defineProps<{ addon: ObjAddon; display?: DisplaySettings }>();
 
 const { selectedIds } = useProjectRefs();
 
