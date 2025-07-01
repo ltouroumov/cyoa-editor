@@ -249,7 +249,10 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         }
         
         &.disabled {
-          background-color: {{reqFilterBgColor}}
+          background-color: {{reqFilterBgColor}};
+          {{#if reqFilterGrayIsOn}}
+          filter: grayscale({{reqFilterGray}}%);
+          {{/if}}
         }
       }
 
@@ -280,11 +283,17 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       {{#if selBgColorIsOn}}
       &.selected {
         background-color: {{selFilterBgColor}}
+        {{#if selFilterGrayIsOn}}
+        filter: grayscale({{selFilterGray}}%);
+        {{/if}}
       }
       {{/if}}
       {{#if reqBgColorIsOn}}
       &.disabled {
-        background-color: {{reqFilterBgColor}}
+        background-color: {{reqFilterBgColor}};
+        {{#if reqFilterGrayIsOn}}
+        filter: grayscale({{reqFilterGray}}%);
+        {{/if}}
       }
       {{/if}}
     }
