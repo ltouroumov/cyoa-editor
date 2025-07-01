@@ -5696,6 +5696,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dom-to-svg@patch:dom-to-svg@npm:0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch::locator=icc-neo%40workspace%3A.":
+  version: 0.12.2
+  resolution: "dom-to-svg@patch:dom-to-svg@npm%3A0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch::version=0.12.2&hash=f1f7fe&locator=icc-neo%40workspace%3A."
+  dependencies:
+    gradient-parser: ^1.0.2
+    postcss: ^8.2.9
+    postcss-value-parser: ^4.1.0
+  checksum: e1ac775d8dc96fea41b0dadec500747854c431a0373fc14722c91feaa498c39497855011facc5496e3a1c1a846da265247765fd1e7c7a3bfefe19f616c9773ea
+  languageName: node
+  linkType: hard
+
 "domelementtype@npm:^2.3.0":
   version: 2.3.0
   resolution: "domelementtype@npm:2.3.0"
@@ -7638,7 +7649,7 @@ __metadata:
     browserslist: ^4.24.4
     canvas-size: 2.0.0
     dexie: 4.0.11
-    dom-to-svg: 0.12.2
+    dom-to-svg: "patch:dom-to-svg@npm:0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch"
     eslint: 9.24.0
     eslint-config-prettier: 10.1.2
     eslint-plugin-import-x: 4.10.5

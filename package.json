@@ -53,7 +53,7 @@
     "bootstrap": "5.3.5",
     "canvas-size": "2.0.0",
     "dexie": "4.0.11",
-    "dom-to-svg": "0.12.2",
+    "dom-to-svg": "patch:dom-to-svg@npm:0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch",
     "handlebars": "4.7.8",
     "nanoid": "5.1.5",
     "nuxt": "3.16.2",
@@ -73,9 +73,6 @@
   "packageManager": "yarn@3.6.3",
   "engines": {
     "node": "^22"
-  },
-  "resolutions": {
-    "dom-to-svg@^0.12.2": "patch:dom-to-svg@npm%3A0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch"
   },
   "peerDependencies": {
     "@tailwindcss/vite": "*"
