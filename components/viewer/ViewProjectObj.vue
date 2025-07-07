@@ -174,9 +174,15 @@ const canToggle = computed<boolean>(() => {
     $props.viewObject !== ViewContext.BackpackDisabled
   );
 });
-const isSelected = computed<boolean>(() =>
-  R.has($props.obj.id, selected.value),
-);
+const isSelected = computed<boolean>(() => {
+  switch ($props.viewObject) {
+    case ViewContext.BackpackEnabled:
+    case ViewContext.BackpackDisabled:
+      return false;
+    default:
+      return R.has($props.obj.id, selected.value);
+  }
+});
 
 const selectedAmount = computed(() => {
   if ($props.obj.isSelectableMultiple)
