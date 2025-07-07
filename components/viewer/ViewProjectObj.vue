@@ -8,7 +8,7 @@
     <div
       class="project-obj"
       :class="{
-        selected: isSelected,
+        selected: isSelected && !isInBackpack,
         disabled: !isEnabled,
         notSelectable: obj.isNotSelectable || row.isInfoRow,
         canToggle: canToggle,
@@ -175,14 +175,14 @@ const canToggle = computed<boolean>(() => {
     $props.viewObject !== ViewContext.BackpackDisabled
   );
 });
+const isInBackpack = computed<boolean>(() => {
+  return (
+    $props.viewObject === ViewContext.BackpackEnabled ||
+    $props.viewObject === ViewContext.BackpackDisabled
+  );
+});
 const isSelected = computed<boolean>(() => {
-  switch ($props.viewObject) {
-    case ViewContext.BackpackEnabled:
-    case ViewContext.BackpackDisabled:
-      return false;
-    default:
-      return R.has($props.obj.id, selected.value);
-  }
+  return R.has($props.obj.id, selected.value);
 });
 
 const selectedAmount = computed(() => {
