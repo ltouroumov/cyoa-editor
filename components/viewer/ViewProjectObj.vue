@@ -13,6 +13,7 @@
         notSelectable: obj.isNotSelectable || row.isInfoRow,
         canToggle: canToggle,
         hideDisabledAddons: $props.display?.hideDisabledAddons,
+        hasPrivateStyling: obj.isPrivateStyling,
       }"
       @click="toggle"
     >

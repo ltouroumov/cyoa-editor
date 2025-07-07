@@ -16,8 +16,8 @@ const { styles } = defineProps<{ styles: ProjectStyles }>();
 
 const generators = [
   new ProjectStylesGen(),
-  new RowStylesGen(),
-  new ObjStylesGen(),
+  new RowStylesGen({ global: true }),
+  new ObjStylesGen({ global: true }),
 ];
 const stylesheet = computed(() => {
   return createStyles(styles, generators);

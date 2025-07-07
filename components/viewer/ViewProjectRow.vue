@@ -5,7 +5,10 @@
       :styles="row.styling"
       :row-id="row.id"
     />
-    <div class="project-row" :class="{ hidden: !isVisible }">
+    <div
+      class="project-row"
+      :class="{ hidden: !isVisible, hasPrivateStyle: row.isPrivateStyling }"
+    >
       <img
         v-if="row.image && !display?.hideRowImages"
         class="row-image"

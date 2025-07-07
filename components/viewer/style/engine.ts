@@ -69,7 +69,7 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
 
   private readonly _template;
   private readonly _options;
-  constructor(options: { container?: string } = {}) {
+  constructor(options: { container?: string; global?: boolean } = {}) {
     super();
     this._options = options;
     this._template = Handlebars.compile(RowStylesGen.TEMPLATE);
@@ -94,7 +94,10 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       ),
     });
 
-    const styles = this._template(computed);
+    const styles = this._template({
+      ...computed,
+      global: this._options.global,
+    });
     if (this._options.container) {
       return `${this._options.container} { ${styles} }`;
     } else {
@@ -103,7 +106,7 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   }
 
   static TEMPLATE: string = `
-    .project-row {
+    .project-row{{#if global}}:not(.hasPrivateStyling){{/if}} {
       
       .row-title {
         font-family: {{rowTitle}};
@@ -129,11 +132,15 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
 
         {{#if rowImgBorderIsOn}}
         border: {{rowImgBorderWidth}}px {{rowImgBorderStyle}} {{rowImgBorderColor}};
+        {{else}}
+        border: none;
         {{/if}}
       }
       .row-header {
         {{#if rowBgColorIsOn}}
         background-color: {{rowBgColor}};
+        {{else}}
+        background-color: transparent;
         {{/if}}
       
         margin-left: {{rowMargin}}%;
@@ -168,7 +175,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
 
   private readonly _template;
   private readonly _options;
-  constructor(options: { container?: string } = {}) {
+  constructor(options: { container?: string; global?: boolean } = {}) {
     super();
     this._options = options;
     this._template = Handlebars.compile(ObjStylesGen.TEMPLATE);
@@ -193,7 +200,10 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       ),
     });
 
-    const styles = this._template(computed);
+    const styles = this._template({
+      ...computed,
+      global: this._options.global,
+    });
     if (this._options.container) {
       return `${this._options.container} { ${styles} }`;
     } else {
@@ -202,7 +212,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
   }
 
   static TEMPLATE: string = `
-    .project-obj {
+    .project-obj{{#if global}}:not(.hasPrivateStyling){{/if}} {
       {{#if objectBgColorIsOn}}
       background-color: {{objectBgColor}};
       {{/if}}
@@ -249,7 +259,9 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         }
         
         &.disabled {
+          {{#if reqBgColorIsOn}}
           background-color: {{reqFilterBgColor}};
+          {{/if}}
           {{#if reqFilterGrayIsOn}}
           filter: grayscale({{reqFilterGray}}%);
           {{/if}}
@@ -263,7 +275,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
         color: {{scoreTextColor}};
       }
 
-      /* FIXME: Disabled as it messes up parent colunms, appears related to grid.css
+      /* FIXME: Disabled as it messes up parent columns, appears related to grid.css
       margin: {{objectMargin}}px;
       */
 
@@ -280,22 +292,22 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       border: none;
       {{/if}}
       
-      {{#if selBgColorIsOn}}
       &.selected {
-        background-color: {{selFilterBgColor}}
+        {{#if selBgColorIsOn}}
+        background-color: {{selFilterBgColor}};
+        {{/if}}
         {{#if selFilterGrayIsOn}}
         filter: grayscale({{selFilterGray}}%);
         {{/if}}
       }
-      {{/if}}
-      {{#if reqBgColorIsOn}}
       &.disabled {
+        {{#if reqBgColorIsOn}}
         background-color: {{reqFilterBgColor}};
+        {{/if}}
         {{#if reqFilterGrayIsOn}}
         filter: grayscale({{reqFilterGray}}%);
         {{/if}}
       }
-      {{/if}}
     }
   `;
 }
