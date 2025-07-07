@@ -1,6 +1,6 @@
 <template>
   <Toolbar
-    class="sticky-top sticky top-0"
+    class="sticky-top sticky top-0 z-50"
     :dt="{ padding: '0.3rem', border: { radius: 0, color: null } }"
     :pt="{
       root: 'grid md:grid-cols-3 md:grid-rows-1 grid-cols-2 grid-rows-2 gap-2',
