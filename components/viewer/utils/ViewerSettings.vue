@@ -100,6 +100,23 @@
           class="flex flex-row items-center gap-2 py-2 border-b border-surface-700"
         >
           <Checkbox
+            v-model="isObjectPaginated"
+            binary
+            input-id="isObjectPaginated"
+          />
+          <div class="flex flex-col gap-1">
+            <label for="isObjectPaginated" class="grow">
+              Paginated Object View
+            </label>
+            <small class="text-slate-500 text-sm">
+              Renders choices in a fixed-height container with pagination.
+            </small>
+          </div>
+        </li>
+        <li
+          class="flex flex-row items-center gap-2 py-2 border-b border-surface-700"
+        >
+          <Checkbox
             v-model="displaySettings.settings.hideObjectImages"
             input-id="hideObjectImages"
             binary
@@ -253,7 +270,7 @@ import {
 } from '~/composables/store/settings';
 import { useViewerRefs } from '~/composables/store/viewer';
 
-const { viewerProjectList } = useViewerRefs();
+const { viewerProjectList, isObjectPaginated } = useViewerRefs();
 const {
   showDisabledAddonsInBackpack,
   hideImagesInBackpack,

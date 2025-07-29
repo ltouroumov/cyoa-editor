@@ -29,6 +29,7 @@
           :width="packRow.objectWidth"
           :view-object="objectMode"
           :display="display"
+          :is-object-paginated="false"
         />
       </div>
     </div>

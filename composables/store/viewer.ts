@@ -7,6 +7,7 @@ export const useViewerStore = defineStore('viewer', () => {
   const isNotesVisible = ref<boolean>(false);
   const isSearchVisible = ref<boolean>(false);
   const isProjectMenuVisible = ref<boolean>(false);
+  const isObjectPaginated = ref<boolean>(false);
 
   const viewerProjectList = ref<ViewerProjectList>({
     items: [],
@@ -31,16 +32,22 @@ export const useViewerStore = defineStore('viewer', () => {
     isProjectMenuVisible.value = set ?? !isProjectMenuVisible.value;
   };
 
+  const toggleObjectPagination = (set?: boolean) => {
+    isObjectPaginated.value = set ?? !isObjectPaginated.value;
+  };
+
   return {
     isBackpackVisible,
     isNotesVisible,
     isSearchVisible,
     isProjectMenuVisible,
+    isObjectPaginated,
     viewerProjectList,
     toggleBackpack,
     toggleNotes,
     toggleSearch,
     toggleProjectMenu,
+    toggleObjectPagination,
   };
 });
 
