@@ -29,7 +29,7 @@
             :alt="obj.title"
           />
         </div>
-        <div class="obj-content">
+        <div class="obj-header">
           <div class="obj-title">
             {{ obj.title }}
           </div>
@@ -61,6 +61,8 @@
             v-if="!display?.hideObjectRequirements"
             :requireds="obj.requireds"
           />
+        </div>
+        <div class="obj-content">
           <!-- eslint-disable vue/no-v-html -->
           <div
             v-if="obj.text && !display?.hideObjectText"
@@ -68,13 +70,13 @@
             v-html="formatText(obj.text)"
           ></div>
           <!-- eslint-enable vue/no-v-html -->
+          <ViewAddon
+            v-for="(addon, idx) in obj.addons"
+            :key="idx"
+            :addon="addon"
+            :display="display"
+          />
         </div>
-        <ViewAddon
-          v-for="(addon, idx) in obj.addons"
-          :key="idx"
-          :addon="addon"
-          :display="display"
-        />
       </div>
     </div>
   </div>
@@ -231,12 +233,14 @@ const decrement = () => {
 
   .project-obj-content {
     overflow: auto;
+    max-height: 1000px;
+    position: relative;
 
     &.obj-template-top {
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: auto auto;
-      grid-template-areas: 'image' 'text';
+      grid-template-rows: auto auto auto;
+      grid-template-areas: 'image' 'header' 'content';
     }
     &.obj-template-left {
       display: grid;
@@ -252,12 +256,6 @@ const decrement = () => {
     }
   }
 
-  // Why was this here?
-  // &.notSelectable {
-  //   border: none;
-  //   border-radius: 0;
-  // }
-
   .obj-image-wrapper {
     display: flex;
     flex-direction: row;
@@ -270,9 +268,11 @@ const decrement = () => {
     object-fit: contain;
   }
 
-  .obj-content {
-    overflow-x: auto;
-    grid-area: text;
+  .obj-header {
+    grid-area: header;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 
     .obj-title {
       margin-bottom: 5px;
@@ -284,6 +284,13 @@ const decrement = () => {
       justify-content: center;
       align-items: center;
     }
+  }
+  .obj-content {
+    overflow-x: auto;
+    overflow-y: hidden;
+    grid-area: content;
+    column-width: 10000px;
+    column-rule-width: 0;
   }
 }
 
