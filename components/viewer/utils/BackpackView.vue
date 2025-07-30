@@ -1,10 +1,10 @@
 <template>
   <div ref="backpackRef" class="backpack-container">
-    <div v-if="showTitle" class="project-title">
+    <div v-if="showTitle" class="project-title text-primary text-3xl">
       {{ project?.projectName }}
     </div>
     <div class="pack-info-container">
-      <div class="pack-scores">
+      <div class="pack-scores text-surface-0">
         <ViewScoreStatus :vertical="verticalScore" />
       </div>
     </div>
@@ -14,7 +14,7 @@
       class="pack-row"
     >
       <div class="pack-row-title-container">
-        <span class="pack-row-title">{{ packRow.title }}</span>
+        <span class="pack-row-title text-primary">{{ packRow.title }}</span>
 
         <div class="pack-row-info">
           <RowScores :scores="scores" :horizontal="true" />
