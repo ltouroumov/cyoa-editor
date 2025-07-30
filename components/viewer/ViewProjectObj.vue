@@ -375,6 +375,14 @@ const decrement = () => {
     &.hasOverflow {
       margin-bottom: 2rem;
     }
+
+    .obj-text {
+      break-after: column;
+    }
+    .addon {
+      break-before: column;
+      break-after: column;
+    }
   }
 
   .obj-controls {
