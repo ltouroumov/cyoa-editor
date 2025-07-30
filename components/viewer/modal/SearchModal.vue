@@ -56,6 +56,7 @@
           :view-object="ViewContext.Viewer"
           template="1"
           force-width="col-12"
+          :is-object-paginated="false"
         />
       </div>
     </div>

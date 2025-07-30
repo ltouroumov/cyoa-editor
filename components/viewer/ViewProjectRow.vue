@@ -30,7 +30,8 @@
         <!-- eslint-enable vue/no-v-html -->
       </div>
       <div class="row g-2">
-        <ViewProjectObj
+        <component
+          :is="isObjectPaginated ? ViewProjectObjPaginated : ViewProjectObj"
           v-for="obj in row.objects"
           :key="obj.id"
           :obj="obj"
@@ -46,10 +47,13 @@
 import { computed } from 'vue';
 
 import StyleRow from '~/components/viewer/style/StyleRow.vue';
+import ViewProjectObj from '~/components/viewer/ViewProjectObj.vue';
+import ViewProjectObjPaginated from '~/components/viewer/ViewProjectObjPaginated.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
+import { useViewerRefs } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
 
 const { row } = defineProps<{
@@ -58,6 +62,7 @@ const { row } = defineProps<{
 }>();
 
 const { selectedIds } = useProjectRefs();
+const { isObjectPaginated } = useViewerRefs();
 
 const condition = buildConditions(row);
 const isVisible = computed(() => condition(selectedIds.value));
