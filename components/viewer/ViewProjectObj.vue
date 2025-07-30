@@ -6,6 +6,7 @@
       :obj-id="obj.id"
     />
     <div
+      ref="objContainerRef"
       class="project-obj"
       :class="{
         selected: isSelected && !isInBackpack,
@@ -17,7 +18,10 @@
       }"
       @click="toggle"
     >
-      <div class="project-obj-content" :class="objTemplateClass">
+      <div
+        class="project-obj-content"
+        :class="[objTemplateClass, objHeightClass]"
+      >
         <div class="obj-image-wrapper">
           <img
             v-if="obj.image && !display?.hideObjectImages"
@@ -62,7 +66,7 @@
             :requireds="obj.requireds"
           />
         </div>
-        <div class="obj-content">
+        <div ref="objContentRef" class="obj-content" :class="{ hasOverflow }">
           <!-- eslint-disable vue/no-v-html -->
           <div
             v-if="obj.text && !display?.hideObjectText"
@@ -77,17 +81,32 @@
             :display="display"
           />
         </div>
+        <div class="obj-controls" :class="{ show: hasOverflow }" @click.stop>
+          <div class="background"></div>
+          <div class="controls">
+            <div class="scroll-btn size-8" @click.prevent="scrollText(-1)">
+              <div class="iconify size-6 carbon--arrow-left scroll-arrow" />
+            </div>
+            <div class="flex items-center justify-center gap-1">
+              <span>{{ scrollCurrentPage }} / {{ scrollTotalPages }}</span>
+            </div>
+            <div class="scroll-btn size-8" @click.prevent="scrollText(1)">
+              <div class="iconify size-6 carbon--arrow-right scroll-arrow" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core';
 import * as R from 'ramda';
 
 import StyleObj from './style/StyleObj.vue';
 
-import { ObjectSizes } from '~/components/viewer/style/sizes';
+import { ObjectHeights, ObjectSizes } from '~/components/viewer/style/sizes';
 import ViewScores from '~/components/viewer/ViewScores.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
@@ -125,6 +144,21 @@ const objClass = computed(() => {
     return ['col', 'col-12', objectSize];
   }
 });
+const objHeightClass = computed(() => {
+  let objectSize = $props.forceWidth ?? $props.row.objectWidth;
+  if ($props.obj.objectWidth) {
+    objectSize = $props.obj.objectWidth;
+  }
+  if ($props.width) {
+    objectSize = $props.width;
+  }
+
+  if (objectSize in ObjectHeights) {
+    return ObjectHeights[objectSize];
+  } else {
+    return 'mh-3';
+  }
+});
 
 const objTemplateClass = computed(() => {
   // Allow to override the template
@@ -143,6 +177,34 @@ const objTemplateClass = computed(() => {
 
 const objImageIsURL = computed(() => {
   return R.match(/^https?:\/\//, $props.obj.image);
+});
+
+const objContentRef = useTemplateRef('objContentRef');
+const objContentSize = useElementSize(objContentRef);
+const objContentScroll = useScroll(objContentRef);
+const hasOverflow = ref<boolean>(false);
+const scrollTotalPages = ref<number>(0);
+const scrollCurrentPage = ref<number>(1);
+
+watch([objContentSize.width, objContentSize.height], () => {
+  const objContentEl = objContentRef.value;
+  if (!objContentEl) return;
+  hasOverflow.value = objContentEl.scrollWidth > objContentEl.clientWidth;
+  scrollTotalPages.value = Math.floor(
+    objContentEl.scrollWidth / objContentEl.clientWidth,
+  );
+});
+
+const scrollText = (direction: number) => {
+  if (scrollCurrentPage.value <= 1 && direction < 0) return;
+  if (scrollCurrentPage.value >= scrollTotalPages.value && direction > 0)
+    return;
+  scrollCurrentPage.value += direction;
+};
+watch(scrollCurrentPage, (val) => {
+  const objContentEl = objContentRef.value;
+  if (!objContentEl) return;
+  objContentScroll.x.value = (val - 1) * objContentEl.clientWidth;
 });
 
 const store = useProjectStore();
@@ -254,6 +316,19 @@ const decrement = () => {
       grid-template-rows: 1fr;
       grid-template-areas: 'text image';
     }
+
+    &.mh-12 {
+      max-height: 1400px;
+    }
+    &.mh-9 {
+      max-height: 1200px;
+    }
+    &.mh-6 {
+      max-height: 1000px;
+    }
+    &.mh-3 {
+      max-height: 900px;
+    }
   }
 
   .obj-image-wrapper {
@@ -273,6 +348,8 @@ const decrement = () => {
     position: sticky;
     top: 0;
     z-index: 10;
+    margin-top: 5px;
+    margin-bottom: 5px;
 
     .obj-title {
       margin-bottom: 5px;
@@ -286,11 +363,59 @@ const decrement = () => {
     }
   }
   .obj-content {
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     grid-area: content;
     column-width: 10000px;
     column-rule-width: 0;
+    column-gap: 0;
+
+    scroll-behavior: smooth;
+
+    &.hasOverflow {
+      margin-bottom: 2rem;
+    }
+  }
+
+  .obj-controls {
+    visibility: hidden;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 10;
+
+    &.show {
+      visibility: visible;
+    }
+
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--p-surface-700);
+      opacity: 0.5;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .scroll-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+
+        .scroll-arrow {
+          background-color: var(--p-surface-300);
+        }
+      }
+    }
   }
 }
 
