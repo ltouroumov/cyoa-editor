@@ -66,7 +66,7 @@
             :requireds="obj.requireds"
           />
         </div>
-        <div ref="objContentRef" class="obj-content" :class="{ hasOverflow }">
+        <div ref="objContentRef" class="obj-content">
           <!-- eslint-disable vue/no-v-html -->
           <div
             v-if="obj.text && !display?.hideObjectText"
@@ -81,19 +81,18 @@
             :display="display"
           />
         </div>
-        <div class="obj-controls" :class="{ show: hasOverflow }" @click.stop>
-          <div class="background"></div>
-          <div class="controls">
-            <div class="scroll-btn size-8" @click.prevent="scrollText(-1)">
-              <div class="iconify size-6 carbon--arrow-left scroll-arrow" />
-            </div>
-            <div class="flex items-center justify-center gap-1">
-              <span>{{ scrollCurrentPage }} / {{ scrollTotalPages }}</span>
-            </div>
-            <div class="scroll-btn size-8" @click.prevent="scrollText(1)">
-              <div class="iconify size-6 carbon--arrow-right scroll-arrow" />
+        <div
+          class="obj-controls h-12"
+          :class="{ show: hasOverflow }"
+          @click.stop
+        >
+          <div class="flex flex-row justify-center items-center cursor-pointer">
+            <div class="scroll-btn flex flex-row items-center">
+              <div class="iconify size-6 carbon--zoom-in bg-surface-200" />
+              <span class="text-surface-200">More ...</span>
             </div>
           </div>
+          <div class="background"></div>
         </div>
       </div>
     </div>
@@ -181,30 +180,12 @@ const objImageIsURL = computed(() => {
 
 const objContentRef = useTemplateRef('objContentRef');
 const objContentSize = useElementSize(objContentRef);
-const objContentScroll = useScroll(objContentRef);
 const hasOverflow = ref<boolean>(false);
-const scrollTotalPages = ref<number>(0);
-const scrollCurrentPage = ref<number>(1);
 
 watch([objContentSize.width, objContentSize.height], () => {
   const objContentEl = objContentRef.value;
   if (!objContentEl) return;
-  hasOverflow.value = objContentEl.scrollWidth > objContentEl.clientWidth;
-  scrollTotalPages.value = Math.floor(
-    objContentEl.scrollWidth / objContentEl.clientWidth,
-  );
-});
-
-const scrollText = (direction: number) => {
-  if (scrollCurrentPage.value <= 1 && direction < 0) return;
-  if (scrollCurrentPage.value >= scrollTotalPages.value && direction > 0)
-    return;
-  scrollCurrentPage.value += direction;
-};
-watch(scrollCurrentPage, (val) => {
-  const objContentEl = objContentRef.value;
-  if (!objContentEl) return;
-  objContentScroll.x.value = (val - 1) * objContentEl.clientWidth;
+  hasOverflow.value = objContentEl.scrollHeight > objContentEl.clientHeight;
 });
 
 const store = useProjectStore();
@@ -366,23 +347,6 @@ const decrement = () => {
     overflow-x: hidden;
     overflow-y: hidden;
     grid-area: content;
-    column-width: 10000px;
-    column-rule-width: 0;
-    column-gap: 0;
-
-    scroll-behavior: smooth;
-
-    &.hasOverflow {
-      margin-bottom: 2rem;
-    }
-
-    .obj-text {
-      break-after: column;
-    }
-    .addon {
-      break-before: column;
-      break-after: column;
-    }
   }
 
   .obj-controls {
@@ -392,6 +356,11 @@ const decrement = () => {
     right: 0;
     left: 0;
     z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
     &.show {
       visibility: visible;
@@ -403,26 +372,19 @@ const decrement = () => {
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: var(--p-surface-700);
-      opacity: 0.5;
+      background: #2a7b9b;
+      background: linear-gradient(
+        0deg,
+        var(--p-surface-800) 0%,
+        var(--p-surface-700) 50%,
+        rgba(from var(--p-surface-700) r g b / 50%) 100%
+      );
+      z-index: -1;
     }
 
     .controls {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      .scroll-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-
-        .scroll-arrow {
-          background-color: var(--p-surface-300);
-        }
-      }
+      color: var(--p-surface-200);
+      z-index: 10;
     }
   }
 }
