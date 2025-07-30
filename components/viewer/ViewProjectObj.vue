@@ -84,9 +84,11 @@
         <div
           class="obj-controls h-12"
           :class="{ show: hasOverflow }"
-          @click.stop
+          @click.stop.prevent="showMore()"
         >
-          <div class="flex flex-row justify-center items-center cursor-pointer">
+          <div
+            class="controls flex flex-row justify-center items-center cursor-pointer"
+          >
             <div class="scroll-btn flex flex-row items-center">
               <div class="iconify size-6 carbon--zoom-in bg-surface-200" />
               <span class="text-surface-200">More ...</span>
@@ -111,6 +113,7 @@ import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
+import { useViewerStore } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';
 
@@ -122,6 +125,7 @@ const $props = defineProps<{
   forceWidth?: string;
   template?: string;
   display?: DisplaySettings;
+  allowOverflow?: boolean;
 }>();
 
 const objClass = computed(() => {
@@ -144,6 +148,8 @@ const objClass = computed(() => {
   }
 });
 const objHeightClass = computed(() => {
+  if ($props.allowOverflow) return null;
+
   let objectSize = $props.forceWidth ?? $props.row.objectWidth;
   if ($props.obj.objectWidth) {
     objectSize = $props.obj.objectWidth;
@@ -185,8 +191,15 @@ const hasOverflow = ref<boolean>(false);
 watch([objContentSize.width, objContentSize.height], () => {
   const objContentEl = objContentRef.value;
   if (!objContentEl) return;
-  hasOverflow.value = objContentEl.scrollHeight > objContentEl.clientHeight;
+  hasOverflow.value =
+    !$props.allowOverflow &&
+    objContentEl.scrollHeight > objContentEl.clientHeight;
 });
+
+const viewerStore = useViewerStore();
+const showMore = () => {
+  viewerStore.showObjectDetails = $props.obj.id;
+};
 
 const store = useProjectStore();
 const { selectedIds, selected } = useProjectRefs();
@@ -276,7 +289,6 @@ const decrement = () => {
 
   .project-obj-content {
     overflow: auto;
-    max-height: 1000px;
     position: relative;
 
     &.obj-template-top {

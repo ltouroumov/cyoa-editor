@@ -4,6 +4,7 @@
     v-if="store.status === 'empty'"
     :project-list="viewerProjectList"
   />
+  <DynamicDialog />
 </template>
 
 <script setup lang="ts">

@@ -16,6 +16,7 @@
   <NotesModal />
   <SearchModal />
   <MenuModal />
+  <ObjectModal />
 
   <Toast />
   <ConfirmPopup group="popup" />
