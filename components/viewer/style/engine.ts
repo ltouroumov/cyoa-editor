@@ -121,56 +121,9 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       --row-bg-color: {{#if rowBgColorIsOn}}{{rowBgColor}}{{else}}transparent{{/if}};
       --row-margin: {{rowMargin}}%;
       --row-border: {{#if rowBorderIsOn}}{{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}}{{else}}none{{/if}};
-      --row-border-radius-top-left: {{rowBorderRadiusTopLeft}}{{rowBorderRadiusUnit}};
-      --row-border-radius-top-right: {{rowBorderRadiusTopRight}}{{rowBorderRadiusUnit}};
-      --row-border-radius-bottom-left: {{rowBorderRadiusBottomLeft}}{{rowBorderRadiusUnit}};
-      --row-border-radius-bottom-right: {{rowBorderRadiusBottomRight}}{{rowBorderRadiusUnit}};
-      --row-body-margin-top: {{rowBodyMarginTop}}px;
-      --row-body-margin-bottom: {{rowBodyMarginBottom}}px;
-      --row-body-margin-sides: {{rowBodyMarginSides}}%;
+      --row-border-radius: {{rowBorderRadiusTopLeft}}{{rowBorderRadiusUnit}} {{rowBorderRadiusTopRight}}{{rowBorderRadiusUnit}} {{rowBorderRadiusBottomRight}}{{rowBorderRadiusUnit}} {{rowBorderRadiusBottomLeft}}{{rowBorderRadiusUnit}};
+      --row-body-margin: {{rowBodyMarginTop}}px {{rowBodyMarginSides}}% {{rowBodyMarginBottom}}px {{rowBodyMarginSides}}%;
       --row-overflow: {{#if rowOverFlowIsOn}}hidden{{else}}initial{{/if}};
-    }
-    
-    .project-row {
-      .row-title {
-        font-family: var(--row-title-font);
-        font-size: var(--row-title-size);
-        text-align: var(--row-title-align); 
-        color: var(--row-title-color);
-      }
-      .row-text {
-        font-family: var(--row-text-font);
-        text-align: var(--row-text-align);
-        font-size: var(--row-text-size);
-        color: var(--row-text-color);
-        padding: var(--row-text-padding-x) var(--row-text-padding-y);
-      }
-      .row-image {
-        width: var(--row-image-width);
-        margin-top: var(--row-image-margin-top);
-        margin-bottom: var(--row-image-margin-bottom);
-
-        overflow: var(--row-img-overflow);
-        border: var(--row-img-border);
-      }
-      .row-header {
-        background-color: var(--row-bg-color);
-        margin-left: var(--row-margin);
-        margin-right: var(--row-margin);
-        border: var(--row-border);
-        
-        border-top-left-radius: var(--row-border-radius-top-left);
-        border-top-right-radius: var(--row-border-radius-top-right);
-        border-bottom-left-radius: var(--row-border-radius-bottom-left);
-        border-bottom-right-radius: var(--row-border-radius-bottom-right);
-      }
-
-      margin-top: var(--row-body-margin-top);
-      margin-bottom: var(--row-body-margin-bottom);
-      margin-left: var(--row-body-margin-sides);
-      margin-right: var(--row-body-margin-sides);
-
-      overflow: var(--row-overflow);
     }
   `;
 }
@@ -213,102 +166,43 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
   }
 
   static TEMPLATE: string = `
-    .project-obj{{#if global}}:not(.hasPrivateStyling){{/if}} {
-      {{#if objectBgColorIsOn}}
-      background-color: {{objectBgColor}};
-      {{/if}}
-      
-      .obj-title {
-        font-family: {{objectTitle}};
-        font-size: {{objectTitleTextSize}}%;
-        color: {{objectTitleColor}};
-        text-align: {{objectTitleAlign}};
-      }
-      .obj-text {
-        font-family: {{objectText}};
-        text-align: {{objectTextAlign}};
-        color: {{objectTextColor}};
-        padding: max({{objectTextPadding}}px, 0.75rem);
-        font-size: {{objectTextTextSize}}%;
-      }
-      .obj-image {
-        width: {{objectImageWidth}}%;
-        margin-top: {{objectImageMarginTop}}px;
-        margin-bottom: {{objectImageMarginBottom}}px;
-
-        {{#if objectImgObjectFillIsOn}}
-        object-fit: {{objectImgObjectFillStyle}};
-        {{#if objectImgObjectFillHeight}}
-        height: {{objectImgObjectFillHeight}}px; /* this can be empty while objectImgObjectFillIsOn :) */
-        {{/if}}
-        {{/if}}
-      }
-      .addon {
-        .text {
-          font-family: {{addonText}};
-          font-size: {{addonTextTextSize}}%;
-          color: {{addonTextColor}};
-          text-align: {{addonTextAlign}};
-          padding: max({{objectTextPadding}}px, 0.75rem);
-        }
-
-        .title {
-          font-family: {{addonTitle}};
-          font-size: {{addonTitleTextSize}}%;
-          color: {{addonTitleColor}};
-          text-align: {{addonTitleAlign}};
-        }
-        
-        &.disabled {
-          {{#if reqBgColorIsOn}}
-          background-color: {{reqFilterBgColor}};
-          {{/if}}
-          {{#if reqFilterGrayIsOn}}
-          filter: grayscale({{reqFilterGray}}%);
-          {{/if}}
-        }
-      }
-
-      .obj-score, .obj-requirements {
-        font-family: {{scoreText}};
-        font-size: {{scoreTextSize}}%;
-        text-align: {{scoreTextAlign}};
-        color: {{scoreTextColor}};
-      }
-
-      /* FIXME: Disabled as it messes up parent columns, appears related to grid.css
-      margin: {{objectMargin}}px;
-      */
-
-      {{#if objectBorderIsOn}}
-      border-color: {{objectBorderColor}};
-      border-style: {{objectBorderStyle}};
-      border-width: {{objectBorderWidth}}px;
-      
-      border-top-left-radius: {{objectBorderRadiusTopLeft}}{{objectBorderRadiusUnit}};
-      border-top-right-radius: {{objectBorderRadiusTopRight}}{{objectBorderRadiusUnit}};
-      border-bottom-left-radius: {{objectBorderRadiusBottomLeft}}{{objectBorderRadiusUnit}};
-      border-bottom-right-radius: {{objectBorderRadiusBottomRight}}{{objectBorderRadiusUnit}};
-      {{else}}
-      border: none;
-      {{/if}}
-      
-      &.selected {
-        {{#if selBgColorIsOn}}
-        background-color: {{selFilterBgColor}};
-        {{/if}}
-        {{#if selFilterGrayIsOn}}
-        filter: grayscale({{selFilterGray}}%);
-        {{/if}}
-      }
-      &.disabled {
-        {{#if reqBgColorIsOn}}
-        background-color: {{reqFilterBgColor}};
-        {{/if}}
-        {{#if reqFilterGrayIsOn}}
-        filter: grayscale({{reqFilterGray}}%);
-        {{/if}}
-      }
+    {{#if global}}*:not(.hasPrivateStyling){{/if}}{{#if container}}{{container}}{{/if}} {
+      --obj-title-font: {{objectTitle}};
+      --obj-title-size: {{objectTitleTextSize}}%;
+      --obj-title-align: {{objectTitleAlign}};
+      --obj-title-color: {{objectTitleColor}};
+      --obj-text-font: {{objectText}};
+      --obj-text-align: {{objectTextAlign}};
+      --obj-text-size: {{objectTextTextSize}}%;
+      --obj-text-color: {{objectTextColor}};
+      --obj-text-padding: max({{objectTextPadding}}px, 0.75rem);
+      --obj-image-width: {{objectImageWidth}}%;
+      --obj-image-margin-top: {{objectImageMarginTop}}px;
+      --obj-image-margin-bottom: {{objectImageMarginBottom}}px;
+      --obj-img-object-fit: {{#if objectImgObjectFillIsOn}}{{objectImgObjectFillStyle}}{{else}}initial{{/if}};
+      --obj-img-object-height: {{#if objectImgObjectFillHeight}}{{objectImgObjectFillHeight}}px{{else}}auto{{/if}};
+      --obj-addon-text-font: {{addonText}};
+      --obj-addon-text-size: {{addonTextTextSize}}%;
+      --obj-addon-text-color: {{addonTextColor}};
+      --obj-addon-text-align: {{addonTextAlign}};
+      --obj-addon-title-font: {{addonTitle}};
+      --obj-addon-title-size: {{addonTitleTextSize}}%;
+      --obj-addon-title-color: {{addonTitleColor}};
+      --obj-addon-title-align: {{addonTitleAlign}};
+      --obj-score-font: {{scoreText}};
+      --obj-score-size: {{scoreTextSize}}%;
+      --obj-score-align: {{scoreTextAlign}};
+      --obj-score-color: {{scoreTextColor}};
+      --obj-bg-color: {{#if objectBgColorIsOn}}{{objectBgColor}}{{else}}initial{{/if}};
+      --obj-margin: {{objectMargin}}px; /* Not used, see comment below */
+      --obj-border: {{#if objectBorderIsOn}}{{objectBorderWidth}}px {{objectBorderStyle}} {{objectBorderColor}}{{else}}none{{/if}};
+      --obj-border-radius: {{objectBorderRadiusTopLeft}}{{objectBorderRadiusUnit}} {{objectBorderRadiusTopRight}}{{objectBorderRadiusUnit}} {{objectBorderRadiusBottomRight}}{{objectBorderRadiusUnit}} {{objectBorderRadiusBottomLeft}}{{objectBorderRadiusUnit}};
+      --obj-selected-bg-color: {{#if selBgColorIsOn}}{{selFilterBgColor}}{{else}}initial{{/if}};
+      --obj-selected-filter: {{#if selFilterGrayIsOn}}grayscale({{selFilterGray}}%){{else}}none{{/if}};
+      --obj-disabled-bg-color: {{#if reqBgColorIsOn}}{{reqFilterBgColor}}{{else}}initial{{/if}};
+      --obj-disabled-filter: {{#if reqFilterGrayIsOn}}grayscale({{reqFilterGray}}%){{else}}none{{/if}};
+      --obj-addon-disabled-bg-color: {{#if reqBgColorIsOn}}{{reqFilterBgColor}}{{else}}initial{{/if}};
+      --obj-addon-disabled-filter: {{#if reqFilterGrayIsOn}}grayscale({{reqFilterGray}}%){{else}}none{{/if}};
     }
   `;
 }
