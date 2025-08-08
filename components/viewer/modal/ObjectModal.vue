@@ -1,14 +1,14 @@
 <template>
   <Dialog
     v-model:visible="showDetails"
-    pt:root:class="!border-0 !bg-transparent !shadow-none overflow-hidden h-full "
+    pt:root:class="!border-0 !bg-transparent !shadow-none overflow-hidden h-full !max-h-full "
     pt:mask:class="backdrop-blur-sm"
     block-scroll
   >
     <template #container>
       <div
         v-if="obj && row"
-        class="w-full h-full flex flex-col items-center overflow-auto relative"
+        class="w-full h-full py-[1rem] px-[1rem] flex flex-col items-center overflow-auto relative"
       >
         <ViewDetailsAsync :obj="obj" :row="row">
           <template #right>
