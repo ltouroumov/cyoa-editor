@@ -111,9 +111,7 @@ const decrement = () => {
 
 <style scoped lang="scss">
 .obj-details-contents {
-  //background-color: var(--obj-bg-color);
-  background-attachment: fixed;
-  background-image: var(--bg-gradient);
+  //background-image: var(--bg-gradient);
 
   .obj-title {
     font-family: var(--obj-title-font) sans-serif;

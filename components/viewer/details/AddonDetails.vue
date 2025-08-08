@@ -23,8 +23,7 @@ const isEnabled = computed(() => condition.value(selectedIds.value));
 
 <style scoped lang="scss">
 .obj-addon-details {
-  background-attachment: fixed;
-  background-image: var(--bg-gradient);
+  //background-image: var(--bg-gradient);
 
   .title {
     font-family: var(--obj-addon-title-font) sans-serif;
