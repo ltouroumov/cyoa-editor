@@ -1,18 +1,25 @@
 <template>
   <Dialog
     v-model:visible="showDetails"
-    pt:root:class="!border-0 !bg-transparent overflow-hidden"
+    pt:root:class="!border-0 !bg-transparent !shadow-none overflow-hidden h-full"
     pt:mask:class="backdrop-blur-sm"
-    dismissable-mask
-    close-on-escape
     block-scroll
   >
-    <template #container="{}">
+    <template #container>
       <div
         v-if="obj && row"
-        class="w-full flex flex-col items-center overflow-auto"
+        class="w-full h-full flex flex-col items-center overflow-auto relative"
       >
-        <ViewProjectObjDetailsAsync :obj="obj" :row="row" />
+        <ViewDetailsAsync :obj="obj" :row="row">
+          <template #right>
+            <div class="absolute top-0 right-0 pt-2 pr-2 z-20">
+              <div
+                class="iconify carbon--close-outline size-6 text-surface-200 cursor-pointer"
+                @click="close()"
+              ></div>
+            </div>
+          </template>
+        </ViewDetailsAsync>
       </div>
     </template>
   </Dialog>
@@ -22,8 +29,8 @@
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
 
-const ViewProjectObjDetailsAsync = defineAsyncComponent(
-  () => import('../ViewProjectObjDetails.vue'),
+const ViewDetailsAsync = defineAsyncComponent(
+  () => import('../details/ViewDetails.vue'),
 );
 
 const vStore = useViewerStore();
@@ -39,6 +46,10 @@ const row = computed(() => {
   const rowId = pStore.getObjectRow(vStore.showObjectDetails);
   return pStore.getRow(rowId);
 });
+
+const close = () => {
+  vStore.showObjectDetails = false;
+};
 </script>
 
 <style scoped lang="scss"></style>
