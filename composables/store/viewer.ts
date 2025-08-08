@@ -7,6 +7,7 @@ export const useViewerStore = defineStore('viewer', () => {
   const isNotesVisible = ref<boolean>(false);
   const isSearchVisible = ref<boolean>(false);
   const isProjectMenuVisible = ref<boolean>(false);
+  const showObjectDetails = ref<string | false>(false);
 
   const viewerProjectList = ref<ViewerProjectList>({
     items: [],
@@ -37,6 +38,7 @@ export const useViewerStore = defineStore('viewer', () => {
     isSearchVisible,
     isProjectMenuVisible,
     viewerProjectList,
+    showObjectDetails,
     toggleBackpack,
     toggleNotes,
     toggleSearch,
