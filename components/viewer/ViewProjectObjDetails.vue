@@ -1,18 +1,20 @@
 <template>
-  <div class="w-1/2 overflow-auto flex flex-row gap-2">
-    <div class="project-obj-details w-2/3 relative pt-[120px]">
-      <div class="obj-image-wrapper absolute top-0 left-0 right-0 z-0">
-        <img
-          v-if="obj.image"
-          class="obj-image"
-          :decoding="`sync`"
-          :loading="`eager`"
-          :src="obj.image"
-          :href="objImageIsURL ? obj.image : ''"
-          :alt="obj.title"
-        />
-      </div>
-      <div class="flex flex-col gap-2 flex-auto z-10 relative">
+  <div class="project-obj-details w-1/2 overflow-auto flex flex-row relative">
+    <div class="obj-image-wrapper absolute top-0 left-0 right-0 z-0">
+      <img
+        v-if="obj.image"
+        class="obj-image w-full"
+        :decoding="`sync`"
+        :loading="`eager`"
+        :src="obj.image"
+        :href="objImageIsURL ? obj.image : ''"
+        :alt="obj.title"
+      />
+    </div>
+    <div class="overflow-auto w-2/3 relative">
+      <div
+        class="obj-details-contents flex flex-col gap-2 flex-auto z-10 relative pt-[120px]"
+      >
         <div class="obj-header">
           <div class="obj-title">
             {{ obj.title }}
@@ -59,7 +61,9 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-col gap-2 flex-auto">
+    <div
+      class="obj-details-controls flex flex-col gap-2 flex-auto relative z-10 p-2 pt-[120px]"
+    >
       <span>TEST</span>
       <span>TEST</span>
       <span>TEST</span>
@@ -134,4 +138,85 @@ const decrement = () => {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.project-obj-details {
+  background-color: var(--obj-bg-color);
+  border: var(--obj-border);
+  border-radius: var(--obj-border-radius);
+}
+
+.obj-details-controls {
+  //background-color: var(--obj-bg-color);
+  background: linear-gradient(
+    180deg,
+    rgba(from var(--obj-bg-color) r g b / 0%) 0px,
+    rgba(from var(--obj-bg-color) r g b / 0%) 120px,
+    rgba(from var(--obj-bg-color) r g b / 100%) 240px,
+    var(--obj-bg-color) 100%
+  );
+}
+
+.obj-details-contents {
+  //background-color: var(--obj-bg-color);
+  background: linear-gradient(
+    180deg,
+    rgba(from var(--obj-bg-color) r g b / 0%) 0px,
+    rgba(from var(--obj-bg-color) r g b / 0%) 120px,
+    rgba(from var(--obj-bg-color) r g b / 100%) 240px,
+    var(--obj-bg-color) 100%
+  );
+
+  .obj-title {
+    font-family: var(--obj-title-font) sans-serif;
+    font-size: var(--obj-title-size);
+    color: var(--obj-title-color);
+    text-align: var(--obj-title-align);
+  }
+  .obj-text {
+    font-family: var(--obj-text-font) sans-serif;
+    text-align: var(--obj-text-align);
+    color: var(--obj-text-color);
+    padding: var(--obj-text-padding);
+    font-size: var(--obj-text-size);
+  }
+
+  .obj-score,
+  .obj-requirements {
+    font-family: var(--obj-score-font) sans-serif;
+    font-size: var(--obj-score-size);
+    text-align: var(--obj-score-align);
+    color: var(--obj-score-color);
+  }
+
+  &.selected {
+    background-color: var(--obj-selected-bg-color);
+    filter: var(--obj-selected-filter);
+  }
+  &.disabled {
+    background-color: var(--obj-disabled-bg-color);
+    filter: var(--obj-disabled-filter);
+  }
+
+  :deep(.addon) {
+    .title {
+      font-family: var(--obj-addon-title-font) sans-serif;
+      font-size: var(--obj-addon-title-size);
+      color: var(--obj-addon-title-color);
+      text-align: var(--obj-addon-title-align);
+    }
+
+    .text {
+      font-family: var(--obj-addon-text-font) sans-serif;
+      font-size: var(--obj-addon-text-size);
+      color: var(--obj-addon-text-color);
+      text-align: var(--obj-addon-text-align);
+      padding: var(--obj-text-padding);
+    }
+
+    &.disabled {
+      background-color: var(--obj-addon-disabled-bg-color);
+      filter: var(--obj-addon-disabled-filter);
+    }
+  }
+}
+</style>

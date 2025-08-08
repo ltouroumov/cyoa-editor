@@ -384,7 +384,6 @@ const decrement = () => {
       left: 0;
       right: 0;
       bottom: 0;
-      background: #2a7b9b;
       background: linear-gradient(
         0deg,
         var(--p-surface-800) 0%,
