@@ -94,78 +94,83 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       ),
     });
 
-    const styles = this._template({
+    return this._template({
       ...computed,
       global: this._options.global,
+      container: this._options.container,
     });
-    if (this._options.container) {
-      return `${this._options.container} { ${styles} }`;
-    } else {
-      return styles;
-    }
   }
 
   static TEMPLATE: string = `
-    .project-row{{#if global}}:not(.hasPrivateStyling){{/if}} {
-      
+    {{#if global}}*:not(.hasPrivateStyling){{/if}}{{#if container}}{{container}}{{/if}} {
+      --row-title-font: {{rowTitle}};
+      --row-title-size: {{rowTitleTextSize}}%;
+      --row-title-align: {{rowTitleAlign}};
+      --row-title-color: {{rowTitleColor}};
+      --row-text-font: {{rowText}};
+      --row-text-align: {{rowTextAlign}};
+      --row-text-size: {{rowTextTextSize}}%;
+      --row-text-color: {{rowTextColor}};
+      --row-text-padding-x: {{rowTextPaddingX}}px;
+      --row-text-padding-y: {{rowTextPaddingY}}%;
+      --row-image-width: {{rowImageWidth}}%;
+      --row-image-margin-top: {{rowImageMarginTop}}%;
+      --row-image-margin-bottom: {{rowImageMarginBottom}}%;
+      --row-img-border: {{#if rowImgBorderIsOn}}{{rowImgBorderWidth}}px {{rowImgBorderStyle}} {{rowImgBorderColor}}{{else}}none{{/if}};
+      --row-img-overflow: {{#if rowImgOverflowIsOn}}hidden{{else}}initial{{/if}};
+      --row-bg-color: {{#if rowBgColorIsOn}}{{rowBgColor}}{{else}}transparent{{/if}};
+      --row-margin: {{rowMargin}}%;
+      --row-border: {{#if rowBorderIsOn}}{{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}}{{else}}none{{/if}};
+      --row-border-radius-top-left: {{rowBorderRadiusTopLeft}}{{rowBorderRadiusUnit}};
+      --row-border-radius-top-right: {{rowBorderRadiusTopRight}}{{rowBorderRadiusUnit}};
+      --row-border-radius-bottom-left: {{rowBorderRadiusBottomLeft}}{{rowBorderRadiusUnit}};
+      --row-border-radius-bottom-right: {{rowBorderRadiusBottomRight}}{{rowBorderRadiusUnit}};
+      --row-body-margin-top: {{rowBodyMarginTop}}px;
+      --row-body-margin-bottom: {{rowBodyMarginBottom}}px;
+      --row-body-margin-sides: {{rowBodyMarginSides}}%;
+      --row-overflow: {{#if rowOverFlowIsOn}}hidden{{else}}initial{{/if}};
+    }
+    
+    .project-row {
       .row-title {
-        font-family: {{rowTitle}};
-        font-size: {{rowTitleTextSize}}%;
-        text-align: {{rowTitleAlign}};
-        color: {{rowTitleColor}};
+        font-family: var(--row-title-font);
+        font-size: var(--row-title-size);
+        text-align: var(--row-title-align); 
+        color: var(--row-title-color);
       }
       .row-text {
-        font-family: {{rowText}};
-        text-align: {{rowTextAlign}};
-        font-size: {{rowTextTextSize}}%;
-        color: {{rowTextColor}};
-        padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}%;
+        font-family: var(--row-text-font);
+        text-align: var(--row-text-align);
+        font-size: var(--row-text-size);
+        color: var(--row-text-color);
+        padding: var(--row-text-padding-x) var(--row-text-padding-y);
       }
       .row-image {
-        width: {{rowImageWidth}}%;
-        margin-top: {{rowImageMarginTop}}%;
-        margin-bottom: {{rowImageMarginBottom}}%;
+        width: var(--row-image-width);
+        margin-top: var(--row-image-margin-top);
+        margin-bottom: var(--row-image-margin-bottom);
 
-        {{#if rowImgOverflowIsOn}}
-        overflow: hidden;
-        {{/if}}
-
-        {{#if rowImgBorderIsOn}}
-        border: {{rowImgBorderWidth}}px {{rowImgBorderStyle}} {{rowImgBorderColor}};
-        {{else}}
-        border: none;
-        {{/if}}
+        overflow: var(--row-img-overflow);
+        border: var(--row-img-border);
       }
       .row-header {
-        {{#if rowBgColorIsOn}}
-        background-color: {{rowBgColor}};
-        {{else}}
-        background-color: transparent;
-        {{/if}}
-      
-        margin-left: {{rowMargin}}%;
-        margin-right: {{rowMargin}}%;
+        background-color: var(--row-bg-color);
+        margin-left: var(--row-margin);
+        margin-right: var(--row-margin);
+        border: var(--row-border);
         
-        {{#if rowBorderIsOn}}
-        border: {{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}};
-        
-        border-top-left-radius: {{rowBorderRadiusTopLeft}}{{rowBorderRadiusUnit}};
-        border-top-right-radius: {{rowBorderRadiusTopRight}}{{rowBorderRadiusUnit}};
-        border-bottom-left-radius: {{rowBorderRadiusBottomLeft}}{{rowBorderRadiusUnit}};
-        border-bottom-right-radius: {{rowBorderRadiusBottomRight}}{{rowBorderRadiusUnit}};
-        {{else}}
-        border: none;
-        {{/if}}
+        border-top-left-radius: var(--row-border-radius-top-left);
+        border-top-right-radius: var(--row-border-radius-top-right);
+        border-bottom-left-radius: var(--row-border-radius-bottom-left);
+        border-bottom-right-radius: var(--row-border-radius-bottom-right);
       }
 
-      margin-top: {{rowBodyMarginTop}}px;
-      margin-bottom: {{rowBodyMarginBottom}}px;
-      margin-left: {{rowBodyMarginSides}}%;
-      margin-right: {{rowBodyMarginSides}}%;
+      margin-top: var(--row-body-margin-top);
+      margin-bottom: var(--row-body-margin-bottom);
+      margin-left: var(--row-body-margin-sides);
+      margin-right: var(--row-body-margin-sides);
 
-      {{#if rowOverFlowIsOn}}
-      overflow: hidden;
-      {{/if}}
+      overflow: var(--row-overflow);
     }
   `;
 }
@@ -200,15 +205,11 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       ),
     });
 
-    const styles = this._template({
+    return this._template({
       ...computed,
       global: this._options.global,
+      container: this._options.container,
     });
-    if (this._options.container) {
-      return `${this._options.container} { ${styles} }`;
-    } else {
-      return styles;
-    }
   }
 
   static TEMPLATE: string = `

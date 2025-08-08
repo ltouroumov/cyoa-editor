@@ -129,7 +129,7 @@ const $props = defineProps<{
 }>();
 
 const objClass = computed(() => {
-  if ($props.forceWidth) return ['col', { [$props.forceWidth]: true }];
+  if ($props.forceWidth) return [$props.forceWidth];
 
   let objectSize = $props.row.objectWidth;
   if ($props.obj.objectWidth) {
