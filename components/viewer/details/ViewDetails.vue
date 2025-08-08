@@ -34,28 +34,36 @@
       />
     </div>
     <div
-      class="obj-details-controls flex flex-col gap-2 flex-auto relative z-10 p-2 pt-[120px]"
+      class="obj-details-controls flex flex-col gap-2 w-1/3 relative z-10 p-2 pt-[120px] overflow-auto"
     >
       <div
         class="details-entry flex flex-row items-center gap-2"
         @click="selectTab('main')"
       >
-        <div class="iconify carbon--cube" />
-        <div class="flex-auto">{{ obj.title }}</div>
-        <div v-show="showTab === 'main'" class="iconify carbon--chevron-left" />
+        <div class="size-4 flex-none iconify carbon--cube" />
+        <div class="flex-auto label font-bold">{{ obj.title }}</div>
+        <div
+          class="size-4 iconify carbon--chevron-left"
+          :class="{ invisible: showTab !== 'main' }"
+        />
       </div>
       <div class="my-1 border-t sep"></div>
+      <div v-if="obj.addons.length === 0" class="flex flex-col">
+        <span class="text-surface-700">No Addons</span>
+      </div>
       <div
         v-for="(addon, idx) in obj.addons"
         :key="idx"
         class="details-entry flex flex-row items-center gap-2"
         @click="selectTab('addon', idx)"
       >
-        <div class="iconify carbon--hexagon-vertical-outline" />
-        <div class="flex-auto">{{ addon.title }}</div>
         <div
-          v-show="showTab === 'addon' && showAddonIdx === idx"
-          class="iconify carbon--chevron-left"
+          class="size-4 flex-none iconify carbon--hexagon-vertical-outline"
+        />
+        <div class="flex-auto label">{{ addon.title }}</div>
+        <div
+          class="size-4 iconify carbon--chevron-left"
+          :class="{ invisible: !(showTab === 'addon' && showAddonIdx === idx) }"
         />
       </div>
     </div>
@@ -165,5 +173,11 @@ function selectTab(tab: 'main' | 'addon', idx?: number) {
   .sep {
     border-color: var(--p-surface-500);
   }
+}
+
+.label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

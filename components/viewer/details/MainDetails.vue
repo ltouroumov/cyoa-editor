@@ -113,6 +113,24 @@ const decrement = () => {
 .obj-details-contents {
   //background-image: var(--bg-gradient);
 
+  .obj-header {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    .obj-title {
+      margin-bottom: 5px;
+    }
+
+    .obj-select-multi {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
   .obj-title {
     font-family: var(--obj-title-font) sans-serif;
     font-size: var(--obj-title-size);
