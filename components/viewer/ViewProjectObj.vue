@@ -298,14 +298,14 @@ const decrement = () => {
     &.obj-template-left {
       display: grid;
       grid-template-columns: 1fr 2fr;
-      grid-template-rows: 1fr;
+      grid-template-rows: auto 1fr;
       grid-template-areas: 'image header' 'image content';
       align-content: start;
     }
     &.obj-template-right {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      grid-template-rows: 1fr;
+      grid-template-rows: auto 1fr;
       grid-template-areas: 'header image' 'content image';
       align-content: start;
     }
