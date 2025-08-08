@@ -1,5 +1,8 @@
 <template>
-  <div class="obj-addon-details pt-[120px]" :class="{ disabled: !isEnabled }">
+  <div
+    class="obj-addon-details pt-[60px] md:pt-[120px]"
+    :class="{ disabled: !isEnabled }"
+  >
     <div class="title">{{ addon.title }}</div>
     <ViewRequirements :requireds="addon.requireds" :show-always="true" />
     <!-- eslint-disable vue/no-v-html -->

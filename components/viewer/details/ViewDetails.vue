@@ -1,6 +1,6 @@
 <template>
   <div
-    class="project-obj-details w-1/2 h-full overflow-auto flex flex-row relative"
+    class="project-obj-details w-full lg:w-[60rem] h-full overflow-auto flex flex-col md:flex-row relative"
   >
     <div
       class="obj-image-wrapper absolute top-0 left-0 right-0 bottom-0 overflow-hidden z-0"
@@ -17,12 +17,13 @@
     </div>
 
     <div
-      class="obj-image-gradient-content absolute top-0 left-0 bottom-0 w-2/3 z-5"
+      class="obj-image-gradient-content absolute top-0 left-0 bottom-0 w-full md:w-2/3 h-3/4 md:h-full z-5"
     />
     <div
-      class="obj-image-gradient-controls absolute top-0 right-0 bottom-0 w-1/3 z-5"
+      class="obj-image-gradient-controls absolute md:top-0 right-0 bottom-0 w-full md:w-1/3 md:h-full h-1/4 z-5"
     />
-    <div class="overflow-auto w-2/3 relative">
+
+    <div class="overflow-auto w-auto md:w-2/3 h-3/4 md:h-auto relative">
       <MainDetails
         :class="{ hidden: showTab !== 'main' }"
         :row="row"
@@ -34,7 +35,7 @@
       />
     </div>
     <div
-      class="obj-details-controls flex flex-col gap-2 w-1/3 relative z-10 p-2 pt-[120px] overflow-auto"
+      class="obj-details-controls flex flex-col gap-2 md:w-1/3 h-1/4 md:h-auto relative z-10 p-2 md:pt-[120px] overflow-auto"
     >
       <div
         class="details-entry flex flex-row items-center gap-2"
@@ -169,10 +170,10 @@ function selectTab(tab: 'main' | 'addon', idx?: number) {
     font-family: var(--obj-title-font) sans-serif;
     color: var(--obj-title-color);
   }
+}
 
-  .sep {
-    border-color: var(--p-surface-500);
-  }
+.sep {
+  border-color: var(--p-surface-500);
 }
 
 .label {

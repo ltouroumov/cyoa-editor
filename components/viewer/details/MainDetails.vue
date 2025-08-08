@@ -1,6 +1,6 @@
 <template>
   <div
-    class="obj-details-contents flex flex-col gap-2 flex-auto z-10 relative pt-[120px]"
+    class="obj-details-contents flex flex-col gap-2 flex-auto z-10 relative pt-[60px] md:pt-[120px]"
     :class="{
       selected: isSelected,
       disabled: !isEnabled,

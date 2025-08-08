@@ -74,12 +74,6 @@
             v-html="formatText(obj.text)"
           ></div>
           <!-- eslint-enable vue/no-v-html -->
-          <ViewAddon
-            v-for="(addon, idx) in obj.addons"
-            :key="idx"
-            :addon="addon"
-            :display="display"
-          />
         </div>
         <div
           class="obj-controls h-12"
@@ -104,6 +98,7 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core';
 import * as R from 'ramda';
+import { isNotEmpty } from 'ramda';
 
 import StyleObj from './style/StyleObj.vue';
 
@@ -188,12 +183,13 @@ const objContentRef = useTemplateRef('objContentRef');
 const objContentSize = useElementSize(objContentRef);
 const hasOverflow = ref<boolean>(false);
 
-watch([objContentSize.width, objContentSize.height], () => {
+watch([objContentSize.width, objContentSize.height, $props.obj], () => {
   const objContentEl = objContentRef.value;
   if (!objContentEl) return;
   hasOverflow.value =
     !$props.allowOverflow &&
-    objContentEl.scrollHeight > objContentEl.clientHeight;
+    (objContentEl.scrollHeight > objContentEl.clientHeight ||
+      isNotEmpty($props.obj.addons));
 });
 
 const viewerStore = useViewerStore();
@@ -290,24 +286,28 @@ const decrement = () => {
   .project-obj-content {
     overflow: auto;
     position: relative;
+    height: 100%;
 
     &.obj-template-top {
       display: grid;
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
       grid-template-areas: 'image' 'header' 'content';
+      align-content: start;
     }
     &.obj-template-left {
       display: grid;
       grid-template-columns: 1fr 2fr;
       grid-template-rows: 1fr;
-      grid-template-areas: 'image text';
+      grid-template-areas: 'image header' 'image content';
+      align-content: start;
     }
     &.obj-template-right {
       display: grid;
       grid-template-columns: 2fr 1fr;
       grid-template-rows: 1fr;
-      grid-template-areas: 'text image';
+      grid-template-areas: 'header image' 'content image';
+      align-content: start;
     }
 
     &.mh-12 {

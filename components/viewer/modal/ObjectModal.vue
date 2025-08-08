@@ -1,7 +1,7 @@
 <template>
   <Dialog
     v-model:visible="showDetails"
-    pt:root:class="!border-0 !bg-transparent !shadow-none overflow-hidden h-full"
+    pt:root:class="!border-0 !bg-transparent !shadow-none overflow-hidden h-full "
     pt:mask:class="backdrop-blur-sm"
     block-scroll
   >
