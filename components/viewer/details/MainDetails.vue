@@ -145,8 +145,8 @@ const decrement = () => {
     font-size: var(--obj-text-size);
   }
 
-  .obj-score,
-  .obj-requirements {
+  :deep(.obj-score),
+  :deep(.obj-requirements) {
     font-family: var(--obj-score-font) sans-serif;
     font-size: var(--obj-score-size);
     text-align: var(--obj-score-align);

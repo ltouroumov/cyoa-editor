@@ -3,8 +3,10 @@
     class="obj-addon-details pt-[60px] md:pt-[120px]"
     :class="{ disabled: !isEnabled }"
   >
-    <div class="title">{{ addon.title }}</div>
-    <ViewRequirements :requireds="addon.requireds" :show-always="true" />
+    <div class="obj-header">
+      <div class="title">{{ addon.title }}</div>
+      <ViewRequirements :requireds="addon.requireds" :show-always="true" />
+    </div>
     <!-- eslint-disable vue/no-v-html -->
     <div class="text" v-html="formatText(addon.text)"></div>
   </div>
@@ -41,6 +43,19 @@ const isEnabled = computed(() => condition.value(selectedIds.value));
     color: var(--obj-addon-text-color);
     text-align: var(--obj-addon-text-align);
     padding: var(--obj-text-padding);
+  }
+
+  .obj-header {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  :deep(.obj-score),
+  :deep(.obj-requirements) {
+    font-family: var(--obj-score-font) sans-serif;
+    font-size: var(--obj-score-size);
+    text-align: var(--obj-score-align);
+    color: var(--obj-score-color);
   }
 
   &.disabled {
