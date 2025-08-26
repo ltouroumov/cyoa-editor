@@ -1,5 +1,5 @@
 {
-  "remote": "https://app.cyoa.ltouroumov.ch/api/v1/neo/projects.json",
+  "remote": "https://cyoa-app.ltouroumov.ch/api/v1/neo/projects.json",
   "items": [],
   "default": null,
   "show_load_file": true,
