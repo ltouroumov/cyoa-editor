@@ -63,9 +63,6 @@ watch(
     } else {
       $interval.pause();
       $timeout.stop();
-      // reset the contents
-      index.value = 0;
-      visible.value = [];
     }
   },
 );
