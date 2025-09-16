@@ -71,7 +71,7 @@ export function useBackpackRender() {
 
   const renderBackpack = (doc: Document): HTMLElement => {
     copyStyles(window.document, doc);
-    doc.body.setAttribute('data-bs-theme', 'dark');
+    doc.documentElement.classList.add('dark-theme');
 
     const vNode = h(BackpackExportWrapper, {});
     render(vNode, doc.body);
