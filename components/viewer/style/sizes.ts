@@ -1,3 +1,5 @@
+import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
+
 export const ObjectSizes: Record<string, string[]> = {
   'col-12': [],
   'col-sm-11': ['md:col-11'],
@@ -38,3 +40,25 @@ export const ObjectHeights: Record<string, string> = {
   'w-9': 'mh-3',
   'col-xl-1': 'mh-3',
 };
+
+export function getSizeClasses(
+  obj: ProjectObj,
+  row: ProjectRow,
+  width?: string,
+): string[] {
+  let objectSize = row.objectWidth;
+  if (obj.objectWidth) {
+    objectSize = obj.objectWidth;
+  }
+  if (width) {
+    objectSize = width;
+  }
+
+  if (objectSize in ObjectSizes) {
+    const classes = ObjectSizes[objectSize];
+    return ['col', 'col-12', ...classes];
+  } else {
+    console.log(`Missing size reducer for ${objectSize}`);
+    return ['col', 'col-12', objectSize];
+  }
+}

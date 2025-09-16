@@ -81,11 +81,17 @@
           @click.stop.prevent="showMore()"
         >
           <div
-            class="controls flex flex-row justify-center items-center cursor-pointer"
+            class="controls flex flex-row justify-center items-center cursor-pointer pt-4"
           >
             <div class="scroll-btn flex flex-row items-center">
-              <div class="iconify size-6 carbon--zoom-in bg-surface-200" />
-              <span class="text-surface-200">More ...</span>
+              <div
+                class="iconify size-6 carbon--zoom-in bg-surface-200 text-surface-200"
+              />
+              <span v-if="isNotEmpty(obj.addons)">
+                {{ length(obj.addons) }}
+                {{ length(obj.addons) > 1 ? 'Addons' : 'Addon' }} ...
+              </span>
+              <span v-else>More ...</span>
             </div>
           </div>
           <div class="background"></div>
@@ -96,13 +102,12 @@
 </template>
 
 <script setup lang="ts">
-import { useElementSize } from '@vueuse/core';
 import * as R from 'ramda';
-import { isNotEmpty } from 'ramda';
+import { isNotEmpty, isNotNil, length } from 'ramda';
 
 import StyleObj from './style/StyleObj.vue';
 
-import { ObjectHeights, ObjectSizes } from '~/components/viewer/style/sizes';
+import { ObjectHeights, getSizeClasses } from '~/components/viewer/style/sizes';
 import ViewScores from '~/components/viewer/ViewScores.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
@@ -125,22 +130,7 @@ const $props = defineProps<{
 
 const objClass = computed(() => {
   if ($props.forceWidth) return [$props.forceWidth];
-
-  let objectSize = $props.row.objectWidth;
-  if ($props.obj.objectWidth) {
-    objectSize = $props.obj.objectWidth;
-  }
-  if ($props.width) {
-    objectSize = $props.width;
-  }
-
-  if (objectSize in ObjectSizes) {
-    const classes = ObjectSizes[objectSize];
-    return ['col', 'col-12', ...classes];
-  } else {
-    console.log(`Missing size reducer for ${objectSize}`);
-    return ['col', 'col-12', objectSize];
-  }
+  return getSizeClasses($props.obj, $props.row, $props.width);
 });
 const objHeightClass = computed(() => {
   if ($props.allowOverflow) return null;
@@ -173,6 +163,26 @@ const objTemplateClass = computed(() => {
   }
 
   return 'obj-template-top';
+});
+
+const objBgColor = computed(() => {
+  if ($props.obj.isPrivateStyling) {
+    if ($props.obj.styling.objectBgColorIsOn) {
+      return $props.obj.styling.objectBgColor;
+    } else {
+      return 'transparent';
+    }
+  } else if ($props.row.styling.objectBgColorIsOn) {
+    return $props.row.styling.objectBgColor;
+  } else if (isNotNil(store.project)) {
+    if (store.project.data.styling.objectBgColorIsOn) {
+      return store.project.data.styling.objectBgColor;
+    } else {
+      return 'transparent';
+    }
+  } else {
+    return 'transparent';
+  }
 });
 
 const objImageIsURL = computed(() => {
@@ -269,6 +279,12 @@ const decrement = () => {
   }
 };
 </script>
+
+<style scoped lang="scss">
+.project-obj {
+  --obj-bg-color: v-bind('objBgColor');
+}
+</style>
 
 <style lang="scss">
 .project-obj {
@@ -385,10 +401,10 @@ const decrement = () => {
       right: 0;
       bottom: 0;
       background: linear-gradient(
-        0deg,
-        var(--p-surface-800) 0%,
-        var(--p-surface-700) 50%,
-        rgba(from var(--p-surface-700) r g b / 50%) 100%
+        180deg,
+        rgba(from var(--obj-bg-color) r g b / 0%) 0%,
+        rgba(from var(--obj-bg-color) r g b / 75%) 1.5rem,
+        rgba(from var(--obj-bg-color) r g b / 100%) 100%
       );
       z-index: -1;
     }

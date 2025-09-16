@@ -29,15 +29,33 @@
         />
         <!-- eslint-enable vue/no-v-html -->
       </div>
-      <div class="row g-2">
-        <ViewProjectObj
-          v-for="obj in row.objects"
-          :key="obj.id"
-          :obj="obj"
-          :row="row"
-          :display="display"
-        />
-      </div>
+      <CollectionLoader
+        v-if="row.objects.length > 0"
+        :is-visible="isVisible"
+        :items="row.objects"
+        :step="10"
+        :wrapper="{ tag: 'div', props: { class: 'row g-2' } }"
+      >
+        <template #item="{ item }">
+          <ViewProjectObj
+            :key="item.id"
+            :obj="item"
+            :row="row"
+            :display="display"
+          />
+        </template>
+        <template #loader>
+          <div class="row g-2">
+            <div
+              v-for="obj in row.objects"
+              :key="obj.id"
+              :class="getSizeClasses(obj, row)"
+            >
+              <Skeleton width="100%" height="200px" />
+            </div>
+          </div>
+        </template>
+      </CollectionLoader>
     </div>
   </div>
 </template>
@@ -45,7 +63,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import { getSizeClasses } from '~/components/viewer/style/sizes';
 import StyleRow from '~/components/viewer/style/StyleRow.vue';
+import CollectionLoader from '~/components/viewer/utils/CollectionLoader.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';

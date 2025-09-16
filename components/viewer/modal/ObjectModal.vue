@@ -3,7 +3,10 @@
     v-model:visible="showDetails"
     pt:root:class="!border-0 !bg-transparent !shadow-none overflow-hidden h-full !max-h-full "
     pt:mask:class="backdrop-blur-sm"
-    block-scroll
+    :block-scroll="true"
+    :dismissable-mask="true"
+    :modal="true"
+    :close-on-escape="true"
   >
     <template #container>
       <div
