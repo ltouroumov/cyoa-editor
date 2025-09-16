@@ -31,9 +31,9 @@ const $props = defineProps<{
 
 const visible = ref<any[]>([]);
 const index = ref<number>(0);
-const isLoading = computed(
-  () => index.value < length($props.items) || !$timeout.ready.value,
-);
+
+const isCompleted = computed(() => index.value >= length($props.items));
+const isLoading = computed(() => !isCompleted.value || !$timeout.ready.value);
 
 const addVisible = () => {
   const curIndex = index.value;
@@ -57,7 +57,7 @@ const $interval = useIntervalFn(addVisible, 100, {
 watch(
   () => $props.isVisible,
   (newVal) => {
-    if (newVal) {
+    if (newVal && !isCompleted.value) {
       $interval.resume();
       $timeout.start();
     } else {
