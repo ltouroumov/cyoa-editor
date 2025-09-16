@@ -38,7 +38,15 @@ const ViewDetailsAsync = defineAsyncComponent(
 
 const vStore = useViewerStore();
 const pStore = useProjectStore();
-const showDetails = computed(() => vStore.showObjectDetails !== false);
+const showDetails = computed<boolean>({
+  get: () => vStore.showObjectDetails !== false,
+  set: (val) => {
+    if (val === false) {
+      vStore.showObjectDetails = false;
+    }
+    // Do nothing when the value is true
+  },
+});
 
 const obj = computed(() => {
   if (!vStore.showObjectDetails) return undefined;
