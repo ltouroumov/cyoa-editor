@@ -21,5 +21,9 @@ defineProps<{ requireds: ConditionTerm[]; showAlways?: boolean }>();
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  &.left {
+    align-items: flex-start;
+  }
 }
 </style>

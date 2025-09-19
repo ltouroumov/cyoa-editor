@@ -58,18 +58,32 @@
       <div
         v-for="(addon, idx) in obj.addons"
         :key="idx"
-        class="details-entry flex flex-row items-center gap-2"
+        class="details-entry flex flex-col items-start cursor-pointer"
         @click="selectTab('addon', idx)"
       >
-        <div
-          class="size-4 flex-none iconify carbon--hexagon-vertical-outline"
-          :class="{ 'text-emerald-500': addonStates[idx].value }"
-        />
-        <div class="flex-auto label">{{ addon.title }}</div>
-        <div
-          class="size-4 iconify carbon--chevron-left"
-          :class="{ invisible: !(showTab === 'addon' && showAddonIdx === idx) }"
-        />
+        <div v-if="idx > 0" class="mb-2 px-6 w-full">
+          <div class="border-t sep w-full"></div>
+        </div>
+        <div class="flex flex-row items-center gap-2 w-full">
+          <div
+            class="size-4 flex-none iconify carbon--hexagon-vertical-outline"
+            :class="{ 'text-emerald-500': addonStates[idx].value }"
+          />
+          <div class="flex-auto label">{{ addon.title }}</div>
+          <div
+            class="size-4 iconify carbon--chevron-left"
+            :class="{
+              invisible: !(showTab === 'addon' && showAddonIdx === idx),
+            }"
+          />
+        </div>
+        <div class="reqs mx-6 text-surface-500 text-sm">
+          <ViewRequirements
+            :requireds="addon.requireds"
+            :show-always="true"
+            class="left"
+          />
+        </div>
       </div>
     </div>
     <slot name="right" />
