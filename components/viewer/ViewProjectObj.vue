@@ -69,7 +69,7 @@
         <div
           ref="objContentRef"
           class="obj-content"
-          :class="{ 'hide-overflow': hideOverflow }"
+          :class="{ 'hide-overflow': objHideOverflow }"
         >
           <!-- eslint-disable vue/no-v-html -->
           <div
@@ -78,10 +78,7 @@
             v-html="formatText(obj.text)"
           ></div>
           <!-- eslint-enable vue/no-v-html -->
-          <div
-            v-if="showAddons || display?.showObjectAddons"
-            class="obj-addons"
-          >
+          <div v-if="objShowAddons" class="obj-addons">
             <LazyViewAddon
               v-for="(addon, idx) in obj.addons"
               :key="idx"
@@ -165,10 +162,15 @@ const objHeightClass = computed(() => {
     return 'mh-3';
   }
 });
-const hideOverflow = computed(() => {
+const objHideOverflow = computed(() => {
   if ($props.allowOverflow) return false;
   if ($props.display?.showObjectOverflow) return false;
   return true;
+});
+const objShowAddons = computed(() => {
+  if ($props.showAddons) return true;
+  if ($props.display?.showObjectAddons) return true;
+  return false;
 });
 
 const objTemplateClass = computed(() => {

@@ -24,7 +24,7 @@ type DisplaySettingsValue =
   | { type: 'custom'; settings: DisplaySettings }
   | { type: 'preset'; name: string };
 
-const DefaultSettings: DisplaySettings = {
+const DefaultSettings: DisplaySettings = Object.freeze({
   hideRowImages: false,
   hideRowText: false,
   hideObjectImages: false,
@@ -37,24 +37,24 @@ const DefaultSettings: DisplaySettings = {
   hideDisabledAddons: false,
   hideAddonRequirements: false,
   hideAddonText: false,
-};
+});
 
 export const DisplaySettingsPresets: Record<
   string,
   DisplaySettings & { name: string }
-> = {
-  default: {
+> = Object.freeze({
+  default: Object.freeze({
     name: 'Default',
     ...DefaultSettings,
-  },
-  extended: {
+  }),
+  extended: Object.freeze({
     name: 'Extended',
     ...DefaultSettings,
     showObjectControls: 'never',
     showObjectOverflow: true,
     showObjectAddons: true,
-  },
-  minimal: {
+  }),
+  minimal: Object.freeze({
     name: 'Minimal',
     hideRowImages: true,
     hideRowText: true,
@@ -68,8 +68,8 @@ export const DisplaySettingsPresets: Record<
     hideDisabledAddons: false,
     hideAddonRequirements: false,
     hideAddonText: true,
-  },
-};
+  }),
+});
 
 export const useSettingStore = defineStore(
   'viewer-settings',
