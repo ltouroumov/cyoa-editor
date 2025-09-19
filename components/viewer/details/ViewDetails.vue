@@ -1,6 +1,6 @@
 <template>
   <div
-    class="project-obj-details w-full lg:w-[60rem] h-full overflow-auto flex flex-col md:flex-row relative"
+    class="project-obj obj-details w-full lg:w-[60rem] h-full overflow-auto flex flex-col md:flex-row relative"
   >
     <div
       class="obj-image-wrapper absolute top-0 left-0 right-0 bottom-0 overflow-hidden z-0"
@@ -41,7 +41,10 @@
         class="details-entry flex flex-row items-center gap-2"
         @click="selectTab('main')"
       >
-        <div class="size-4 flex-none iconify carbon--cube" />
+        <div
+          class="size-4 flex-none iconify carbon--cube"
+          :class="{ 'text-emerald-500': isChoiceSelected }"
+        />
         <div class="flex-auto label font-bold">{{ obj.title }}</div>
         <div
           class="size-4 iconify carbon--chevron-left"
@@ -60,6 +63,7 @@
       >
         <div
           class="size-4 flex-none iconify carbon--hexagon-vertical-outline"
+          :class="{ 'text-emerald-500': addonStates[idx].value }"
         />
         <div class="flex-auto label">{{ addon.title }}</div>
         <div
@@ -74,9 +78,11 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
+import type { ComputedRef } from 'vue';
 
 import AddonDetails from '~/components/viewer/details/AddonDetails.vue';
 import MainDetails from '~/components/viewer/details/MainDetails.vue';
+import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 
@@ -96,6 +102,21 @@ const showTab = ref<'main' | 'addon'>('main');
 const showAddonIdx = ref<number>(-1);
 const showAddon = computed(() => $props.obj.addons[showAddonIdx.value]);
 
+const addonStates = computed(() => {
+  const states: Record<number, ComputedRef<boolean>> = {};
+  for (let idx = 0; idx < R.length($props.obj.addons); idx++) {
+    const addon = $props.obj.addons[idx];
+    const condition = buildConditions(addon);
+    const isEnabled = computed(() => condition(selectedIds.value));
+    states[idx] = isEnabled;
+  }
+  return states;
+});
+
+const isChoiceSelected = computed<boolean>(() => {
+  return R.has($props.obj.id, selected.value);
+});
+
 function selectTab(tab: 'main' | 'addon', idx?: number) {
   if (tab === 'main') {
     showTab.value = 'main';
@@ -108,7 +129,7 @@ function selectTab(tab: 'main' | 'addon', idx?: number) {
 </script>
 
 <style scoped lang="scss">
-.project-obj-details {
+.project-obj.obj-details {
   background-color: var(--obj-bg-color);
   border: var(--obj-border);
   border-radius: var(--obj-border-radius);

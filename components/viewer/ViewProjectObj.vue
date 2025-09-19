@@ -7,7 +7,7 @@
     />
     <div
       ref="objContainerRef"
-      class="project-obj"
+      class="project-obj obj-default"
       :class="{
         selected: isSelected && !isInBackpack,
         disabled: !isEnabled,
@@ -66,7 +66,11 @@
             :requireds="obj.requireds"
           />
         </div>
-        <div ref="objContentRef" class="obj-content">
+        <div
+          ref="objContentRef"
+          class="obj-content"
+          :class="{ 'hide-overflow': !allowOverflow }"
+        >
           <!-- eslint-disable vue/no-v-html -->
           <div
             v-if="obj.text && !display?.hideObjectText"
@@ -74,6 +78,13 @@
             v-html="formatText(obj.text)"
           ></div>
           <!-- eslint-enable vue/no-v-html -->
+          <div v-if="showAddons" class="obj-addons">
+            <LazyViewAddon
+              v-for="(addon, idx) in obj.addons"
+              :key="idx"
+              :addon="addon"
+            />
+          </div>
         </div>
         <div
           class="obj-controls h-12"
@@ -126,6 +137,7 @@ const $props = defineProps<{
   template?: string;
   display?: DisplaySettings;
   allowOverflow?: boolean;
+  showAddons?: boolean;
 }>();
 
 const objClass = computed(() => {
@@ -281,13 +293,13 @@ const decrement = () => {
 </script>
 
 <style scoped lang="scss">
-.project-obj {
+.project-obj.obj-default {
   --obj-bg-color: v-bind('objBgColor');
 }
 </style>
 
 <style lang="scss">
-.project-obj {
+.project-obj.obj-default {
   height: 100%;
   overflow: hidden;
   display: flex;
@@ -372,9 +384,12 @@ const decrement = () => {
     }
   }
   .obj-content {
-    overflow-x: hidden;
-    overflow-y: hidden;
     grid-area: content;
+
+    &.hide-overflow {
+      overflow-x: hidden;
+      overflow-y: hidden;
+    }
   }
 
   .obj-controls {

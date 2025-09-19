@@ -59,7 +59,7 @@ const stylesheet = computed(() => {
   overflow: var(--row-overflow);
 }
 
-.project-obj {
+.project-obj.obj-default {
   background-color: var(--obj-bg-color);
 
   .obj-title {

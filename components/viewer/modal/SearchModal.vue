@@ -56,6 +56,8 @@
           :view-object="ViewContext.Viewer"
           template="1"
           force-width="col-12"
+          :allow-overflow="true"
+          :show-addons="true"
         />
       </div>
     </div>
