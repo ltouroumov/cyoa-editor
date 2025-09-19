@@ -29,6 +29,8 @@
           :width="packRow.objectWidth"
           :view-object="objectMode"
           :display="display"
+          :allow-overflow="true"
+          :show-addons="true"
         />
       </div>
     </div>
