@@ -69,7 +69,7 @@
         <div
           ref="objContentRef"
           class="obj-content"
-          :class="{ 'hide-overflow': !allowOverflow }"
+          :class="{ 'hide-overflow': hideOverflow }"
         >
           <!-- eslint-disable vue/no-v-html -->
           <div
@@ -78,7 +78,10 @@
             v-html="formatText(obj.text)"
           ></div>
           <!-- eslint-enable vue/no-v-html -->
-          <div v-if="showAddons" class="obj-addons">
+          <div
+            v-if="showAddons || display?.showObjectAddons"
+            class="obj-addons"
+          >
             <LazyViewAddon
               v-for="(addon, idx) in obj.addons"
               :key="idx"
@@ -87,12 +90,12 @@
           </div>
         </div>
         <div
-          class="obj-controls h-12"
-          :class="{ show: hasOverflow }"
+          class="obj-controls"
+          :class="{ show: showControls, floating: showFloatingControls }"
           @click.stop.prevent="showMore()"
         >
           <div
-            class="controls flex flex-row justify-center items-center cursor-pointer pt-4"
+            class="controls flex flex-row justify-center items-center cursor-pointer py-1"
           >
             <div class="scroll-btn flex flex-row items-center">
               <div
@@ -114,7 +117,7 @@
 
 <script setup lang="ts">
 import * as R from 'ramda';
-import { isNotEmpty, isNotNil, length } from 'ramda';
+import { isEmpty, isNotEmpty, isNotNil, length } from 'ramda';
 
 import StyleObj from './style/StyleObj.vue';
 
@@ -146,6 +149,7 @@ const objClass = computed(() => {
 });
 const objHeightClass = computed(() => {
   if ($props.allowOverflow) return null;
+  if ($props.display?.showObjectOverflow) return null;
 
   let objectSize = $props.forceWidth ?? $props.row.objectWidth;
   if ($props.obj.objectWidth) {
@@ -160,6 +164,11 @@ const objHeightClass = computed(() => {
   } else {
     return 'mh-3';
   }
+});
+const hideOverflow = computed(() => {
+  if ($props.allowOverflow) return false;
+  if ($props.display?.showObjectOverflow) return false;
+  return true;
 });
 
 const objTemplateClass = computed(() => {
@@ -203,15 +212,32 @@ const objImageIsURL = computed(() => {
 
 const objContentRef = useTemplateRef('objContentRef');
 const objContentSize = useElementSize(objContentRef);
-const hasOverflow = ref<boolean>(false);
-
-watch([objContentSize.width, objContentSize.height, $props.obj], () => {
-  const objContentEl = objContentRef.value;
-  if (!objContentEl) return;
-  hasOverflow.value =
-    !$props.allowOverflow &&
-    (objContentEl.scrollHeight > objContentEl.clientHeight ||
-      isNotEmpty($props.obj.addons));
+const showControls = computed<boolean>(() => {
+  if ($props.display?.showObjectControls === 'always') {
+    return isNotEmpty($props.obj.text) || isNotEmpty($props.obj.addons);
+  } else if ($props.display?.showObjectControls === 'never') {
+    return false;
+  } else if (isNotEmpty($props.obj.text) || isNotEmpty($props.obj.addons)) {
+    // showObjectControls is 'auto'
+    // Access these properties to trigger reactivity on changes
+    const _ = [objContentSize.height.value, objContentSize.width.value];
+    const objContentEl = objContentRef.value;
+    if (!objContentEl) return false;
+    return (
+      !$props.allowOverflow &&
+      (objContentEl.scrollHeight > objContentEl.clientHeight ||
+        isNotEmpty($props.obj.addons))
+    );
+  } else {
+    return false;
+  }
+});
+const showFloatingControls = computed<boolean>(() => {
+  return (
+    $props.display?.showObjectControls === 'auto' ||
+    $props.display?.showObjectControls === 'never' ||
+    (isEmpty($props.obj.text) && isEmpty($props.obj.addons))
+  );
 });
 
 const viewerStore = useViewerStore();
@@ -374,6 +400,8 @@ const decrement = () => {
 
     .obj-title {
       margin-bottom: 5px;
+      margin-left: 5px;
+      margin-right: 5px;
     }
 
     .obj-select-multi {
@@ -394,16 +422,24 @@ const decrement = () => {
 
   .obj-controls {
     visibility: hidden;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    z-index: 10;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    &.floating {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      z-index: 10;
+
+      height: 3rem;
+      .controls {
+        padding-top: 1rem;
+      }
+    }
 
     &.show {
       visibility: visible;
