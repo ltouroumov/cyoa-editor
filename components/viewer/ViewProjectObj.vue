@@ -394,9 +394,6 @@ const decrement = () => {
 
   .obj-header {
     grid-area: header;
-    position: sticky;
-    top: 0;
-    z-index: 10;
     margin-top: 5px;
     margin-bottom: 5px;
 
