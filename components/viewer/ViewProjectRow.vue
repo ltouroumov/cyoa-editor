@@ -2,7 +2,7 @@
   <div :id="`row-${row.id}`" class="project-row-wrapper">
     <StyleRow
       v-if="row.isPrivateStyling"
-      :styles="row.styling"
+      :styles="row.styling!"
       :row-id="row.id"
     />
     <div

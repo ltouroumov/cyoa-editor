@@ -195,7 +195,7 @@ const objBgColor = computed(() => {
     } else {
       return 'transparent';
     }
-  } else if ($props.row.styling.objectBgColorIsOn) {
+  } else if ($props.row.styling?.objectBgColorIsOn) {
     return $props.row.styling.objectBgColor;
   } else if (isNotNil(store.project)) {
     if (store.project.data.styling.objectBgColorIsOn) {

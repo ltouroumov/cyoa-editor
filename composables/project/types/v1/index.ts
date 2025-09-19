@@ -206,7 +206,7 @@ export type ProjectRow = HasId &
     objects: ProjectObj[];
 
     isPrivateStyling: boolean;
-    styling: RowStyles;
+    styling?: RowStyles;
   };
 
 export type PointType = {
