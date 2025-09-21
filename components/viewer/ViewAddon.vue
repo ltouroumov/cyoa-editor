@@ -5,6 +5,7 @@
       v-if="!display?.hideAddonRequirements"
       :requireds="addon.requireds"
       :show-always="true"
+      :enable-show-more="true"
     />
     <!-- eslint-disable vue/no-v-html -->
     <div

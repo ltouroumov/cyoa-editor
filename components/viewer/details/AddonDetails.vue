@@ -5,7 +5,11 @@
   >
     <div class="obj-header">
       <div class="title">{{ addon.title }}</div>
-      <ViewRequirements :requireds="addon.requireds" :show-always="true" />
+      <ViewRequirements
+        :requireds="addon.requireds"
+        :show-always="true"
+        :enable-show-more="true"
+      />
     </div>
     <!-- eslint-disable vue/no-v-html -->
     <div class="text" v-html="formatText(addon.text)"></div>

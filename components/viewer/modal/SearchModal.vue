@@ -219,7 +219,7 @@ const select = (result: SearchResult) => {
 };
 
 const showMore = (obj: ProjectObj) => {
-  viewerStore.showObjectDetails = obj.id;
+  viewerStore.showObjectDetails = { id: obj.id, tab: 'details' };
 };
 </script>
 

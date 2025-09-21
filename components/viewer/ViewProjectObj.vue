@@ -37,33 +37,13 @@
           <div class="obj-title">
             {{ obj.title }}
           </div>
-          <template v-if="obj.isSelectableMultiple">
-            <div class="obj-select-multi">
-              <div
-                v-if="canToggle"
-                class="iconify carbon--subtract-alt text-xl"
-                :class="{
-                  'text-green-400': selectedAmount > minSelectedAmount,
-                  'text-grey-400': selectedAmount <= minSelectedAmount,
-                }"
-                @click="decrement"
-              />
-              <span class="mx-1">{{ selectedAmount }}</span>
-              <div
-                v-if="canToggle"
-                class="iconify carbon--add-alt text-xl"
-                :class="{
-                  'text-green-400': selectedAmount < maxSelectedAmount,
-                  'text-grey-400': selectedAmount >= minSelectedAmount,
-                }"
-                @click="increment"
-              />
-            </div>
-          </template>
+          <ProjectObjMulti v-if="obj.isSelectableMultiple" :obj="obj" />
           <ViewScores v-if="!display?.hideObjectScores" :scores="obj.scores" />
           <ViewRequirements
             v-if="!display?.hideObjectRequirements"
             :requireds="obj.requireds"
+            :enable-show-more="true"
+            @show-more="showParents()"
           />
         </div>
         <div
@@ -122,15 +102,16 @@ import { isEmpty, isNotEmpty, isNotNil, length } from 'ramda';
 
 import StyleObj from './style/StyleObj.vue';
 
+import ProjectObjMulti from '~/components/viewer/ProjectObjMulti.vue';
 import { ObjectHeights, getSizeClasses } from '~/components/viewer/style/sizes';
 import ViewScores from '~/components/viewer/ViewScores.vue';
-import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { useProjectStore } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
 import { useViewerStore } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';
+import { useObject } from '~/composables/viewer/useObject';
 
 const $props = defineProps<{
   row: ProjectRow;
@@ -143,6 +124,17 @@ const $props = defineProps<{
   allowOverflow?: boolean;
   showAddons?: boolean;
 }>();
+
+const _object = useObject($props.obj, $props.row);
+const {
+  isSelected,
+  selectedAmount,
+  minSelectedAmount,
+  maxSelectedAmount,
+  toggle,
+  increment,
+  decrement,
+} = _object;
 
 const objClass = computed(() => {
   if ($props.forceWidth) return [$props.forceWidth];
@@ -253,13 +245,14 @@ const showStickyControls = computed<boolean>(() => {
 
 const viewerStore = useViewerStore();
 const showMore = () => {
-  viewerStore.showObjectDetails = $props.obj.id;
+  viewerStore.showObjectDetails = { id: $props.obj.id, tab: 'details' };
+};
+const showParents = () => {
+  viewerStore.showObjectDetails = { id: $props.obj.id, tab: 'parents' };
 };
 
 const store = useProjectStore();
-const { selectedIds, selected } = useProjectRefs();
 
-const condition = computed(() => buildConditions($props.obj));
 const isEnabled = computed<boolean>(() => {
   // Whether the object is always enabled or disabled based on the viewObject
   // Otherwise check the object conditions
@@ -268,7 +261,7 @@ const isEnabled = computed<boolean>(() => {
     case ViewContext.BackpackDisabled:
       return true;
     default:
-      return condition.value(selectedIds.value);
+      return _object.isEnabled.value;
   }
 });
 const alwaysEnable = computed<boolean>(() => {
@@ -282,9 +275,7 @@ const alwaysEnable = computed<boolean>(() => {
 });
 const canToggle = computed<boolean>(() => {
   return (
-    isEnabled.value &&
-    !$props.obj.isNotSelectable &&
-    !$props.row.isInfoRow &&
+    _object.canToggle.value &&
     $props.viewObject !== ViewContext.BackpackDisabled
   );
 });
@@ -294,39 +285,6 @@ const isInBackpack = computed<boolean>(() => {
     $props.viewObject === ViewContext.BackpackDisabled
   );
 });
-const isSelected = computed<boolean>(() => {
-  return R.has($props.obj.id, selected.value);
-});
-
-const selectedAmount = computed(() => {
-  if ($props.obj.isSelectableMultiple)
-    return selected.value[$props.obj.id] ?? 0;
-  else return 0;
-});
-
-const minSelectedAmount = computed(() =>
-  Number.parseInt($props.obj.numMultipleTimesMinus),
-);
-const maxSelectedAmount = computed(() =>
-  Number.parseInt($props.obj.numMultipleTimesPluss),
-);
-
-const toggle = () => {
-  if (canToggle.value && !$props.obj.isSelectableMultiple) {
-    store.setSelected($props.obj.id, !isSelected.value);
-  }
-};
-
-const increment = () => {
-  if (canToggle.value) {
-    store.incSelected($props.obj.id);
-  }
-};
-const decrement = () => {
-  if (canToggle.value) {
-    store.decSelected($props.obj.id);
-  }
-};
 </script>
 
 <style scoped lang="scss">

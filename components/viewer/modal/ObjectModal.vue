@@ -13,7 +13,7 @@
         v-if="obj && row"
         class="w-full h-full py-[1rem] px-[1rem] flex flex-col items-center overflow-auto relative"
       >
-        <ViewDetailsAsync :obj="obj" :row="row">
+        <ViewDetailsAsync v-if="tab === 'details'" :obj="obj" :row="row">
           <template #right>
             <div class="absolute top-0 right-0 pt-2 pr-2 z-20">
               <div
@@ -23,6 +23,16 @@
             </div>
           </template>
         </ViewDetailsAsync>
+        <ViewParentsAsync v-if="tab === 'parents'" :obj="obj" :row="row">
+          <template #right>
+            <div class="absolute top-0 right-0 pt-2 pr-2 z-20">
+              <div
+                class="iconify carbon--close-outline size-6 text-surface-200 cursor-pointer"
+                @click="close()"
+              ></div>
+            </div>
+          </template>
+        </ViewParentsAsync>
       </div>
     </template>
   </Dialog>
@@ -34,6 +44,9 @@ import { useViewerStore } from '~/composables/store/viewer';
 
 const ViewDetailsAsync = defineAsyncComponent(
   () => import('../details/ViewDetails.vue'),
+);
+const ViewParentsAsync = defineAsyncComponent(
+  () => import('../parents/ViewParents.vue'),
 );
 
 const vStore = useViewerStore();
@@ -49,14 +62,22 @@ const showDetails = computed<boolean>({
 });
 
 const obj = computed(() => {
-  if (!vStore.showObjectDetails) return undefined;
-  return pStore.getObject(vStore.showObjectDetails);
+  if (vStore.showObjectDetails) {
+    return pStore.getObject(vStore.showObjectDetails.id);
+  } else {
+    return undefined;
+  }
 });
 const row = computed(() => {
-  if (!vStore.showObjectDetails) return undefined;
-  const rowId = pStore.getObjectRow(vStore.showObjectDetails);
+  if (!obj.value) return undefined;
+  const rowId = pStore.getObjectRow(obj.value.id);
   return pStore.getRow(rowId);
 });
+const tab = computed(() =>
+  typeof vStore.showObjectDetails === 'object'
+    ? vStore.showObjectDetails.tab
+    : null,
+);
 
 const close = () => {
   vStore.showObjectDetails = false;

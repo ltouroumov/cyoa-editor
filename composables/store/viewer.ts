@@ -2,12 +2,13 @@ import { defineStore, storeToRefs } from 'pinia';
 
 import type { ViewerProjectList } from '~/composables/viewer';
 
+type ShowDetails = { id: string; tab: 'details' | 'parents' };
 export const useViewerStore = defineStore('viewer', () => {
   const isBackpackVisible = ref<boolean>(false);
   const isNotesVisible = ref<boolean>(false);
   const isSearchVisible = ref<boolean>(false);
   const isProjectMenuVisible = ref<boolean>(false);
-  const showObjectDetails = ref<string | false>(false);
+  const showObjectDetails = ref<ShowDetails | false>(false);
 
   const viewerProjectList = ref<ViewerProjectList>({
     items: [],

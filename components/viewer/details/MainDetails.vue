@@ -14,31 +14,9 @@
       <div class="obj-title">
         {{ obj.title }}
       </div>
-      <template v-if="obj.isSelectableMultiple">
-        <div class="obj-select-multi">
-          <div
-            v-if="canToggle"
-            class="iconify carbon--subtract-alt text-xl"
-            :class="{
-              'text-green-400': selectedAmount > minSelectedAmount,
-              'text-grey-400': selectedAmount <= minSelectedAmount,
-            }"
-            @click="decrement"
-          />
-          <span class="mx-1">{{ selectedAmount }}</span>
-          <div
-            v-if="canToggle"
-            class="iconify carbon--add-alt text-xl"
-            :class="{
-              'text-green-400': selectedAmount < maxSelectedAmount,
-              'text-grey-400': selectedAmount >= minSelectedAmount,
-            }"
-            @click="increment"
-          />
-        </div>
-      </template>
+      <ProjectObjMulti v-if="obj.isSelectableMultiple" :obj="obj" />
       <ViewScores :scores="obj.scores" />
-      <ViewRequirements :requireds="obj.requireds" />
+      <ViewRequirements :requireds="obj.requireds" :enable-show-more="true" />
     </div>
     <div ref="objContentRef" class="obj-content">
       <!-- eslint-disable vue/no-v-html -->
@@ -49,64 +27,21 @@
 </template>
 
 <script setup lang="ts">
-import * as R from 'ramda';
-
+import ProjectObjMulti from '~/components/viewer/ProjectObjMulti.vue';
 import ViewScores from '~/components/viewer/ViewScores.vue';
-import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { formatText } from '~/composables/text';
-
-const store = useProjectStore();
-const { selectedIds, selected } = useProjectRefs();
+import { useObject } from '~/composables/viewer/useObject';
 
 const $props = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
 }>();
 
-const condition = computed(() => buildConditions($props.obj));
-const isEnabled = computed<boolean>(() => {
-  return condition.value(selectedIds.value);
-});
-const isSelected = computed<boolean>(() => {
-  return R.has($props.obj.id, selected.value);
-});
-const canToggle = computed<boolean>(() => {
-  return (
-    isEnabled.value && !$props.obj.isNotSelectable && !$props.row.isInfoRow
-  );
-});
-
-const selectedAmount = computed(() => {
-  if ($props.obj.isSelectableMultiple)
-    return selected.value[$props.obj.id] ?? 0;
-  else return 0;
-});
-
-const minSelectedAmount = computed(() =>
-  Number.parseInt($props.obj.numMultipleTimesMinus),
+const { isEnabled, isSelected, canToggle, toggle } = useObject(
+  $props.obj,
+  $props.row,
 );
-const maxSelectedAmount = computed(() =>
-  Number.parseInt($props.obj.numMultipleTimesPluss),
-);
-
-const toggle = () => {
-  if (canToggle.value && !$props.obj.isSelectableMultiple) {
-    store.setSelected($props.obj.id, !isSelected.value);
-  }
-};
-
-const increment = () => {
-  if (canToggle.value) {
-    store.incSelected($props.obj.id);
-  }
-};
-const decrement = () => {
-  if (canToggle.value) {
-    store.decSelected($props.obj.id);
-  }
-};
 </script>
 
 <style scoped lang="scss">
