@@ -51,7 +51,6 @@
           icon="iconify solar--diskette-outline"
           @click="updateCurrentBuild($event)"
         />
-        <div class="border-s border-surface-500 mx-2 h-6"></div>
         <SearchField />
       </div>
     </template>

@@ -4,11 +4,11 @@
     :modal="true"
     :dismissable-mask="true"
     :unstyled="true"
-    pt:root:class="w-full md:w-2/3"
-    pt:mask:class="backdrop-blur-sm overflow-auto"
+    pt:root:class="w-full md:w-2/3 p-4 max-h-[100%]"
+    pt:mask:class="backdrop-blur-sm"
   >
     <template #container>
-      <div class="search-modal w-full h-full border border-white overflow-auto">
+      <div class="search-modal w-full overflow-auto">
         <div class="search-header w-full">
           <InputGroup>
             <InputText
@@ -52,50 +52,81 @@
         </div>
 
         <div
-          class="search-results w-full h-[3000px]"
+          v-if="isNotEmpty(searchResults)"
+          class="search-results w-full"
           :class="{ 'show-view': !!searchView }"
         >
-          <div class="panel results-list flex-grow-2">
-            <template v-for="result in searchResults" :key="result.key">
-              <div
-                v-if="result.type === 'object'"
-                class="flex flex-row justify-start gap-1"
-              >
+          <div class="panel results-list">
+            <div class="h-full overflow-auto flex flex-col gap-2">
+              <template v-for="result in searchResults" :key="result.key">
                 <div
-                  class="iconify carbon--cube size-4 mt-1 text-primary-500"
-                ></div>
-                <div class="flex flex-col gap-1">
-                  <div class="font-bold">{{ result.obj.title }}</div>
-                  <div class="text-surface-500">{{ result.row.title }}</div>
-                </div>
-              </div>
-              <div
-                v-if="result.type === 'addon'"
-                class="flex flex-row justify-start gap-1"
-              >
-                <div
-                  class="iconify carbon--hexagon-vertical-outline size-4 mt-1 text-primary-500"
-                ></div>
-                <div class="flex flex-col gap-1">
-                  <div class="font-bold">{{ result.addon.title }}</div>
-                  <div class="text-surface-500">
-                    {{ result.obj.title }} / {{ result.row.title }}
+                  v-if="result.type === 'object'"
+                  class="result-item"
+                  :class="{ selected: isSelected(result) }"
+                  @click="select(result)"
+                >
+                  <div
+                    class="iconify carbon--cube size-4 mt-1 text-primary-500"
+                  ></div>
+                  <div class="flex flex-col gap-1">
+                    <div class="font-bold">{{ result.obj.title }}</div>
+                    <div class="text-surface-500">{{ result.row.title }}</div>
                   </div>
                 </div>
-              </div>
-            </template>
+                <div
+                  v-if="result.type === 'addon'"
+                  class="result-item"
+                  :class="{ selected: isSelected(result) }"
+                  @click="select(result)"
+                >
+                  <div
+                    class="iconify carbon--hexagon-vertical-outline size-4 mt-1 text-primary-500"
+                  ></div>
+                  <div class="flex flex-col gap-1">
+                    <div class="flex flex-row gap-1 items-center">
+                      <div class="font-bold">{{ result.addon.title }}</div>
+                      <div class="text-surface-500 text-sm">
+                        on {{ result.obj.title }}
+                      </div>
+                    </div>
+                    <div class="text-surface-500">
+                      {{ result.row.title }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
-          <div v-if="!!searchView" class="panel results-view flex-grow-1">
+          <div v-if="!!searchView" class="results-view">
             <ViewProjectObj
-              :key="searchView.obj.id"
+              v-if="searchView.type === 'object'"
               :obj="searchView.obj"
               :row="searchView.row"
               :view-object="ViewContext.Viewer"
               template="1"
               force-width="col-12"
+              class="h-full"
               :allow-overflow="true"
-              :show-addons="true"
+              :show-addons="false"
+              :display="{ showObjectControls: 'always' }"
             />
+            <div
+              v-if="searchView.type === 'addon'"
+              class="h-full flex flex-col"
+            >
+              <div
+                class="flex flex-row gap-1 items-center justify-center p-2 bg-surface-900 mb-1 border border-surface-700 rounded-xl"
+                @click="showMore(searchView.obj)"
+              >
+                <div class="iconify carbon--zoom-in"></div>
+                <span>Show Parent</span>
+              </div>
+              <div class="project-obj obj-default">
+                <div class="project-obj-content">
+                  <ViewAddon :addon="searchView.addon" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -105,21 +136,19 @@
 
 <script setup lang="ts">
 import { debounce } from 'perfect-debounce';
+import { isNotEmpty } from 'ramda';
 
-import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
-import { useViewerRefs } from '~/composables/store/viewer';
+import type { ProjectObj } from '~/composables/project/types/v1';
+import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';
-import { useSearch } from '~/composables/viewer/useSearch';
+import { type SearchResult, useSearch } from '~/composables/viewer/useSearch';
 
 const { isSearchVisible } = useViewerRefs();
 const { searchText, searchResults, updateResults } = useSearch();
 
-type ResultView = {
-  row: ProjectRow;
-  obj: ProjectObj;
-};
+const viewerStore = useViewerStore();
 
-const searchView = ref<ResultView | null>(null);
+const searchView = ref<SearchResult | null>(null);
 
 const searchHelp = ref<any>();
 const searchInput = ref<HTMLInputElement>();
@@ -142,12 +171,23 @@ const search = debounce(() => updateResults(), 500, {
   trailing: true,
 });
 
-const preview = (obj: ProjectObj, row: ProjectRow) => {
-  if (!!searchView.value && searchView.value.obj.id === obj.id) {
+const isSelected = (result: SearchResult) => {
+  if (!searchView.value) return false;
+  return (
+    result.type === searchView.value.type && result.key === searchView.value.key
+  );
+};
+
+const select = (result: SearchResult) => {
+  if (!!searchView.value && isSelected(result)) {
     searchView.value = null;
   } else {
-    searchView.value = { obj, row };
+    searchView.value = result;
   }
+};
+
+const showMore = (obj: ProjectObj) => {
+  viewerStore.showObjectDetails = obj.id;
 };
 </script>
 
@@ -171,28 +211,36 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
     display: flex;
     flex-direction: row;
     align-items: stretch;
+    gap: 0.25rem;
 
-    margin-top: 1rem;
+    margin-top: 0.5rem;
+    overflow: auto;
   }
 
-  .search-result-view {
-    grid-area: view;
-    display: flex;
-    align-items: stretch;
-    justify-content: stretch;
-    overflow: auto;
+  .results-list {
+    flex: 6 1 60%;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .results-view {
+    flex: 4 1 40%;
+
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 
 .panel {
-  @apply bg-surface-900 rounded-xl border border-surface-700 p-2;
+  @apply bg-surface-900 rounded-xl border border-surface-700;
 }
 
 .result-item {
-  padding: 0.2rem 0.5rem;
+  @apply flex flex-row justify-start gap-1 px-2 py-1 cursor-pointer;
 
   &.selected {
-    background: var(--p-primary-500);
+    background: var(--p-surface-700);
   }
 }
 

@@ -88,7 +88,11 @@
         </div>
         <div
           class="obj-controls"
-          :class="{ show: showControls, floating: showFloatingControls }"
+          :class="{
+            show: showControls,
+            floating: showFloatingControls,
+            sticky: showStickyControls,
+          }"
           @click.stop.prevent="showMore()"
         >
           <div
@@ -135,7 +139,7 @@ const $props = defineProps<{
   width?: string;
   forceWidth?: string;
   template?: string;
-  display?: DisplaySettings;
+  display?: Partial<DisplaySettings>;
   allowOverflow?: boolean;
   showAddons?: boolean;
 }>();
@@ -239,6 +243,11 @@ const showFloatingControls = computed<boolean>(() => {
     $props.display?.showObjectControls === 'auto' ||
     $props.display?.showObjectControls === 'never' ||
     (isEmpty($props.obj.text) && isEmpty($props.obj.addons))
+  );
+});
+const showStickyControls = computed<boolean>(() => {
+  return (
+    $props.display?.showObjectControls === 'always' && $props.allowOverflow
   );
 });
 
@@ -429,6 +438,19 @@ const decrement = () => {
 
     &.floating {
       position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      z-index: 10;
+
+      height: 3rem;
+      .controls {
+        padding-top: 1rem;
+      }
+    }
+
+    &.sticky {
+      position: sticky;
       bottom: 0;
       right: 0;
       left: 0;

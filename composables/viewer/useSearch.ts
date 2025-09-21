@@ -84,8 +84,8 @@ export function useSearch() {
 
   type SearchFn = (
     entry:
-      | { type: 'object'; data: ProjectObj }
-      | { type: 'addon'; data: ObjAddon },
+      | { type: 'object'; data: ProjectObj; parent: ProjectRow }
+      | { type: 'addon'; data: ObjAddon; parent: ProjectObj },
   ) => boolean;
   type ScoreMatchFn = (score: Score) => boolean;
 
@@ -130,17 +130,20 @@ export function useSearch() {
     };
 
     const compileMatcher = (matcher: {
-      onObject?: (data: ProjectObj) => boolean;
-      onAddon?: (data: ObjAddon) => boolean;
-      onBoth?: (data: ProjectObj | ObjAddon) => boolean;
+      onObject?: (data: ProjectObj, parent: ProjectRow) => boolean;
+      onAddon?: (data: ObjAddon, parent: ProjectObj) => boolean;
+      onBoth?: (
+        data: ProjectObj | ObjAddon,
+        parent: ProjectObj | ProjectRow,
+      ) => boolean;
     }): SearchFn => {
       return (entry) => {
         if (entry.type === 'object' && matcher.onObject) {
-          return matcher.onObject(entry.data);
+          return matcher.onObject(entry.data, entry.parent);
         } else if (entry.type === 'addon' && matcher.onAddon) {
-          return matcher.onAddon(entry.data);
+          return matcher.onAddon(entry.data, entry.parent);
         } else if (matcher.onBoth) {
-          return matcher.onBoth(entry.data);
+          return matcher.onBoth(entry.data, entry.parent);
         } else {
           return false;
         }
@@ -236,6 +239,20 @@ export function useSearch() {
             }),
           );
         }
+        if ('parent' in kwargs) {
+          searchFns.push(
+            compileMatcher({
+              onBoth: (_obj, parent) => matchesAll(kwargs.parent, parent.title),
+            }),
+          );
+        }
+        if ('row' in kwargs) {
+          searchFns.push(
+            compileMatcher({
+              onObject: (_obj, parent) => matchesAll(kwargs.row, parent.title),
+            }),
+          );
+        }
         if ('required' in kwargs) {
           searchFns.push(
             compileMatcher({
@@ -279,7 +296,7 @@ export function useSearch() {
     const data: Project = project.value.data;
     for (const row of data.rows) {
       for (const obj of row.objects) {
-        const objMatch = searchFn({ type: 'object', data: obj });
+        const objMatch = searchFn({ type: 'object', data: obj, parent: row });
         if (objMatch) {
           results.push({
             type: 'object',
@@ -291,7 +308,11 @@ export function useSearch() {
 
         for (let idx = 0; idx < obj.addons.length; idx++) {
           const addon = obj.addons[idx];
-          const addonMatch = searchFn({ type: 'addon', data: addon });
+          const addonMatch = searchFn({
+            type: 'addon',
+            data: addon,
+            parent: obj,
+          });
           if (addonMatch) {
             results.push({
               type: 'addon',
@@ -315,7 +336,7 @@ export function useSearch() {
   };
 }
 
-type SearchResult =
+export type SearchResult =
   | { type: 'object'; key: string; row: ProjectRow; obj: ProjectObj }
   | {
       type: 'addon';
