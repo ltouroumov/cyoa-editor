@@ -1,116 +1,127 @@
 <template>
   <Dialog
     v-model:visible="isSearchVisible"
-    modal
-    dismissable-mask
-    class="w-full h-full lg:mx-[2rem] mx-0"
-    :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
+    :modal="true"
+    :dismissable-mask="true"
+    :unstyled="true"
+    pt:root:class="w-full md:w-2/3"
+    pt:mask:class="backdrop-blur-sm overflow-auto"
   >
-    <template #header>
-      <h5 class="text-primary text-xl">Search</h5>
-    </template>
-    <div class="search-modal" :class="{ 'show-view': !!searchView }">
-      <div class="search-header">
-        <InputText
-          ref="searchInput"
-          v-model="searchText"
-          placeholder="Search CYOA"
-          fluid
-          autofocus
-          @input="search"
-        />
-        <div class="search-help">
-          Supports: <span class="code">"corona pollentia"</span>,
-          <span class="code">title:taylor</span>,
-          <span class="code">text:charges</span>,
-          <span class="code">required:skitter</span>,
-          <span class="code">cost:10SP</span>,
-          <span class="code">gain:"&lt;10 SP"</span>,
-          <span class="code">id:3ea234</span>, and
-          <span class="code">trump or tinker</span>
+    <template #container>
+      <div class="search-modal w-full h-full border border-white overflow-auto">
+        <div class="search-header w-full">
+          <InputGroup>
+            <InputText
+              ref="searchInput"
+              v-model="searchText"
+              placeholder="Search CYOA"
+              :fluid="true"
+              :autofocus="true"
+              @input="search"
+            />
+            <InputGroupAddon>
+              <Button
+                icon="iconify carbon--information"
+                severity="secondary"
+                @click="searchHelp.toggle($event)"
+              />
+            </InputGroupAddon>
+          </InputGroup>
+          <Popover ref="searchHelp">
+            <div class="search-help">
+              <div class="font-bold text-primary">Search Syntax</div>
+              <ul>
+                <li>
+                  Exact value: <span class="code">"corona pollentia"</span>
+                </li>
+                <li>Only titles:<span class="code">title:taylor</span></li>
+                <li>Only text:<span class="code">text:charges</span></li>
+                <li>Requirement:<span class="code">required:skitter</span></li>
+                <li>
+                  Search exact cost/gain: <span class="code">cost:10SP</span>
+                </li>
+                <li>
+                  Search cost/gain less or great than:
+                  <span class="code">gain:"&lt;10 SP"</span>
+                </li>
+                <li>Search by ID: <span class="code">id:3ea234</span></li>
+                <li>Alternatives: <span class="code">trump or tinker</span></li>
+              </ul>
+            </div>
+          </Popover>
         </div>
-      </div>
-      <div class="search-result-list text-light">
+
         <div
-          v-for="group in searchResults"
-          :key="group.row.id"
-          class="result-group"
+          class="search-results w-full h-[3000px]"
+          :class="{ 'show-view': !!searchView }"
         >
-          <div class="group-title">{{ group.row.title }}</div>
-          <div
-            v-for="obj in group.items"
-            :key="obj.id"
-            class="result-item"
-            :class="{ selected: searchView?.obj.id === obj.id }"
-            @click="preview(obj, group.row)"
-          >
-            {{ obj.title }}
+          <div class="panel results-list flex-grow-2">
+            <template v-for="result in searchResults" :key="result.key">
+              <div
+                v-if="result.type === 'object'"
+                class="flex flex-row justify-start gap-1"
+              >
+                <div
+                  class="iconify carbon--cube size-4 mt-1 text-primary-500"
+                ></div>
+                <div class="flex flex-col gap-1">
+                  <div class="font-bold">{{ result.obj.title }}</div>
+                  <div class="text-surface-500">{{ result.row.title }}</div>
+                </div>
+              </div>
+              <div
+                v-if="result.type === 'addon'"
+                class="flex flex-row justify-start gap-1"
+              >
+                <div
+                  class="iconify carbon--hexagon-vertical-outline size-4 mt-1 text-primary-500"
+                ></div>
+                <div class="flex flex-col gap-1">
+                  <div class="font-bold">{{ result.addon.title }}</div>
+                  <div class="text-surface-500">
+                    {{ result.obj.title }} / {{ result.row.title }}
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+          <div v-if="!!searchView" class="panel results-view flex-grow-1">
+            <ViewProjectObj
+              :key="searchView.obj.id"
+              :obj="searchView.obj"
+              :row="searchView.row"
+              :view-object="ViewContext.Viewer"
+              template="1"
+              force-width="col-12"
+              :allow-overflow="true"
+              :show-addons="true"
+            />
           </div>
         </div>
       </div>
-      <div v-if="!!searchView" class="search-result-view text-light">
-        <ViewProjectObj
-          :key="searchView.obj.id"
-          :obj="searchView.obj"
-          :row="searchView.row"
-          :view-object="ViewContext.Viewer"
-          template="1"
-          force-width="col-12"
-          :allow-overflow="true"
-          :show-addons="true"
-        />
-      </div>
-    </div>
+    </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
 import { debounce } from 'perfect-debounce';
-import {
-  all,
-  any,
-  chain,
-  concat,
-  filter,
-  includes,
-  isEmpty,
-  isNil,
-  isNotEmpty,
-  isNotNil,
-  length,
-  map,
-  prop,
-  reject,
-} from 'ramda';
 
-import type {
-  ConditionTerm,
-  Project,
-  ProjectObj,
-  ProjectRow,
-  Score,
-} from '~/composables/project/types/v1';
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useViewerRefs } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';
+import { useSearch } from '~/composables/viewer/useSearch';
 
 const { isSearchVisible } = useViewerRefs();
-const { getObject, getPointType } = useProjectStore();
-const { project } = useProjectRefs();
+const { searchText, searchResults, updateResults } = useSearch();
 
-type ResultGroup = {
-  row: ProjectRow;
-  items: ProjectObj[];
-};
 type ResultView = {
   row: ProjectRow;
   obj: ProjectObj;
 };
 
-const searchText = ref<string>('');
-const searchResults = ref<ResultGroup[]>([]);
 const searchView = ref<ResultView | null>(null);
 
+const searchHelp = ref<any>();
 const searchInput = ref<HTMLInputElement>();
 watch(isSearchVisible, (newValue) => {
   if (newValue === false) {
@@ -126,258 +137,10 @@ watch(searchText, (newValue) => {
   }
 });
 
-type SearchResult =
-  | { or: SearchResult[] }
-  | {
-      args?: string[];
-      kwargs?: Record<string, string[]>;
-    };
-
-const PART_MATCH = /(?:(?<key>\S+):)?(?:"(?<quoted>[^"]+)"|(?<word>\S+))/g;
-const SCORE_MATCH = /^(?<operator><|>)?\s*(?<value>\d+)\s*(?<name>\w+)?$/;
-
-function parseSearchTerm(parts: RegExpExecArray[]) {
-  const result: SearchResult = {};
-  for (const part of parts) {
-    const partWords = part.groups?.quoted ?? part.groups?.word;
-    if (isNil(partWords) || isEmpty(partWords)) continue;
-
-    if (part.groups?.key) {
-      const key = part.groups.key;
-      if (!result.kwargs) {
-        result.kwargs = {};
-      }
-      if (!result.kwargs[key]) {
-        result.kwargs[key] = [];
-      }
-
-      result.kwargs[key].push(partWords);
-    } else {
-      if (!result.args) {
-        result.args = [];
-      }
-
-      result.args.push(partWords);
-    }
-  }
-  return result;
-}
-
-function parseSearch(input: string): SearchResult {
-  const parts = input.matchAll(PART_MATCH);
-
-  // Scan for the "or" keyword and split the input keywords into groups
-  const orParts: RegExpExecArray[][] = [];
-  let acc: RegExpExecArray[] = [];
-
-  for (const part of parts) {
-    if (part[0] === 'or') {
-      orParts.push(acc);
-      acc = [];
-    } else {
-      acc.push(part);
-    }
-  }
-  orParts.push(acc);
-
-  if (orParts.length > 1) {
-    return { or: orParts.map(parseSearchTerm).filter(isNotEmpty) };
-  } else {
-    return parseSearchTerm(acc);
-  }
-}
-
-type SearchFn = (obj: ProjectObj) => boolean;
-type ScoreMatchFn = (score: Score) => boolean;
-
-function createSearchFunction(searchText: string) {
-  const searchTerms = searchText.toLowerCase().split(/\s+/);
-  // If there are no search term, return
-  if (length(searchTerms) === 0) return () => false;
-
-  const searchExpr = parseSearch(searchText);
-
-  const matchesOne = (args: string[], text: string): boolean => {
-    const textLC = text.toLowerCase();
-    return any((term) => includes(term, textLC), args);
-  };
-
-  const matchesAll = (args: string[], text: string): boolean => {
-    const textLC = text.toLowerCase();
-    return all((term) => includes(term, textLC), args);
-  };
-
-  const resolveReqNames = (ids: string[]): string[] => {
-    const names = map((id) => getObject(id)?.title, ids);
-    return reject(isNil, names);
-  };
-
-  const resolveReqIds = (reqs: ConditionTerm[]): string[] => {
-    const resolveReq = (req: ConditionTerm): string[] => {
-      if (req.showRequired) {
-        return reject(
-          isEmpty,
-          concat(
-            [req.reqId, req.reqId1, req.reqId2, req.reqId3],
-            map(prop('req'), req.orRequired),
-          ),
-        );
-      } else {
-        return [];
-      }
-    };
-
-    return chain(resolveReq, reqs);
-  };
-
-  const compileScoreMatcher = (
-    inputs: string[],
-    mode: 'cost' | 'gain',
-  ): SearchFn => {
-    const scoreMatch: ScoreMatchFn[] = map((search: string) => {
-      const scoreMatch = SCORE_MATCH.exec(search);
-      if (!scoreMatch) return null;
-
-      const { operator, value, name } = scoreMatch.groups!;
-      const valueInt = parseInt(value, 10);
-      if (isNaN(valueInt)) return null;
-
-      return (objScore: Score): boolean => {
-        const pointType = getPointType(objScore.id);
-        if (
-          isNotNil(name) &&
-          pointType.afterText.toLowerCase() !== name.toLowerCase()
-        ) {
-          return false;
-        }
-        const rawScoreValue = parseInt(objScore.value);
-
-        if (isNaN(rawScoreValue)) return false;
-        else if (mode === 'cost' && rawScoreValue < 0) return false;
-        else if (mode === 'gain' && rawScoreValue > 0) return false;
-
-        const scoreValue = mode === 'gain' ? -rawScoreValue : rawScoreValue;
-        if (operator === '>') {
-          return scoreValue >= valueInt;
-        }
-        if (operator === '<') {
-          return scoreValue <= valueInt;
-        }
-        return scoreValue === valueInt;
-      };
-    }, inputs).filter(isNotNil);
-
-    return (obj: ProjectObj) => {
-      return any(
-        (objScore: Score) => any((mat) => mat(objScore), scoreMatch),
-        filter((score) => isEmpty(score.requireds), obj.scores),
-      );
-    };
-  };
-
-  function compileSearchExpr(expr: SearchResult): SearchFn {
-    if ('or' in expr) {
-      const subExpr = expr.or.map((expr: SearchResult) =>
-        compileSearchExpr(expr),
-      );
-      return (obj) => any((subExpr) => subExpr(obj), subExpr);
-    } else {
-      const args = expr.args ?? [];
-      const kwargs = expr.kwargs ?? {};
-
-      const searchFns: SearchFn[] = [];
-
-      if (length(args) > 0) {
-        searchFns.push((obj) => {
-          return (
-            matchesAll(args, obj.title) ||
-            matchesAll(args, obj.text) ||
-            any(
-              (addon) =>
-                matchesAll(args, addon.title) || matchesAll(args, addon.text),
-              obj.addons,
-            )
-          );
-        });
-      }
-      if ('id' in kwargs) {
-        searchFns.push((obj) => matchesOne(kwargs.id, obj.id));
-      }
-      if ('title' in kwargs) {
-        searchFns.push((obj) => matchesAll(kwargs.title, obj.title));
-      }
-      if ('text' in kwargs) {
-        searchFns.push((obj) => matchesAll(kwargs.text, obj.text));
-      }
-      if ('required' in kwargs) {
-        searchFns.push((obj) => {
-          const reqIds: string[] = resolveReqIds(obj.requireds);
-          const reqNames = resolveReqNames(reqIds);
-          return (
-            any((req) => matchesAll(kwargs.required, req), reqNames) ||
-            any((req) => matchesOne(kwargs.required, req), reqIds) ||
-            any((addon) => {
-              const reqIds: string[] = resolveReqIds(addon.requireds);
-              const reqNames = resolveReqNames(reqIds);
-              return (
-                any((req) => matchesAll(kwargs.required, req), reqNames) ||
-                any((req) => matchesOne(kwargs.required, req), reqIds)
-              );
-            }, obj.addons)
-          );
-        });
-      }
-      if ('cost' in kwargs) {
-        searchFns.push(compileScoreMatcher(kwargs.cost, 'cost'));
-      }
-      if ('gain' in kwargs) {
-        searchFns.push(compileScoreMatcher(kwargs.gain, 'gain'));
-      }
-
-      return (obj) => all((searchFn) => searchFn(obj), searchFns);
-    }
-  }
-
-  return compileSearchExpr(searchExpr);
-}
-
-const search = debounce(
-  () => {
-    if (!project.value) return;
-
-    const searchTextLC = searchText.value.trim().toLowerCase();
-    if (isEmpty(searchTextLC)) {
-      searchResults.value = [];
-      return;
-    }
-
-    const searchFn = createSearchFunction(searchTextLC);
-    const results: ResultGroup[] = [];
-
-    const data: Project = project.value.data;
-    for (const row of data.rows) {
-      const _results: ProjectObj[] = [];
-
-      for (const obj of row.objects) {
-        const objMatch = searchFn(obj);
-        if (objMatch) {
-          _results.push(obj);
-        }
-      }
-
-      if (!isEmpty(_results)) {
-        results.push({
-          row,
-          items: _results,
-        });
-      }
-    }
-
-    searchResults.value = results;
-  },
-  500,
-  { leading: false, trailing: true },
-);
+const search = debounce(() => updateResults(), 500, {
+  leading: false,
+  trailing: true,
+});
 
 const preview = (obj: ProjectObj, row: ProjectRow) => {
   if (!!searchView.value && searchView.value.obj.id === obj.id) {
@@ -394,54 +157,22 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 }
 
 .search-modal {
-  flex: 1 1 auto;
-  display: grid;
-  gap: 0.5em;
-
-  height: 100%;
-
-  grid-template:
-    'header header' auto
-    'list list' 1fr
-    / 1fr 1fr;
-
-  &.show-view {
-    grid-template:
-      'header header' auto
-      'list view' 1fr
-      / 2fr 1fr;
-  }
-
-  @media screen and (max-width: 768px) {
-    &.show-view {
-      grid-template:
-        'header' auto
-        'list' 1fr
-        'view' 1fr
-        / 1fr;
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   .search-header {
-    grid-area: header;
-
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-
-    .search-help {
-      color: var(--p-stone-500);
-      font-size: 0.75rem;
-
-      .code {
-        font-family: monospace;
-      }
-    }
+    justify-self: center;
+    align-self: center;
   }
 
-  .search-result-list {
-    grid-area: list;
-    overflow: auto;
+  .search-results {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+
+    margin-top: 1rem;
   }
 
   .search-result-view {
@@ -451,21 +182,25 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
     justify-content: stretch;
     overflow: auto;
   }
+}
 
-  .result-group {
-    .group-title {
-      font-weight: bold;
-      border-bottom: 1px solid var(--p-content-border-color);
-      padding: 0.2rem 0.5rem;
-    }
+.panel {
+  @apply bg-surface-900 rounded-xl border border-surface-700 p-2;
+}
 
-    .result-item {
-      padding: 0.2rem 0.5rem;
+.result-item {
+  padding: 0.2rem 0.5rem;
 
-      &.selected {
-        background: var(--p-primary-500);
-      }
-    }
+  &.selected {
+    background: var(--p-primary-500);
+  }
+}
+
+.search-help {
+  font-size: 0.75rem;
+
+  .code {
+    font-family: monospace;
   }
 }
 </style>

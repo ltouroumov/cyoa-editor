@@ -1,0 +1,336 @@
+import {
+  all,
+  any,
+  chain,
+  concat,
+  filter,
+  includes,
+  isEmpty,
+  isNil,
+  isNotEmpty,
+  isNotNil,
+  length,
+  map,
+  prop,
+  reject,
+} from 'ramda';
+
+import type {
+  ConditionTerm,
+  ObjAddon,
+  Project,
+  ProjectObj,
+  ProjectRow,
+  Score,
+} from '~/composables/project/types/v1';
+import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+
+export function useSearch() {
+  const { getObject, getPointType } = useProjectStore();
+  const { project } = useProjectRefs();
+  const searchText = ref<string>('');
+  const searchResults = ref<SearchResult[]>([]);
+
+  function parseSearchTerm(parts: RegExpExecArray[]): SearchTerm {
+    const terms: SearchTerm = {};
+    for (const part of parts) {
+      const partWords = part.groups?.quoted ?? part.groups?.word;
+      if (isNil(partWords) || isEmpty(partWords)) continue;
+
+      if (part.groups?.key) {
+        const key = part.groups.key;
+        if (!terms.kwargs) {
+          terms.kwargs = {};
+        }
+        if (!terms.kwargs[key]) {
+          terms.kwargs[key] = [];
+        }
+
+        terms.kwargs[key].push(partWords);
+      } else {
+        if (!terms.args) {
+          terms.args = [];
+        }
+
+        terms.args.push(partWords);
+      }
+    }
+    return terms;
+  }
+
+  function parseSearch(input: string): SearchTerm {
+    const parts = input.matchAll(PART_MATCH);
+
+    // Scan for the "or" keyword and split the input keywords into groups
+    const orParts: RegExpExecArray[][] = [];
+    let acc: RegExpExecArray[] = [];
+
+    for (const part of parts) {
+      if (part[0] === 'or') {
+        orParts.push(acc);
+        acc = [];
+      } else {
+        acc.push(part);
+      }
+    }
+    orParts.push(acc);
+
+    if (orParts.length > 1) {
+      return { or: orParts.map(parseSearchTerm).filter(isNotEmpty) };
+    } else {
+      return parseSearchTerm(acc);
+    }
+  }
+
+  type SearchFn = (
+    entry:
+      | { type: 'object'; data: ProjectObj }
+      | { type: 'addon'; data: ObjAddon },
+  ) => boolean;
+  type ScoreMatchFn = (score: Score) => boolean;
+
+  function createSearchFunction(searchText: string) {
+    const searchTerms = searchText.toLowerCase().split(/\s+/);
+    // If there are no search term, return
+    if (length(searchTerms) === 0) return () => false;
+
+    const searchExpr = parseSearch(searchText);
+
+    const matchesOne = (args: string[], text: string): boolean => {
+      const textLC = text.toLowerCase();
+      return any((term) => includes(term, textLC), args);
+    };
+
+    const matchesAll = (args: string[], text: string): boolean => {
+      const textLC = text.toLowerCase();
+      return all((term) => includes(term, textLC), args);
+    };
+
+    const resolveReqNames = (ids: string[]): string[] => {
+      const names = map((id) => getObject(id)?.title, ids);
+      return reject(isNil, names);
+    };
+
+    const resolveReqIds = (reqs: ConditionTerm[]): string[] => {
+      const resolveReq = (req: ConditionTerm): string[] => {
+        if (req.showRequired) {
+          return reject(
+            isEmpty,
+            concat(
+              [req.reqId, req.reqId1, req.reqId2, req.reqId3],
+              map(prop('req'), req.orRequired),
+            ),
+          );
+        } else {
+          return [];
+        }
+      };
+
+      return chain(resolveReq, reqs);
+    };
+
+    const compileMatcher = (matcher: {
+      onObject?: (data: ProjectObj) => boolean;
+      onAddon?: (data: ObjAddon) => boolean;
+      onBoth?: (data: ProjectObj | ObjAddon) => boolean;
+    }): SearchFn => {
+      return (entry) => {
+        if (entry.type === 'object' && matcher.onObject) {
+          return matcher.onObject(entry.data);
+        } else if (entry.type === 'addon' && matcher.onAddon) {
+          return matcher.onAddon(entry.data);
+        } else if (matcher.onBoth) {
+          return matcher.onBoth(entry.data);
+        } else {
+          return false;
+        }
+      };
+    };
+
+    const compileScoreMatcher = (
+      inputs: string[],
+      mode: 'cost' | 'gain',
+    ): SearchFn => {
+      const scoreMatch: ScoreMatchFn[] = map((search: string) => {
+        const scoreMatch = SCORE_MATCH.exec(search);
+        if (!scoreMatch) return null;
+
+        const { operator, value, name } = scoreMatch.groups!;
+        const valueInt = parseInt(value, 10);
+        if (isNaN(valueInt)) return null;
+
+        return (objScore: Score): boolean => {
+          const pointType = getPointType(objScore.id);
+          if (
+            isNotNil(name) &&
+            pointType.afterText.toLowerCase() !== name.toLowerCase()
+          ) {
+            return false;
+          }
+          const rawScoreValue = parseInt(objScore.value);
+
+          if (isNaN(rawScoreValue)) return false;
+          else if (mode === 'cost' && rawScoreValue < 0) return false;
+          else if (mode === 'gain' && rawScoreValue > 0) return false;
+
+          const scoreValue = mode === 'gain' ? -rawScoreValue : rawScoreValue;
+          if (operator === '>') {
+            return scoreValue >= valueInt;
+          }
+          if (operator === '<') {
+            return scoreValue <= valueInt;
+          }
+          return scoreValue === valueInt;
+        };
+      }, inputs).filter(isNotNil);
+
+      return compileMatcher({
+        onObject: (obj: ProjectObj) => {
+          return any(
+            (objScore: Score) => any((mat) => mat(objScore), scoreMatch),
+            filter((score) => isEmpty(score.requireds), obj.scores),
+          );
+        },
+      });
+    };
+
+    function compileSearchExpr(expr: SearchTerm): SearchFn {
+      if ('or' in expr) {
+        const subExpr = expr.or.map((expr: SearchTerm) =>
+          compileSearchExpr(expr),
+        );
+        return (obj) => any((subExpr) => subExpr(obj), subExpr);
+      } else {
+        const args = expr.args ?? [];
+        const kwargs = expr.kwargs ?? {};
+
+        const searchFns: SearchFn[] = [];
+
+        if (length(args) > 0) {
+          searchFns.push(
+            compileMatcher({
+              onBoth: (data) =>
+                matchesAll(args, data.title) || matchesAll(args, data.text),
+            }),
+          );
+        }
+        if ('id' in kwargs) {
+          searchFns.push(
+            compileMatcher({
+              onBoth: (obj) =>
+                isNotNil(obj.id) && matchesOne(kwargs.id, obj.id),
+            }),
+          );
+        }
+        if ('title' in kwargs) {
+          searchFns.push(
+            compileMatcher({
+              onBoth: (obj) => matchesAll(kwargs.title, obj.title),
+            }),
+          );
+        }
+        if ('text' in kwargs) {
+          searchFns.push(
+            compileMatcher({
+              onBoth: (obj) => matchesAll(kwargs.text, obj.text),
+            }),
+          );
+        }
+        if ('required' in kwargs) {
+          searchFns.push(
+            compileMatcher({
+              onBoth: (obj) => {
+                const reqIds: string[] = resolveReqIds(obj.requireds);
+                const reqNames = resolveReqNames(reqIds);
+                return (
+                  any((req) => matchesAll(kwargs.required, req), reqNames) ||
+                  any((req) => matchesOne(kwargs.required, req), reqIds)
+                );
+              },
+            }),
+          );
+        }
+        if ('cost' in kwargs) {
+          searchFns.push(compileScoreMatcher(kwargs.cost, 'cost'));
+        }
+        if ('gain' in kwargs) {
+          searchFns.push(compileScoreMatcher(kwargs.gain, 'gain'));
+        }
+
+        return (obj) => all((searchFn) => searchFn(obj), searchFns);
+      }
+    }
+
+    return compileSearchExpr(searchExpr);
+  }
+
+  function updateResults() {
+    if (!project.value) return;
+
+    const searchTextLC = searchText.value.trim().toLowerCase();
+    if (isEmpty(searchTextLC)) {
+      searchResults.value = [];
+      return;
+    }
+
+    const searchFn = createSearchFunction(searchTextLC);
+    const results: SearchResult[] = [];
+
+    const data: Project = project.value.data;
+    for (const row of data.rows) {
+      for (const obj of row.objects) {
+        const objMatch = searchFn({ type: 'object', data: obj });
+        if (objMatch) {
+          results.push({
+            type: 'object',
+            row: row,
+            obj: obj,
+            key: obj.id,
+          });
+        }
+
+        for (let idx = 0; idx < obj.addons.length; idx++) {
+          const addon = obj.addons[idx];
+          const addonMatch = searchFn({ type: 'addon', data: addon });
+          if (addonMatch) {
+            results.push({
+              type: 'addon',
+              row: row,
+              obj: obj,
+              addon: addon,
+              key: `${obj.id}:${addon.id || idx}`,
+            });
+          }
+        }
+      }
+    }
+
+    searchResults.value = results;
+  }
+
+  return {
+    searchText,
+    searchResults,
+    updateResults,
+  };
+}
+
+type SearchResult =
+  | { type: 'object'; key: string; row: ProjectRow; obj: ProjectObj }
+  | {
+      type: 'addon';
+      key: string;
+      row: ProjectRow;
+      obj: ProjectObj;
+      addon: ObjAddon;
+    };
+
+type SearchTerm =
+  | { or: SearchTerm[] }
+  | {
+      args?: string[];
+      kwargs?: Record<string, string[]>;
+    };
+
+const PART_MATCH = /(?:(?<key>\S+):)?(?:"(?<quoted>[^"]+)"|(?<word>\S+))/g;
+const SCORE_MATCH = /^(?<operator>[<>])?\s*(?<value>\d+)\s*(?<name>\w+)?$/;

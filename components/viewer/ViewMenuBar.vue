@@ -1,6 +1,6 @@
 <template>
   <Toolbar
-    class="sticky-top sticky top-0 z-50"
+    class="sticky-top sticky top-0 z-50 md:h-12 h-24"
     :dt="{ padding: '0.3rem', border: { radius: 0, color: null } }"
     :pt="{
       root: 'grid md:grid-cols-3 md:grid-rows-1 grid-cols-2 grid-rows-2 gap-2',
@@ -29,14 +29,6 @@
         <Button
           variant="text"
           severity="contrast"
-          icon="iconify solar--magnifer-outline"
-          :dt="MenuButtonDT"
-          :pt="MenuButtonPT"
-          @click="toggleSearch()"
-        />
-        <Button
-          variant="text"
-          severity="contrast"
           :dt="MenuButtonDT"
           :pt="MenuButtonPT"
           icon="iconify solar--backpack-outline"
@@ -59,6 +51,8 @@
           icon="iconify solar--diskette-outline"
           @click="updateCurrentBuild($event)"
         />
+        <div class="border-s border-surface-500 mx-2 h-6"></div>
+        <SearchField />
       </div>
     </template>
   </Toolbar>

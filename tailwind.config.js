@@ -31,6 +31,7 @@ module.exports = {
         ...genColSpan(13, 60),
       },
       flexGrow: {
+        1: '1',
         2: '2',
         3: '3',
       },

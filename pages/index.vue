@@ -24,12 +24,12 @@ const _config = useRuntimeConfig();
 const { data: projectList } = await useAsyncData(
   'projects',
   async (): Promise<ViewerProjectList> => {
-    const response: ViewerProjectList = await $fetch(
+    const response = await $fetch<ViewerProjectList>(
       `${_config.app.baseURL}config/viewer/projects.json`,
     );
 
     if (response.remote) {
-      const remote: ViewerProjectList = await $fetch(response.remote);
+      const remote = await $fetch<ViewerProjectList>(response.remote);
       const items = concat(response.items, remote.items);
       return assoc('items', items, mergeDeepRight(response, remote));
     } else {

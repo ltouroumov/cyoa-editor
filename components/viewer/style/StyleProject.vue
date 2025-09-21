@@ -20,9 +20,7 @@ const generators = [
   new ObjStylesGen({ global: true }),
 ];
 const stylesheet = computed(() => {
-  const s = createStyles(styles, generators);
-  console.log('project stylesheet:', s);
-  return s;
+  return createStyles(styles, generators);
 });
 </script>
 
