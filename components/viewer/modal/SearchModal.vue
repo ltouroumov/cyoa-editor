@@ -14,7 +14,7 @@
             <InputText
               ref="searchInput"
               v-model="searchText"
-              placeholder="Search CYOA"
+              placeholder="Search the CYOA"
               :fluid="true"
               :autofocus="true"
               @input="search"
@@ -52,12 +52,38 @@
         </div>
 
         <div
-          v-if="isNotEmpty(searchResults)"
           class="search-results w-full"
           :class="{ 'show-view': !!searchView }"
         >
           <div class="panel results-list">
             <div class="h-full overflow-auto flex flex-col gap-2">
+              <div
+                v-if="isEmpty(searchResults)"
+                class="flex flex-col gap-2 py-2 max-h-[20rem] overflow-hidden relative"
+              >
+                <div
+                  v-for="dummy in range(0, 10)"
+                  :key="dummy"
+                  class="result-item"
+                >
+                  <Skeleton shape="circle" size="1rem" animation="none" />
+                  <div class="flex flex-col gap-1 w-full">
+                    <div class="font-bold">
+                      <Skeleton width="100%" height="1rem" animation="none" />
+                    </div>
+                    <div class="text-surface-500">
+                      <Skeleton width="60%" height="1rem" animation="none" />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="absolute bottom-0 left-0 right-0 top-0 bg-surface-900/50 flex flex-row justify-center items-center"
+                >
+                  <div class="text-surface-500 text-center text-sm">
+                    <span>no results ...</span>
+                  </div>
+                </div>
+              </div>
               <template v-for="result in searchResults" :key="result.key">
                 <div
                   v-if="result.type === 'object'"
@@ -136,7 +162,7 @@
 
 <script setup lang="ts">
 import { debounce } from 'perfect-debounce';
-import { isNotEmpty } from 'ramda';
+import { isEmpty, range } from 'ramda';
 
 import type { ProjectObj } from '~/composables/project/types/v1';
 import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
@@ -166,10 +192,16 @@ watch(searchText, (newValue) => {
   }
 });
 
-const search = debounce(() => updateResults(), 500, {
-  leading: false,
-  trailing: true,
-});
+const search = debounce(
+  () => {
+    updateResults();
+  },
+  500,
+  {
+    leading: false,
+    trailing: true,
+  },
+);
 
 const isSelected = (result: SearchResult) => {
   if (!searchView.value) return false;

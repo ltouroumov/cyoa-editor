@@ -13,6 +13,7 @@ import {
   map,
   prop,
   reject,
+  startsWith,
 } from 'ramda';
 
 import type {
@@ -96,14 +97,19 @@ export function useSearch() {
 
     const searchExpr = parseSearch(searchText);
 
+    const matchTerm = (term: string, text: string): boolean => {
+      if (startsWith('~', term)) return !includes(term.slice(1), text);
+      else return includes(term, text);
+    };
+
     const matchesOne = (args: string[], text: string): boolean => {
       const textLC = text.toLowerCase();
-      return any((term) => includes(term, textLC), args);
+      return any((term) => matchTerm(term, textLC), args);
     };
 
     const matchesAll = (args: string[], text: string): boolean => {
       const textLC = text.toLowerCase();
-      return all((term) => includes(term, textLC), args);
+      return all((term) => matchTerm(term, textLC), args);
     };
 
     const resolveReqNames = (ids: string[]): string[] => {
