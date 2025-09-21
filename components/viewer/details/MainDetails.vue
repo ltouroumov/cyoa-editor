@@ -16,7 +16,11 @@
       </div>
       <ProjectObjMulti v-if="obj.isSelectableMultiple" :obj="obj" />
       <ViewScores :scores="obj.scores" />
-      <ViewRequirements :requireds="obj.requireds" :enable-show-more="true" />
+      <ViewRequirements
+        :requireds="obj.requireds"
+        :enable-show-more="true"
+        @show-more="showParents()"
+      />
     </div>
     <div ref="objContentRef" class="obj-content">
       <!-- eslint-disable vue/no-v-html -->
@@ -30,6 +34,7 @@
 import ProjectObjMulti from '~/components/viewer/ProjectObjMulti.vue';
 import ViewScores from '~/components/viewer/ViewScores.vue';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
+import { useViewerStore } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
 import { useObject } from '~/composables/viewer/useObject';
 
@@ -42,6 +47,11 @@ const { isEnabled, isSelected, canToggle, toggle } = useObject(
   $props.obj,
   $props.row,
 );
+
+const viewerStore = useViewerStore();
+const showParents = () => {
+  viewerStore.showObjectDetails = { id: $props.obj.id, tab: 'parents' };
+};
 </script>
 
 <style scoped lang="scss">

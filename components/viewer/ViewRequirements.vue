@@ -29,8 +29,8 @@ const $props = defineProps<{
 }>();
 defineEmits(['show-more']);
 
-const hasVisibleReqs = computed(() =>
-  any((term) => term.showRequired, $props.requireds),
+const hasVisibleReqs = computed(
+  () => $props.showAlways || any((term) => term.showRequired, $props.requireds),
 );
 </script>
 

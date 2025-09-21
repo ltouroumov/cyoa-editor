@@ -126,15 +126,7 @@ const $props = defineProps<{
 }>();
 
 const _object = useObject($props.obj, $props.row);
-const {
-  isSelected,
-  selectedAmount,
-  minSelectedAmount,
-  maxSelectedAmount,
-  toggle,
-  increment,
-  decrement,
-} = _object;
+const { isSelected, toggle } = _object;
 
 const objClass = computed(() => {
   if ($props.forceWidth) return [$props.forceWidth];

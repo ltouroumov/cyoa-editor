@@ -9,7 +9,13 @@
     @click.capture="toggle"
   >
     <div class="grow flex flex-col gap-0">
-      <div class="obj-title text-lg">{{ obj.title }}</div>
+      <div class="flex flex-row justify-between items-center">
+        <div class="obj-title text-lg">{{ obj.title }}</div>
+        <div
+          class="size-4 iconify carbon--zoom-in text-surface-300"
+          @click.prevent="showMore()"
+        ></div>
+      </div>
       <ProjectObjMulti v-if="obj.isSelectableMultiple" :obj="obj" />
       <ViewRequirements
         :requireds="obj.requireds"
@@ -22,21 +28,17 @@
 <script setup lang="ts">
 import ProjectObjMulti from '~/components/viewer/ProjectObjMulti.vue';
 import type { ProjectObj } from '~/composables/project/types/v1';
+import { useViewerStore } from '~/composables/store/viewer';
 import { useObject } from '~/composables/viewer/useObject';
 
 const $props = defineProps<{ obj: ProjectObj }>();
 
-const {
-  isEnabled,
-  isSelected,
-  canToggle,
-  selectedAmount,
-  minSelectedAmount,
-  maxSelectedAmount,
-  toggle,
-  increment,
-  decrement,
-} = useObject($props.obj);
+const { isEnabled, isSelected, canToggle, toggle } = useObject($props.obj);
+
+const viewerStore = useViewerStore();
+const showMore = () => {
+  viewerStore.showObjectDetails = { id: $props.obj.id, tab: 'details' };
+};
 </script>
 
 <style scoped lang="scss">
