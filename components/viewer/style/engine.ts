@@ -50,7 +50,9 @@ export class ProjectStylesGen extends StyleGenerator<ProjectStyles> {
   private readonly _template;
   constructor() {
     super();
-    this._template = Handlebars.compile(ProjectStylesGen.TEMPLATE);
+    this._template = HB().compile(ProjectStylesGen.TEMPLATE, {
+      noEscape: true,
+    });
   }
 
   gen(styling: ProjectStyles): string {
@@ -72,7 +74,7 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   constructor(options: { container?: string; global?: boolean } = {}) {
     super();
     this._options = options;
-    this._template = Handlebars.compile(RowStylesGen.TEMPLATE);
+    this._template = HB().compile(RowStylesGen.TEMPLATE, { noEscape: true });
   }
 
   gen(styling: RowStyles): string {
@@ -103,11 +105,11 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
 
   static TEMPLATE: string = `
     {{#if global}}.project-row:not(.hasPrivateStyling){{/if}}{{#if container}}{{container}}{{/if}} {
-      --row-title-font: {{rowTitle}};
+      --row-title-font: {{quote rowTitle}};
       --row-title-size: {{rowTitleTextSize}}%;
       --row-title-align: {{rowTitleAlign}};
       --row-title-color: {{rowTitleColor}};
-      --row-text-font: {{rowText}};
+      --row-text-font: {{quote rowText}};
       --row-text-align: {{rowTextAlign}};
       --row-text-size: {{rowTextTextSize}}%;
       --row-text-color: {{rowTextColor}};
@@ -136,7 +138,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
   constructor(options: { container?: string; global?: boolean } = {}) {
     super();
     this._options = options;
-    this._template = Handlebars.compile(ObjStylesGen.TEMPLATE);
+    this._template = HB().compile(ObjStylesGen.TEMPLATE, { noEscape: true });
   }
 
   gen(styling: ObjStyles): string {
@@ -167,11 +169,11 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
 
   static TEMPLATE: string = `
     {{#if global}}.project-obj:not(.hasPrivateStyling){{/if}}{{#if container}}{{container}}{{/if}} {
-      --obj-title-font: {{objectTitle}};
+      --obj-title-font: {{quote objectTitle}};
       --obj-title-size: {{objectTitleTextSize}}%;
       --obj-title-align: {{objectTitleAlign}};
       --obj-title-color: {{objectTitleColor}};
-      --obj-text-font: {{objectText}};
+      --obj-text-font: {{quote objectText}};
       --obj-text-align: {{objectTextAlign}};
       --obj-text-size: {{objectTextTextSize}}%;
       --obj-text-color: {{objectTextColor}};
@@ -181,15 +183,15 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       --obj-image-margin-bottom: {{objectImageMarginBottom}}px;
       --obj-img-object-fit: {{#if objectImgObjectFillIsOn}}{{objectImgObjectFillStyle}}{{else}}initial{{/if}};
       --obj-img-object-height: {{#if objectImgObjectFillHeight}}{{objectImgObjectFillHeight}}px{{else}}auto{{/if}};
-      --obj-addon-text-font: {{addonText}};
+      --obj-addon-text-font: {{quote addonText}};
       --obj-addon-text-size: {{addonTextTextSize}}%;
       --obj-addon-text-color: {{addonTextColor}};
       --obj-addon-text-align: {{addonTextAlign}};
-      --obj-addon-title-font: {{addonTitle}};
+      --obj-addon-title-font: {{quote addonTitle}};
       --obj-addon-title-size: {{addonTitleTextSize}}%;
       --obj-addon-title-color: {{addonTitleColor}};
       --obj-addon-title-align: {{addonTitleAlign}};
-      --obj-score-font: {{scoreText}};
+      --obj-score-font: {{quote scoreText}};
       --obj-score-size: {{scoreTextSize}}%;
       --obj-score-align: {{scoreTextAlign}};
       --obj-score-color: {{scoreTextColor}};
@@ -206,3 +208,19 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
     }
   `;
 }
+
+const HB = (() => {
+  let _instance: typeof Handlebars;
+
+  const _setup = () => {
+    _instance = Handlebars.create();
+    _instance.registerHelper('quote', (input: any) =>
+      JSON.stringify(input.toString()),
+    );
+  };
+
+  return (): typeof Handlebars => {
+    if (!_instance) _setup();
+    return _instance!;
+  };
+})();

@@ -40,9 +40,7 @@ defineProps<{
 const { resolveDisplaySettings } = useSettingStore();
 
 const display = computed(() => {
-  const settings = resolveDisplaySettings();
-  console.log('display settings', settings);
-  return settings;
+  return resolveDisplaySettings();
 });
 </script>
 <style lang="scss">

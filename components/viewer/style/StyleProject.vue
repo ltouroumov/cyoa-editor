@@ -20,20 +20,22 @@ const generators = [
   new ObjStylesGen({ global: true }),
 ];
 const stylesheet = computed(() => {
-  return createStyles(styles, generators);
+  const s = createStyles(styles, generators);
+  console.log('project stylesheet:', s);
+  return s;
 });
 </script>
 
 <style lang="scss">
 .project-row {
   .row-title {
-    font-family: var(--row-title-font) sans-serif;
+    font-family: var(--row-title-font);
     font-size: var(--row-title-size);
     text-align: var(--row-title-align);
     color: var(--row-title-color);
   }
   .row-text {
-    font-family: var(--row-text-font) sans-serif;
+    font-family: var(--row-text-font);
     text-align: var(--row-text-align);
     font-size: var(--row-text-size);
     color: var(--row-text-color);
@@ -63,13 +65,13 @@ const stylesheet = computed(() => {
   background-color: var(--obj-bg-color);
 
   .obj-title {
-    font-family: var(--obj-title-font) sans-serif;
+    font-family: var(--obj-title-font);
     font-size: var(--obj-title-size);
     color: var(--obj-title-color);
     text-align: var(--obj-title-align);
   }
   .obj-text {
-    font-family: var(--obj-text-font) sans-serif;
+    font-family: var(--obj-text-font);
     text-align: var(--obj-text-align);
     color: var(--obj-text-color);
     padding: var(--obj-text-padding);
@@ -84,7 +86,7 @@ const stylesheet = computed(() => {
   }
   .addon {
     .text {
-      font-family: var(--obj-addon-text-font) sans-serif;
+      font-family: var(--obj-addon-text-font);
       font-size: var(--obj-addon-text-size);
       color: var(--obj-addon-text-color);
       text-align: var(--obj-addon-text-align);
