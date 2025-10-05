@@ -9,6 +9,7 @@
         :requireds="addon.requireds"
         :show-always="true"
         :enable-show-more="true"
+        @show-more="showParents()"
       />
     </div>
     <!-- eslint-disable vue/no-v-html -->
@@ -17,17 +18,36 @@
 </template>
 
 <script setup lang="ts">
+import { isEmpty, isNil } from 'ramda';
+
 import { buildConditions } from '~/composables/conditions';
 import type { ObjAddon } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
+import { useViewerStore } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
 
-const $props = defineProps<{ addon: ObjAddon }>();
+const $props = defineProps<{
+  objId: string;
+  index: number;
+  addon: ObjAddon;
+}>();
 
 const { selectedIds } = useProjectRefs();
 
 const condition = computed(() => buildConditions($props.addon));
 const isEnabled = computed(() => condition.value(selectedIds.value));
+
+const viewerStore = useViewerStore();
+const showParents = () => {
+  viewerStore.showObjectDetails = {
+    id: $props.objId,
+    addonId:
+      isNil($props.addon.id) || isEmpty($props.addon.id)
+        ? $props.index
+        : $props.addon.id,
+    tab: 'parents',
+  };
+};
 </script>
 
 <style scoped lang="scss">

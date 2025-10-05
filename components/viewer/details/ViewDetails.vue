@@ -31,7 +31,9 @@
       />
       <AddonDetails
         v-if="showTab === 'addon' && showAddon !== null"
-        :addon="showAddon"
+        :addon="showAddon.data"
+        :index="showAddon.index"
+        :obj-id="obj.id"
       />
     </div>
     <div
@@ -114,7 +116,10 @@ const objImageIsURL = computed(() => {
 
 const showTab = ref<'main' | 'addon'>('main');
 const showAddonIdx = ref<number>(-1);
-const showAddon = computed(() => $props.obj.addons[showAddonIdx.value]);
+const showAddon = computed(() => ({
+  index: showAddonIdx.value,
+  data: $props.obj.addons[showAddonIdx.value],
+}));
 
 const addonStates = computed(() => {
   const states: Record<number, ComputedRef<boolean>> = {};
