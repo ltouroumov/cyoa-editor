@@ -1,13 +1,15 @@
 <template>
   <Dialog
     v-model:visible="isBackpackVisible"
-    modal
-    dismissable-mask
+    :modal="true"
+    :dismissable-mask="true"
+    :maximizable="false"
+    :draggable="false"
     class="w-full h-full lg:mx-[2rem] mx-0"
     :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
   >
     <template #header>
-      <h5 class="text-primary text-xl">Choices</h5>
+      <h5 class="text-primary text-2xl">Choices</h5>
     </template>
     <div class="pack-content flex-grow-1 bg-dark">
       <div class="pack-actions mb-3">
