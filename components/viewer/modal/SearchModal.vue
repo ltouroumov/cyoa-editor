@@ -4,11 +4,11 @@
     :modal="true"
     :dismissable-mask="true"
     :unstyled="true"
-    pt:root:class="w-full md:w-2/3 p-4 max-h-[100%]"
+    pt:root:class="w-full md:w-2/3 p-4 h-full md:h-auto max-h-[100%]"
     pt:mask:class="backdrop-blur-sm"
   >
     <template #container>
-      <div class="search-modal w-full overflow-auto">
+      <div class="search-modal w-full h-full md:h-auto overflow-auto">
         <div class="search-header w-full">
           <InputGroup>
             <InputText
@@ -52,17 +52,17 @@
         </div>
 
         <div
-          class="search-results w-full"
+          class="search-results w-full h-full"
           :class="{ 'show-view': !!searchView }"
         >
           <div class="panel results-list">
             <div class="h-full overflow-auto flex flex-col gap-2">
               <div
                 v-if="isEmpty(searchResults)"
-                class="flex flex-col gap-2 py-2 max-h-[20rem] overflow-hidden relative"
+                class="flex flex-col gap-2 py-2 h-full md:max-h-[20rem] overflow-hidden relative"
               >
                 <div
-                  v-for="dummy in range(0, 10)"
+                  v-for="dummy in range(0, 20)"
                   :key="dummy"
                   class="result-item"
                 >
