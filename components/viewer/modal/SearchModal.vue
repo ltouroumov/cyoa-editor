@@ -8,9 +8,18 @@
     pt:mask:class="backdrop-blur-sm"
   >
     <template #container>
+      <div class="absolute top-0 right-0 pt-2 pr-2 z-20 hidden md:block">
+        <Button
+          icon="iconify carbon--close size-6"
+          severity="secondary"
+          variant="outlined"
+          :rounded="true"
+          @click="isSearchVisible = false"
+        />
+      </div>
       <div class="search-modal w-full h-full md:h-auto overflow-auto">
         <div class="search-header w-full">
-          <InputGroup>
+          <div class="flex flex-row gap-2 items-center">
             <InputText
               ref="searchInput"
               v-model="searchText"
@@ -19,14 +28,19 @@
               :autofocus="true"
               @input="search"
             />
-            <InputGroupAddon>
-              <Button
-                icon="iconify carbon--information"
-                severity="secondary"
-                @click="searchHelp.toggle($event)"
-              />
-            </InputGroupAddon>
-          </InputGroup>
+            <Button
+              icon="iconify carbon--information"
+              severity="secondary"
+              class="size-10"
+              @click="searchHelp.toggle($event)"
+            />
+            <Button
+              icon="iconify carbon--close size-6"
+              severity="secondary"
+              class="md:hidden size-10"
+              @click="isSearchVisible = false"
+            />
+          </div>
           <Popover ref="searchHelp">
             <div class="search-help">
               <div class="font-bold text-primary">Search Syntax</div>
