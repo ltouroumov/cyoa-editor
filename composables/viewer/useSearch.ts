@@ -11,6 +11,7 @@ import {
   isNotNil,
   length,
   map,
+  partition,
   prop,
   reject,
   startsWith,
@@ -90,6 +91,11 @@ export function useSearch() {
   ) => boolean;
   type ScoreMatchFn = (score: Score) => boolean;
 
+  type ScoreMatch = {
+    relative: boolean;
+    exec: ScoreMatchFn;
+  };
+
   function createSearchFunction(searchText: string) {
     const searchTerms = searchText.toLowerCase().split(/\s+/);
     // If there are no search term, return
@@ -160,43 +166,56 @@ export function useSearch() {
       inputs: string[],
       mode: 'cost' | 'gain',
     ): SearchFn => {
-      const scoreMatch: ScoreMatchFn[] = map((search: string) => {
-        const scoreMatch = SCORE_MATCH.exec(search);
-        if (!scoreMatch) return null;
+      const scoreMatch: ScoreMatch[] = map(
+        (search: string): ScoreMatch | null => {
+          const scoreMatch = SCORE_MATCH.exec(search);
+          if (!scoreMatch) return null;
 
-        const { operator, value, name } = scoreMatch.groups!;
-        const valueInt = parseInt(value, 10);
-        if (isNaN(valueInt)) return null;
+          const { operator, value, name } = scoreMatch.groups!;
+          const valueInt = parseInt(value, 10);
+          if (isNaN(valueInt)) return null;
 
-        return (objScore: Score): boolean => {
-          const pointType = getPointType(objScore.id);
-          if (
-            isNotNil(name) &&
-            pointType.afterText.toLowerCase() !== name.toLowerCase()
-          ) {
-            return false;
-          }
-          const rawScoreValue = parseInt(objScore.value);
+          return {
+            relative: operator === '>' || operator === '<',
+            exec: (objScore: Score): boolean => {
+              const pointType = getPointType(objScore.id);
+              if (
+                isNotNil(name) &&
+                pointType.afterText.toLowerCase() !== name.toLowerCase()
+              ) {
+                return false;
+              }
+              const rawScoreValue = parseInt(objScore.value);
 
-          if (isNaN(rawScoreValue)) return false;
-          else if (mode === 'cost' && rawScoreValue < 0) return false;
-          else if (mode === 'gain' && rawScoreValue > 0) return false;
+              if (isNaN(rawScoreValue)) return false;
+              else if (mode === 'cost' && rawScoreValue < 0) return false;
+              else if (mode === 'gain' && rawScoreValue > 0) return false;
 
-          const scoreValue = mode === 'gain' ? -rawScoreValue : rawScoreValue;
-          if (operator === '>') {
-            return scoreValue >= valueInt;
-          }
-          if (operator === '<') {
-            return scoreValue <= valueInt;
-          }
-          return scoreValue === valueInt;
-        };
-      }, inputs).filter(isNotNil);
+              const scoreValue =
+                mode === 'gain' ? -rawScoreValue : rawScoreValue;
+              if (operator === '>') {
+                return scoreValue >= valueInt;
+              } else if (operator === '<') {
+                return scoreValue <= valueInt;
+              } else {
+                return scoreValue === valueInt;
+              }
+            },
+          };
+        },
+        inputs,
+      ).filter(isNotNil);
 
+      const [relativeMatch, absoluteMatch] = partition(
+        prop('relative'),
+        scoreMatch,
+      );
       return compileMatcher({
         onObject: (obj: ProjectObj) => {
           return any(
-            (objScore: Score) => any((mat) => mat(objScore), scoreMatch),
+            (objScore: Score) =>
+              all((mat) => mat.exec(objScore), relativeMatch) ||
+              any((mat) => mat.exec(objScore), absoluteMatch),
             filter((score) => isEmpty(score.requireds), obj.scores),
           );
         },
