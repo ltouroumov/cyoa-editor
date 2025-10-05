@@ -149,7 +149,11 @@
               </div>
               <div class="project-obj obj-default">
                 <div class="project-obj-content">
-                  <ViewAddon :addon="searchView.addon" />
+                  <ViewAddon
+                    :addon="searchView.addon"
+                    :index="searchView.index"
+                    :obj-id="searchView.obj.id"
+                  />
                 </div>
               </div>
             </div>

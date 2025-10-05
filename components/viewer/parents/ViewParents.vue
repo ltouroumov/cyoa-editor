@@ -23,6 +23,11 @@
             :key="obj.id"
             :obj="obj"
           />
+          <ParentAddon
+            v-if="layer.depth === 0 && addon"
+            :obj="obj"
+            :addon="addon.data"
+          />
         </div>
         <div v-if="expand" class="w-full row g-2">
           <ViewProjectObj
@@ -37,6 +42,15 @@
             :show-addons="false"
             :display="{ showObjectControls: 'never' }"
           />
+          <div v-if="layer.depth === 0 && addon" class="col-4">
+            <div class="project-obj obj-default">
+              <ViewAddon
+                :obj-id="obj.id"
+                :index="addon.index"
+                :addon="addon.data"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -53,19 +67,18 @@ import ParentObj from '~/components/viewer/parents/ParentObj.vue';
 import type {
   ConditionTerm,
   HasRequirements,
+  ObjAddon,
   ProjectObj,
   ProjectRow,
 } from '~/composables/project/types/v1';
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
-
-/*  */
+import { useProjectStore } from '~/composables/store/project';
 
 const store = useProjectStore();
-const { selectedIds, selected } = useProjectRefs();
 
 const $props = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
+  addon?: { index: number; data: ObjAddon };
 }>();
 
 type Layer = { depth: number; entries: LayerEntry[] };
@@ -76,6 +89,17 @@ const parents = computed(() => {
   const layers: Layer[] = [];
   const stack = [{ depth: 0, data: $props.obj }];
   const visited = new Set<string>();
+
+  // If an addon is provided, add its dependencies to the stack one level below the containing object.
+  if ($props.addon) {
+    const deps = collectRequirements($props.addon.data, true);
+    deps.forEach((depId) => {
+      const depObj = store.getObject(depId);
+      if (depObj) {
+        stack.push({ depth: 1, data: depObj });
+      }
+    });
+  }
 
   while (stack.length > 0) {
     const { depth, data } = stack.pop()!;
@@ -103,10 +127,13 @@ const parents = computed(() => {
   return layers;
 });
 
-function collectRequirements(obj: HasRequirements): string[] {
+function collectRequirements(
+  obj: HasRequirements,
+  collectHidden: boolean = false,
+): string[] {
   function _collect(term: ConditionTerm): string[] {
     // do not collect hidden requirements
-    if (!term.showRequired) return [];
+    if (!term.showRequired && !collectHidden) return [];
 
     return match(term)
       .with({ type: 'id', required: true }, () => {
@@ -149,5 +176,10 @@ function collectRequirements(obj: HasRequirements): string[] {
   background-color: var(--obj-bg-color);
   border: var(--obj-border);
   border-radius: var(--obj-border-radius);
+
+  .addon:not(.disabled) {
+    background-color: var(--obj-selected-bg-color);
+    filter: var(--obj-selected-filter);
+  }
 }
 </style>

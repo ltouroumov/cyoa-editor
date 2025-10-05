@@ -23,7 +23,12 @@
             </div>
           </template>
         </ViewDetailsAsync>
-        <ViewParentsAsync v-if="tab === 'parents'" :obj="obj" :row="row">
+        <ViewParentsAsync
+          v-if="tab === 'parents'"
+          :obj="obj"
+          :row="row"
+          :addon="addon"
+        >
           <template #right>
             <div class="absolute top-0 right-0 pt-2 pr-2 z-20">
               <div
@@ -39,6 +44,8 @@
 </template>
 
 <script setup lang="ts">
+import { isNotNil } from 'ramda';
+
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
 
@@ -64,6 +71,20 @@ const showDetails = computed<boolean>({
 const obj = computed(() => {
   if (vStore.showObjectDetails) {
     return pStore.getObject(vStore.showObjectDetails.id);
+  } else {
+    return undefined;
+  }
+});
+const addon = computed(() => {
+  if (
+    vStore.showObjectDetails &&
+    'addonId' in vStore.showObjectDetails &&
+    isNotNil(vStore.showObjectDetails.addonId)
+  ) {
+    return pStore.getObjectAddon(
+      vStore.showObjectDetails.id,
+      vStore.showObjectDetails.addonId,
+    );
   } else {
     return undefined;
   }

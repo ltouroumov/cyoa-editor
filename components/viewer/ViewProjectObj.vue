@@ -62,7 +62,9 @@
             <LazyViewAddon
               v-for="(addon, idx) in obj.addons"
               :key="idx"
+              :index="idx"
               :addon="addon"
+              :obj-id="obj.id"
             />
           </div>
         </div>

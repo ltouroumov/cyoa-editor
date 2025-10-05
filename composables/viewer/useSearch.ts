@@ -345,6 +345,7 @@ export function useSearch() {
               obj: obj,
               addon: addon,
               key: `${obj.id}:${addon.id || idx}`,
+              index: idx,
             });
           }
         }
@@ -369,6 +370,7 @@ export type SearchResult =
       row: ProjectRow;
       obj: ProjectObj;
       addon: ObjAddon;
+      index: number;
     };
 
 type SearchTerm =
