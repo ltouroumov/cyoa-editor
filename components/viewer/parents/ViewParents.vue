@@ -6,9 +6,17 @@
       class="w-full flex flex-row items-center justify-between border-b border-surface-500 gap-2 px-4 mb-4 pb-4"
     >
       <div class="text-xl text-primary">Parents of {{ obj.title }}</div>
-      <div class="flex flex-row items-center mr-10">
-        <ToggleSwitch v-model="expand" class="mr-2" />
-        <label class="text-surface-500">Expand Objects</label>
+      <div class="flex flex-row items-center gap-2 mr-10">
+        <Button
+          size="small"
+          variant="outlined"
+          label="Select All"
+          @click="trySelectAll()"
+        />
+        <div class="flex flex-row items-center">
+          <ToggleSwitch v-model="expand" class="mr-2" />
+          <label class="text-surface-500">Expand Objects</label>
+        </div>
       </div>
     </div>
     <div class="w-full px-4 pb-4 flex flex-col gap-4 overflow-auto">
@@ -59,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { chain } from 'ramda';
+import { chain, fromPairs, map } from 'ramda';
 import * as R from 'ramda';
 import { P, match } from 'ts-pattern';
 
@@ -71,7 +79,7 @@ import type {
   ProjectObj,
   ProjectRow,
 } from '~/composables/project/types/v1';
-import { useProjectStore } from '~/composables/store/project';
+import { type Selections, useProjectStore } from '~/composables/store/project';
 
 const store = useProjectStore();
 
@@ -83,6 +91,16 @@ const $props = defineProps<{
 
 type Layer = { depth: number; entries: LayerEntry[] };
 type LayerEntry = { obj: ProjectObj; row: ProjectRow };
+
+const trySelectAll = () => {
+  const allObjectIds: Selections = fromPairs(
+    chain(
+      (layer) => map((entry) => [entry.obj.id, 1], layer.entries),
+      parents.value,
+    ),
+  );
+  store.setSelected(allObjectIds, true);
+};
 
 const expand = ref<boolean>(false);
 const parents = computed(() => {

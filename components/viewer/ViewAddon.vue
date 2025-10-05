@@ -1,6 +1,6 @@
 <template>
   <div class="addon" :class="{ disabled: !isEnabled }">
-    <div class="title">{{ addon.title }} // {{ index }}</div>
+    <div class="title">{{ addon.title }}</div>
     <ViewRequirements
       v-if="!display?.hideAddonRequirements"
       :requireds="addon.requireds"
