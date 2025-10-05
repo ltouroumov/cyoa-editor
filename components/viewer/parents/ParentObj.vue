@@ -33,7 +33,9 @@ import { useObject } from '~/composables/viewer/useObject';
 
 const $props = defineProps<{ obj: ProjectObj }>();
 
-const { isEnabled, isSelected, canToggle, toggle } = useObject($props.obj);
+const { isEnabled, isSelected, canToggle, toggle } = useObject({
+  obj: computed(() => $props.obj),
+});
 
 const viewerStore = useViewerStore();
 const showMore = () => {

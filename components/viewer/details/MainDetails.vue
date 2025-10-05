@@ -43,10 +43,10 @@ const $props = defineProps<{
   obj: ProjectObj;
 }>();
 
-const { isEnabled, isSelected, canToggle, toggle } = useObject(
-  $props.obj,
-  $props.row,
-);
+const { isEnabled, isSelected, canToggle, toggle } = useObject({
+  obj: computed(() => $props.obj),
+  row: computed(() => $props.row),
+});
 
 const viewerStore = useViewerStore();
 const showParents = () => {

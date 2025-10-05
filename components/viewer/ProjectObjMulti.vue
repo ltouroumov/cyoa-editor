@@ -34,7 +34,9 @@ const {
   maxSelectedAmount,
   increment,
   decrement,
-} = useObject($props.obj);
+} = useObject({
+  obj: computed(() => $props.obj),
+});
 </script>
 
 <style scoped lang="scss"></style>

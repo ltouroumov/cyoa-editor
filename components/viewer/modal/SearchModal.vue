@@ -240,10 +240,7 @@ const showMore = (obj: ProjectObj) => {
   }
 
   .search-results {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    gap: 0.25rem;
+    @apply flex flex-col md:flex-row items-stretch gap-2;
 
     margin-top: 0.5rem;
     overflow: auto;

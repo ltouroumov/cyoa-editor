@@ -125,8 +125,12 @@ const $props = defineProps<{
   showAddons?: boolean;
 }>();
 
-const _object = useObject($props.obj, $props.row);
-const { isSelected, toggle } = _object;
+const _object = useObject({
+  obj: computed(() => $props.obj),
+  row: computed(() => $props.row),
+  canToggle: computed(() => $props.viewObject !== ViewContext.BackpackDisabled),
+});
+const { isSelected, canToggle, toggle } = _object;
 
 const objClass = computed(() => {
   if ($props.forceWidth) return [$props.forceWidth];
@@ -264,12 +268,6 @@ const alwaysEnable = computed<boolean>(() => {
     default:
       return false;
   }
-});
-const canToggle = computed<boolean>(() => {
-  return (
-    _object.canToggle.value &&
-    $props.viewObject !== ViewContext.BackpackDisabled
-  );
 });
 const isInBackpack = computed<boolean>(() => {
   return (
