@@ -30,15 +30,19 @@ export function useSearch() {
 
   async function initSearchWorker() {
     if (worker.value) return;
-    worker.value = new SearchWorker();
-    worker.value.addEventListener('message', (event) => {
-      workerData.next(event.data);
-    });
+    try {
+      worker.value = new SearchWorker();
+      worker.value.addEventListener('message', (event) => {
+        workerData.next(event.data);
+      });
 
-    publishSync({
-      type: 'init',
-      project: project.value!.data,
-    });
+      publishSync({
+        type: 'init',
+        project: project.value!.data,
+      });
+    } catch (e) {
+      console.log('initSearchWorker', e);
+    }
   }
 
   function closeSearchWorker() {
@@ -50,14 +54,22 @@ export function useSearch() {
     if (!worker.value) {
       throw new Error('Worker not initialized');
     }
-    worker.value.postMessage({ event: JSON.stringify(event) });
+    try {
+      worker.value.postMessage({ event: JSON.stringify(event) });
+    } catch (e) {
+      console.log('publishSync', e);
+    }
   }
 
   async function publishAsync<T>(event: SearchEvent): Promise<T> {
     if (!worker.value)
       return Promise.reject(new Error('Worker not initialized'));
     const replyTo = crypto.randomUUID();
-    worker.value.postMessage({ event: JSON.stringify(event), replyTo });
+    try {
+      worker.value.postMessage({ event: JSON.stringify(event), replyTo });
+    } catch (e) {
+      console.log('publishAsync', e);
+    }
 
     return new Promise((resolve, reject) => {
       const _sub = workerData.subscribe({

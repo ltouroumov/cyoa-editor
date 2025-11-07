@@ -18,7 +18,7 @@ import {
 } from 'ramda';
 import * as R from 'ramda';
 import { match } from 'ts-pattern';
-import { type ComputedRef, computed } from 'vue';
+import { type ComputedRef, computed, ref } from 'vue';
 
 import type {
   ConditionTerm,
