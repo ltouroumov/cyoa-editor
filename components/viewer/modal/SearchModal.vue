@@ -70,7 +70,7 @@
           :class="{ 'show-view': !!searchView }"
         >
           <div class="panel results-list">
-            <div class="h-full overflow-auto flex flex-col gap-2">
+            <div class="h-full overflow-auto flex flex-col gap-2 relative">
               <div
                 v-if="isEmpty(searchResults)"
                 class="flex flex-col gap-2 py-2 h-full md:max-h-[20rem] overflow-hidden relative"
@@ -135,6 +135,18 @@
                   </div>
                 </div>
               </template>
+              <div
+                v-if="searchResultCount > searchResults.length"
+                class="text-surface-500 text-center text-sm py-2"
+              >
+                {{ searchResultCount }} total results
+              </div>
+              <div
+                v-if="searchLoading"
+                class="absolute top-0 left-0 w-full h-full bg-black/50 flex flex-col p-8 z-10"
+              >
+                <ProgressSpinner />
+              </div>
             </div>
           </div>
           <div v-if="!!searchView" class="results-view">
@@ -188,7 +200,23 @@ import { ViewContext } from '~/composables/viewer';
 import { type SearchResult, useSearch } from '~/composables/viewer/useSearch';
 
 const { isSearchVisible } = useViewerRefs();
-const { searchText, searchResults, updateResults } = useSearch();
+const {
+  searchText,
+  searchResults,
+  searchResultCount,
+  searchLoading,
+  updateResults,
+  initSearchWorker,
+  closeSearchWorker,
+} = useSearch();
+
+onMounted(() => {
+  initSearchWorker();
+});
+
+onUnmounted(() => {
+  closeSearchWorker();
+});
 
 const viewerStore = useViewerStore();
 

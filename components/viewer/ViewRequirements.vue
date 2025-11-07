@@ -9,7 +9,7 @@
     <div
       v-if="enableShowMore && hasVisibleReqs"
       class="absolute right-0 top-0 bottom-0 flex items-center justify-center w-6 cursor-pointer"
-      @click.prevent="$emit('show-more')"
+      @click.stop.prevent="$emit('show-more')"
     >
       <div class="iconify carbon--zoom-in"></div>
     </div>

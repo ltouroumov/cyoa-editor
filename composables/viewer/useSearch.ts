@@ -1,364 +1,141 @@
-import {
-  all,
-  any,
-  chain,
-  concat,
-  filter,
-  includes,
-  isEmpty,
-  isNil,
-  isNotEmpty,
-  isNotNil,
-  length,
-  map,
-  partition,
-  prop,
-  reject,
-  startsWith,
-} from 'ramda';
+import { map } from 'ramda';
+import { Subject } from 'rxjs';
+import { match } from 'ts-pattern';
+
+import SearchWorker from './search/worker?worker';
 
 import type {
-  ConditionTerm,
   ObjAddon,
-  Project,
   ProjectObj,
   ProjectRow,
-  Score,
 } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { sleep } from '~/composables/utils/sleep';
+import type {
+  SearchEvent,
+  WorkerSearchResult,
+} from '~/composables/viewer/search/types';
 
 export function useSearch() {
-  const { getObject, getPointType } = useProjectStore();
+  const { getRow, getObject, getObjectAddon } = useProjectStore();
   const { project } = useProjectRefs();
   const searchText = ref<string>('');
   const searchResults = ref<SearchResult[]>([]);
+  const searchResultCount = ref<number>(0);
+  const searchLoading = ref<boolean>(false);
 
-  function parseSearchTerm(parts: RegExpExecArray[]): SearchTerm {
-    const terms: SearchTerm = {};
-    for (const part of parts) {
-      const partWords = part.groups?.quoted ?? part.groups?.word;
-      if (isNil(partWords) || isEmpty(partWords)) continue;
+  // WebWorker infrastructure
+  const worker = ref<Worker | null>(null);
+  const workerData = new Subject<any>();
 
-      if (part.groups?.key) {
-        const key = part.groups.key;
-        if (!terms.kwargs) {
-          terms.kwargs = {};
-        }
-        if (!terms.kwargs[key]) {
-          terms.kwargs[key] = [];
-        }
+  async function initSearchWorker() {
+    if (worker.value) return;
+    worker.value = new SearchWorker();
+    worker.value.addEventListener('message', (event) => {
+      workerData.next(event.data);
+    });
 
-        terms.kwargs[key].push(partWords);
-      } else {
-        if (!terms.args) {
-          terms.args = [];
-        }
-
-        terms.args.push(partWords);
-      }
-    }
-    return terms;
+    publishSync({
+      type: 'init',
+      project: project.value!.data,
+    });
   }
 
-  function parseSearch(input: string): SearchTerm {
-    const parts = input.matchAll(PART_MATCH);
-
-    // Scan for the "or" keyword and split the input keywords into groups
-    const orParts: RegExpExecArray[][] = [];
-    let acc: RegExpExecArray[] = [];
-
-    for (const part of parts) {
-      if (part[0] === 'or') {
-        orParts.push(acc);
-        acc = [];
-      } else {
-        acc.push(part);
-      }
-    }
-    orParts.push(acc);
-
-    if (orParts.length > 1) {
-      return { or: orParts.map(parseSearchTerm).filter(isNotEmpty) };
-    } else {
-      return parseSearchTerm(acc);
-    }
+  function closeSearchWorker() {
+    if (!worker.value) return;
+    worker.value.terminate();
   }
 
-  type SearchFn = (
-    entry:
-      | { type: 'object'; data: ProjectObj; parent: ProjectRow }
-      | { type: 'addon'; data: ObjAddon; parent: ProjectObj },
-  ) => boolean;
-  type ScoreMatchFn = (score: Score) => boolean;
+  function publishSync(event: SearchEvent): void {
+    if (!worker.value) {
+      throw new Error('Worker not initialized');
+    }
+    worker.value.postMessage({ event: JSON.stringify(event) });
+  }
 
-  type ScoreMatch = {
-    relative: boolean;
-    exec: ScoreMatchFn;
-  };
+  async function publishAsync<T>(event: SearchEvent): Promise<T> {
+    if (!worker.value)
+      return Promise.reject(new Error('Worker not initialized'));
+    const replyTo = crypto.randomUUID();
+    worker.value.postMessage({ event: JSON.stringify(event), replyTo });
 
-  function createSearchFunction(searchText: string) {
-    const searchTerms = searchText.toLowerCase().split(/\s+/);
-    // If there are no search term, return
-    if (length(searchTerms) === 0) return () => false;
-
-    const searchExpr = parseSearch(searchText);
-
-    const matchTerm = (term: string, text: string): boolean => {
-      if (startsWith('~', term)) return !includes(term.slice(1), text);
-      else return includes(term, text);
-    };
-
-    const matchesOne = (args: string[], text: string): boolean => {
-      const textLC = text.toLowerCase();
-      return any((term) => matchTerm(term, textLC), args);
-    };
-
-    const matchesAll = (args: string[], text: string): boolean => {
-      const textLC = text.toLowerCase();
-      return all((term) => matchTerm(term, textLC), args);
-    };
-
-    const resolveReqNames = (ids: string[]): string[] => {
-      const names = map((id) => getObject(id)?.title, ids);
-      return reject(isNil, names);
-    };
-
-    const resolveReqIds = (reqs: ConditionTerm[]): string[] => {
-      const resolveReq = (req: ConditionTerm): string[] => {
-        if (req.showRequired) {
-          return reject(
-            isEmpty,
-            concat(
-              [req.reqId, req.reqId1, req.reqId2, req.reqId3],
-              map(prop('req'), req.orRequired),
-            ),
-          );
-        } else {
-          return [];
-        }
-      };
-
-      return chain(resolveReq, reqs);
-    };
-
-    const compileMatcher = (matcher: {
-      onObject?: (data: ProjectObj, parent: ProjectRow) => boolean;
-      onAddon?: (data: ObjAddon, parent: ProjectObj) => boolean;
-      onBoth?: (
-        data: ProjectObj | ObjAddon,
-        parent: ProjectObj | ProjectRow,
-      ) => boolean;
-    }): SearchFn => {
-      return (entry) => {
-        if (entry.type === 'object' && matcher.onObject) {
-          return matcher.onObject(entry.data, entry.parent);
-        } else if (entry.type === 'addon' && matcher.onAddon) {
-          return matcher.onAddon(entry.data, entry.parent);
-        } else if (matcher.onBoth) {
-          return matcher.onBoth(entry.data, entry.parent);
-        } else {
-          return false;
-        }
-      };
-    };
-
-    const compileScoreMatcher = (
-      inputs: string[],
-      mode: 'cost' | 'gain',
-    ): SearchFn => {
-      const scoreMatch: ScoreMatch[] = map(
-        (search: string): ScoreMatch | null => {
-          const scoreMatch = SCORE_MATCH.exec(search);
-          if (!scoreMatch) return null;
-
-          const { operator, value, name } = scoreMatch.groups!;
-          const valueInt = parseInt(value, 10);
-          if (isNaN(valueInt)) return null;
-
-          return {
-            relative: operator === '>' || operator === '<',
-            exec: (objScore: Score): boolean => {
-              const pointType = getPointType(objScore.id);
-              if (
-                isNotNil(name) &&
-                pointType.afterText.toLowerCase() !== name.toLowerCase()
-              ) {
-                return false;
-              }
-              const rawScoreValue = parseInt(objScore.value);
-
-              if (isNaN(rawScoreValue)) return false;
-              else if (mode === 'cost' && rawScoreValue < 0) return false;
-              else if (mode === 'gain' && rawScoreValue > 0) return false;
-
-              const scoreValue =
-                mode === 'gain' ? -rawScoreValue : rawScoreValue;
-              if (operator === '>') {
-                return scoreValue >= valueInt;
-              } else if (operator === '<') {
-                return scoreValue <= valueInt;
-              } else {
-                return scoreValue === valueInt;
-              }
-            },
-          };
+    return new Promise((resolve, reject) => {
+      const _sub = workerData.subscribe({
+        next: (data) => {
+          if (data.replyTo === replyTo) {
+            resolve(JSON.parse(data.message));
+            _sub.unsubscribe();
+          }
         },
-        inputs,
-      ).filter(isNotNil);
-
-      const [relativeMatch, absoluteMatch] = partition(
-        prop('relative'),
-        scoreMatch,
-      );
-      return compileMatcher({
-        onObject: (obj: ProjectObj) => {
-          return any(
-            (objScore: Score) =>
-              all((mat) => mat.exec(objScore), relativeMatch) ||
-              any((mat) => mat.exec(objScore), absoluteMatch),
-            filter((score) => isEmpty(score.requireds), obj.scores),
-          );
+        error: (err) => {
+          reject(err);
+          _sub.unsubscribe();
+        },
+        complete: () => {
+          reject(new Error('Worker completed without reply'));
+          _sub.unsubscribe();
         },
       });
-    };
-
-    function compileSearchExpr(expr: SearchTerm): SearchFn {
-      if ('or' in expr) {
-        const subExpr = expr.or.map((expr: SearchTerm) =>
-          compileSearchExpr(expr),
-        );
-        return (obj) => any((subExpr) => subExpr(obj), subExpr);
-      } else {
-        const args = expr.args ?? [];
-        const kwargs = expr.kwargs ?? {};
-
-        const searchFns: SearchFn[] = [];
-
-        if (length(args) > 0) {
-          searchFns.push(
-            compileMatcher({
-              onBoth: (data) =>
-                matchesAll(args, data.title) || matchesAll(args, data.text),
-            }),
-          );
-        }
-        if ('id' in kwargs) {
-          searchFns.push(
-            compileMatcher({
-              onBoth: (obj) =>
-                isNotNil(obj.id) && matchesOne(kwargs.id, obj.id),
-            }),
-          );
-        }
-        if ('title' in kwargs) {
-          searchFns.push(
-            compileMatcher({
-              onBoth: (obj) => matchesAll(kwargs.title, obj.title),
-            }),
-          );
-        }
-        if ('text' in kwargs) {
-          searchFns.push(
-            compileMatcher({
-              onBoth: (obj) => matchesAll(kwargs.text, obj.text),
-            }),
-          );
-        }
-        if ('parent' in kwargs) {
-          searchFns.push(
-            compileMatcher({
-              onBoth: (_obj, parent) => matchesAll(kwargs.parent, parent.title),
-            }),
-          );
-        }
-        if ('row' in kwargs) {
-          searchFns.push(
-            compileMatcher({
-              onObject: (_obj, parent) => matchesAll(kwargs.row, parent.title),
-            }),
-          );
-        }
-        if ('required' in kwargs) {
-          searchFns.push(
-            compileMatcher({
-              onBoth: (obj) => {
-                const reqIds: string[] = resolveReqIds(obj.requireds);
-                const reqNames = resolveReqNames(reqIds);
-                return (
-                  any((req) => matchesAll(kwargs.required, req), reqNames) ||
-                  any((req) => matchesOne(kwargs.required, req), reqIds)
-                );
-              },
-            }),
-          );
-        }
-        if ('cost' in kwargs) {
-          searchFns.push(compileScoreMatcher(kwargs.cost, 'cost'));
-        }
-        if ('gain' in kwargs) {
-          searchFns.push(compileScoreMatcher(kwargs.gain, 'gain'));
-        }
-
-        return (obj) => all((searchFn) => searchFn(obj), searchFns);
-      }
-    }
-
-    return compileSearchExpr(searchExpr);
+    });
   }
 
-  function updateResults() {
-    if (!project.value) return;
+  async function runSearchAsync() {
+    const { results, count } = await publishAsync<{
+      results: WorkerSearchResult[];
+      count: number;
+    }>({
+      type: 'search',
+      query: searchText.value,
+    });
 
-    const searchTextLC = searchText.value.trim().toLowerCase();
-    if (isEmpty(searchTextLC)) {
-      searchResults.value = [];
-      return;
-    }
-
-    const searchFn = createSearchFunction(searchTextLC);
-    const results: SearchResult[] = [];
-
-    const data: Project = project.value.data;
-    for (const row of data.rows) {
-      for (const obj of row.objects) {
-        const objMatch = searchFn({ type: 'object', data: obj, parent: row });
-        if (objMatch) {
-          results.push({
+    searchResultCount.value = count;
+    searchResults.value = map((result: WorkerSearchResult): SearchResult => {
+      return match(result)
+        .with({ type: 'object' }, ({ rowId, objId }): SearchResult => {
+          const row = getRow(rowId);
+          const obj = getObject(objId);
+          return {
             type: 'object',
+            key: objId,
             row: row,
             obj: obj,
-            key: obj.id,
-          });
-        }
-
-        for (let idx = 0; idx < obj.addons.length; idx++) {
-          const addon = obj.addons[idx];
-          const addonMatch = searchFn({
+          };
+        })
+        .with({ type: 'addon' }, ({ rowId, objId, addonId }): SearchResult => {
+          const row = getRow(rowId);
+          const obj = getObject(objId);
+          const addon = getObjectAddon(objId, addonId);
+          return {
             type: 'addon',
-            data: addon,
-            parent: obj,
-          });
-          if (addonMatch) {
-            results.push({
-              type: 'addon',
-              row: row,
-              obj: obj,
-              addon: addon,
-              key: `${obj.id}:${addon.id || idx}`,
-              index: idx,
-            });
-          }
-        }
-      }
-    }
+            row: row,
+            obj: obj,
+            addon: addon!.data,
+            index: addon!.index,
+            key: `${objId}:${addonId}`,
+          };
+        })
+        .exhaustive();
+    }, results);
+  }
 
-    searchResults.value = results;
+  async function updateResults() {
+    if (!project.value) return;
+
+    searchLoading.value = true;
+    await nextTick();
+    await Promise.all([runSearchAsync(), sleep(400)]);
+
+    searchLoading.value = false;
   }
 
   return {
     searchText,
     searchResults,
+    searchResultCount,
+    searchLoading,
     updateResults,
+    initSearchWorker,
+    closeSearchWorker,
   };
 }
 
@@ -372,13 +149,3 @@ export type SearchResult =
       addon: ObjAddon;
       index: number;
     };
-
-type SearchTerm =
-  | { or: SearchTerm[] }
-  | {
-      args?: string[];
-      kwargs?: Record<string, string[]>;
-    };
-
-const PART_MATCH = /(?:(?<key>\S+):)?(?:"(?<quoted>[^"]+)"|(?<word>\S+))/g;
-const SCORE_MATCH = /^(?<operator>[<>])?\s*(?<value>\d+)\s*(?<name>\w+)?$/;
