@@ -14,7 +14,11 @@
       <div class="obj-title">
         {{ obj.title }}
       </div>
-      <ProjectObjMulti v-if="obj.isSelectableMultiple" :obj="obj" />
+      <ProjectObjMulti
+        v-if="obj.isSelectableMultiple"
+        :obj="obj"
+        :can-toggle="canToggle"
+      />
       <ViewScores :scores="obj.scores" />
       <ViewRequirements
         :requireds="obj.requireds"

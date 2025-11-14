@@ -16,7 +16,11 @@
           @click.prevent="showMore()"
         ></div>
       </div>
-      <ProjectObjMulti v-if="obj.isSelectableMultiple" :obj="obj" />
+      <ProjectObjMulti
+        v-if="obj.isSelectableMultiple"
+        :obj="obj"
+        :can-toggle="canToggle"
+      />
       <ViewRequirements
         :requireds="obj.requireds"
         class="left text-surface-500 text-sm"

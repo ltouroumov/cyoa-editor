@@ -26,7 +26,7 @@
 import type { ProjectObj } from '~/composables/project/types/v1';
 import { useObject } from '~/composables/viewer/useObject';
 
-const $props = defineProps<{ obj: ProjectObj }>();
+const $props = defineProps<{ obj: ProjectObj; canToggle?: boolean }>();
 const {
   canToggle,
   selectedAmount,
@@ -36,6 +36,7 @@ const {
   decrement,
 } = useObject({
   obj: computed(() => $props.obj),
+  canToggle: computed(() => $props.canToggle),
 });
 </script>
 
