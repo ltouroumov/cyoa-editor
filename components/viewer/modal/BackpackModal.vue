@@ -9,18 +9,13 @@
     :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
   >
     <template #header>
-      <h5 class="text-primary text-2xl">Choices</h5>
-    </template>
-    <div class="pack-content flex-grow-1 bg-dark">
-      <div class="pack-actions mb-3">
-        <div class="pack-actions-download">
-          <Button @click="exportToImage()"> Download Image (Beta)</Button>
-          <Button @click="exportToHtml()"> Download HTML</Button>
-        </div>
+      <div class="flex justify-between items-center w-full me-2">
+        <h5 class="text-primary text-2xl">Choices</h5>
         <div v-show="!isLoading" class="flex flex-col gap-1">
           <Button
             icon="pi pi-cog"
             severity="secondary"
+            variant="text"
             label="Settings"
             @click="toggleSettings"
           />
@@ -67,6 +62,14 @@
               </div>
             </div>
           </Popover>
+        </div>
+      </div>
+    </template>
+    <div class="pack-content flex-grow-1 bg-dark">
+      <div class="pack-actions mb-3">
+        <div class="pack-actions-download">
+          <Button @click="exportToImage()"> Download Image (Beta)</Button>
+          <Button @click="exportToHtml()"> Download HTML</Button>
         </div>
       </div>
       <BackpackView
