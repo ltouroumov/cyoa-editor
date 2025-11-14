@@ -13,17 +13,16 @@
     <span v-if="req.type === 'id'" class="inline-flex items-center">
       <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
     </span>
-    <template v-else-if="req.type === 'or'">
+    <span v-else-if="req.type === 'or'" class="break-normal">
       <span v-for="(orReq, idx) in req.orRequired" :key="idx">
         <template v-if="orReq.req">
-          <span v-if="idx > 0">
-            ,
-            <span v-if="idx >= req.orRequired.length - 1">or</span>
-          </span>
+          {{
+            idx > 0 ? (idx >= req.orRequired.length - 1 ? ', or ' : ', ') : ''
+          }}
           {{ getObject(orReq.req)?.title ?? '???' }}
         </template>
       </span>
-    </template>
+    </span>
     <div v-else>Unknown Condition</div>
     <span v-if="req.afterText">{{ req.afterText }}</span>
     <span v-if="isActive" class="iconify solar--check-circle-bold ms-1"></span>
@@ -56,12 +55,12 @@ const isActive = computed<boolean>(() => {
 
 <style lang="scss">
 .obj-requirement {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
+  //display: inline-flex;
+  //align-items: center;
+  //flex-wrap: wrap;
 
   .req-before-text {
-    margin-right: 0.2rem;
+    //margin-right: 0.2rem;
   }
 
   &.disabled {

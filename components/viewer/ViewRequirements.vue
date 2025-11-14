@@ -1,5 +1,9 @@
 <template>
-  <div v-if="hasVisibleReqs" class="obj-requirements relative">
+  <div
+    v-if="hasVisibleReqs"
+    class="obj-requirements relative"
+    :class="{ 'pe-6': enableShowMore && hasVisibleReqs }"
+  >
     <ViewRequirement
       v-for="(req, idx) in requireds"
       :key="idx"
