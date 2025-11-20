@@ -6,15 +6,17 @@
       disabled: !isEnabled,
       canToggle: canToggle,
     }"
-    @click.capture="toggle"
+    @click="toggle"
   >
     <div class="grow flex flex-col gap-0">
       <div class="flex flex-row justify-between items-center">
         <div class="obj-title text-lg">{{ obj.title }}</div>
         <div
-          class="size-4 iconify carbon--zoom-in text-surface-300"
-          @click.prevent="showMore()"
-        ></div>
+          class="size-8 flex flex-col justify-center items-center cursor-pointer"
+          @click.stop.prevent="showMore()"
+        >
+          <div class="size-4 iconify carbon--zoom-in text-surface-300"></div>
+        </div>
       </div>
       <ProjectObjMulti
         v-if="obj.isSelectableMultiple"
