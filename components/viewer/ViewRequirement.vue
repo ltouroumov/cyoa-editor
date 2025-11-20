@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="req.showRequired || showAlways"
-    class="obj-requirement"
+    class="obj-requirement break-normal"
     :class="{ disabled: !isEnabled }"
   >
     <span v-if="!req.required && showAlways" class="req-before-text">
@@ -13,7 +13,7 @@
     <span v-if="req.type === 'id'" class="inline-flex items-center">
       <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
     </span>
-    <span v-else-if="req.type === 'or'" class="break-normal">
+    <template v-else-if="req.type === 'or'">
       <span v-for="(orReq, idx) in req.orRequired" :key="idx">
         <template v-if="orReq.req">
           {{
@@ -22,7 +22,7 @@
           {{ getObject(orReq.req)?.title ?? '???' }}
         </template>
       </span>
-    </span>
+    </template>
     <div v-else>Unknown Condition</div>
     <span v-if="req.afterText">{{ req.afterText }}</span>
     <span v-if="isActive" class="iconify solar--check-circle-bold ms-1"></span>
