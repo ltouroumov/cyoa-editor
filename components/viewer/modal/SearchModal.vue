@@ -123,13 +123,13 @@
                     class="iconify carbon--hexagon-vertical-outline size-4 mt-1 text-primary-500"
                   ></div>
                   <div class="flex flex-col gap-1">
-                    <div class="flex flex-row gap-1 items-center">
-                      <div class="font-bold">{{ result.addon.title }}</div>
-                      <div class="text-surface-500 text-sm">
+                    <div class="break-normal">
+                      <span class="font-bold">{{ result.addon.title }}</span>
+                      <span class="text-surface-500 text-sm">
                         on {{ result.obj.title }}
-                      </div>
+                      </span>
                     </div>
-                    <div class="text-surface-500">
+                    <div class="text-surface-500 break-normal">
                       {{ result.row.title }}
                     </div>
                   </div>
