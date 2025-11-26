@@ -2,7 +2,7 @@ import { map } from 'ramda';
 import { Subject } from 'rxjs';
 import { match } from 'ts-pattern';
 
-import SearchWorker from './search/worker?worker';
+import SearchWorker from '~/composables/viewer/search/worker?worker';
 
 import type {
   ObjAddon,
