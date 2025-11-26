@@ -7057,7 +7057,7 @@ __metadata:
     handlebars: "npm:4.7.8"
     nanoid: "npm:5.1.6"
     nuxt: "npm:3.20.1"
-    perfect-debounce: "npm:1.0.0"
+    perfect-debounce: "npm:2.0.0"
     pinia: "npm:3.0.4"
     pinia-plugin-persistedstate: "npm:4.7.1"
     postcss: "npm:8.5.6"
@@ -9337,17 +9337,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"perfect-debounce@npm:1.0.0, perfect-debounce@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "perfect-debounce@npm:1.0.0"
-  checksum: 10/220343acf52976947958fef3599849471605316e924fe19c633ae2772576298e9d38f02cefa8db46f06607505ce7b232cbb35c9bfd477bd0329bd0a2ce37c594
-  languageName: node
-  linkType: hard
-
-"perfect-debounce@npm:^2.0.0":
+"perfect-debounce@npm:2.0.0, perfect-debounce@npm:^2.0.0":
   version: 2.0.0
   resolution: "perfect-debounce@npm:2.0.0"
   checksum: 10/3f889ab0fe22d84daf49564d4a0b5e823f67beeb1974a2ea26f139b3d90f56a8f81eabc8d317b56caa05c5ee1bf06d2ae6c0aac4bab8f266c6db2aa89ae16ed8
+  languageName: node
+  linkType: hard
+
+"perfect-debounce@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "perfect-debounce@npm:1.0.0"
+  checksum: 10/220343acf52976947958fef3599849471605316e924fe19c633ae2772576298e9d38f02cefa8db46f06607505ce7b232cbb35c9bfd477bd0329bd0a2ce37c594
   languageName: node
   linkType: hard
 

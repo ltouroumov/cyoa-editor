@@ -22,8 +22,8 @@ export const bufferToHex = (buffer: ArrayBuffer): string => {
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder('utf-8');
 
-export const stringToBuffer = (value: string): Uint8Array => {
-  return textEncoder.encode(value);
+export const stringToBuffer = (value: string): Uint8Array<ArrayBuffer> => {
+  return new Uint8Array(textEncoder.encode(value));
 };
 export const bufferToString = (buffer: ArrayBuffer) => {
   return textDecoder.decode(buffer);

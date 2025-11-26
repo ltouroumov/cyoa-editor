@@ -57,7 +57,7 @@
     "handlebars": "4.7.8",
     "nanoid": "5.1.6",
     "nuxt": "3.20.1",
-    "perfect-debounce": "1.0.0",
+    "perfect-debounce": "2.0.0",
     "pinia": "3.0.4",
     "pinia-plugin-persistedstate": "4.7.1",
     "primeicons": "7.0.0",

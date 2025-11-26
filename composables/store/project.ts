@@ -179,7 +179,7 @@ export const useProjectStore = defineStore('project', () => {
 
         const hashBytes = await crypto.subtle.digest(
           'SHA-1',
-          Buffer.from(stringToBuffer(fileContents)),
+          stringToBuffer(fileContents),
         );
         const hashHex = bufferToHex(hashBytes);
 
