@@ -39,6 +39,7 @@ const scrollToTop = () => {
   right: 1rem;
   //margin-left: auto;
   //margin-right: 1rem;
+  z-index: 500;
 
   cursor: pointer;
 

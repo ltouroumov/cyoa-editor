@@ -5,6 +5,8 @@
       v-if="!display?.hideAddonRequirements"
       :requireds="addon.requireds"
       :show-always="true"
+      :enable-show-more="true"
+      @show-more="showParents()"
     />
     <!-- eslint-disable vue/no-v-html -->
     <div
@@ -16,22 +18,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { isEmpty, isNil } from 'ramda';
 
 import { buildConditions } from '~/composables/conditions';
 import type { ObjAddon } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
+import { useViewerStore } from '~/composables/store/viewer';
 
-const { addon } = defineProps<{ addon: ObjAddon; display?: DisplaySettings }>();
+const $props = defineProps<{
+  objId: string;
+  index: number;
+  addon: ObjAddon;
+  display?: DisplaySettings;
+  parentEnabled?: boolean;
+}>();
 
 const { selectedIds } = useProjectRefs();
 
-const condition = buildConditions(addon);
-const isEnabled = ref<boolean>(condition(selectedIds.value));
-watch(selectedIds, (newSelection) => {
-  isEnabled.value = condition(newSelection);
-});
+const condition = computed(() => buildConditions($props.addon));
+const isEnabled = computed(() => condition.value(selectedIds.value));
+
+const viewerStore = useViewerStore();
+const showParents = () => {
+  viewerStore.showObjectDetails = {
+    id: $props.objId,
+    addonId:
+      isNil($props.addon.id) || isEmpty($props.addon.id)
+        ? $props.index
+        : $props.addon.id,
+    tab: 'parents',
+  };
+};
 </script>
 
 <style lang="scss">

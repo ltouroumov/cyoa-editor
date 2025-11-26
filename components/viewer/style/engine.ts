@@ -50,7 +50,9 @@ export class ProjectStylesGen extends StyleGenerator<ProjectStyles> {
   private readonly _template;
   constructor() {
     super();
-    this._template = Handlebars.compile(ProjectStylesGen.TEMPLATE);
+    this._template = HB().compile(ProjectStylesGen.TEMPLATE, {
+      noEscape: true,
+    });
   }
 
   gen(styling: ProjectStyles): string {
@@ -72,7 +74,7 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   constructor(options: { container?: string; global?: boolean } = {}) {
     super();
     this._options = options;
-    this._template = Handlebars.compile(RowStylesGen.TEMPLATE);
+    this._template = HB().compile(RowStylesGen.TEMPLATE, { noEscape: true });
   }
 
   gen(styling: RowStyles): string {
@@ -94,78 +96,36 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
       ),
     });
 
-    const styles = this._template({
+    return this._template({
       ...computed,
       global: this._options.global,
+      container: this._options.container,
     });
-    if (this._options.container) {
-      return `${this._options.container} { ${styles} }`;
-    } else {
-      return styles;
-    }
   }
 
   static TEMPLATE: string = `
-    .project-row{{#if global}}:not(.hasPrivateStyling){{/if}} {
-      
-      .row-title {
-        font-family: {{rowTitle}};
-        font-size: {{rowTitleTextSize}}%;
-        text-align: {{rowTitleAlign}};
-        color: {{rowTitleColor}};
-      }
-      .row-text {
-        font-family: {{rowText}};
-        text-align: {{rowTextAlign}};
-        font-size: {{rowTextTextSize}}%;
-        color: {{rowTextColor}};
-        padding: {{rowTextPaddingX}}px {{rowTextPaddingY}}%;
-      }
-      .row-image {
-        width: {{rowImageWidth}}%;
-        margin-top: {{rowImageMarginTop}}%;
-        margin-bottom: {{rowImageMarginBottom}}%;
-
-        {{#if rowImgOverflowIsOn}}
-        overflow: hidden;
-        {{/if}}
-
-        {{#if rowImgBorderIsOn}}
-        border: {{rowImgBorderWidth}}px {{rowImgBorderStyle}} {{rowImgBorderColor}};
-        {{else}}
-        border: none;
-        {{/if}}
-      }
-      .row-header {
-        {{#if rowBgColorIsOn}}
-        background-color: {{rowBgColor}};
-        {{else}}
-        background-color: transparent;
-        {{/if}}
-      
-        margin-left: {{rowMargin}}%;
-        margin-right: {{rowMargin}}%;
-        
-        {{#if rowBorderIsOn}}
-        border: {{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}};
-        
-        border-top-left-radius: {{rowBorderRadiusTopLeft}}{{rowBorderRadiusUnit}};
-        border-top-right-radius: {{rowBorderRadiusTopRight}}{{rowBorderRadiusUnit}};
-        border-bottom-left-radius: {{rowBorderRadiusBottomLeft}}{{rowBorderRadiusUnit}};
-        border-bottom-right-radius: {{rowBorderRadiusBottomRight}}{{rowBorderRadiusUnit}};
-        {{else}}
-        border: none;
-        {{/if}}
-      }
-
-      margin-top: {{rowBodyMarginTop}}px;
-      margin-bottom: {{rowBodyMarginBottom}}px;
-      margin-left: {{rowBodyMarginSides}}%;
-      margin-right: {{rowBodyMarginSides}}%;
-
-      {{#if rowOverFlowIsOn}}
-      overflow: hidden;
-      {{/if}}
+    {{#if global}}.project-row:not(.hasPrivateStyling){{/if}}{{#if container}}{{container}}{{/if}} {
+      --row-title-font: {{quote rowTitle}};
+      --row-title-size: {{rowTitleTextSize}}%;
+      --row-title-align: {{rowTitleAlign}};
+      --row-title-color: {{rowTitleColor}};
+      --row-text-font: {{quote rowText}};
+      --row-text-align: {{rowTextAlign}};
+      --row-text-size: {{rowTextTextSize}}%;
+      --row-text-color: {{rowTextColor}};
+      --row-text-padding-x: {{rowTextPaddingX}}px;
+      --row-text-padding-y: {{rowTextPaddingY}}%;
+      --row-image-width: {{rowImageWidth}}%;
+      --row-image-margin-top: {{rowImageMarginTop}}%;
+      --row-image-margin-bottom: {{rowImageMarginBottom}}%;
+      --row-img-border: {{#if rowImgBorderIsOn}}{{rowImgBorderWidth}}px {{rowImgBorderStyle}} {{rowImgBorderColor}}{{else}}none{{/if}};
+      --row-img-overflow: {{#if rowImgOverflowIsOn}}hidden{{else}}initial{{/if}};
+      --row-bg-color: {{#if rowBgColorIsOn}}{{rowBgColor}}{{else}}transparent{{/if}};
+      --row-margin: {{rowMargin}}%;
+      --row-border: {{#if rowBorderIsOn}}{{rowBorderWidth}}px {{rowBorderStyle}} {{rowBorderColor}}{{else}}none{{/if}};
+      --row-border-radius: {{rowBorderRadiusTopLeft}}{{rowBorderRadiusUnit}} {{rowBorderRadiusTopRight}}{{rowBorderRadiusUnit}} {{rowBorderRadiusBottomRight}}{{rowBorderRadiusUnit}} {{rowBorderRadiusBottomLeft}}{{rowBorderRadiusUnit}};
+      --row-body-margin: {{rowBodyMarginTop}}px {{rowBodyMarginSides}}% {{rowBodyMarginBottom}}px {{rowBodyMarginSides}}%;
+      --row-overflow: {{#if rowOverFlowIsOn}}hidden{{else}}initial{{/if}};
     }
   `;
 }
@@ -178,7 +138,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
   constructor(options: { container?: string; global?: boolean } = {}) {
     super();
     this._options = options;
-    this._template = Handlebars.compile(ObjStylesGen.TEMPLATE);
+    this._template = HB().compile(ObjStylesGen.TEMPLATE, { noEscape: true });
   }
 
   gen(styling: ObjStyles): string {
@@ -200,114 +160,67 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
       ),
     });
 
-    const styles = this._template({
+    return this._template({
       ...computed,
       global: this._options.global,
+      container: this._options.container,
     });
-    if (this._options.container) {
-      return `${this._options.container} { ${styles} }`;
-    } else {
-      return styles;
-    }
   }
 
   static TEMPLATE: string = `
-    .project-obj{{#if global}}:not(.hasPrivateStyling){{/if}} {
-      {{#if objectBgColorIsOn}}
-      background-color: {{objectBgColor}};
-      {{/if}}
-      
-      .obj-title {
-        font-family: {{objectTitle}};
-        font-size: {{objectTitleTextSize}}%;
-        color: {{objectTitleColor}};
-        text-align: {{objectTitleAlign}};
-      }
-      .obj-text {
-        font-family: {{objectText}};
-        text-align: {{objectTextAlign}};
-        color: {{objectTextColor}};
-        padding: max({{objectTextPadding}}px, 0.75rem);
-        font-size: {{objectTextTextSize}}%;
-      }
-      .obj-image {
-        width: {{objectImageWidth}}%;
-        margin-top: {{objectImageMarginTop}}px;
-        margin-bottom: {{objectImageMarginBottom}}px;
-
-        {{#if objectImgObjectFillIsOn}}
-        object-fit: {{objectImgObjectFillStyle}};
-        {{#if objectImgObjectFillHeight}}
-        height: {{objectImgObjectFillHeight}}px; /* this can be empty while objectImgObjectFillIsOn :) */
-        {{/if}}
-        {{/if}}
-      }
-      .addon {
-        .text {
-          font-family: {{addonText}};
-          font-size: {{addonTextTextSize}}%;
-          color: {{addonTextColor}};
-          text-align: {{addonTextAlign}};
-          padding: max({{objectTextPadding}}px, 0.75rem);
-        }
-
-        .title {
-          font-family: {{addonTitle}};
-          font-size: {{addonTitleTextSize}}%;
-          color: {{addonTitleColor}};
-          text-align: {{addonTitleAlign}};
-        }
-        
-        &.disabled {
-          {{#if reqBgColorIsOn}}
-          background-color: {{reqFilterBgColor}};
-          {{/if}}
-          {{#if reqFilterGrayIsOn}}
-          filter: grayscale({{reqFilterGray}}%);
-          {{/if}}
-        }
-      }
-
-      .obj-score, .obj-requirements {
-        font-family: {{scoreText}};
-        font-size: {{scoreTextSize}}%;
-        text-align: {{scoreTextAlign}};
-        color: {{scoreTextColor}};
-      }
-
-      /* FIXME: Disabled as it messes up parent columns, appears related to grid.css
-      margin: {{objectMargin}}px;
-      */
-
-      {{#if objectBorderIsOn}}
-      border-color: {{objectBorderColor}};
-      border-style: {{objectBorderStyle}};
-      border-width: {{objectBorderWidth}}px;
-      
-      border-top-left-radius: {{objectBorderRadiusTopLeft}}{{objectBorderRadiusUnit}};
-      border-top-right-radius: {{objectBorderRadiusTopRight}}{{objectBorderRadiusUnit}};
-      border-bottom-left-radius: {{objectBorderRadiusBottomLeft}}{{objectBorderRadiusUnit}};
-      border-bottom-right-radius: {{objectBorderRadiusBottomRight}}{{objectBorderRadiusUnit}};
-      {{else}}
-      border: none;
-      {{/if}}
-      
-      &.selected {
-        {{#if selBgColorIsOn}}
-        background-color: {{selFilterBgColor}};
-        {{/if}}
-        {{#if selFilterGrayIsOn}}
-        filter: grayscale({{selFilterGray}}%);
-        {{/if}}
-      }
-      &.disabled {
-        {{#if reqBgColorIsOn}}
-        background-color: {{reqFilterBgColor}};
-        {{/if}}
-        {{#if reqFilterGrayIsOn}}
-        filter: grayscale({{reqFilterGray}}%);
-        {{/if}}
-      }
+    {{#if global}}.project-obj:not(.hasPrivateStyling){{/if}}{{#if container}}{{container}}{{/if}} {
+      --obj-title-font: {{quote objectTitle}};
+      --obj-title-size: {{objectTitleTextSize}}%;
+      --obj-title-align: {{objectTitleAlign}};
+      --obj-title-color: {{objectTitleColor}};
+      --obj-text-font: {{quote objectText}};
+      --obj-text-align: {{objectTextAlign}};
+      --obj-text-size: {{objectTextTextSize}}%;
+      --obj-text-color: {{objectTextColor}};
+      --obj-text-padding: max({{objectTextPadding}}px, 0.75rem);
+      --obj-image-width: {{objectImageWidth}}%;
+      --obj-image-margin-top: {{objectImageMarginTop}}px;
+      --obj-image-margin-bottom: {{objectImageMarginBottom}}px;
+      --obj-img-object-fit: {{#if objectImgObjectFillIsOn}}{{objectImgObjectFillStyle}}{{else}}initial{{/if}};
+      --obj-img-object-height: {{#if objectImgObjectFillHeight}}{{objectImgObjectFillHeight}}px{{else}}auto{{/if}};
+      --obj-addon-text-font: {{quote addonText}};
+      --obj-addon-text-size: {{addonTextTextSize}}%;
+      --obj-addon-text-color: {{addonTextColor}};
+      --obj-addon-text-align: {{addonTextAlign}};
+      --obj-addon-title-font: {{quote addonTitle}};
+      --obj-addon-title-size: {{addonTitleTextSize}}%;
+      --obj-addon-title-color: {{addonTitleColor}};
+      --obj-addon-title-align: {{addonTitleAlign}};
+      --obj-score-font: {{quote scoreText}};
+      --obj-score-size: {{scoreTextSize}}%;
+      --obj-score-align: {{scoreTextAlign}};
+      --obj-score-color: {{scoreTextColor}};
+      --obj-bg-color: {{#if objectBgColorIsOn}}{{objectBgColor}}{{else}}initial{{/if}};
+      --obj-margin: {{objectMargin}}px; /* Not used, see comment below */
+      --obj-border: {{#if objectBorderIsOn}}{{objectBorderWidth}}px {{objectBorderStyle}} {{objectBorderColor}}{{else}}none{{/if}};
+      --obj-border-radius: {{objectBorderRadiusTopLeft}}{{objectBorderRadiusUnit}} {{objectBorderRadiusTopRight}}{{objectBorderRadiusUnit}} {{objectBorderRadiusBottomRight}}{{objectBorderRadiusUnit}} {{objectBorderRadiusBottomLeft}}{{objectBorderRadiusUnit}};
+      --obj-selected-bg-color: {{#if selBgColorIsOn}}{{selFilterBgColor}}{{else}}initial{{/if}};
+      --obj-selected-filter: {{#if selFilterGrayIsOn}}grayscale({{selFilterGray}}%){{else}}none{{/if}};
+      --obj-disabled-bg-color: {{#if reqBgColorIsOn}}{{reqFilterBgColor}}{{else}}initial{{/if}};
+      --obj-disabled-filter: {{#if reqFilterGrayIsOn}}grayscale({{reqFilterGray}}%){{else}}none{{/if}};
+      --obj-addon-disabled-bg-color: {{#if reqBgColorIsOn}}{{reqFilterBgColor}}{{else}}initial{{/if}};
+      --obj-addon-disabled-filter: {{#if reqFilterGrayIsOn}}grayscale({{reqFilterGray}}%){{else}}none{{/if}};
     }
   `;
 }
+
+const HB = (() => {
+  let _instance: typeof Handlebars;
+
+  const _setup = () => {
+    _instance = Handlebars.create();
+    _instance.registerHelper('quote', (input: any) =>
+      JSON.stringify(input.toString()),
+    );
+  };
+
+  return (): typeof Handlebars => {
+    if (!_instance) _setup();
+    return _instance!;
+  };
+})();

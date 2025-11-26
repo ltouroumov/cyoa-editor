@@ -1,8 +1,10 @@
 <template>
   <Dialog
     v-model:visible="isNotesVisible"
-    modal
-    dismissable-mask
+    :modal="true"
+    :dismissable-mask="true"
+    :draggable="false"
+    :maximizable="false"
     class="w-full h-full lg:mx-[2rem] mx-0"
     :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
   >

@@ -154,10 +154,11 @@ export type Score = HasRequirements & {
   afterText: string;
 };
 
-export type ObjAddon = HasRequirements & {
-  title: string;
-  text: string;
-};
+export type ObjAddon = Partial<HasId> &
+  HasRequirements & {
+    title: string;
+    text: string;
+  };
 
 export type ProjectObj = HasId &
   HasRequirements & {
@@ -205,7 +206,7 @@ export type ProjectRow = HasId &
     objects: ProjectObj[];
 
     isPrivateStyling: boolean;
-    styling: RowStyles;
+    styling?: RowStyles;
   };
 
 export type PointType = {

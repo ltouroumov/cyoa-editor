@@ -1,12 +1,13 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
-import { isNil, keys } from 'ramda';
+import { findIndex, isNil } from 'ramda';
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
 import { buildConditions } from '~/composables/conditions';
 import type {
   LoadingProjectStore,
+  ObjAddon,
   PointType,
   Project,
   ProjectFile,
@@ -91,6 +92,20 @@ export const useProjectStore = defineStore('project', () => {
 
     return (id: string) => objects[id];
   });
+
+  const getObjectAddon = (
+    objId: string,
+    addonId: string | number,
+  ): { index: number; data: ObjAddon } | undefined => {
+    const obj = getObject.value(objId);
+    if (!obj) return undefined;
+    else if (typeof addonId === 'number') {
+      return { index: addonId, data: obj.addons[addonId] };
+    } else {
+      const index = findIndex((addon) => addon.id === addonId, obj.addons);
+      return { index, data: obj.addons[index] };
+    }
+  };
 
   const getObjectRow: ComputedRef<(id: string) => string> = computed(() => {
     const mapping: Record<string, string> = R.fromPairs(
@@ -445,6 +460,7 @@ export const useProjectStore = defineStore('project', () => {
     unloadProject,
     getRow,
     getObject,
+    getObjectAddon,
     getObjectRow,
     getPointType,
     indexMap,

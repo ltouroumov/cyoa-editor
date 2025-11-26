@@ -1,114 +1,228 @@
 <template>
   <Dialog
     v-model:visible="isSearchVisible"
-    modal
-    dismissable-mask
-    class="w-full h-full lg:mx-[2rem] mx-0"
-    :dt="{ header: { padding: '1rem' }, content: { padding: '1rem' } }"
+    :modal="true"
+    :dismissable-mask="true"
+    :unstyled="true"
+    pt:root:class="w-full md:w-2/3 p-4 h-full md:h-auto max-h-[100%]"
+    pt:mask:class="backdrop-blur-sm"
   >
-    <template #header>
-      <h5 class="text-primary text-xl">Search</h5>
-    </template>
-    <div class="search-modal" :class="{ 'show-view': !!searchView }">
-      <div class="search-header">
-        <InputText
-          ref="searchInput"
-          v-model="searchText"
-          placeholder="Search CYOA"
-          fluid
-          autofocus
-          @input="search"
+    <template #container>
+      <div class="absolute top-0 right-0 pt-2 pr-2 z-20 hidden md:block">
+        <Button
+          icon="iconify carbon--close size-6"
+          severity="secondary"
+          variant="outlined"
+          :rounded="true"
+          @click="isSearchVisible = false"
         />
-        <div class="search-help">
-          Supports: <span class="code">"corona pollentia"</span>,
-          <span class="code">title:taylor</span>,
-          <span class="code">text:charges</span>,
-          <span class="code">required:skitter</span>,
-          <span class="code">cost:10SP</span>,
-          <span class="code">gain:"&lt;10 SP"</span>,
-          <span class="code">id:3ea234</span>, and
-          <span class="code">trump or tinker</span>
-        </div>
       </div>
-      <div class="search-result-list text-light">
+      <div class="search-modal w-full h-full md:h-auto overflow-auto">
+        <div class="search-header w-full">
+          <div class="flex flex-row gap-2 items-center">
+            <InputText
+              ref="searchInput"
+              v-model="searchText"
+              placeholder="Search the CYOA"
+              :fluid="true"
+              :autofocus="true"
+              @input="search"
+            />
+            <Button
+              icon="iconify carbon--information"
+              severity="secondary"
+              class="size-10"
+              @click="searchHelp.toggle($event)"
+            />
+            <Button
+              icon="iconify carbon--close size-6"
+              severity="secondary"
+              class="md:hidden size-10"
+              @click="isSearchVisible = false"
+            />
+          </div>
+          <Popover ref="searchHelp">
+            <div class="search-help">
+              <div class="font-bold text-primary">Search Syntax</div>
+              <ul>
+                <li>
+                  Exact value: <span class="code">"corona pollentia"</span>
+                </li>
+                <li>Only titles:<span class="code">title:taylor</span></li>
+                <li>Only text:<span class="code">text:charges</span></li>
+                <li>Requirement:<span class="code">required:skitter</span></li>
+                <li>
+                  Search exact cost/gain: <span class="code">cost:10SP</span>
+                </li>
+                <li>
+                  Search cost/gain less or great than:
+                  <span class="code">gain:"&lt;10 SP"</span>
+                </li>
+                <li>Search by ID: <span class="code">id:3ea234</span></li>
+                <li>Alternatives: <span class="code">trump or tinker</span></li>
+              </ul>
+            </div>
+          </Popover>
+        </div>
+
         <div
-          v-for="group in searchResults"
-          :key="group.row.id"
-          class="result-group"
+          class="search-results w-full h-full"
+          :class="{ 'show-view': !!searchView }"
         >
-          <div class="group-title">{{ group.row.title }}</div>
-          <div
-            v-for="obj in group.items"
-            :key="obj.id"
-            class="result-item"
-            :class="{ selected: searchView?.obj.id === obj.id }"
-            @click="preview(obj, group.row)"
-          >
-            {{ obj.title }}
+          <div class="panel results-list">
+            <div class="h-full overflow-auto flex flex-col gap-2 relative">
+              <div
+                v-if="isEmpty(searchResults)"
+                class="flex flex-col gap-2 py-2 h-full md:max-h-[20rem] overflow-hidden relative"
+              >
+                <div
+                  v-for="dummy in range(0, 20)"
+                  :key="dummy"
+                  class="result-item"
+                >
+                  <Skeleton shape="circle" size="1rem" animation="none" />
+                  <div class="flex flex-col gap-1 w-full">
+                    <div class="font-bold">
+                      <Skeleton width="100%" height="1rem" animation="none" />
+                    </div>
+                    <div class="text-surface-500">
+                      <Skeleton width="60%" height="1rem" animation="none" />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="absolute bottom-0 left-0 right-0 top-0 bg-surface-900/50 flex flex-row justify-center items-center"
+                >
+                  <div class="text-surface-500 text-center text-sm">
+                    <span>no results ...</span>
+                  </div>
+                </div>
+              </div>
+              <template v-for="result in searchResults" :key="result.key">
+                <div
+                  v-if="result.type === 'object'"
+                  class="result-item"
+                  :class="{ selected: isSelected(result) }"
+                  @click="select(result)"
+                >
+                  <div
+                    class="iconify carbon--cube size-4 mt-1 text-primary-500"
+                  ></div>
+                  <div class="flex flex-col gap-1">
+                    <div class="font-bold">{{ result.obj.title }}</div>
+                    <div class="text-surface-500">{{ result.row.title }}</div>
+                  </div>
+                </div>
+                <div
+                  v-if="result.type === 'addon'"
+                  class="result-item"
+                  :class="{ selected: isSelected(result) }"
+                  @click="select(result)"
+                >
+                  <div
+                    class="iconify carbon--hexagon-vertical-outline size-4 mt-1 text-primary-500"
+                  ></div>
+                  <div class="flex flex-col gap-1">
+                    <div class="break-normal">
+                      <span class="font-bold">{{ result.addon.title }}</span>
+                      <span class="text-surface-500 text-sm">
+                        on {{ result.obj.title }}
+                      </span>
+                    </div>
+                    <div class="text-surface-500 break-normal">
+                      {{ result.row.title }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <div
+                v-if="searchResultCount > searchResults.length"
+                class="text-surface-500 text-center text-sm py-2"
+              >
+                {{ searchResultCount }} total results
+              </div>
+              <div
+                v-if="searchLoading"
+                class="absolute top-0 left-0 w-full h-full bg-black/50 flex flex-col p-8 z-10"
+              >
+                <ProgressSpinner />
+              </div>
+            </div>
+          </div>
+          <div v-if="!!searchView" class="results-view">
+            <ViewProjectObj
+              v-if="searchView.type === 'object'"
+              :obj="searchView.obj"
+              :row="searchView.row"
+              :view-object="ViewContext.Viewer"
+              template="1"
+              force-width="col-12"
+              class="h-full"
+              :allow-overflow="true"
+              :show-addons="false"
+              :display="{ showObjectControls: 'always' }"
+            />
+            <div
+              v-if="searchView.type === 'addon'"
+              class="h-full flex flex-col"
+            >
+              <div
+                class="flex flex-row gap-1 items-center justify-center p-2 bg-surface-900 mb-1 border border-surface-700 rounded-xl"
+                @click="showMore(searchView.obj)"
+              >
+                <div class="iconify carbon--zoom-in"></div>
+                <span>Show Parent</span>
+              </div>
+              <div class="project-obj obj-default">
+                <div class="project-obj-content">
+                  <ViewAddon
+                    :addon="searchView.addon"
+                    :index="searchView.index"
+                    :obj-id="searchView.obj.id"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div v-if="!!searchView" class="search-result-view text-light">
-        <ViewProjectObj
-          :key="searchView.obj.id"
-          :obj="searchView.obj"
-          :row="searchView.row"
-          :view-object="ViewContext.Viewer"
-          template="1"
-          force-width="col-12"
-        />
-      </div>
-    </div>
+    </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
 import { debounce } from 'perfect-debounce';
-import {
-  all,
-  any,
-  chain,
-  concat,
-  filter,
-  includes,
-  isEmpty,
-  isNil,
-  isNotEmpty,
-  isNotNil,
-  length,
-  map,
-  prop,
-  reject,
-} from 'ramda';
+import { isEmpty, range } from 'ramda';
 
-import type {
-  ConditionTerm,
-  Project,
-  ProjectObj,
-  ProjectRow,
-  Score,
-} from '~/composables/project/types/v1';
-import { useProjectRefs, useProjectStore } from '~/composables/store/project';
-import { useViewerRefs } from '~/composables/store/viewer';
+import type { ProjectObj } from '~/composables/project/types/v1';
+import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
 import { ViewContext } from '~/composables/viewer';
+import { type SearchResult, useSearch } from '~/composables/viewer/useSearch';
 
 const { isSearchVisible } = useViewerRefs();
-const { getObject, getPointType } = useProjectStore();
-const { project } = useProjectRefs();
+const {
+  searchText,
+  searchResults,
+  searchResultCount,
+  searchLoading,
+  updateResults,
+  initSearchWorker,
+  closeSearchWorker,
+} = useSearch();
 
-type ResultGroup = {
-  row: ProjectRow;
-  items: ProjectObj[];
-};
-type ResultView = {
-  row: ProjectRow;
-  obj: ProjectObj;
-};
+onMounted(() => {
+  initSearchWorker();
+});
 
-const searchText = ref<string>('');
-const searchResults = ref<ResultGroup[]>([]);
-const searchView = ref<ResultView | null>(null);
+onUnmounted(() => {
+  closeSearchWorker();
+});
 
+const viewerStore = useViewerStore();
+
+const searchView = ref<SearchResult | null>(null);
+
+const searchHelp = ref<any>();
 const searchInput = ref<HTMLInputElement>();
 watch(isSearchVisible, (newValue) => {
   if (newValue === false) {
@@ -124,265 +238,34 @@ watch(searchText, (newValue) => {
   }
 });
 
-type SearchResult =
-  | { or: SearchResult[] }
-  | {
-      args?: string[];
-      kwargs?: Record<string, string[]>;
-    };
-
-const PART_MATCH = /(?:(?<key>\S+):)?(?:"(?<quoted>[^"]+)"|(?<word>\S+))/g;
-const SCORE_MATCH = /^(?<operator><|>)?\s*(?<value>\d+)\s*(?<name>\w+)?$/;
-
-function parseSearchTerm(parts: RegExpExecArray[]) {
-  const result: SearchResult = {};
-  for (const part of parts) {
-    const partWords = part.groups?.quoted ?? part.groups?.word;
-    if (isNil(partWords) || isEmpty(partWords)) continue;
-
-    if (part.groups?.key) {
-      const key = part.groups.key;
-      if (!result.kwargs) {
-        result.kwargs = {};
-      }
-      if (!result.kwargs[key]) {
-        result.kwargs[key] = [];
-      }
-
-      result.kwargs[key].push(partWords);
-    } else {
-      if (!result.args) {
-        result.args = [];
-      }
-
-      result.args.push(partWords);
-    }
-  }
-  return result;
-}
-
-function parseSearch(input: string): SearchResult {
-  const parts = input.matchAll(PART_MATCH);
-
-  // Scan for the "or" keyword and split the input keywords into groups
-  const orParts: RegExpExecArray[][] = [];
-  let acc: RegExpExecArray[] = [];
-
-  for (const part of parts) {
-    if (part[0] === 'or') {
-      orParts.push(acc);
-      acc = [];
-    } else {
-      acc.push(part);
-    }
-  }
-  orParts.push(acc);
-
-  if (orParts.length > 1) {
-    return { or: orParts.map(parseSearchTerm).filter(isNotEmpty) };
-  } else {
-    return parseSearchTerm(acc);
-  }
-}
-
-type SearchFn = (obj: ProjectObj) => boolean;
-type ScoreMatchFn = (score: Score) => boolean;
-
-function createSearchFunction(searchText: string) {
-  const searchTerms = searchText.toLowerCase().split(/\s+/);
-  // If there are no search term, return
-  if (length(searchTerms) === 0) return () => false;
-
-  const searchExpr = parseSearch(searchText);
-
-  const matchesOne = (args: string[], text: string): boolean => {
-    const textLC = text.toLowerCase();
-    return any((term) => includes(term, textLC), args);
-  };
-
-  const matchesAll = (args: string[], text: string): boolean => {
-    const textLC = text.toLowerCase();
-    return all((term) => includes(term, textLC), args);
-  };
-
-  const resolveReqNames = (ids: string[]): string[] => {
-    const names = map((id) => getObject(id)?.title, ids);
-    return reject(isNil, names);
-  };
-
-  const resolveReqIds = (reqs: ConditionTerm[]): string[] => {
-    const resolveReq = (req: ConditionTerm): string[] => {
-      if (req.showRequired) {
-        return reject(
-          isEmpty,
-          concat(
-            [req.reqId, req.reqId1, req.reqId2, req.reqId3],
-            map(prop('req'), req.orRequired),
-          ),
-        );
-      } else {
-        return [];
-      }
-    };
-
-    return chain(resolveReq, reqs);
-  };
-
-  const compileScoreMatcher = (
-    inputs: string[],
-    mode: 'cost' | 'gain',
-  ): SearchFn => {
-    const scoreMatch: ScoreMatchFn[] = map((search: string) => {
-      const scoreMatch = SCORE_MATCH.exec(search);
-      if (!scoreMatch) return null;
-
-      const { operator, value, name } = scoreMatch.groups!;
-      const valueInt = parseInt(value, 10);
-      if (isNaN(valueInt)) return null;
-
-      return (objScore: Score): boolean => {
-        const pointType = getPointType(objScore.id);
-        if (
-          isNotNil(name) &&
-          pointType.afterText.toLowerCase() !== name.toLowerCase()
-        ) {
-          return false;
-        }
-        const rawScoreValue = parseInt(objScore.value);
-
-        if (isNaN(rawScoreValue)) return false;
-        else if (mode === 'cost' && rawScoreValue < 0) return false;
-        else if (mode === 'gain' && rawScoreValue > 0) return false;
-
-        const scoreValue = mode === 'gain' ? -rawScoreValue : rawScoreValue;
-        if (operator === '>') {
-          return scoreValue >= valueInt;
-        }
-        if (operator === '<') {
-          return scoreValue <= valueInt;
-        }
-        return scoreValue === valueInt;
-      };
-    }, inputs).filter(isNotNil);
-
-    return (obj: ProjectObj) => {
-      return any(
-        (objScore: Score) => any((mat) => mat(objScore), scoreMatch),
-        filter((score) => isEmpty(score.requireds), obj.scores),
-      );
-    };
-  };
-
-  function compileSearchExpr(expr: SearchResult): SearchFn {
-    if ('or' in expr) {
-      const subExpr = expr.or.map((expr: SearchResult) =>
-        compileSearchExpr(expr),
-      );
-      return (obj) => any((subExpr) => subExpr(obj), subExpr);
-    } else {
-      const args = expr.args ?? [];
-      const kwargs = expr.kwargs ?? {};
-
-      const searchFns: SearchFn[] = [];
-
-      if (length(args) > 0) {
-        searchFns.push((obj) => {
-          return (
-            matchesAll(args, obj.title) ||
-            matchesAll(args, obj.text) ||
-            any(
-              (addon) =>
-                matchesAll(args, addon.title) || matchesAll(args, addon.text),
-              obj.addons,
-            )
-          );
-        });
-      }
-      if ('id' in kwargs) {
-        searchFns.push((obj) => matchesOne(kwargs.id, obj.id));
-      }
-      if ('title' in kwargs) {
-        searchFns.push((obj) => matchesAll(kwargs.title, obj.title));
-      }
-      if ('text' in kwargs) {
-        searchFns.push((obj) => matchesAll(kwargs.text, obj.text));
-      }
-      if ('required' in kwargs) {
-        searchFns.push((obj) => {
-          const reqIds: string[] = resolveReqIds(obj.requireds);
-          const reqNames = resolveReqNames(reqIds);
-          return (
-            any((req) => matchesAll(kwargs.required, req), reqNames) ||
-            any((req) => matchesOne(kwargs.required, req), reqIds) ||
-            any((addon) => {
-              const reqIds: string[] = resolveReqIds(addon.requireds);
-              const reqNames = resolveReqNames(reqIds);
-              return (
-                any((req) => matchesAll(kwargs.required, req), reqNames) ||
-                any((req) => matchesOne(kwargs.required, req), reqIds)
-              );
-            }, obj.addons)
-          );
-        });
-      }
-      if ('cost' in kwargs) {
-        searchFns.push(compileScoreMatcher(kwargs.cost, 'cost'));
-      }
-      if ('gain' in kwargs) {
-        searchFns.push(compileScoreMatcher(kwargs.gain, 'gain'));
-      }
-
-      return (obj) => all((searchFn) => searchFn(obj), searchFns);
-    }
-  }
-
-  return compileSearchExpr(searchExpr);
-}
-
 const search = debounce(
   () => {
-    if (!project.value) return;
-
-    const searchTextLC = searchText.value.trim().toLowerCase();
-    if (isEmpty(searchTextLC)) {
-      searchResults.value = [];
-      return;
-    }
-
-    const searchFn = createSearchFunction(searchTextLC);
-    const results: ResultGroup[] = [];
-
-    const data: Project = project.value.data;
-    for (const row of data.rows) {
-      const _results: ProjectObj[] = [];
-
-      for (const obj of row.objects) {
-        const objMatch = searchFn(obj);
-        if (objMatch) {
-          _results.push(obj);
-        }
-      }
-
-      if (!isEmpty(_results)) {
-        results.push({
-          row,
-          items: _results,
-        });
-      }
-    }
-
-    searchResults.value = results;
+    updateResults();
   },
   500,
-  { leading: false, trailing: true },
+  {
+    leading: false,
+    trailing: true,
+  },
 );
 
-const preview = (obj: ProjectObj, row: ProjectRow) => {
-  if (!!searchView.value && searchView.value.obj.id === obj.id) {
+const isSelected = (result: SearchResult) => {
+  if (!searchView.value) return false;
+  return (
+    result.type === searchView.value.type && result.key === searchView.value.key
+  );
+};
+
+const select = (result: SearchResult) => {
+  if (!!searchView.value && isSelected(result)) {
     searchView.value = null;
   } else {
-    searchView.value = { obj, row };
+    searchView.value = result;
   }
+};
+
+const showMore = (obj: ProjectObj) => {
+  viewerStore.showObjectDetails = { id: obj.id, tab: 'details' };
 };
 </script>
 
@@ -392,78 +275,55 @@ const preview = (obj: ProjectObj, row: ProjectRow) => {
 }
 
 .search-modal {
-  flex: 1 1 auto;
-  display: grid;
-  gap: 0.5em;
-
-  height: 100%;
-
-  grid-template:
-    'header header' auto
-    'list list' 1fr
-    / 1fr 1fr;
-
-  &.show-view {
-    grid-template:
-      'header header' auto
-      'list view' 1fr
-      / 2fr 1fr;
-  }
-
-  @media screen and (max-width: 768px) {
-    &.show-view {
-      grid-template:
-        'header' auto
-        'list' 1fr
-        'view' 1fr
-        / 1fr;
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   .search-header {
-    grid-area: header;
-
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-
-    .search-help {
-      color: var(--p-stone-500);
-      font-size: 0.75rem;
-
-      .code {
-        font-family: monospace;
-      }
-    }
+    justify-self: center;
+    align-self: center;
   }
 
-  .search-result-list {
-    grid-area: list;
+  .search-results {
+    @apply flex flex-col md:flex-row items-stretch gap-2;
+
+    margin-top: 0.5rem;
     overflow: auto;
   }
 
-  .search-result-view {
-    grid-area: view;
-    display: flex;
-    align-items: stretch;
-    justify-content: stretch;
-    overflow: auto;
+  .results-list {
+    flex: 6 1 60%;
+
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
-  .result-group {
-    .group-title {
-      font-weight: bold;
-      border-bottom: 1px solid var(--p-content-border-color);
-      padding: 0.2rem 0.5rem;
-    }
+  .results-view {
+    flex: 4 1 40%;
 
-    .result-item {
-      padding: 0.2rem 0.5rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
 
-      &.selected {
-        background: var(--p-primary-500);
-      }
-    }
+.panel {
+  @apply bg-surface-900 rounded-xl border border-surface-700;
+}
+
+.result-item {
+  @apply flex flex-row justify-start gap-1 px-2 py-1 cursor-pointer;
+
+  &.selected {
+    background: var(--p-surface-700);
+  }
+}
+
+.search-help {
+  font-size: 0.75rem;
+
+  .code {
+    font-family: monospace;
   }
 }
 </style>

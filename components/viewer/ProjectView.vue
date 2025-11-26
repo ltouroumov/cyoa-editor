@@ -16,6 +16,7 @@
   <NotesModal />
   <SearchModal />
   <MenuModal />
+  <ObjectModal />
 
   <Toast />
   <ConfirmPopup group="popup" />
@@ -38,7 +39,9 @@ defineProps<{
 
 const { resolveDisplaySettings } = useSettingStore();
 
-const display = computed(() => resolveDisplaySettings());
+const display = computed(() => {
+  return resolveDisplaySettings();
+});
 </script>
 <style lang="scss">
 .project {

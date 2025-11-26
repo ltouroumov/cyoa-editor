@@ -10,6 +10,9 @@ export type DisplaySettings = {
   hideObjectScores: boolean;
   hideObjectRequirements: boolean;
   hideObjectText: boolean;
+  showObjectControls: 'auto' | 'always' | 'never';
+  showObjectOverflow: boolean;
+  showObjectAddons: boolean;
 
   hideDisabledAddons: boolean;
 
@@ -21,23 +24,37 @@ type DisplaySettingsValue =
   | { type: 'custom'; settings: DisplaySettings }
   | { type: 'preset'; name: string };
 
+const DefaultSettings: DisplaySettings = Object.freeze({
+  hideRowImages: false,
+  hideRowText: false,
+  hideObjectImages: false,
+  hideObjectScores: false,
+  hideObjectRequirements: false,
+  hideObjectText: false,
+  showObjectControls: 'auto',
+  showObjectOverflow: false,
+  showObjectAddons: false,
+  hideDisabledAddons: false,
+  hideAddonRequirements: false,
+  hideAddonText: false,
+});
+
 export const DisplaySettingsPresets: Record<
   string,
   DisplaySettings & { name: string }
-> = {
-  default: {
+> = Object.freeze({
+  default: Object.freeze({
     name: 'Default',
-    hideRowImages: false,
-    hideRowText: false,
-    hideObjectImages: false,
-    hideObjectScores: false,
-    hideObjectRequirements: false,
-    hideObjectText: false,
-    hideDisabledAddons: false,
-    hideAddonRequirements: false,
-    hideAddonText: false,
-  },
-  minimal: {
+    ...DefaultSettings,
+  }),
+  extended: Object.freeze({
+    name: 'Extended',
+    ...DefaultSettings,
+    showObjectControls: 'never',
+    showObjectOverflow: true,
+    showObjectAddons: true,
+  }),
+  minimal: Object.freeze({
     name: 'Minimal',
     hideRowImages: true,
     hideRowText: true,
@@ -45,11 +62,14 @@ export const DisplaySettingsPresets: Record<
     hideObjectScores: false,
     hideObjectRequirements: false,
     hideObjectText: true,
+    showObjectControls: 'always',
+    showObjectOverflow: false,
+    showObjectAddons: false,
     hideDisabledAddons: false,
     hideAddonRequirements: false,
     hideAddonText: true,
-  },
-};
+  }),
+});
 
 export const useSettingStore = defineStore(
   'viewer-settings',

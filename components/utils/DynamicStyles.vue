@@ -4,5 +4,5 @@ const { stylesheet } = defineProps<{ stylesheet: string }>();
 
 <template>
   <!-- eslint-disable-next-line vue/no-v-html, vue/no-v-text-v-html-on-component -->
-  <component :is="'style'" v-html="stylesheet" />
+  <component :is="'style'" type="text/css" v-text="stylesheet" />
 </template>
