@@ -8,7 +8,7 @@
       canToggle: canToggle,
       hasPrivateStyling: obj.isPrivateStyling,
     }"
-    @click.capture="toggle"
+    @click="toggle"
   >
     <div class="obj-header">
       <div class="obj-title">
