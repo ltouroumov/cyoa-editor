@@ -3,10 +3,10 @@
     class="project-obj obj-details w-full lg:w-[60rem] h-full overflow-auto flex flex-col md:flex-row relative"
   >
     <div
+      v-if="obj.image && !display.hideObjectImages"
       class="obj-image-wrapper absolute top-0 left-0 right-0 bottom-0 overflow-hidden z-0"
     >
       <img
-        v-if="obj.image"
         class="obj-image w-full"
         :decoding="`sync`"
         :loading="`eager`"
@@ -101,6 +101,7 @@ import MainDetails from '~/components/viewer/details/MainDetails.vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import type { DisplaySettings } from '~/composables/store/settings';
 
 const store = useProjectStore();
 const { selectedIds, selected } = useProjectRefs();
@@ -108,6 +109,7 @@ const { selectedIds, selected } = useProjectRefs();
 const $props = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;
+  display: DisplaySettings;
 }>();
 
 const objImageIsURL = computed(() => {

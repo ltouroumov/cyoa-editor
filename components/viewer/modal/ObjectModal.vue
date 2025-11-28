@@ -13,7 +13,12 @@
         v-if="obj && row"
         class="w-full h-full py-[1rem] px-[1rem] flex flex-col items-center overflow-auto relative"
       >
-        <ViewDetailsAsync v-if="tab === 'details'" :obj="obj" :row="row">
+        <ViewDetailsAsync
+          v-if="tab === 'details'"
+          :obj="obj"
+          :row="row"
+          :display="display"
+        >
           <template #right>
             <div class="absolute top-0 right-0 pt-2 pr-2 z-20">
               <div
@@ -47,6 +52,7 @@
 import { isNotNil } from 'ramda';
 
 import { useProjectStore } from '~/composables/store/project';
+import { useSettingStore } from '~/composables/store/settings';
 import { useViewerStore } from '~/composables/store/viewer';
 
 const ViewDetailsAsync = defineAsyncComponent(
@@ -58,6 +64,9 @@ const ViewParentsAsync = defineAsyncComponent(
 
 const vStore = useViewerStore();
 const pStore = useProjectStore();
+
+const { resolveDisplaySettings } = useSettingStore();
+
 const showDetails = computed<boolean>({
   get: () => vStore.showObjectDetails !== false,
   set: (val) => {
@@ -99,6 +108,10 @@ const tab = computed(() =>
     ? vStore.showObjectDetails.tab
     : null,
 );
+
+const display = computed(() => {
+  return resolveDisplaySettings();
+});
 
 const close = () => {
   vStore.showObjectDetails = false;
