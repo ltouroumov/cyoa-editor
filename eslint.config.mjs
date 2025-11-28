@@ -6,7 +6,7 @@ import vue from 'eslint-plugin-vue';
 import tslint from 'typescript-eslint';
 import vueParser from 'vue-eslint-parser';
 
-import withNuxt from './.nuxt/eslint.config.mjs';
+import withNuxt from '.nuxt/eslint.config.mjs';
 
 export default withNuxt(
   tslint.config(
