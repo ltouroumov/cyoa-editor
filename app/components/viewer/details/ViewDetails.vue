@@ -23,7 +23,7 @@
       class="obj-image-gradient-controls absolute md:top-0 right-0 bottom-0 w-full md:w-1/3 md:h-full h-1/4 z-5"
     />
 
-    <div class="overflow-auto w-auto md:w-2/3 h-3/4 md:h-auto relative">
+    <div class="overflow-auto w-auto md:w-2/3 h-3/4 md:h-auto relative z-10">
       <MainDetails
         :class="{ hidden: showTab !== 'main' }"
         :row="row"
