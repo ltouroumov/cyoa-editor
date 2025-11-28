@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 import { GoldMorning } from './prime/gold-morning.style.mjs';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   app: {
@@ -68,11 +69,8 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   typescript: { typeCheck: true },
 
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
+  vite: {
+    plugins: [tailwindcss()],
   },
 
   components: [
@@ -91,6 +89,7 @@ export default defineNuxtConfig({
   ],
 
   primevue: {
+    usePrimeVue: true,
     autoImport: true,
     components: {
       exclude: ['Chart', 'Form', 'FormField'],
@@ -103,12 +102,12 @@ export default defineNuxtConfig({
           darkModeSelector: '.dark-theme',
           cssLayer: {
             name: 'primevue',
-            order: 'tailwind-base, primevue, tailwind-utilities',
+            order: 'base, primevue',
           },
         },
       },
     },
   },
 
-  compatibilityDate: '2024-09-04',
+  compatibilityDate: '2025-11-28',
 });
