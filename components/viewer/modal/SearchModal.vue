@@ -48,8 +48,13 @@
                 <li>
                   Exact value: <span class="code">"corona pollentia"</span>
                 </li>
-                <li>Only titles:<span class="code">title:taylor</span></li>
+                <li>
+                  Only titles:<span class="code">title:taylor</span> or
+                  <span class="code">title:"taylor hebert"</span> for exact
+                  value (works on other fields too)
+                </li>
                 <li>Only text:<span class="code">text:charges</span></li>
+                <li>Search in row:<span class="code">row:magic</span></li>
                 <li>Requirement:<span class="code">required:skitter</span></li>
                 <li>
                   Search exact cost/gain: <span class="code">cost:10SP</span>
