@@ -15,17 +15,3 @@ import { useViewerStore } from '~/composables/store/viewer';
 
 const { toggleSearch } = useViewerStore();
 </script>
-
-<style scoped lang="scss">
-.search-field {
-  @apply bg-transparent h-6;
-
-  &:focus {
-    @apply outline-none;
-  }
-}
-
-.search-field-btn {
-  @apply flex flex-row items-center justify-center;
-}
-</style>

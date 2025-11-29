@@ -274,10 +274,8 @@ const showMore = (obj: ProjectObj) => {
 };
 </script>
 
-<style scoped lang="scss">
-.modal-80 {
-  width: 80%;
-}
+<style scoped>
+@reference "#main.css";
 
 .search-modal {
   display: flex;

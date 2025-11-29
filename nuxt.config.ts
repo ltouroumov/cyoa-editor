@@ -69,8 +69,11 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   typescript: { typeCheck: true },
 
-  vite: {
-    plugins: [tailwindcss()],
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+      autoprefixer: {},
+    },
   },
 
   components: [

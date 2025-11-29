@@ -54,6 +54,8 @@ const isActive = computed<boolean>(() => {
 </script>
 
 <style lang="scss">
+@reference "#main.css";
+
 .obj-requirement {
   //display: inline-flex;
   //align-items: center;
