@@ -92,7 +92,7 @@ const stylesheet = computed(() => {
     }
 
     .title {
-      font-family: var(--obj-addon-title-font) sans-serif;
+      font-family: var(--obj-addon-title-font);
       font-size: var(--obj-addon-title-size);
       color: var(--obj-addon-title-color);
       text-align: var(--obj-addon-title-align);
