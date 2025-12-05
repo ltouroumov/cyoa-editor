@@ -30,10 +30,12 @@ type ProjectListEntry = ViewerProject &
 
 type CacheOperation =
   | { status: 'idle' }
-  | { status: 'running'; progress?: string }
-  | { status: 'completed' }
-  | { status: 'cancelled' }
-  | { status: 'failure'; error: string };
+  | ({ projectId: string } & (
+      | { status: 'running'; progress?: string }
+      | { status: 'completed' }
+      | { status: 'cancelled' }
+      | { status: 'failure'; error: string }
+    ));
 
 export function useViewerLibrary() {
   const dexie = useDexie();
@@ -101,7 +103,7 @@ export function useViewerLibrary() {
     if (project.source === 'local') {
       return; // nothing to do for local projects
     } else {
-      cacheOperation.value = { status: 'running' };
+      cacheOperation.value = { status: 'running', projectId: project.id };
 
       // cache the project using the cache worker
       await worker.initWorker();
@@ -114,20 +116,31 @@ export function useViewerLibrary() {
             cacheOperation.value = {
               status: 'running',
               progress: progress.info,
+              projectId: project.id,
             };
           })
           .with({ status: 'completed' }, async () => {
-            cacheOperation.value = { status: 'completed' };
+            cacheOperation.value = {
+              status: 'completed',
+              projectId: project.id,
+            };
             await worker.closeWorker();
             _sub.unsubscribe();
           })
           .with({ status: 'cancelled' }, async () => {
-            cacheOperation.value = { status: 'cancelled' };
+            cacheOperation.value = {
+              status: 'cancelled',
+              projectId: project.id,
+            };
             await worker.closeWorker();
             _sub.unsubscribe();
           })
           .with({ status: 'failure' }, async ({ error }) => {
-            cacheOperation.value = { status: 'failure', error };
+            cacheOperation.value = {
+              status: 'failure',
+              projectId: project.id,
+              error,
+            };
             await worker.closeWorker();
             _sub.unsubscribe();
           })

@@ -19,7 +19,25 @@ self.addEventListener(
         .with({ type: 'init' }, () => {})
         .with({ type: 'cache' }, async ({ project }) => {
           abortController = new AbortController();
-          await doCache(project, abortController.signal);
+          try {
+            await doCache(project, abortController.signal);
+          } catch (err) {
+            if (
+              typeof err === 'object' &&
+              err !== null &&
+              'name' in err &&
+              err.name === 'AbortError'
+            ) {
+              postMessage({ status: 'cancelled' });
+            } else {
+              console.log('error in cache worker', e);
+
+              postMessage({
+                status: 'failure',
+                error: 'Failed to download project file',
+              });
+            }
+          }
         })
         .with({ type: 'abort' }, () => {
           abortController?.abort();
@@ -34,16 +52,23 @@ self.addEventListener(
 
 async function doCache(project: ViewerProject, abortSignal: AbortSignal) {
   postMessage({ status: 'progress', info: 'Downloading project file ...' });
-  const result = await downloadFile(project.file_url, async (progress) => {
-    if (progress.type === 'stream') {
-      postMessage({
-        status: 'progress',
-        info: `Downloading project file ... ${formatBytes(progress.bytes)}`,
-      });
-    } else if (progress.type === 'decode') {
-      postMessage({ status: 'progress', info: `Downloading project file ...` });
-    }
-  });
+  const result = await downloadFile(
+    project.file_url,
+    async (progress) => {
+      if (progress.type === 'stream') {
+        postMessage({
+          status: 'progress',
+          info: `Downloading project file ... ${formatBytes(progress.bytes)}`,
+        });
+      } else if (progress.type === 'decode') {
+        postMessage({
+          status: 'progress',
+          info: `Downloading project file ...`,
+        });
+      }
+    },
+    abortSignal,
+  );
 
   if ('error' in result) {
     postMessage({
@@ -96,7 +121,9 @@ async function doCache(project: ViewerProject, abortSignal: AbortSignal) {
   let progress = 0;
   for (const batch of chunk(images, 10)) {
     await Promise.all(
-      batch.map((imageUrl) => cacheImage(new URL(imageUrl), imagesDir)),
+      batch.map((imageUrl) =>
+        cacheImage(new URL(imageUrl), imagesDir, abortSignal),
+      ),
     );
     progress += batch.length;
     console.log(`[cache ${project.id}] cached ${progress}/${images.length}`);
@@ -114,14 +141,18 @@ async function doCache(project: ViewerProject, abortSignal: AbortSignal) {
   postMessage({ status: 'completed' });
 }
 
-async function cacheImage(imageUrl: URL, imagesDir: FileSystemDirectoryHandle) {
+async function cacheImage(
+  imageUrl: URL,
+  imagesDir: FileSystemDirectoryHandle,
+  abortSignal: AbortSignal,
+): Promise<string> {
   const imageName = last(imageUrl.pathname.split('/'))!;
   const imageFile = await imagesDir.getFileHandle(imageName, {
     create: true,
   });
   const imageFileHandle = await imageFile.createSyncAccessHandle();
 
-  const imageResponse = await fetch(imageUrl);
+  const imageResponse = await fetch(imageUrl, { signal: abortSignal });
   const imageBlob = await imageResponse.blob();
   imageFileHandle.write(await imageBlob.arrayBuffer());
   return imageName;

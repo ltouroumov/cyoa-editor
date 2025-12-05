@@ -5,10 +5,11 @@ export async function downloadFile(
       | { type: 'stream'; bytes: number }
       | { type: 'decode'; bytes: number; total: number },
   ) => Promise<void>,
+  signal?: AbortSignal,
 ): Promise<
   { error: true; status: number } | { ok: true; data: Uint8Array<ArrayBuffer> }
 > {
-  const response = await fetch(fileURL);
+  const response = await fetch(fileURL, { signal });
   if (response.ok) {
     const reader = response.body!.getReader();
 

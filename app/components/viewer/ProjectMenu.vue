@@ -14,27 +14,26 @@
           severity="info"
           class="mt-2"
         >
-          <template #container>
-            <div class="flex flex-row items-center gap-1 w-full px-2">
-              <ProgressSpinner class="size-4" />
-              <div class="grow w-full">
-                {{ cacheOperation.progress ?? 'Running ...' }}
-              </div>
-              <Button variant="text" icon="pi pi-times" @click="abortCache()" />
+          <div class="flex flex-row items-center gap-1 w-full">
+            <ProgressSpinner class="size-4" />
+            <div class="grow w-full">
+              {{ cacheOperation.progress ?? 'Running ...' }}
             </div>
-          </template>
+          </div>
         </Message>
         <Message
           v-if="cacheOperation.status === 'completed'"
           severity="success"
           class="mt-2"
+          closable
         >
           Cache operation completed.
         </Message>
         <Message
           v-if="cacheOperation.status === 'cancelled'"
-          severity="warning"
+          severity="warn"
           class="mt-2"
+          closable
         >
           Cache operation cancelled.
         </Message>
@@ -42,6 +41,7 @@
           v-if="cacheOperation.status === 'failure'"
           severity="error"
           class="mt-2"
+          closable
         >
           Cache operation failed.
         </Message>
@@ -76,9 +76,19 @@
           </div>
           <div class="project-actions">
             <Button
+              v-if="cacheOperation.status !== 'running'"
               icon="iconify solar--download-broken"
               variant="outlined"
               @click.stop.prevent="cacheProject(project.id)"
+            />
+            <Button
+              v-if="
+                cacheOperation.status === 'running' &&
+                cacheOperation.projectId === project.id
+              "
+              icon="iconify solar--forbidden-circle-broken"
+              variant="outlined"
+              @click.stop.prevent="abortCache()"
             />
           </div>
         </div>
