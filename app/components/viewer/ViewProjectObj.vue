@@ -22,16 +22,15 @@
         class="project-obj-content"
         :class="[objTemplateClass, objHeightClass]"
       >
-        <div class="obj-image-wrapper">
-          <img
-            v-if="obj.image && !display?.hideObjectImages"
-            class="obj-image"
-            :decoding="alwaysEnable ? `sync` : `auto`"
-            :loading="alwaysEnable ? `eager` : `lazy`"
-            :src="obj.image"
-            :href="objImageIsURL ? obj.image : ''"
-            :alt="obj.title"
-          />
+        <div
+          v-if="
+            isNotNil(obj.image) &&
+            isNotEmpty(obj.image) &&
+            !display?.hideObjectImages
+          "
+          class="obj-image-container"
+        >
+          <ViewImage :element="obj" :always-enable="alwaysEnable" />
         </div>
         <div class="obj-header">
           <div class="obj-title">
@@ -108,7 +107,6 @@
 </template>
 
 <script setup lang="ts">
-import * as R from 'ramda';
 import { isEmpty, isNotEmpty, isNotNil, length } from 'ramda';
 
 import StyleObj from './style/StyleObj.vue';
@@ -123,6 +121,8 @@ import { useViewerStore } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';
 import { useObject } from '~/composables/viewer/useObject';
+
+const LazyViewAddon = defineAsyncComponent(() => import('./ViewAddon.vue'));
 
 const $props = defineProps<{
   row: ProjectRow;
@@ -209,10 +209,6 @@ const objBgColor = computed(() => {
   } else {
     return 'transparent';
   }
-});
-
-const objImageIsURL = computed(() => {
-  return R.match(/^https?:\/\//, $props.obj.image);
 });
 
 const objContentRef = useTemplateRef('objContentRef');
@@ -348,16 +344,12 @@ const isInBackpack = computed<boolean>(() => {
     }
   }
 
-  .obj-image-wrapper {
+  .obj-image-container {
     display: flex;
     flex-direction: row;
     justify-content: center;
 
     grid-area: image;
-  }
-  .obj-image {
-    width: 100%;
-    object-fit: contain;
   }
 
   .obj-header {

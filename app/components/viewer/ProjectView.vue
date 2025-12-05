@@ -17,10 +17,6 @@
   <SearchModal />
   <MenuModal />
   <ObjectModal />
-
-  <Toast />
-  <ConfirmPopup group="popup" />
-  <ConfirmDialog group="modal" />
 </template>
 
 <script setup lang="ts">

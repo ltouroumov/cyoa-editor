@@ -9,7 +9,7 @@ import type {
   SavedBuildGroup,
   SavedBuildItem,
   SavedBuildProject,
-} from '~/composables/shared/tables/builds';
+} from '~/composables/shared/tables/viewer_builds';
 import type { Selections } from '~/composables/store/project';
 
 export const getProjectInfo = (store: ProjectStore): SavedBuildProject => {
