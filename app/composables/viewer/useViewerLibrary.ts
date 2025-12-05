@@ -112,7 +112,6 @@ export function useViewerLibrary() {
       const _sub = worker.messages.subscribe(async (msg: CacheResult) => {
         await match(msg)
           .with({ status: 'progress' }, async (progress) => {
-            console.log(`progress ${project.id}`, progress);
             cacheOperation.value = {
               status: 'running',
               progress: progress.info,
@@ -124,7 +123,6 @@ export function useViewerLibrary() {
               status: 'completed',
               projectId: project.id,
             };
-            await worker.closeWorker();
             _sub.unsubscribe();
           })
           .with({ status: 'cancelled' }, async () => {
@@ -132,7 +130,6 @@ export function useViewerLibrary() {
               status: 'cancelled',
               projectId: project.id,
             };
-            await worker.closeWorker();
             _sub.unsubscribe();
           })
           .with({ status: 'failure' }, async ({ error }) => {
@@ -141,7 +138,6 @@ export function useViewerLibrary() {
               projectId: project.id,
               error,
             };
-            await worker.closeWorker();
             _sub.unsubscribe();
           })
           .exhaustive();

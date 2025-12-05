@@ -30,11 +30,11 @@ self.addEventListener(
             ) {
               postMessage({ status: 'cancelled' });
             } else {
-              console.log('error in cache worker', e);
+              console.error('error in cache worker', err);
 
               postMessage({
                 status: 'failure',
-                error: 'Failed to download project file',
+                error: 'Failed to download project file (exception)',
               });
             }
           }
@@ -44,14 +44,15 @@ self.addEventListener(
           abortController = null;
         })
         .exhaustive();
-    } catch (e) {
-      console.log('error in cache worker', e);
+    } catch (err) {
+      console.error('error in cache worker', err);
     }
   },
 );
 
 async function doCache(project: ViewerProject, abortSignal: AbortSignal) {
   postMessage({ status: 'progress', info: 'Downloading project file ...' });
+
   const result = await downloadFile(
     project.file_url,
     async (progress) => {
@@ -73,7 +74,7 @@ async function doCache(project: ViewerProject, abortSignal: AbortSignal) {
   if ('error' in result) {
     postMessage({
       status: 'failure',
-      error: 'Failed to download project file',
+      error: `Failed to download project file (HTTP ${result.status})`,
     });
     return;
   }
@@ -88,11 +89,14 @@ async function doCache(project: ViewerProject, abortSignal: AbortSignal) {
   const projectDir = await fsHandle.getDirectoryHandle(project.id, {
     create: true,
   });
+
   const projectFile = await projectDir.getFileHandle('project.json', {
     create: true,
   });
+
   const projectFileHandle = await projectFile.createSyncAccessHandle();
   projectFileHandle.write(projectBytes.buffer);
+  projectFileHandle.close();
   console.log(`[cache ${project.id}] project.json cached`);
 
   const imagesDir = await projectDir.getDirectoryHandle('images', {
@@ -126,7 +130,6 @@ async function doCache(project: ViewerProject, abortSignal: AbortSignal) {
       ),
     );
     progress += batch.length;
-    console.log(`[cache ${project.id}] cached ${progress}/${images.length}`);
     postMessage({
       status: 'progress',
       info: `Downloading images ... ${progress}/${images.length}`,
@@ -150,11 +153,14 @@ async function cacheImage(
   const imageFile = await imagesDir.getFileHandle(imageName, {
     create: true,
   });
-  const imageFileHandle = await imageFile.createSyncAccessHandle();
 
   const imageResponse = await fetch(imageUrl, { signal: abortSignal });
   const imageBlob = await imageResponse.blob();
+
+  const imageFileHandle = await imageFile.createSyncAccessHandle();
   imageFileHandle.write(await imageBlob.arrayBuffer());
+  imageFileHandle.close();
+
   return imageName;
 }
 
@@ -167,4 +173,13 @@ function chunk<T>(input: T[], size: number): T[][] {
     if (seed.length === 0) return false;
     return [take(size, seed), drop(size, seed)];
   }, input);
+}
+
+async function attempt<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    console.error('error in cache worker (attempt)', err);
+    throw new Error('Failed to download project file (exception)');
+  }
 }

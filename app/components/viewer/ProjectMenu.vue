@@ -52,15 +52,22 @@
           :key="project.id"
           class="project-list-item"
           :class="{ compact: $props.compact ?? false }"
-          @click.prevent="loadRemoteFile(project)"
         >
-          <div v-if="isNotNil(project.thumbnail_url)" class="thumbnail">
+          <div
+            v-if="isNotNil(project.thumbnail_url)"
+            class="thumbnail"
+            @click.prevent="loadRemoteFile(project)"
+          >
             <img :src="project.thumbnail_url" class="thumbnail-img" />
           </div>
-          <div v-if="isNil(project.thumbnail_url)" class="thumbnail-ph">
+          <div
+            v-if="isNil(project.thumbnail_url)"
+            class="thumbnail-ph"
+            @click.prevent="loadRemoteFile(project)"
+          >
             <span>No Thumbnail</span>
           </div>
-          <div class="project-info">
+          <div class="project-info" @click.prevent="loadRemoteFile(project)">
             <h2 class="project-title text-xl text-primary font-bold">
               {{ project.title }}
             </h2>
