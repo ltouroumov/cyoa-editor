@@ -38,6 +38,13 @@
               By {{ project.author }}
             </div>
           </div>
+          <div class="project-actions">
+            <Button
+              icon="iconify solar--download-broken"
+              variant="outlined"
+              @click.stop.prevent="cacheProject(project.id)"
+            />
+          </div>
         </div>
       </div>
     </main>
@@ -58,9 +65,6 @@ import {
 
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
-import { bufferToString } from '~/composables/utils';
-import { sleep } from '~/composables/utils/sleep';
-import type { ViewerProject } from '~/composables/viewer/types';
 import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
 defineProps<{
@@ -69,7 +73,8 @@ defineProps<{
 
 const { loadProject } = useProjectStore();
 const { toggleProjectMenu } = useViewerStore();
-const { projectList, librarySettings } = useViewerLibrary();
+const { projectList, librarySettings, loadRemoteFile, cacheProject } =
+  useViewerLibrary();
 
 const search = ref<string>('');
 
@@ -84,54 +89,6 @@ const projects = computed(() => {
     });
   }
 });
-
-const loadRemoteFile = async (project: ViewerProject) => {
-  const fileURL = project.file_url;
-  if (!fileURL) return;
-
-  toggleProjectMenu(false);
-  await loadProject(async (setProgress) => {
-    const response = await fetch(fileURL);
-    if (response.ok) {
-      const reader = response.body!.getReader();
-
-      let received = 0;
-      const chunks = [];
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        chunks.push(value);
-        received += value.length;
-
-        const receivedMB = received / (1024 * 1024);
-        const neat = Math.round(receivedMB * 100) / 100;
-        await setProgress(`Downloaded ${neat} Mb`);
-      }
-
-      await setProgress(`Loading ${project.title} ...`);
-      // A hack, but otherwise the progress value never updates before loadProject is called
-      await sleep(100);
-
-      const bodyBytes = new Uint8Array(received);
-      let pos = 0;
-      for (const chunk of chunks) {
-        bodyBytes.set(chunk, pos);
-        pos += chunk.length;
-      }
-
-      return {
-        fileContents: bufferToString(bodyBytes.buffer),
-        fileName: fileURL.toString(),
-      };
-    } else {
-      throw new Error(
-        `HTTP Request failed with ${response.status}: ${response.statusText}`,
-      );
-    }
-  });
-};
 </script>
 
 <style scoped lang="scss">
@@ -225,6 +182,15 @@ const loadRemoteFile = async (project: ViewerProject) => {
     font-size: 0.8rem;
     color: var(--p-stone-600);
     font-style: italic;
+  }
+
+  .project-actions {
+    flex-grow: 0;
+    padding: 0.75rem;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
   }
 
   &.compact {
