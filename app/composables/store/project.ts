@@ -16,11 +16,11 @@ import type {
   ProjectRow,
   ProjectStore,
 } from '~/composables/project/types/v1';
-import type { SavedBuildData } from '~/composables/shared/tables/builds';
+import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
 import type {
   EditorProject,
   EditorProjectVersion,
-} from '~/composables/shared/tables/projects';
+} from '~/composables/shared/tables/editor_projects';
 import { bufferToHex, stringToBuffer } from '~/composables/utils';
 
 export type Selections = Record<string, number>;

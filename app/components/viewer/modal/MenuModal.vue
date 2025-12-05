@@ -23,7 +23,7 @@
       <div class="p-4 overflow-y-auto">
         <Tabs value="save-load" :dt="{ tabpanel: { padding: '1rem 0 0 0' } }">
           <TabList>
-            <Tab v-if="viewerProjectList.show_project_sidebar" value="project">
+            <Tab v-if="librarySettings.show_project_sidebar" value="project">
               Index
             </Tab>
             <Tab value="save-load">Save / Load</Tab>
@@ -32,7 +32,7 @@
           </TabList>
           <TabPanels>
             <TabPanel
-              v-if="viewerProjectList.show_project_sidebar"
+              v-if="librarySettings.show_project_sidebar"
               value="project"
             >
               <div v-if="store.status === 'loaded'" class="mb-2">
@@ -41,7 +41,7 @@
                   Hash: {{ store.file.projectHash }}
                 </div>
               </div>
-              <ProjectMenu :project-list="viewerProjectList" :compact="true" />
+              <ProjectMenu :compact="true" />
             </TabPanel>
             <TabPanel value="save-load">
               <ImportCode />
@@ -68,13 +68,12 @@
 import ProjectMenu from '~/components/viewer/ProjectMenu.vue';
 import ViewerSettings from '~/components/viewer/utils/ViewerSettings.vue';
 import { useProjectRefs } from '~/composables/store/project';
-import { useViewerRefs, useViewerStore } from '~/composables/store/viewer';
+import { useViewerRefs } from '~/composables/store/viewer';
+import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
-const { toggleProjectMenu, viewerProjectList } = useViewerStore();
 const { isProjectMenuVisible } = useViewerRefs();
 const { store } = useProjectRefs();
-
-const selected = ref<string>('save-load');
+const { librarySettings } = useViewerLibrary();
 </script>
 
 <style lang="scss">

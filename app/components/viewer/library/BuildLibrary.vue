@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SavedBuildData } from '~/composables/shared/tables/builds';
+import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 import * as R from 'ramda';
 

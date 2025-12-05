@@ -1,50 +1,25 @@
 <template>
   <ProjectViewWrapper />
-  <ProjectMenu
-    v-if="store.status === 'empty'"
-    :project-list="viewerProjectList"
-  />
+  <ProjectMenu v-if="store.status === 'empty'" class="pb-4" />
   <DynamicDialog />
 </template>
 
 <script setup lang="ts">
-import { assoc, concat, mergeDeepRight } from 'ramda';
-
 import { definePageMeta } from '#imports';
 import ProjectViewWrapper from '~/components/viewer/ProjectViewWrapper.vue';
 import { useProjectRefs } from '~/composables/store/project';
 import { useSettingRefs } from '~/composables/store/settings';
-import { useViewerRefs } from '~/composables/store/viewer';
+import { setupLibrary } from '~/composables/viewer/useViewerLibrary';
 
 const { store, buildModified } = useProjectRefs();
-const { viewerProjectList } = useViewerRefs();
 const { lightThemeUI } = useSettingRefs();
-
-const _config = useRuntimeConfig();
-const { data: projectList } = await useAsyncData(
-  'projects',
-  async (): Promise<ViewerProjectList> => {
-    const response = await $fetch<ViewerProjectList>(
-      `${_config.app.baseURL}config/viewer/projects.json`,
-    );
-
-    if (response.remote) {
-      const remote = await $fetch<ViewerProjectList>(response.remote);
-      const items = concat(response.items, remote.items);
-      return assoc('items', items, mergeDeepRight(response, remote));
-    } else {
-      return response;
-    }
-  },
-);
-
-if (projectList.value) {
-  viewerProjectList.value = projectList.value;
-}
 
 definePageMeta({
   layout: false,
 });
+
+// Run the library setup on page load
+await setupLibrary();
 
 function setBodyTheme(lightTheme: boolean) {
   if (lightTheme) {

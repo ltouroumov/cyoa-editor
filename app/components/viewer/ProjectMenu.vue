@@ -2,13 +2,13 @@
   <div class="container" :class="{ compact: $props.compact ?? false }">
     <div class="toolbar" :class="{ compact: $props.compact ?? false }">
       <h1 class="title text-3xl">Interactive CYOA Viewer (NEO)</h1>
-      <div v-if="projectList.show_load_file" class="load-container">
+      <div v-if="librarySettings.show_load_file" class="load-container">
         <LoadProject :inline="true" />
       </div>
     </div>
     <main class="main-container">
       <div class="main-header">
-        <InputText v-model="search" placeholder="Search ..." />
+        <InputText v-model="search" placeholder="Search ..." class="w-full" />
       </div>
       <div class="project-list-container">
         <div
@@ -60,24 +60,25 @@ import { useProjectStore } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
 import { bufferToString } from '~/composables/utils';
 import { sleep } from '~/composables/utils/sleep';
-import type { ViewerProjectList } from '~/composables/viewer';
+import type { ViewerProject } from '~/composables/viewer/types';
+import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
-const { projectList } = defineProps<{
-  projectList: ViewerProjectList;
+defineProps<{
   compact?: boolean;
 }>();
 
 const { loadProject } = useProjectStore();
 const { toggleProjectMenu } = useViewerStore();
+const { projectList, librarySettings } = useViewerLibrary();
 
 const search = ref<string>('');
 
 const projects = computed(() => {
-  if (isEmpty(search.value)) return projectList.items;
+  if (isEmpty(search.value)) return projectList.value;
   else {
     const searchStr = toLower(search.value);
     const terms = split(' ', searchStr);
-    return projectList.items.filter((project) => {
+    return projectList.value.filter((project) => {
       const title = toLower(project.title);
       return all(includes(__, title), terms);
     });

@@ -14,14 +14,14 @@
         </div>
       </li>
       <li
-        v-if="isNil(viewerProjectList.default)"
+        v-if="isNil(librarySettings.default)"
         class="flex flex-col gap-2 py-2"
       >
         <label class="grow" for="hideDisabledAddons"> Default Project </label>
         <Select
           v-model="loadOnStartup"
           aria-label="Default CYOA to load at Startup"
-          :options="projectList"
+          :options="projectListItems"
           option-label="name"
           option-value="value"
           class="grow"
@@ -129,9 +129,9 @@ import {
   DisplaySettingsPresets,
   useSettingRefs,
 } from '~/composables/store/settings';
-import { useViewerRefs } from '~/composables/store/viewer';
+import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
-const { viewerProjectList } = useViewerRefs();
+const { projectList, librarySettings } = useViewerLibrary();
 const {
   showDisabledAddonsInBackpack,
   hideImagesInBackpack,
@@ -156,13 +156,13 @@ const loadOnStartup = computed({
   },
 });
 
-const projectList = computed(() => {
+const projectListItems = computed(() => {
   return prepend(
     {
       name: 'None (show menu)',
       value: '--none',
     },
-    viewerProjectList.value.items.map((project) => {
+    projectList.value.map((project) => {
       return { name: project.title, value: project.id };
     }),
   );

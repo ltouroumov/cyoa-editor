@@ -2,6 +2,7 @@
   // https://nuxt.com/docs/guide/concepts/typescript
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "noUncheckedIndexedAccess": false,
-  }
+    "noUncheckedIndexedAccess": false
+  },
+  "exclude": ["eslint.config.mjs"]
 }

@@ -87,7 +87,7 @@ import { isNotEmpty, join, map, toPairs } from 'ramda';
 
 import BuildChoices from '~/components/viewer/library/BuildChoices.vue';
 import { ProjectMatch } from '~/components/viewer/utils/types';
-import type { SavedBuildData } from '~/composables/shared/tables/builds';
+import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
 import { type Selections, useProjectRefs } from '~/composables/store/project';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 
