@@ -1,11 +1,13 @@
-import { isNotEmpty, last } from 'ramda';
+import { drop, isNotEmpty, last, take, unfold } from 'ramda';
 import { match } from 'ts-pattern';
 
 import type { Project } from '~/composables/project/types/v1';
 import { bufferToString } from '~/composables/utils';
 import type { CacheEvent } from '~/composables/viewer/cache/types';
-import { downloadFile } from '~/composables/viewer/cache/utils';
+import { downloadFile, formatBytes } from '~/composables/viewer/cache/utils';
 import type { ViewerProject } from '~/composables/viewer/types';
+
+let abortController: AbortController | null = null;
 
 self.addEventListener(
   'message',
@@ -16,26 +18,39 @@ self.addEventListener(
       match(payload)
         .with({ type: 'init' }, () => {})
         .with({ type: 'cache' }, async ({ project }) => {
-          const result = await doCache(project);
-          postMessage({
-            replyTo: replyTo,
-            message: JSON.stringify(result),
-          });
+          abortController = new AbortController();
+          await doCache(project, abortController.signal);
+        })
+        .with({ type: 'abort' }, () => {
+          abortController?.abort();
+          abortController = null;
         })
         .exhaustive();
     } catch (e) {
-      console.log('error in search worker', e);
+      console.log('error in cache worker', e);
     }
   },
 );
 
-async function doCache(project: ViewerProject) {
+async function doCache(project: ViewerProject, abortSignal: AbortSignal) {
+  postMessage({ status: 'progress', info: 'Downloading project file ...' });
   const result = await downloadFile(project.file_url, async (progress) => {
-    console.log(`progress ${project.id}`, progress);
+    if (progress.type === 'stream') {
+      postMessage({
+        status: 'progress',
+        info: `Downloading project file ... ${formatBytes(progress.bytes)}`,
+      });
+    } else if (progress.type === 'decode') {
+      postMessage({ status: 'progress', info: `Downloading project file ...` });
+    }
   });
 
   if ('error' in result) {
-    return { status: 'error' };
+    postMessage({
+      status: 'failure',
+      error: 'Failed to download project file',
+    });
+    return;
   }
 
   const projectBytes = result.data;
@@ -59,25 +74,44 @@ async function doCache(project: ViewerProject) {
     create: true,
   });
 
+  const images = [];
   for (const rowData of projectData.rows) {
     if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
-      const imageName = await cacheImage(new URL(rowData.image), imagesDir);
-      console.log(
-        `[cache ${project.id}] image for row ${rowData.id} cached as ${imageName}`,
-      );
+      images.push(rowData.image);
     }
 
     for (const objData of rowData.objects) {
       if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
-        const imageName = await cacheImage(new URL(objData.image), imagesDir);
-        console.log(
-          `[cache ${project.id}] image for obj ${objData.id} cached as ${imageName}`,
-        );
+        images.push(objData.image);
       }
     }
   }
 
-  return { status: 'success' };
+  console.log(`[cache ${project.id}] found ${images.length} images to cache`);
+  postMessage({
+    status: 'progress',
+    info: `Downloading images ... 0/${images.length}`,
+  });
+  // cache the images in batches of 10
+  let progress = 0;
+  for (const batch of chunk(images, 10)) {
+    await Promise.all(
+      batch.map((imageUrl) => cacheImage(new URL(imageUrl), imagesDir)),
+    );
+    progress += batch.length;
+    console.log(`[cache ${project.id}] cached ${progress}/${images.length}`);
+    postMessage({
+      status: 'progress',
+      info: `Downloading images ... ${progress}/${images.length}`,
+    });
+
+    if (abortSignal.aborted) {
+      console.log(`[cache ${project.id}] cancelled`);
+      postMessage({ status: 'cancelled' });
+    }
+  }
+
+  postMessage({ status: 'completed' });
 }
 
 async function cacheImage(imageUrl: URL, imagesDir: FileSystemDirectoryHandle) {
@@ -95,4 +129,11 @@ async function cacheImage(imageUrl: URL, imagesDir: FileSystemDirectoryHandle) {
 
 function imageIsUrl(url: string): boolean {
   return url.startsWith('http://') || url.startsWith('https://');
+}
+
+function chunk<T>(input: T[], size: number): T[][] {
+  return unfold((seed) => {
+    if (seed.length === 0) return false;
+    return [take(size, seed), drop(size, seed)];
+  }, input);
 }

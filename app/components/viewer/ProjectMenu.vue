@@ -9,6 +9,42 @@
     <main class="main-container">
       <div class="main-header">
         <InputText v-model="search" placeholder="Search ..." class="w-full" />
+        <Message
+          v-if="cacheOperation.status === 'running'"
+          severity="info"
+          class="mt-2"
+        >
+          <template #container>
+            <div class="flex flex-row items-center gap-1 w-full px-2">
+              <ProgressSpinner class="size-4" />
+              <div class="grow w-full">
+                {{ cacheOperation.progress ?? 'Running ...' }}
+              </div>
+              <Button variant="text" icon="pi pi-times" @click="abortCache()" />
+            </div>
+          </template>
+        </Message>
+        <Message
+          v-if="cacheOperation.status === 'completed'"
+          severity="success"
+          class="mt-2"
+        >
+          Cache operation completed.
+        </Message>
+        <Message
+          v-if="cacheOperation.status === 'cancelled'"
+          severity="warning"
+          class="mt-2"
+        >
+          Cache operation cancelled.
+        </Message>
+        <Message
+          v-if="cacheOperation.status === 'failure'"
+          severity="error"
+          class="mt-2"
+        >
+          Cache operation failed.
+        </Message>
       </div>
       <div class="project-list-container">
         <div
@@ -63,18 +99,20 @@ import {
   toLower,
 } from 'ramda';
 
-import { useProjectStore } from '~/composables/store/project';
-import { useViewerStore } from '~/composables/store/viewer';
 import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
 defineProps<{
   compact?: boolean;
 }>();
 
-const { loadProject } = useProjectStore();
-const { toggleProjectMenu } = useViewerStore();
-const { projectList, librarySettings, loadRemoteFile, cacheProject } =
-  useViewerLibrary();
+const {
+  projectList,
+  librarySettings,
+  loadRemoteFile,
+  cacheProject,
+  abortCache,
+  cacheOperation,
+} = useViewerLibrary();
 
 const search = ref<string>('');
 

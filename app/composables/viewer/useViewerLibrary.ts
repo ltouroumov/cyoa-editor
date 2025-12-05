@@ -10,6 +10,7 @@ import {
   propEq,
   uniq,
 } from 'ramda';
+import { match } from 'ts-pattern';
 
 import type { ViewerProjectCacheFields } from '~/composables/shared/tables/viewer_projects';
 import { useDexie } from '~/composables/shared/useDexie';
@@ -17,8 +18,9 @@ import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 import { bufferToString } from '~/composables/utils';
+import type { CacheResult } from '~/composables/viewer/cache/types';
 import { useCacheWorker } from '~/composables/viewer/cache/useCacheWorker';
-import { downloadFile } from '~/composables/viewer/cache/utils';
+import { downloadFile, formatBytes } from '~/composables/viewer/cache/utils';
 import type { LibraryData, ViewerProject } from '~/composables/viewer/types';
 
 type ProjectListEntry = ViewerProject &
@@ -26,11 +28,20 @@ type ProjectListEntry = ViewerProject &
     source: 'local' | 'remote' | 'cached';
   };
 
+type CacheOperation =
+  | { status: 'idle' }
+  | { status: 'running'; progress?: string }
+  | { status: 'completed' }
+  | { status: 'cancelled' }
+  | { status: 'failure'; error: string };
+
 export function useViewerLibrary() {
   const dexie = useDexie();
   const worker = useCacheWorker();
   const { librarySettings, remoteProjectList } = useViewerRefs();
   const { loadProject } = useProjectStore();
+
+  const cacheOperation = ref<CacheOperation>({ status: 'idle' });
 
   const localProjectList = useLiveQuery<ViewerProject[]>(() => {
     return dexie.viewer_projects_cache.toArray();
@@ -90,11 +101,43 @@ export function useViewerLibrary() {
     if (project.source === 'local') {
       return; // nothing to do for local projects
     } else {
+      cacheOperation.value = { status: 'running' };
+
       // cache the project using the cache worker
       await worker.initWorker();
-      await worker.publishAsync({ type: 'cache', project: project });
-      await worker.closeWorker();
+      worker.publishSync({ type: 'cache', project: project });
+      // read the stream of messages from the worker until the cache operation is complete
+      const _sub = worker.messages.subscribe(async (msg: CacheResult) => {
+        await match(msg)
+          .with({ status: 'progress' }, async (progress) => {
+            console.log(`progress ${project.id}`, progress);
+            cacheOperation.value = {
+              status: 'running',
+              progress: progress.info,
+            };
+          })
+          .with({ status: 'completed' }, async () => {
+            cacheOperation.value = { status: 'completed' };
+            await worker.closeWorker();
+            _sub.unsubscribe();
+          })
+          .with({ status: 'cancelled' }, async () => {
+            cacheOperation.value = { status: 'cancelled' };
+            await worker.closeWorker();
+            _sub.unsubscribe();
+          })
+          .with({ status: 'failure' }, async ({ error }) => {
+            cacheOperation.value = { status: 'failure', error };
+            await worker.closeWorker();
+            _sub.unsubscribe();
+          })
+          .exhaustive();
+      });
     }
+  };
+
+  const abortCache = async () => {
+    worker.publishSync({ type: 'abort' });
   };
 
   const loadRemoteFile = async (project: ViewerProject) => {
@@ -126,9 +169,11 @@ export function useViewerLibrary() {
     projectList,
     remoteProjectList,
     librarySettings,
+    cacheOperation,
     // methods
     loadRemoteFile,
     cacheProject,
+    abortCache,
   };
 }
 
@@ -163,11 +208,4 @@ export async function setupLibrary() {
     library.remoteProjectList.value = response.value.items;
     library.librarySettings.value = omit(['items'], response.value);
   }
-}
-
-function formatBytes(received: number) {
-  if (received === 0) return '0 Mb';
-  const receivedMB = received / (1024 * 1024);
-  const rounded = Math.round(receivedMB * 100) / 100;
-  return `${rounded} Mb`;
 }

@@ -42,3 +42,10 @@ export async function downloadFile(
     return { error: true, status: response.status };
   }
 }
+
+export function formatBytes(received: number) {
+  if (received === 0) return '0 Mb';
+  const receivedMB = received / (1024 * 1024);
+  const rounded = Math.round(receivedMB * 100) / 100;
+  return `${rounded} Mb`;
+}

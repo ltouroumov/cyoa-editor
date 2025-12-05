@@ -76,5 +76,6 @@ export function useCacheWorker() {
     closeWorker,
     publishSync,
     publishAsync,
+    messages: workerData,
   };
 }
