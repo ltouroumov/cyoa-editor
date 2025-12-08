@@ -1,9 +1,9 @@
 <template>
-  <div class="obj-image-container">
+  <div class="image-wrapper">
     <img
       v-if="isNotNil(imageUrl)"
       ref="image"
-      class="obj-image"
+      class="image"
       :decoding="alwaysEnable ? `sync` : `auto`"
       :loading="alwaysEnable ? `eager` : `lazy`"
       :src="imageUrl"
@@ -32,12 +32,12 @@ const imageUrl = useImageSrc({
 </script>
 
 <style scoped lang="scss">
-.obj-image-container {
+.image-wrapper {
   width: 100%;
   height: 100%;
 }
 
-.obj-image {
+.image {
   width: 100%;
   object-fit: contain;
 }

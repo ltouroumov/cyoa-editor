@@ -22,7 +22,7 @@
         class="project-obj-content"
         :class="[objTemplateClass, objHeightClass]"
       >
-        <div class="obj-image-wrapper">
+        <div class="obj-image-container">
           <ViewImage :element="obj" :always-enable="alwaysEnable" />
         </div>
         <div class="obj-header">
@@ -332,7 +332,7 @@ const isInBackpack = computed<boolean>(() => {
     }
   }
 
-  .obj-image-wrapper {
+  .obj-image-container {
     display: flex;
     flex-direction: row;
     justify-content: center;
