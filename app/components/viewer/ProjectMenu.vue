@@ -51,7 +51,10 @@
           v-for="project in projects"
           :key="project.id"
           class="project-list-item"
-          :class="{ compact: $props.compact ?? false }"
+          :class="{
+            compact: $props.compact ?? false,
+            cached: project.source === 'cached',
+          }"
         >
           <div
             v-if="isNotNil(project.thumbnail_url)"
@@ -82,12 +85,42 @@
             </div>
           </div>
           <div class="project-actions">
-            <Button
-              v-if="cacheOperation.status !== 'running'"
-              icon="iconify solar--download-broken"
-              variant="outlined"
-              @click.stop.prevent="cacheProject(project.id)"
-            />
+            <div
+              v-if="project.source === 'remote'"
+              class="flex flex-col items-center gap-1 grow"
+            >
+              <div class="grow"></div>
+              <Button
+                v-if="cacheOperation.status !== 'running'"
+                icon="iconify solar--download-broken"
+                variant="outlined"
+                @click.stop.prevent="cacheProject(project.id)"
+              />
+            </div>
+            <div
+              v-if="project.source === 'cached'"
+              class="flex flex-col items-center gap-1 grow"
+            >
+              <div
+                v-tooltip.bottom="
+                  `Cached on ${isNotNil(project.cachedAt) ? format(project.cachedAt, 'yyyy-MM-dd') : 'unknown time'}`
+                "
+                class="iconify solar--archive-broken size-6 text-emerald-500"
+              />
+              <div class="grow"></div>
+              <Button
+                v-if="cacheOperation.status !== 'running'"
+                icon="iconify solar--refresh-broken"
+                variant="outlined"
+                @click.stop.prevent="cacheProject(project.id, true)"
+              />
+              <Button
+                v-if="cacheOperation.status !== 'running'"
+                icon="iconify solar--trash-bin-minimalistic-broken"
+                variant="outlined"
+                @click.stop.prevent="clearCache(project.id)"
+              />
+            </div>
             <Button
               v-if="
                 cacheOperation.status === 'running' &&
@@ -105,6 +138,7 @@
 </template>
 
 <script setup lang="ts">
+import { format } from 'date-fns';
 import {
   __,
   all,
@@ -128,6 +162,7 @@ const {
   loadRemoteFile,
   cacheProject,
   abortCache,
+  clearCache,
   cacheOperation,
 } = useViewerLibrary();
 
@@ -174,6 +209,14 @@ const projects = computed(() => {
   overflow: clip;
   align-items: center;
   cursor: pointer;
+
+  &.cached {
+    border-color: var(--p-indigo-500);
+  }
+
+  &.local {
+    border-color: var(--p-cyan-500);
+  }
 
   .thumbnail {
     flex-grow: 0;

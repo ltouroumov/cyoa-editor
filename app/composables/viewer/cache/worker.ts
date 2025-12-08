@@ -1,4 +1,4 @@
-import { drop, isNotEmpty, last, take, unfold } from 'ramda';
+import { drop, isNotEmpty, last, partition, take, unfold } from 'ramda';
 import { match } from 'ts-pattern';
 
 import type { Project } from '~/composables/project/types/v1';
@@ -17,10 +17,10 @@ self.addEventListener(
       const payload = JSON.parse(event) as CacheEvent;
       match(payload)
         .with({ type: 'init' }, () => {})
-        .with({ type: 'cache' }, async ({ project }) => {
+        .with({ type: 'cache' }, async ({ project, refresh = false }) => {
           abortController = new AbortController();
           try {
-            await doCache(project, false, abortController.signal);
+            await doCache(project, refresh, abortController.signal);
           } catch (err) {
             if (
               typeof err === 'object' &&
@@ -146,16 +146,28 @@ async function doCache(
   });
   // cache the images in batches of 10
   let progress = 0;
+  let errors = 0;
+  let cached = 0;
+  let totalBytes = 0;
   for (const batch of chunk(images, 10)) {
-    await Promise.all(
+    const results = await Promise.allSettled(
       batch.map((imageUrl) =>
         cacheImage(new URL(imageUrl), refresh, imagesDir, abortSignal),
       ),
     );
-    progress += batch.length;
+
+    const [success, failures] = partition(
+      (result) => result.status === 'fulfilled',
+      results,
+    );
+
+    progress += results.length;
+    errors += failures.length;
+    cached += success.filter((result) => result.value.cached).length;
+    totalBytes += success.reduce((acc, { value }) => acc + value.bytes, 0);
     postMessage({
       status: 'progress',
-      info: `Downloading images ... ${progress}/${images.length}`,
+      info: `Downloading images ... ${progress}/${images.length} (${cached > 0 ? `${cached} cached, ` : ''}${errors > 0 ? `${errors} errors, ` : ''}${formatBytes(totalBytes)})`,
     });
 
     if (abortSignal.aborted) {
@@ -172,35 +184,29 @@ async function cacheImage(
   refresh: boolean,
   imagesDir: FileSystemDirectoryHandle,
   abortSignal: AbortSignal,
-): Promise<string> {
+): Promise<{ name: string; bytes: number; cached: boolean }> {
   const imageName = last(imageUrl.pathname.split('/'))!;
   const imageFile = await imagesDir.getFileHandle(imageName, {
     create: true,
   });
 
-  const imageFileHandle = await imageFile.createSyncAccessHandle();
+  let imageFileHandle = null;
   try {
+    imageFileHandle = await imageFile.createSyncAccessHandle();
     const imageSize = imageFileHandle.getSize();
     if (!refresh && imageSize > 0) {
-      console.log(
-        `[cache ${imageName}] image already cached: ${imageSize} bytes`,
-      );
-      return imageName;
+      return { name: imageName, bytes: imageSize, cached: true };
     }
 
     const imageResponse = await fetch(imageUrl, { signal: abortSignal });
     const imageBlob = await imageResponse.blob();
     imageFileHandle.write(await imageBlob.arrayBuffer());
 
-    return imageName;
+    return { name: imageName, bytes: imageBlob.size, cached: false };
   } catch (e) {
-    postMessage({
-      status: 'failure',
-      error: `Failed to download image ${imageName}.`,
-    });
     throw new Error(`Failed to download image ${imageName}.`);
   } finally {
-    imageFileHandle.close();
+    imageFileHandle?.close();
   }
 }
 

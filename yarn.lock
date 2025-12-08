@@ -4591,6 +4591,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"date-fns@npm:4.1.0":
+  version: 4.1.0
+  resolution: "date-fns@npm:4.1.0"
+  checksum: 10/d5f6e9de5bbc52310f786099e18609289ed5e30af60a71e0646784c8185ddd1d0eebcf7c96b7faaaefc4a8366f3a3a4244d099b6d0866ee2bec80d1361e64342
+  languageName: node
+  linkType: hard
+
 "db0@npm:^0.3.4":
   version: 0.3.4
   resolution: "db0@npm:0.3.4"
@@ -6225,6 +6232,7 @@ __metadata:
     bootstrap: "npm:5.3.8"
     browserslist: "npm:4.28.0"
     canvas-size: "npm:2.0.0"
+    date-fns: "npm:4.1.0"
     dexie: "npm:4.2.1"
     dom-to-svg: "patch:dom-to-svg@npm:0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch"
     eslint: "npm:9.39.1"

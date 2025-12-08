@@ -2,7 +2,7 @@ import type { ViewerProject } from '~/composables/viewer/types';
 
 export type CacheEvent =
   | { type: 'init' }
-  | { type: 'cache'; project: ViewerProject }
+  | { type: 'cache'; project: ViewerProject; refresh?: boolean }
   | { type: 'abort' };
 
 export type CacheResult =

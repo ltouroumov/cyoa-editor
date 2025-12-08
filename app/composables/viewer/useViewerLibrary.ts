@@ -96,7 +96,7 @@ export function useViewerLibrary() {
       });
   });
 
-  const cacheProject = async (id: string) => {
+  const cacheProject = async (id: string, refresh?: boolean) => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 
@@ -107,7 +107,7 @@ export function useViewerLibrary() {
 
       // cache the project using the cache worker
       await worker.initWorker();
-      worker.publishSync({ type: 'cache', project: project });
+      worker.publishSync({ type: 'cache', project: project, refresh });
       // read the stream of messages from the worker until the cache operation is complete
       const _sub = worker.messages.subscribe(async (msg: CacheResult) => {
         await match(msg)
@@ -119,6 +119,11 @@ export function useViewerLibrary() {
             };
           })
           .with({ status: 'completed' }, async () => {
+            await dexie.viewer_projects_cache.put({
+              ...omit(['source'], project),
+              cachedAt: new Date(),
+            });
+
             cacheOperation.value = {
               status: 'completed',
               projectId: project.id,
@@ -148,6 +153,8 @@ export function useViewerLibrary() {
   const abortCache = async () => {
     worker.publishSync({ type: 'abort' });
   };
+
+  const clearCache = async (id: string) => {};
 
   const loadRemoteFile = async (project: ViewerProject) => {
     const fileURL = project.file_url;
@@ -183,6 +190,7 @@ export function useViewerLibrary() {
     loadRemoteFile,
     cacheProject,
     abortCache,
+    clearCache,
   };
 }
 
