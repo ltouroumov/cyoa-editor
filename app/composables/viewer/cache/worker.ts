@@ -39,6 +39,11 @@ self.addEventListener(
             }
           }
         })
+        .with({ type: 'clear' }, () => {
+          setTimeout(() => {
+            postMessage({ status: 'completed' });
+          }, 5000);
+        })
         .with({ type: 'abort' }, () => {
           abortController?.abort();
           abortController = null;

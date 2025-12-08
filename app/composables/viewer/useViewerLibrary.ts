@@ -18,7 +18,10 @@ import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 import { bufferToString } from '~/composables/utils';
-import type { CacheResult } from '~/composables/viewer/cache/types';
+import type {
+  CacheResult,
+  ClearResult,
+} from '~/composables/viewer/cache/types';
 import { useCacheWorker } from '~/composables/viewer/cache/useCacheWorker';
 import { downloadFile, formatBytes } from '~/composables/viewer/cache/utils';
 import type { LibraryData, ViewerProject } from '~/composables/viewer/types';
@@ -38,10 +41,11 @@ type CacheOperation =
     ));
 
 export function useViewerLibrary() {
+  const $toast = useToast();
   const dexie = useDexie();
   const worker = useCacheWorker();
   const { librarySettings, remoteProjectList } = useViewerRefs();
-  const { loadProject } = useProjectStore();
+  const $store = useProjectStore();
 
   const cacheOperation = ref<CacheOperation>({ status: 'idle' });
 
@@ -95,6 +99,19 @@ export function useViewerLibrary() {
         }
       });
   });
+
+  const loadProject = async (id: string) => {
+    const project = projectList.value.find(propEq(id, 'id'));
+    if (!project) return; // project not found
+
+    if (project.source === 'remote') {
+      await loadRemoteFile(project);
+    } else if (project.source === 'cached') {
+      await loadCachedFile(project);
+    } else if (project.source === 'local') {
+      await loadLocalFile(project);
+    }
+  };
 
   const cacheProject = async (id: string, refresh?: boolean) => {
     const project = projectList.value.find(propEq(id, 'id'));
@@ -154,13 +171,55 @@ export function useViewerLibrary() {
     worker.publishSync({ type: 'abort' });
   };
 
-  const clearCache = async (id: string) => {};
+  const clearCache = async (id: string) => {
+    const project = projectList.value.find(propEq(id, 'id'));
+    if (!project) return; // project not found
+
+    if (project.source === 'cached') {
+      $toast.add({
+        severity: 'info',
+        summary: 'Clear cache ...',
+        detail: project.title,
+        life: 2000,
+      });
+
+      // Delete the entry from the cache table first
+      // This allows users to load the project from the remote without waiting for the cache operation to complete
+      await dexie.viewer_projects_cache.delete(project.id);
+
+      await worker.initWorker();
+      worker.publishSync({ type: 'clear', project: project });
+      // read the stream of messages from the worker until the cache operation is complete
+      const _sub = worker.messages.subscribe(async (msg: ClearResult) => {
+        await match(msg)
+          .with({ status: 'completed' }, async () => {
+            $toast.add({
+              severity: 'success',
+              summary: 'Cache cleared',
+              detail: project.title,
+              life: 10000,
+            });
+            _sub.unsubscribe();
+          })
+          .with({ status: 'failure' }, async ({ error }) => {
+            $toast.add({
+              severity: 'error',
+              summary: 'Cache clear failed',
+              detail: error,
+              life: 10000,
+            });
+            _sub.unsubscribe();
+          })
+          .exhaustive();
+      });
+    }
+  };
 
   const loadRemoteFile = async (project: ViewerProject) => {
     const fileURL = project.file_url;
     if (!fileURL) return;
 
-    await loadProject(async (setProgress) => {
+    await $store.loadProject(async (setProgress) => {
       const result = await downloadFile(fileURL, async (progress) => {
         if (progress.type === 'stream') {
           await setProgress(`Downloaded ${formatBytes(progress.bytes)}`);
@@ -174,11 +233,40 @@ export function useViewerLibrary() {
         throw new Error(`Failed to download ${project.file_url}`);
       } else {
         return {
+          projectId: project.id,
           fileContents: bufferToString(result.data.buffer),
           fileName: fileURL.toString(),
         };
       }
     });
+  };
+
+  const loadCachedFile = async (project: ViewerProject) => {
+    const fsHandle = await navigator.storage.getDirectory();
+    // Create a directory to cache the project files
+    const projectDir = await fsHandle.getDirectoryHandle(project.id, {
+      create: true,
+    });
+
+    const projectFile = await projectDir.getFileHandle('project.json', {
+      create: true,
+    });
+
+    await $store.loadProject(async (setProgress) => {
+      await setProgress(`Loading ${project.title} ...`);
+      const handle = await projectFile.getFile();
+      const buffer = await handle.arrayBuffer();
+      return {
+        projectId: project.id,
+        fileContents: bufferToString(buffer),
+        fileName: handle.name,
+        local: true,
+      };
+    });
+  };
+
+  const loadLocalFile = async (project: ViewerProject) => {
+    // TODO
   };
 
   return {
@@ -187,7 +275,7 @@ export function useViewerLibrary() {
     librarySettings,
     cacheOperation,
     // methods
-    loadRemoteFile,
+    loadProject,
     cacheProject,
     abortCache,
     clearCache,

@@ -9,11 +9,11 @@
       class="project-row"
       :class="{ hidden: !isVisible, hasPrivateStyle: row.isPrivateStyling }"
     >
-      <img
+      <ViewImage
         v-if="row.image && !display?.hideRowImages"
         class="row-image"
-        :src="row.image"
-        :alt="row.title"
+        :element="row"
+        :always-enable="false"
       />
       <div v-if="row.title || row.titleText" class="row-header">
         <!-- eslint-disable vue/no-v-html -->

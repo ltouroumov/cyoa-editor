@@ -229,7 +229,7 @@ export type Project = {
 export type ProjectFile = {
   data: Project;
   fileName?: string;
-  projectId?: string | number;
+  projectId?: string;
   projectName: string;
   projectHash: string;
 };
@@ -244,6 +244,7 @@ export type LoadingProjectStore = {
 export type LoadedProjectStore = {
   status: 'loaded';
   file: ProjectFile;
+  local: boolean;
 };
 
 export type ProjectStore =
