@@ -47,7 +47,6 @@ export default defineNuxtConfig({
           sizes: '180x180',
           href: 'apple-touch-icon.png',
         },
-        { rel: 'manifest', href: '/manifest.webmanifest' },
       ],
       meta: [
         { name: 'description', content: 'Interactive CYOA Creator' },
@@ -100,7 +99,25 @@ export default defineNuxtConfig({
     strategies: 'generateSW',
     injectRegister: 'script',
     registerType: 'autoUpdate',
-    manifest: false,
+    manifest: {
+      name: 'ICC-NEO',
+      short_name: 'ICC',
+      description: 'Interactive CYOA Creator',
+      theme_color: '#ffffff',
+      icons: [
+        {
+          src: '/android-chrome-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '/android-chrome-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+      display: 'standalone',
+    },
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
     },
