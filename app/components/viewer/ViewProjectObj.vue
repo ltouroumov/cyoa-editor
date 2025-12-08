@@ -119,6 +119,8 @@ import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';
 import { useObject } from '~/composables/viewer/useObject';
 
+const LazyViewAddon = defineAsyncComponent(() => import('./ViewAddon.vue'));
+
 const $props = defineProps<{
   row: ProjectRow;
   obj: ProjectObj;

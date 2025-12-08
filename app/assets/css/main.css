@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tailwindcss-primeui';
-@config '../../../tailwind.config.js';
+@config '../../../tailwind.config.mjs';
 
 @layer base, primevue;
 

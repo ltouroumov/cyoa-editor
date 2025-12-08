@@ -49,6 +49,7 @@
     "@popperjs/core": "2.11.8",
     "@primevue/themes": "4.4.1",
     "@tailwindcss/postcss": "^4.1.17",
+    "@vite-pwa/nuxt": "1.1.0",
     "@vueuse/core": "13.9.0",
     "@vueuse/nuxt": "13.9.0",
     "@vueuse/rxjs": "13.9.0",

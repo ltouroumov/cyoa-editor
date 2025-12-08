@@ -1,7 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 import { GoldMorning } from './prime/gold-morning.style.mjs';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   app: {
@@ -11,6 +10,7 @@ export default defineNuxtConfig({
     buildAssetsDir: 'assets',
     head: {
       title: 'Interactive CYOA',
+      viewport: 'width=device-width, initial-scale=1',
       link: [
         {
           rel: 'icon',
@@ -47,7 +47,11 @@ export default defineNuxtConfig({
           sizes: '180x180',
           href: 'apple-touch-icon.png',
         },
-        { rel: 'manifest', href: '/site.webmanifest' },
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+      ],
+      meta: [
+        { name: 'description', content: 'Interactive CYOA Creator' },
+        { name: 'theme-color', content: '#000000' },
       ],
       noscript: [
         // <noscript>JavaScript is required</noscript>
@@ -89,7 +93,35 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@vueuse/nuxt',
     'pinia-plugin-persistedstate/nuxt',
+    '@vite-pwa/nuxt',
   ],
+
+  pwa: {
+    strategies: 'generateSW',
+    injectRegister: 'script',
+    registerType: 'autoUpdate',
+    manifest: false,
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
+    injectManifest: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
+    client: {
+      installPrompt: true,
+      // you don't need to include this: only for testing purposes
+      // if enabling periodic sync for update use 1 hour or so (periodicSyncForUpdates: 3600)
+      periodicSyncForUpdates: 20,
+    },
+    experimental: {
+      // includeAllowlist: true,
+    },
+    devOptions: {
+      enabled: true,
+      suppressWarnings: true,
+      type: 'module',
+    },
+  },
 
   primevue: {
     usePrimeVue: true,
