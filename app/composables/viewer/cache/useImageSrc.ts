@@ -7,6 +7,7 @@ import type {
   ProjectObj,
   ProjectRow,
 } from '~/composables/project/types/v1';
+import { imageIsUrl } from '~/composables/utils/imageIsUrl';
 
 export function useImageSrc({
   isLocal,
@@ -18,7 +19,10 @@ export function useImageSrc({
   projectFile: ComputedRef<ProjectFile | null>;
 }) {
   return computedAsync(async () => {
+    // If there is no image, return null
     if (!element.value.image) return null;
+    // If the image isn't an URL, return the value as-is
+    if (!imageIsUrl(element.value.image)) return element.value.image;
 
     if (!isLocal.value) {
       // If remote, use the link image from the project file

@@ -3,6 +3,7 @@ import { match } from 'ts-pattern';
 
 import type { Project } from '~/composables/project/types/v1';
 import { bufferToString } from '~/composables/utils';
+import { imageIsUrl } from '~/composables/utils/imageIsUrl';
 import type { CacheEvent } from '~/composables/viewer/cache/types';
 import { downloadFile, formatBytes } from '~/composables/viewer/cache/utils';
 import type { ViewerProject } from '~/composables/viewer/types';
@@ -213,10 +214,6 @@ async function cacheImage(
   } finally {
     imageFileHandle?.close();
   }
-}
-
-function imageIsUrl(url: string): boolean {
-  return url.startsWith('http://') || url.startsWith('https://');
 }
 
 function chunk<T>(input: T[], size: number): T[][] {
