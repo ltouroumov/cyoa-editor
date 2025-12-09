@@ -115,8 +115,7 @@ export function useViewerLibrary() {
     let project0 = await dexie.viewer_projects_cache.get(projectId);
     if (isNil(project0)) {
       project0 = await dexie.viewer_projects_cache
-        .where('title')
-        .equals(projectTitle)
+        .where({ title: projectTitle, origin: 'local' })
         .first();
     }
 
@@ -127,6 +126,7 @@ export function useViewerLibrary() {
         title: projectTitle,
         file_url: `file://${projectId}.json`,
         cachedAt: new Date(),
+        origin: 'local',
       };
     } else {
       // Update the date
@@ -212,8 +212,9 @@ export function useViewerLibrary() {
           })
           .with({ status: 'completed' }, async () => {
             await dexie.viewer_projects_cache.put({
-              ...omit(['source'], project),
+              ...omit(['source', 'origin'], project),
               cachedAt: new Date(),
+              origin: 'remote',
             });
 
             cacheOperation.value = {
