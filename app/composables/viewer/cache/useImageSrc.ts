@@ -44,7 +44,6 @@ async function loadImage(projectId: string, image: string): Promise<string> {
 
   const imageUrl = new URL(image);
   const imageName = last(imageUrl.pathname.split('/'))!;
-  console.log('loading image', imageName);
   const imageHandle = await imagesDir.getFileHandle(imageName);
   const imageFile = await imageHandle.getFile();
   const imageBytes = await imageFile.bytes();
@@ -58,8 +57,5 @@ async function loadImage(projectId: string, image: string): Promise<string> {
     .otherwise(() => 'image/jpeg');
 
   const imageSrc = `data:${imageMimeType};base64,${imageB64}`;
-  console.log(
-    `loaded image ${imageName} (${imageSrc.length} bytes): ${imageSrc.slice(0, 100)}[...]${imageSrc.slice(-100)}`,
-  );
   return imageSrc;
 }

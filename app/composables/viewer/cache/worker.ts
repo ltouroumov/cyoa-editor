@@ -1,4 +1,4 @@
-import { drop, isNotEmpty, last, partition, take, unfold } from 'ramda';
+import { drop, isNotEmpty, last, partition, take, unfold, uniq } from 'ramda';
 import { match } from 'ts-pattern';
 
 import type { Project } from '~/composables/project/types/v1';
@@ -132,18 +132,20 @@ async function doCache(
     create: true,
   });
 
-  const images = [];
+  const images0: string[] = [];
   for (const rowData of projectData.rows) {
     if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
-      images.push(rowData.image);
+      images0.push(rowData.image);
     }
 
     for (const objData of rowData.objects) {
       if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
-        images.push(objData.image);
+        images0.push(objData.image);
       }
     }
   }
+
+  const images = uniq(images0);
 
   console.log(`[cache ${project.id}] found ${images.length} images to cache`);
   postMessage({
@@ -155,7 +157,7 @@ async function doCache(
   let errors = 0;
   let cached = 0;
   let totalBytes = 0;
-  for (const batch of chunk(images, 10)) {
+  for (const batch of chunk(images, 20)) {
     const results = await Promise.allSettled(
       batch.map((imageUrl) =>
         cacheImage(new URL(imageUrl), refresh, imagesDir, abortSignal),
@@ -221,13 +223,4 @@ function chunk<T>(input: T[], size: number): T[][] {
     if (seed.length === 0) return false;
     return [take(size, seed), drop(size, seed)];
   }, input);
-}
-
-async function attempt<T>(fn: () => Promise<T>): Promise<T> {
-  try {
-    return await fn();
-  } catch (err) {
-    console.error('error in cache worker (attempt)', err);
-    throw new Error('Failed to download project file (exception)');
-  }
 }
