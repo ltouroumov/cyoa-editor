@@ -2,39 +2,33 @@ import { Base64 } from 'js-base64';
 import { isNotNil, last } from 'ramda';
 import { match } from 'ts-pattern';
 
-import type {
-  ProjectFile,
-  ProjectObj,
-  ProjectRow,
-} from '~/composables/project/types/v1';
+import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
+import { useProjectRefs } from '~/composables/store/project';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
 
-export function useImageSrc({
-  isLocal,
-  element,
-  projectFile,
-}: {
-  isLocal: Ref<boolean>;
-  element: ComputedRef<ProjectObj | ProjectRow>;
-  projectFile: ComputedRef<ProjectFile | null>;
-}) {
-  return computedAsync(async () => {
+export function useImageSrc() {
+  const { project, isLocal } = useProjectRefs();
+
+  const loadImageSrc = async (
+    element: ProjectObj | ProjectRow,
+  ): Promise<string | null> => {
     // If there is no image, return null
-    if (!element.value.image) return null;
+    if (!element.image) return null;
     // If the image isn't an URL, return the value as-is
-    if (!imageIsUrl(element.value.image)) return element.value.image;
+    if (!imageIsUrl(element.image)) return element.image;
 
     if (!isLocal.value) {
       // If remote, use the link image from the project file
-      return element.value.image;
-    } else if (
-      isNotNil(projectFile.value) &&
-      isNotNil(projectFile.value.projectId)
-    ) {
+      return element.image;
+    } else if (isNotNil(project.value) && isNotNil(project.value.projectId)) {
       // When local, load the image from the local file system
-      return await loadImage(projectFile.value!.projectId, element.value.image);
+      return await loadImage(project.value!.projectId!, element.image);
     }
-  }, null);
+
+    return null;
+  };
+
+  return { loadImageSrc };
 }
 
 async function loadImage(projectId: string, image: string): Promise<string> {

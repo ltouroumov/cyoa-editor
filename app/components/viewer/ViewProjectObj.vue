@@ -22,7 +22,10 @@
         class="project-obj-content"
         :class="[objTemplateClass, objHeightClass]"
       >
-        <div class="obj-image-container">
+        <div
+          v-if="isNotNil(obj.image) && isNotEmpty(obj.image)"
+          class="obj-image-container"
+        >
           <ViewImage :element="obj" :always-enable="alwaysEnable" />
         </div>
         <div class="obj-header">

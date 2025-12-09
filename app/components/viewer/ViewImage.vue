@@ -1,33 +1,59 @@
 <template>
-  <div class="image-wrapper">
+  <div ref="wrapper" class="image-wrapper">
     <img
-      v-if="isNotNil(imageUrl)"
+      v-if="isNotNil(imageSrc)"
       ref="image"
       class="image"
       :decoding="alwaysEnable ? `sync` : `auto`"
       :loading="alwaysEnable ? `eager` : `lazy`"
-      :src="imageUrl"
+      :src="imageSrc"
       :alt="element.title"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { isNotNil } from 'ramda';
+import { isNil, isNotNil } from 'ramda';
 
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
-import { useProjectRefs } from '~/composables/store/project';
 import { useImageSrc } from '~/composables/viewer/cache/useImageSrc';
 
-const { isLocal, project } = useProjectRefs();
+const { loadImageSrc } = useImageSrc();
 const $props = defineProps<{
   element: ProjectObj | ProjectRow;
   alwaysEnable?: boolean;
 }>();
-const imageUrl = useImageSrc({
-  isLocal: isLocal,
-  element: computed(() => $props.element),
-  projectFile: project,
+
+const imageSrc = ref<string | null>(null);
+
+const wrapper = ref<HTMLDivElement>();
+const handleObserver: IntersectionObserverCallback = (entries) => {
+  console.log(
+    `image of ${$props.element.title} (${$props.element.id}) is ${entries[0].isIntersecting ? 'visible' : 'not visible'}`,
+  );
+  entries.forEach((entry) => {
+    if (
+      entry.isIntersecting &&
+      entry.target === wrapper.value &&
+      isNil(imageSrc.value)
+    ) {
+      loadImageSrc($props.element).then((src) => {
+        imageSrc.value = src;
+      });
+    }
+  });
+};
+let observer: IntersectionObserver;
+
+onMounted(() => {
+  observer = new IntersectionObserver(handleObserver, {
+    root: null,
+    rootMargin: '10px',
+  });
+  observer.observe(wrapper.value!);
+});
+onUnmounted(() => {
+  observer.disconnect();
 });
 </script>
 
