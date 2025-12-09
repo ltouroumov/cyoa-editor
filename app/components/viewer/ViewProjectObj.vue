@@ -23,7 +23,11 @@
         :class="[objTemplateClass, objHeightClass]"
       >
         <div
-          v-if="isNotNil(obj.image) && isNotEmpty(obj.image)"
+          v-if="
+            isNotNil(obj.image) &&
+            isNotEmpty(obj.image) &&
+            !display?.hideObjectImages
+          "
           class="obj-image-container"
         >
           <ViewImage :element="obj" :always-enable="alwaysEnable" />
