@@ -78,7 +78,7 @@ watch(selectedTable, async (newTable) => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+  <div class="flex flex-col">
     <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
       IndexedDB Tables
     </h2>
@@ -146,11 +146,9 @@ watch(selectedTable, async (newTable) => {
               class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate"
               :title="formatValue(row[column])"
             >
-              <pre
-                v-if="typeof row[column] === 'object'"
-                class="text-xs"
-                >{{ formatValue(row[column]) }}</pre
-              >
+              <pre v-if="typeof row[column] === 'object'" class="text-xs">
+                {{ formatValue(row[column]) }}
+              </pre>
               <span v-else>{{ formatValue(row[column]) }}</span>
             </td>
             <td class="px-4 py-3 text-sm">
