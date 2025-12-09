@@ -110,20 +110,28 @@ export function useViewerLibrary() {
   ): Promise<ViewerProjectCache> => {
     const projectData = JSON.parse(data) as Project;
     const projectId = projectData.$projectId ?? `local-${crypto.randomUUID()}`;
-    const project0 = await dexie.viewer_projects_cache.get(projectId);
+    const projectTitle = projectData.rows[0].title;
+
+    let project0 = await dexie.viewer_projects_cache.get(projectId);
+    if (isNil(project0)) {
+      project0 = await dexie.viewer_projects_cache
+        .where('title')
+        .equals(projectTitle)
+        .first();
+    }
 
     let project: ViewerProjectCache;
     if (isNil(project0)) {
       project = {
         id: projectId,
-        title: projectData.rows[0].title,
+        title: projectTitle,
         file_url: `file://${projectId}.json`,
         cachedAt: new Date(),
       };
     } else {
       // Update the date
       project = mergeRight(project0, {
-        title: projectData.rows[0].title,
+        title: projectTitle,
         cachedAt: new Date(),
       });
     }

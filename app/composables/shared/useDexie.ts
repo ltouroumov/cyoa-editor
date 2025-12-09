@@ -1,11 +1,11 @@
 import Dexie, { type EntityTable, type Transaction } from 'dexie';
 
-import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
-import type { ViewerProjectCache } from '~/composables/shared/tables/viewer_projects';
 import type {
   EditorProject,
   EditorProjectVersion,
 } from '~/composables/shared/tables/editor_projects';
+import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
+import type { ViewerProjectCache } from '~/composables/shared/tables/viewer_projects';
 
 export const DexieProvider = Symbol('DexieProvider') as InjectionKey<AppDb>;
 
@@ -31,7 +31,7 @@ export class AppDb extends Dexie {
     this.version(3)
       .stores({
         viewer_builds: '++id, name',
-        viewer_projects_cache: '++id, name',
+        viewer_projects_cache: '++id, title',
 
         editor_projects: '++id, name',
         editor_projects_versions: '++id, projectId',

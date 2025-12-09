@@ -142,11 +142,6 @@
 
               <Button
                 v-if="cacheOperation.status !== 'running'"
-                icon="iconify solar--upload-square-linear"
-                @click.stop.prevent="cacheProject(project.id, true)"
-              />
-              <Button
-                v-if="cacheOperation.status !== 'running'"
                 icon="iconify solar--trash-bin-minimalistic-broken"
                 variant="outlined"
                 @click.stop.prevent="clearCache(project.id)"
