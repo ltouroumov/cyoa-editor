@@ -54,6 +54,7 @@
           :class="{
             compact: $props.compact ?? false,
             cached: project.source === 'cached',
+            local: project.source === 'local',
           }"
         >
           <div
@@ -74,6 +75,12 @@
             <h2 class="project-title text-xl text-primary font-bold">
               {{ project.title }}
             </h2>
+            <div
+              v-if="project.source === 'local'"
+              class="text-sm text-surface-500"
+            >
+              Local Project
+            </div>
             <div
               v-if="isNotNil(project.description)"
               class="project-description"
@@ -112,6 +119,30 @@
                 v-if="cacheOperation.status !== 'running'"
                 icon="iconify solar--refresh-broken"
                 variant="outlined"
+                @click.stop.prevent="cacheProject(project.id, true)"
+              />
+              <Button
+                v-if="cacheOperation.status !== 'running'"
+                icon="iconify solar--trash-bin-minimalistic-broken"
+                variant="outlined"
+                @click.stop.prevent="clearCache(project.id)"
+              />
+            </div>
+            <div
+              v-if="project.source === 'local'"
+              class="flex flex-col items-center gap-1 grow"
+            >
+              <div
+                v-tooltip.bottom="
+                  `Cached on ${isNotNil(project.cachedAt) ? format(project.cachedAt, 'yyyy-MM-dd') : 'unknown time'}`
+                "
+                class="iconify solar--archive-broken size-6 text-emerald-500"
+              />
+              <div class="grow"></div>
+
+              <Button
+                v-if="cacheOperation.status !== 'running'"
+                icon="iconify solar--upload-square-linear"
                 @click.stop.prevent="cacheProject(project.id, true)"
               />
               <Button

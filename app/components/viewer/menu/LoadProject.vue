@@ -11,6 +11,7 @@
         choose-label="Upload Project"
         @select="onFileSelect"
       />
+      <Button icon="iconify solar--settings-linear" />
     </div>
     <div v-if="error" class="alert alert-danger load-error mb-3" role="alert">
       {{ error }}
@@ -19,53 +20,18 @@
 </template>
 
 <script setup lang="ts">
-import { useProjectStore } from '~/composables/store/project';
-import { useViewerStore } from '~/composables/store/viewer';
-import { readFileContents } from '~/composables/utils';
+import type { FileUploadSelectEvent } from 'primevue';
+
+import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
 const $props = defineProps<{ inline?: boolean }>();
 
-const { loadProject } = useProjectStore();
-const { toggleProjectMenu } = useViewerStore();
-const fileInput = ref<HTMLInputElement>();
-const canLoad = ref<boolean>(false);
+const { addProject } = useViewerLibrary();
 const error = ref<string | null>(null);
 
-const checkCanLoad = () => {
-  error.value = null;
-  if (fileInput.value && fileInput.value.files) {
-    const [file] = fileInput.value.files;
-    if (!file) {
-      canLoad.value = false;
-    } else if (file.type !== 'application/json') {
-      canLoad.value = false;
-      error.value = 'File is not JSON';
-    } else {
-      canLoad.value = true;
-    }
-  } else {
-    canLoad.value = false;
-  }
-};
-
-checkCanLoad();
-
-const onFileSelect = async (event: any) => {
+const onFileSelect = async (event: FileUploadSelectEvent) => {
   const file = event.files[0];
-  toggleProjectMenu(false);
-  await loadProject(async (setProgress) => {
-    await setProgress('0%');
-    const data = await readFileContents(file, (loaded, total) => {
-      setProgress(`${Math.round((loaded / total) * 100)}%`);
-    });
-    await setProgress('100%');
-    if (data && typeof data === 'string') {
-      return {
-        fileContents: data,
-        fileName: file.name,
-      };
-    }
-  });
+  await addProject(file, false);
 };
 </script>
 
@@ -77,6 +43,10 @@ const onFileSelect = async (event: any) => {
 
   .load-input {
     margin-bottom: 0 !important;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+
     label {
       display: none;
     }

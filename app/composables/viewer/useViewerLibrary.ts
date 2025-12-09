@@ -5,6 +5,7 @@ import {
   isNotNil,
   keys,
   mergeLeft,
+  mergeRight,
   omit,
   prop,
   propEq,
@@ -12,12 +13,16 @@ import {
 } from 'ramda';
 import { match } from 'ts-pattern';
 
-import type { ViewerProjectCacheFields } from '~/composables/shared/tables/viewer_projects';
+import type { Project } from '~/composables/project/types/v1';
+import type {
+  ViewerProjectCache,
+  ViewerProjectCacheFields,
+} from '~/composables/shared/tables/viewer_projects';
 import { useDexie } from '~/composables/shared/useDexie';
 import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
-import { bufferToString } from '~/composables/utils';
+import { bufferToString, readFileContents } from '~/composables/utils';
 import type {
   CacheResult,
   ClearResult,
@@ -100,6 +105,70 @@ export function useViewerLibrary() {
       });
   });
 
+  const createLocalProject = async (
+    data: string,
+  ): Promise<ViewerProjectCache> => {
+    const projectData = JSON.parse(data) as Project;
+    const projectId = projectData.$projectId ?? `local-${crypto.randomUUID()}`;
+    const project0 = await dexie.viewer_projects_cache.get(projectId);
+
+    let project: ViewerProjectCache;
+    if (isNil(project0)) {
+      project = {
+        id: projectId,
+        title: projectData.rows[0].title,
+        file_url: `file://${projectId}.json`,
+        cachedAt: new Date(),
+      };
+    } else {
+      // Update the date
+      project = mergeRight(project0, {
+        title: projectData.rows[0].title,
+        cachedAt: new Date(),
+      });
+    }
+
+    await dexie.viewer_projects_cache.put(project);
+
+    const fsHandle = await navigator.storage.getDirectory();
+    const projectDir = await fsHandle.getDirectoryHandle(projectId, {
+      create: true,
+    });
+    const projectFile = await projectDir.getFileHandle('project.json', {
+      create: true,
+    });
+    // Write the project file contents to the cache directory
+    const projectFileHandle = await projectFile.createWritable();
+    try {
+      await projectFileHandle.truncate(0);
+      await projectFileHandle.write(data);
+    } finally {
+      await projectFileHandle.close();
+    }
+
+    return project;
+  };
+
+  const addProject = async (file: File, load?: boolean) => {
+    // Load the file contents into memory
+    const data = await readFileContents(file);
+    // Add the project to the local projects list
+    const project = await createLocalProject(data);
+
+    if (load) {
+      // Load the project into the viewer
+      await $store.loadProject(async (setProgress) => {
+        await setProgress(`Loading ${project.title} ...`);
+        return {
+          fileContents: data,
+          fileName: file.name,
+          local: true,
+          projectId: project.id,
+        };
+      });
+    }
+  };
+
   const loadProject = async (id: string) => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
@@ -175,13 +244,12 @@ export function useViewerLibrary() {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 
-    if (project.source === 'cached') {
-      $toast.add({
-        severity: 'info',
-        summary: 'Clear cache ...',
-        detail: project.title,
-        life: 2000,
-      });
+    if (project.source === 'local') {
+      await dexie.viewer_projects_cache.delete(project.id);
+      const fsHandle = await navigator.storage.getDirectory();
+      await fsHandle.removeEntry(project.id, { recursive: true });
+    } else if (project.source === 'cached') {
+      cacheOperation.value = { status: 'running', projectId: project.id };
 
       // Delete the entry from the cache table first
       // This allows users to load the project from the remote without waiting for the cache operation to complete
@@ -193,21 +261,18 @@ export function useViewerLibrary() {
       const _sub = worker.messages.subscribe(async (msg: ClearResult) => {
         await match(msg)
           .with({ status: 'completed' }, async () => {
-            $toast.add({
-              severity: 'success',
-              summary: 'Cache cleared',
-              detail: project.title,
-              life: 10000,
-            });
+            cacheOperation.value = {
+              status: 'completed',
+              projectId: project.id,
+            };
             _sub.unsubscribe();
           })
           .with({ status: 'failure' }, async ({ error }) => {
-            $toast.add({
-              severity: 'error',
-              summary: 'Cache clear failed',
-              detail: error,
-              life: 10000,
-            });
+            cacheOperation.value = {
+              status: 'failure',
+              projectId: project.id,
+              error,
+            };
             _sub.unsubscribe();
           })
           .exhaustive();
@@ -275,6 +340,7 @@ export function useViewerLibrary() {
     librarySettings,
     cacheOperation,
     // methods
+    addProject,
     loadProject,
     cacheProject,
     abortCache,

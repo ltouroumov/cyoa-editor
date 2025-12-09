@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import type { Project } from '~/composables/project/types/v1';
 import { bufferToString } from '~/composables/utils';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
+import { sleep } from '~/composables/utils/sleep';
 import type { CacheEvent } from '~/composables/viewer/cache/types';
 import { downloadFile, formatBytes } from '~/composables/viewer/cache/utils';
 import type { ViewerProject } from '~/composables/viewer/types';
@@ -40,10 +41,9 @@ self.addEventListener(
             }
           }
         })
-        .with({ type: 'clear' }, () => {
-          setTimeout(() => {
-            postMessage({ status: 'completed' });
-          }, 5000);
+        .with({ type: 'clear' }, async ({ project }) => {
+          await Promise.all([sleep(500), doClear(project)]);
+          postMessage({ status: 'completed' });
         })
         .with({ type: 'abort' }, () => {
           abortController?.abort();
@@ -55,6 +55,11 @@ self.addEventListener(
     }
   },
 );
+
+async function doClear(project: ViewerProject) {
+  const fsHandle = await navigator.storage.getDirectory();
+  await fsHandle.removeEntry(project.id, { recursive: true });
+}
 
 async function doCache(
   project: ViewerProject,

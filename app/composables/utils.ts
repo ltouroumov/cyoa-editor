@@ -32,11 +32,15 @@ export const bufferToString = (buffer: ArrayBuffer) => {
 export const readFileContents = (
   file: Blob,
   onProgress?: (loaded: number, total: number) => void,
-) => {
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => {
-      resolve(reader.result);
+      if (typeof reader.result !== 'string') {
+        reject(new Error('Reader result is not a string'));
+      } else {
+        resolve(reader.result);
+      }
     });
     reader.addEventListener('error', (event) => {
       event.preventDefault();
