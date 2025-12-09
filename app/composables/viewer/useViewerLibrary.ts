@@ -183,10 +183,8 @@ export function useViewerLibrary() {
 
     if (project.source === 'remote') {
       await loadRemoteFile(project);
-    } else if (project.source === 'cached') {
+    } else if (project.source === 'cached' || project.source === 'local') {
       await loadCachedFile(project);
-    } else if (project.source === 'local') {
-      await loadLocalFile(project);
     }
   };
 
@@ -336,10 +334,6 @@ export function useViewerLibrary() {
         local: true,
       };
     });
-  };
-
-  const loadLocalFile = async (project: ViewerProject) => {
-    // TODO
   };
 
   return {

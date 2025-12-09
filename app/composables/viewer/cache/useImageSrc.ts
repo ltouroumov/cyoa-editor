@@ -1,5 +1,5 @@
 import { Base64 } from 'js-base64';
-import { isNotNil, last } from 'ramda';
+import { isNil, isNotNil, last } from 'ramda';
 import { match } from 'ts-pattern';
 
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
@@ -22,7 +22,13 @@ export function useImageSrc() {
       return element.image;
     } else if (isNotNil(project.value) && isNotNil(project.value.projectId)) {
       // When local, load the image from the local file system
-      return await loadImage(project.value!.projectId!, element.image);
+      const localSrc = await loadImage(
+        project.value!.projectId!,
+        element.image,
+      );
+      // Fall back to the URL if the image is not cached locally
+      if (isNil(localSrc)) return element.image;
+      else return localSrc;
     }
 
     return null;
@@ -31,7 +37,10 @@ export function useImageSrc() {
   return { loadImageSrc };
 }
 
-async function loadImage(projectId: string, image: string): Promise<string> {
+async function loadImage(
+  projectId: string,
+  image: string,
+): Promise<string | null> {
   const fsHandle = await navigator.storage.getDirectory();
   // Create a directory to cache the project files
   const projectDir = await fsHandle.getDirectoryHandle(projectId, {
@@ -44,18 +53,24 @@ async function loadImage(projectId: string, image: string): Promise<string> {
 
   const imageUrl = new URL(image);
   const imageName = last(imageUrl.pathname.split('/'))!;
-  const imageHandle = await imagesDir.getFileHandle(imageName);
-  const imageFile = await imageHandle.getFile();
-  const imageBytes = await imageFile.bytes();
-  const imageB64 = Base64.fromUint8Array(imageBytes);
+  try {
+    const imageHandle = await imagesDir.getFileHandle(imageName);
+    const imageFile = await imageHandle.getFile();
+    const imageBytes = await imageFile.bytes();
+    const imageB64 = Base64.fromUint8Array(imageBytes);
 
-  const imageMimeType = match(last(imageName.split('.')))
-    .with('webp', () => 'image/webp')
-    .with('png', () => 'image/png')
-    .with('jpg', () => 'image/jpeg')
-    .with('jpeg', () => 'image/jpeg')
-    .otherwise(() => 'image/jpeg');
+    const imageMimeType = match(last(imageName.split('.')))
+      .with('webp', () => 'image/webp')
+      .with('png', () => 'image/png')
+      .with('jpg', () => 'image/jpeg')
+      .with('jpeg', () => 'image/jpeg')
+      .otherwise(() => 'image/jpeg');
 
-  const imageSrc = `data:${imageMimeType};base64,${imageB64}`;
-  return imageSrc;
+    return `data:${imageMimeType};base64,${imageB64}`;
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'NotFoundError') {
+      return null;
+    }
+    throw err;
+  }
 }

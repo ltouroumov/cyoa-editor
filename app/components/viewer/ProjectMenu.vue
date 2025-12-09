@@ -77,7 +77,7 @@
             </h2>
             <div
               v-if="project.source === 'local'"
-              class="text-sm text-surface-500"
+              class="text-sm text-surface-600 italic mt-2"
             >
               Local Project
             </div>

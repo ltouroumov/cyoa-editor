@@ -28,9 +28,6 @@ const imageSrc = ref<string | null>(null);
 
 const wrapper = ref<HTMLDivElement>();
 const handleObserver: IntersectionObserverCallback = (entries) => {
-  console.log(
-    `image of ${$props.element.title} (${$props.element.id}) is ${entries[0].isIntersecting ? 'visible' : 'not visible'}`,
-  );
   entries.forEach((entry) => {
     if (
       entry.isIntersecting &&
