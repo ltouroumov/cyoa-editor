@@ -133,7 +133,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+  <div class="flex flex-col">
     <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
       OPFS (Origin Private File System)
     </h2>
