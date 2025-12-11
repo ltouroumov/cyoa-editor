@@ -50,3 +50,12 @@ export function formatBytes(received: number) {
   const rounded = Math.round(receivedMB * 100) / 100;
   return `${rounded} Mb`;
 }
+
+export const isAbortError = (err: unknown) => {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'name' in err &&
+    err.name === 'AbortError'
+  );
+};

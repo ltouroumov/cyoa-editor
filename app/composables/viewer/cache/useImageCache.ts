@@ -6,7 +6,7 @@ import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
 
-export function useImageSrc() {
+export function useImageCache() {
   const { project, isLocal } = useProjectRefs();
 
   const loadImageSrc = async (
@@ -34,32 +34,16 @@ export function useImageSrc() {
     return null;
   };
 
-  return { loadImageSrc };
-}
-
-async function loadImage(
-  projectId: string,
-  image: string,
-): Promise<string | null> {
-  const fsHandle = await navigator.storage.getDirectory();
-  // Create a directory to cache the project files
-  const projectDir = await fsHandle.getDirectoryHandle(projectId, {
-    create: true,
-  });
-
-  const imagesDir = await projectDir.getDirectoryHandle('images', {
-    create: true,
-  });
-
-  const imageUrl = new URL(image);
-  const imageName = last(imageUrl.pathname.split('/'))!;
-  try {
-    const imageHandle = await imagesDir.getFileHandle(imageName);
-    const imageFile = await imageHandle.getFile();
-    const imageBytes = await imageFile.bytes();
+  async function loadImage(
+    projectId: string,
+    image: string,
+  ): Promise<string | null> {
+    const imageObj = await resolveImage(projectId, image);
+    if (isNil(imageObj)) return null;
+    const imageBytes = await imageObj.file.bytes();
     const imageB64 = Base64.fromUint8Array(imageBytes);
 
-    const imageMimeType = match(last(imageName.split('.')))
+    const imageMimeType = match(last(imageObj.name.split('.')))
       .with('webp', () => 'image/webp')
       .with('png', () => 'image/png')
       .with('jpg', () => 'image/jpeg')
@@ -67,10 +51,36 @@ async function loadImage(
       .otherwise(() => 'image/jpeg');
 
     return `data:${imageMimeType};base64,${imageB64}`;
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'NotFoundError') {
-      return null;
-    }
-    throw err;
   }
+
+  const resolveImage = async (
+    projectId: string,
+    image: string,
+  ): Promise<{ name: string; file: File } | null> => {
+    const fsHandle = await navigator.storage.getDirectory();
+    // Create a directory to cache the project files
+    const projectDir = await fsHandle.getDirectoryHandle(projectId, {
+      create: true,
+    });
+
+    const imagesDir = await projectDir.getDirectoryHandle('images', {
+      create: true,
+    });
+
+    const imageUrl = new URL(image);
+    const imageName = last(imageUrl.pathname.split('/'))!;
+    try {
+      const imageHandle = await imagesDir.getFileHandle(imageName);
+      const imageFile = await imageHandle.getFile();
+      if (imageFile.size === 0) return null;
+      else return { name: imageName, file: imageFile };
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotFoundError') {
+        return null;
+      }
+      throw err;
+    }
+  };
+
+  return { loadImageSrc, resolveImage };
 }

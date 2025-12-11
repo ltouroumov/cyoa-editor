@@ -16,9 +16,9 @@
 import { isNil, isNotNil } from 'ramda';
 
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
-import { useImageSrc } from '~/composables/viewer/cache/useImageSrc';
+import { useImageCache } from '~/composables/viewer/cache/useImageCache';
 
-const { loadImageSrc } = useImageSrc();
+const { loadImageSrc } = useImageCache();
 const $props = defineProps<{
   element: ProjectObj | ProjectRow;
   alwaysEnable?: boolean;

@@ -158,6 +158,7 @@ export type ObjAddon = Partial<HasId> &
   HasRequirements & {
     title: string;
     text: string;
+    image: string;
   };
 
 export type ProjectObj = HasId &

@@ -1,18 +1,27 @@
 import type { ViewerProject } from '~/composables/viewer/types';
 
-export type CacheOptions = { refresh?: boolean; images?: boolean };
+export type CacheOptions = {
+  refresh?: boolean;
+  project?: boolean;
+  images?: boolean | string[];
+};
 
 export type CacheEvent =
   | { type: 'init' }
-  | { type: 'cache'; project: ViewerProject; options: CacheOptions }
-  | { type: 'clear'; project: ViewerProject }
-  | { type: 'abort' };
+  | {
+      type: 'cache';
+      taskId: string;
+      project: ViewerProject;
+      options: CacheOptions;
+    }
+  | { type: 'clear'; taskId: string; project: ViewerProject }
+  | { type: 'abort'; taskId: string };
 
 export type CacheResult =
-  | { status: 'progress'; info: string }
-  | { status: 'completed' }
-  | { status: 'cancelled' }
-  | { status: 'failure'; error: string };
+  | { taskId: string; status: 'progress'; info: string }
+  | { taskId: string; status: 'completed' }
+  | { taskId: string; status: 'cancelled' }
+  | { taskId: string; status: 'failure'; error: string };
 
 export type ClearResult =
   // | { status: 'progress'; info: string }

@@ -4,15 +4,33 @@ import { match } from 'ts-pattern';
 import type { Project } from '~/composables/project/types/v1';
 import { bufferToString } from '~/composables/utils';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
-import { sleep } from '~/composables/utils/sleep';
 import type {
   CacheEvent,
   CacheOptions,
 } from '~/composables/viewer/cache/types';
-import { downloadFile, formatBytes } from '~/composables/viewer/cache/utils';
+import {
+  downloadFile,
+  formatBytes,
+  isAbortError,
+} from '~/composables/viewer/cache/utils';
 import type { ViewerProject } from '~/composables/viewer/types';
 
-let abortController: AbortController | null = null;
+type Task =
+  | {
+      taskId: string;
+      type: 'cache';
+      project: ViewerProject;
+      options: CacheOptions;
+      abortController: AbortController;
+    }
+  | {
+      taskId: string;
+      type: 'clear';
+      project: ViewerProject;
+    };
+
+const taskQueue: Task[] = [];
+let currentTask: Task | null = null;
 
 self.addEventListener(
   'message',
@@ -22,35 +40,44 @@ self.addEventListener(
       const payload = JSON.parse(event) as CacheEvent;
       match(payload)
         .with({ type: 'init' }, () => {})
-        .with({ type: 'cache' }, async ({ project, options = {} }) => {
-          abortController = new AbortController();
-          try {
-            await doCache(project, options, abortController.signal);
-          } catch (err) {
-            if (
-              typeof err === 'object' &&
-              err !== null &&
-              'name' in err &&
-              err.name === 'AbortError'
-            ) {
-              postMessage({ status: 'cancelled' });
-            } else {
-              console.error('error in cache worker', err);
+        .with({ type: 'cache' }, async ({ taskId, project, options = {} }) => {
+          const abortController = new AbortController();
+          taskQueue.push({
+            taskId,
+            type: 'cache',
+            project,
+            options,
+            abortController,
+          });
 
-              postMessage({
-                status: 'failure',
-                error: 'Failed to download project file (exception)',
-              });
+          startNextTask();
+        })
+        .with({ type: 'clear' }, async ({ taskId, project }) => {
+          taskQueue.push({
+            taskId,
+            type: 'clear',
+            project,
+          });
+
+          startNextTask();
+        })
+        .with({ type: 'abort' }, ({ taskId }) => {
+          // First, check if we need to abort the current task.
+          if (currentTask && currentTask.taskId === taskId) {
+            // Use the abort controller (if present) to abort the task.
+            if ('abortController' in currentTask) {
+              currentTask.abortController.abort();
             }
           }
-        })
-        .with({ type: 'clear' }, async ({ project }) => {
-          await Promise.all([sleep(500), doClear(project)]);
-          postMessage({ status: 'completed' });
-        })
-        .with({ type: 'abort' }, () => {
-          abortController?.abort();
-          abortController = null;
+          // Next, check if the task is still in the queue. If so, remove it.
+          else {
+            const pendingTaskIndex = taskQueue.findIndex(
+              (task) => task.taskId === taskId,
+            );
+            if (pendingTaskIndex !== -1) {
+              taskQueue.splice(pendingTaskIndex, 1);
+            }
+          }
         })
         .exhaustive();
     } catch (err) {
@@ -59,12 +86,70 @@ self.addEventListener(
   },
 );
 
-async function doClear(project: ViewerProject) {
+function startNextTask() {
+  // If a task is already running, do nothing.
+  if (currentTask !== null) return;
+
+  // Take the next task from the queue.
+  const task = taskQueue.shift();
+  if (!task) return;
+
+  // Dispatch the task in the background.
+  currentTask = task;
+  const fiber = match(task)
+    .with(
+      { type: 'cache' },
+      ({ taskId, project, options, abortController }) => {
+        return doCache(taskId, project, options, abortController.signal).catch(
+          (err) => {
+            if (isAbortError(err)) {
+              postMessage({
+                taskId: task.taskId,
+                status: 'cancelled',
+              });
+            } else {
+              console.error('error in cache worker', err);
+
+              postMessage({
+                taskId: task.taskId,
+                status: 'failure',
+                error: 'Failed to download project file (exception)',
+              });
+            }
+          },
+        );
+      },
+    )
+    .with({ type: 'clear' }, ({ taskId, project }) => {
+      return doClear(taskId, project).catch((err) => {
+        console.error('error in cache worker', err);
+
+        postMessage({
+          taskId: taskId,
+          status: 'failure',
+          error: 'Failed to download project file (exception)',
+        });
+      });
+    })
+    .otherwise(() => {
+      console.error('error in cache worker (unknown task type)', task);
+      return Promise.resolve();
+    });
+
+  fiber.then(() => {
+    currentTask = null;
+    startNextTask();
+  });
+}
+
+async function doClear(taskId: string, project: ViewerProject) {
   const fsHandle = await navigator.storage.getDirectory();
   await fsHandle.removeEntry(project.id, { recursive: true });
+  postMessage({ taskId, status: 'completed' });
 }
 
 async function doCache(
+  taskId: string,
   project: ViewerProject,
   options: CacheOptions,
   abortSignal: AbortSignal,
