@@ -1,26 +1,26 @@
 <template>
   <div class="flex flex-col gap-2">
-    <div class="flex flex-col gap-2 py-1">
-      <Message v-if="cacheOperation.status === 'idle'" severity="secondary">
-        No operation in progress.
-      </Message>
-      <Message v-if="cacheOperation.status === 'running'" severity="info">
-        <div class="flex flex-row items-center gap-1 w-full">
-          <ProgressSpinner class="size-4" />
-          <div class="grow w-full">
-            {{ cacheOperation.progress ?? 'Running ...' }}
+    <div v-if="isNotEmpty(cacheOperations)" class="flex flex-col gap-2 py-1">
+      <div class="text-primary">Cache Operations</div>
+      <div v-for="operation in cacheOperations" :key="operation.taskId">
+        <Message v-if="operation.status === 'running'" severity="info">
+          <div class="flex flex-row items-center gap-1 w-full">
+            <ProgressSpinner class="size-4" />
+            <div class="grow w-full">
+              {{ operation.progress ?? 'Running ...' }}
+            </div>
           </div>
-        </div>
-      </Message>
-      <Message v-if="cacheOperation.status === 'completed'" severity="success">
-        Cache operation completed.
-      </Message>
-      <Message v-if="cacheOperation.status === 'cancelled'" severity="warn">
-        Cache operation cancelled.
-      </Message>
-      <Message v-if="cacheOperation.status === 'failure'" severity="error">
-        Cache operation failed.
-      </Message>
+        </Message>
+        <Message v-if="operation.status === 'completed'" severity="success">
+          Cache operation completed.
+        </Message>
+        <Message v-if="operation.status === 'cancelled'" severity="warn">
+          Cache operation cancelled.
+        </Message>
+        <Message v-if="operation.status === 'failure'" severity="error">
+          Cache operation failed.
+        </Message>
+      </div>
     </div>
     <div v-if="project" class="flex flex-col gap-2">
       <div class="flex flex-row items-center justify-between">
@@ -34,7 +34,7 @@
         </div>
         <div v-if="project.source === 'remote'">
           <Button
-            :disabled="cacheOperation.status === 'running'"
+            :disabled="isNotEmpty(cacheOperations)"
             @click="cacheProject(project.id, { images: false })"
           >
             <span class="iconify solar--cloud-download-linear"></span>
@@ -46,7 +46,7 @@
           class="flex flex-row gap-2 justify-end"
         >
           <Button
-            :disabled="cacheOperation.status === 'running'"
+            :disabled="isNotEmpty(cacheOperations)"
             @click="cacheProject(project.id, { refresh: true })"
           >
             <span class="iconify solar--refresh-linear"></span>
@@ -54,7 +54,7 @@
           </Button>
           <Button
             severity="danger"
-            :disabled="cacheOperation.status === 'running'"
+            :disabled="isNotEmpty(cacheOperations)"
             @click="tryClearCache(project.id, $event)"
           >
             <span class="iconify solar--trash-bin-trash-linear"></span>
@@ -170,7 +170,7 @@ const {
   loadCachedData,
   cacheProject,
   clearCache,
-  cacheOperation,
+  cacheOperations,
 } = useViewerLibrary();
 const { resolveImage } = useImageCache();
 

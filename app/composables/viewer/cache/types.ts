@@ -6,16 +6,22 @@ export type CacheOptions = {
   images?: boolean | string[];
 };
 
+export type CacheTask = {
+  type: 'cache';
+  project: ViewerProject;
+  options: CacheOptions;
+};
+
+export type ClearTask = {
+  type: 'clear';
+  project: ViewerProject;
+};
+
 export type CacheEvent =
   | { type: 'init' }
-  | {
-      type: 'cache';
-      taskId: string;
-      project: ViewerProject;
-      options: CacheOptions;
-    }
-  | { type: 'clear'; taskId: string; project: ViewerProject }
-  | { type: 'abort'; taskId: string };
+  | { type: 'abort'; taskId: string }
+  | (CacheTask & { taskId: string })
+  | (ClearTask & { taskId: string });
 
 export type CacheResult =
   | { taskId: string; status: 'progress'; info: string }
@@ -25,6 +31,6 @@ export type CacheResult =
 
 export type ClearResult =
   // | { status: 'progress'; info: string }
-  | { status: 'completed' }
+  | { taskId: string; status: 'completed' }
   // | { status: 'cancelled' }
-  | { status: 'failure'; error: string };
+  | { taskId: string; status: 'failure'; error: string };

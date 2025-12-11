@@ -130,8 +130,7 @@ defineProps<{
   compact?: boolean;
 }>();
 
-const { projectList, librarySettings, loadProject, cacheOperation } =
-  useViewerLibrary();
+const { projectList, librarySettings, loadProject } = useViewerLibrary();
 
 const search = ref<string>('');
 

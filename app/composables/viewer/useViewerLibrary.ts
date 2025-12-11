@@ -1,4 +1,5 @@
 import {
+  append,
   concat,
   indexBy,
   isNil,
@@ -37,14 +38,16 @@ type ProjectListEntry = ViewerProject &
     source: 'local' | 'remote' | 'cached';
   };
 
-type CacheOperation =
-  | { status: 'idle' }
-  | ({ projectId: string } & (
-      | { status: 'running'; progress?: string }
-      | { status: 'completed' }
-      | { status: 'cancelled' }
-      | { status: 'failure'; error: string }
-    ));
+type CacheOperationStatus =
+  | { status: 'running'; progress?: string }
+  | { status: 'completed' }
+  | { status: 'cancelled' }
+  | { status: 'failure'; error: string };
+
+type CacheOperation = {
+  projectId: string;
+  taskId: string;
+} & CacheOperationStatus;
 
 export function useViewerLibrary() {
   const dexie = useDexie();
@@ -52,7 +55,24 @@ export function useViewerLibrary() {
   const { librarySettings, remoteProjectList } = useViewerRefs();
   const $store = useProjectStore();
 
-  const cacheOperation = ref<CacheOperation>({ status: 'idle' });
+  const cacheOperations = ref<CacheOperation[]>([]);
+
+  const startOperation = (taskId: string, projectId: string) => {
+    cacheOperations.value = append(
+      { status: 'running', taskId, projectId },
+      cacheOperations.value,
+    );
+  };
+  const updateOperation = (taskId: string, status: CacheOperationStatus) => {
+    cacheOperations.value = cacheOperations.value.map((op) =>
+      op.taskId === taskId ? mergeRight(op, status) : op,
+    );
+  };
+  const clearOperation = (taskId: string) => {
+    cacheOperations.value = cacheOperations.value.filter(
+      (op) => op.taskId !== taskId,
+    );
+  };
 
   const localProjectList = useLiveQuery<ViewerProject[]>(() => {
     return dexie.viewer_projects_cache.toArray();
@@ -199,56 +219,53 @@ export function useViewerLibrary() {
     if (project.source === 'local') {
       return; // nothing to do for local projects
     } else {
-      cacheOperation.value = { status: 'running', projectId: project.id };
+      const { taskId, events } = await worker.submitTask({
+        type: 'cache',
+        project: project,
+        options,
+      });
 
-      // cache the project using the cache worker
-      await worker.initWorker();
-      worker.publishSync({ type: 'cache', project: project, options });
+      startOperation(taskId, project.id);
+
       // read the stream of messages from the worker until the cache operation is complete
-      const _sub = worker.messages.subscribe(async (msg: CacheResult) => {
+      const _sub = events.subscribe(async (msg: CacheResult) => {
         await match(msg)
           .with({ status: 'progress' }, async (progress) => {
-            cacheOperation.value = {
+            updateOperation(progress.taskId, {
               status: 'running',
               progress: progress.info,
-              projectId: project.id,
-            };
+            });
           })
-          .with({ status: 'completed' }, async () => {
+          .with({ status: 'completed' }, async (event) => {
             await dexie.viewer_projects_cache.put({
               ...omit(['source', 'origin'], project),
               cachedAt: new Date(),
               origin: 'remote',
             });
 
-            cacheOperation.value = {
+            updateOperation(event.taskId, {
               status: 'completed',
-              projectId: project.id,
-            };
-            _sub.unsubscribe();
+            });
           })
-          .with({ status: 'cancelled' }, async () => {
-            cacheOperation.value = {
+          .with({ status: 'cancelled' }, async (event) => {
+            updateOperation(event.taskId, {
               status: 'cancelled',
-              projectId: project.id,
-            };
+            });
             _sub.unsubscribe();
           })
-          .with({ status: 'failure' }, async ({ error }) => {
-            cacheOperation.value = {
+          .with({ status: 'failure' }, async (event) => {
+            updateOperation(event.taskId, {
               status: 'failure',
-              projectId: project.id,
-              error,
-            };
-            _sub.unsubscribe();
+              error: event.error,
+            });
           })
           .exhaustive();
       });
     }
   };
 
-  const abortCache = async () => {
-    worker.publishSync({ type: 'abort' });
+  const abortCache = async (taskId: string) => {
+    worker.publishSync({ type: 'abort', taskId });
   };
 
   const clearCache = async (id: string) => {
@@ -260,30 +277,29 @@ export function useViewerLibrary() {
       const fsHandle = await navigator.storage.getDirectory();
       await fsHandle.removeEntry(project.id, { recursive: true });
     } else if (project.source === 'cached') {
-      cacheOperation.value = { status: 'running', projectId: project.id };
-
       // Delete the entry from the cache table first
       // This allows users to load the project from the remote without waiting for the cache operation to complete
       await dexie.viewer_projects_cache.delete(project.id);
 
-      await worker.initWorker();
-      worker.publishSync({ type: 'clear', project: project });
+      const { taskId, events } = await worker.submitTask({
+        type: 'clear',
+        project: project,
+      });
+      startOperation(taskId, project.id);
       // read the stream of messages from the worker until the cache operation is complete
-      const _sub = worker.messages.subscribe(async (msg: ClearResult) => {
-        await match(msg)
-          .with({ status: 'completed' }, async () => {
-            cacheOperation.value = {
+      const _sub = events.subscribe((msg: ClearResult) => {
+        match(msg)
+          .with({ status: 'completed' }, (event) => {
+            updateOperation(event.taskId, {
               status: 'completed',
-              projectId: project.id,
-            };
+            });
             _sub.unsubscribe();
           })
-          .with({ status: 'failure' }, async ({ error }) => {
-            cacheOperation.value = {
+          .with({ status: 'failure' }, (event) => {
+            updateOperation(event.taskId, {
               status: 'failure',
-              projectId: project.id,
-              error,
-            };
+              error: event.error,
+            });
             _sub.unsubscribe();
           })
           .exhaustive();
@@ -350,7 +366,7 @@ export function useViewerLibrary() {
     projectList,
     remoteProjectList,
     librarySettings,
-    cacheOperation,
+    cacheOperations,
     // methods
     getProject,
     addProject,

@@ -1,8 +1,15 @@
-import { Subject } from 'rxjs';
+import type { Observable } from 'rxjs';
+import { Subject, filter } from 'rxjs';
 
 import CacheWorker from './worker?worker';
 
-import type { CacheEvent } from '~/composables/viewer/cache/types';
+import type {
+  CacheEvent,
+  CacheResult,
+  CacheTask,
+  ClearResult,
+  ClearTask,
+} from '~/composables/viewer/cache/types';
 
 export function useCacheWorker() {
   // WebWorker infrastructure
@@ -14,6 +21,7 @@ export function useCacheWorker() {
     try {
       worker.value = new CacheWorker();
       worker.value.addEventListener('message', (event) => {
+        console.log(`worker message at ${new Date().toISOString()}`, event);
         workerData.next(event.data);
       });
 
@@ -71,11 +79,34 @@ export function useCacheWorker() {
     });
   }
 
+  async function submitTask(
+    task: CacheTask,
+  ): Promise<{ taskId: string; events: Observable<CacheResult> }>;
+  async function submitTask(
+    task: ClearTask,
+  ): Promise<{ taskId: string; events: Observable<ClearResult> }>;
+
+  async function submitTask(task: CacheTask | ClearTask): Promise<{
+    taskId: string;
+    events: Observable<CacheResult | ClearResult>;
+  }> {
+    await initWorker();
+    const taskId = crypto.randomUUID();
+    const event: CacheEvent = { taskId, ...task };
+    publishSync(event);
+
+    const events = workerData.pipe(
+      filter((data) => data.taskId === event.taskId),
+    ) as Observable<CacheResult>;
+    return { taskId, events };
+  }
+
   return {
     initWorker,
     closeWorker,
     publishSync,
     publishAsync,
+    submitTask,
     messages: workerData,
   };
 }
