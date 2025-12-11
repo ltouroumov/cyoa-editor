@@ -1,4 +1,14 @@
-import { drop, isNotEmpty, last, partition, take, unfold, uniq } from 'ramda';
+import {
+  drop,
+  includes,
+  isNotEmpty,
+  isNotNil,
+  last,
+  partition,
+  take,
+  unfold,
+  uniq,
+} from 'ramda';
 import { match } from 'ts-pattern';
 
 import type { Project } from '~/composables/project/types/v1';
@@ -64,10 +74,13 @@ self.addEventListener(
           startNextTask();
         })
         .with({ type: 'abort' }, ({ taskId }) => {
+          console.log(`[cache] aborting task ${taskId}`);
+
           // First, check if we need to abort the current task.
           if (currentTask && currentTask.taskId === taskId) {
             // Use the abort controller (if present) to abort the task.
             if ('abortController' in currentTask) {
+              console.log(`[cache] aborting task ${taskId} (controller)`);
               currentTask.abortController.abort();
             }
           }
@@ -77,6 +90,7 @@ self.addEventListener(
               (task) => task.taskId === taskId,
             );
             if (pendingTaskIndex !== -1) {
+              console.log(`[cache] clear task ${taskId} (queue)`);
               taskQueue.splice(pendingTaskIndex, 1);
             }
           }
@@ -89,12 +103,22 @@ self.addEventListener(
 );
 
 function startNextTask() {
+  console.log(
+    `[cache] starting next task (current: ${currentTask?.taskId ?? 'N/A'}; queue length: ${taskQueue.length})`,
+  );
   // If a task is already running, do nothing.
-  if (currentTask !== null) return;
+  if (currentTask !== null) {
+    console.log(`[cache] task ${currentTask.taskId} is already running`);
+    return;
+  }
 
   // Take the next task from the queue.
   const task = taskQueue.shift();
-  if (!task) return;
+  if (!task) {
+    console.log(`[cache] no more tasks in the queue`);
+    return;
+  }
+  console.log(`[cache] starting task ${task?.taskId ?? 'null'}`, taskQueue);
 
   // Dispatch the task in the background.
   currentTask = task;
@@ -171,11 +195,9 @@ async function doCache(
   let projectBytes: Uint8Array<ArrayBuffer>;
   try {
     const fileSize = projectFileHandle.getSize();
-    console.log(`[cache ${project.id}] project.json size: ${fileSize}`);
-    if (!options.refresh && fileSize > 0) {
+    if ((!options.refresh || options.project === false) && fileSize > 0) {
       projectBytes = new Uint8Array(fileSize);
       projectFileHandle.read(projectBytes, { at: 0 });
-      console.log(`[cache ${project.id}] project.json already cached`);
     } else {
       reply({
         taskId,
@@ -183,9 +205,16 @@ async function doCache(
         info: 'Downloading project file ...',
       });
 
+      let lastUpdate = Date.now();
       const result = await downloadFile(
         project.file_url,
         async (progress) => {
+          const now = Date.now();
+
+          // Only sent updates every 200ms to avoid congestion in the message queue.
+          if (now - lastUpdate < 200) return;
+
+          lastUpdate = now;
           if (progress.type === 'stream') {
             reply({
               taskId,
@@ -228,7 +257,7 @@ async function doCache(
     projectFileHandle.close();
   }
 
-  if (options.images) {
+  if (isNotNil(options.images)) {
     const projectJson = bufferToString(projectBytes.buffer);
     const projectData = JSON.parse(projectJson) as Project;
 
@@ -238,6 +267,14 @@ async function doCache(
 
     const images0: string[] = [];
     for (const rowData of projectData.rows) {
+      if (
+        options.images !== true &&
+        !(Array.isArray(options.images) && includes(rowData.id, options.images))
+      ) {
+        // Skip the row if it's not in the list of images to cache.
+        continue;
+      }
+
       if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
         images0.push(rowData.image);
       }
@@ -245,6 +282,12 @@ async function doCache(
       for (const objData of rowData.objects) {
         if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
           images0.push(objData.image);
+        }
+
+        for (const objAddon of objData.addons) {
+          if (isNotEmpty(objAddon.image) && imageIsUrl(objAddon.image)) {
+            images0.push(objAddon.image);
+          }
         }
       }
     }

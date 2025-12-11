@@ -21,7 +21,6 @@ export function useCacheWorker() {
     try {
       worker.value = new CacheWorker();
       worker.value.addEventListener('message', (event) => {
-        console.log(`worker message at ${new Date().toISOString()}`, event);
         workerData.next(event.data);
       });
 

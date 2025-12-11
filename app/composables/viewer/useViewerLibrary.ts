@@ -78,9 +78,12 @@ export function useViewerLibrary() {
       (op) => op.taskId !== taskId,
     );
   };
-  const hasOperation = (projectId: string, key: string) => {
+  const hasActiveOperation = (projectId: string, key: string) => {
     return cacheOperations.value.some(
-      (op) => op.projectId === projectId && op.keys.includes(key),
+      (op) =>
+        op.projectId === projectId &&
+        op.keys.includes(key) &&
+        op.status === 'running',
     );
   };
 
@@ -385,7 +388,8 @@ export function useViewerLibrary() {
     remoteProjectList,
     librarySettings,
     cacheOperations,
-    hasOperation,
+    hasActiveOperation,
+    clearOperation,
     // methods
     getProject,
     addProject,

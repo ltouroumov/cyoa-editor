@@ -2,24 +2,62 @@
   <div class="flex flex-col gap-2">
     <div v-if="isNotEmpty(cacheOperations)" class="flex flex-col gap-2 py-1">
       <div class="text-primary">Cache Operations</div>
-      <div v-for="operation in cacheOperations" :key="operation.taskId">
-        <Message v-if="operation.status === 'running'" severity="info">
-          <div class="flex flex-row items-center gap-1 w-full">
-            <ProgressSpinner class="size-4" />
-            <div class="grow w-full">
-              {{ operation.progress ?? 'Running ...' }}
-            </div>
+      <div
+        v-for="operation in cacheOperations"
+        :key="operation.taskId"
+        class="flex flex-col gap-2"
+      >
+        <div
+          v-if="operation.status === 'running'"
+          class="flex flex-row items-center gap-1 w-full"
+        >
+          <ProgressSpinner class="size-4" />
+          <div class="grow w-full">
+            {{ operation.progress ?? 'Running ...' }}
           </div>
-        </Message>
-        <Message v-if="operation.status === 'completed'" severity="success">
-          Cache operation completed.
-        </Message>
-        <Message v-if="operation.status === 'cancelled'" severity="warn">
-          Cache operation cancelled.
-        </Message>
-        <Message v-if="operation.status === 'failure'" severity="error">
-          Cache operation failed.
-        </Message>
+          <Button
+            size="small"
+            icon="pi pi-times"
+            variant="text"
+            @click="abortCache(operation.taskId)"
+          />
+        </div>
+        <div
+          v-if="operation.status === 'completed'"
+          class="flex flex-row items-center"
+        >
+          <div class="grow w-full">Cache operation completed.</div>
+          <Button
+            size="small"
+            icon="pi pi-times"
+            variant="text"
+            @click="clearOperation(operation.taskId)"
+          />
+        </div>
+        <div
+          v-if="operation.status === 'cancelled'"
+          class="flex flex-row items-center"
+        >
+          <div class="grow w-full">Cache operation cancelled.</div>
+          <Button
+            size="small"
+            icon="pi pi-times"
+            variant="text"
+            @click="clearOperation(operation.taskId)"
+          />
+        </div>
+        <div
+          v-if="operation.status === 'failure'"
+          class="flex flex-row items-center"
+        >
+          <div class="grow w-full">Cache operation failed.</div>
+          <Button
+            size="small"
+            icon="pi pi-times"
+            variant="text"
+            @click="clearOperation(operation.taskId)"
+          />
+        </div>
       </div>
     </div>
     <div v-if="project" class="flex flex-col gap-2">
@@ -34,7 +72,7 @@
         </div>
         <div v-if="project.source === 'remote'">
           <Button
-            :disabled="hasOperation(project.id, 'project')"
+            :disabled="hasActiveOperation(project.id, 'project')"
             @click="cacheProject(project.id, { images: false })"
           >
             <span class="iconify solar--cloud-download-linear"></span>
@@ -46,7 +84,7 @@
           class="flex flex-row gap-2 justify-end"
         >
           <Button
-            :disabled="hasOperation(project.id, 'project')"
+            :disabled="hasActiveOperation(project.id, 'project')"
             @click="cacheProject(project.id, { refresh: true })"
           >
             <span class="iconify solar--refresh-linear"></span>
@@ -54,7 +92,7 @@
           </Button>
           <Button
             severity="danger"
-            :disabled="hasOperation(project.id, 'project')"
+            :disabled="hasActiveOperation(project.id, 'project')"
             @click="tryClearCache(project.id, $event)"
           >
             <span class="iconify solar--trash-bin-trash-linear"></span>
@@ -65,13 +103,21 @@
     </div>
     <div class="min-h-[400px] relative">
       <div
-        v-if="isEmpty(rows) || isNil(project)"
+        v-if="isEmpty(rows) && isNil(project)"
         class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center"
       >
         <div class="text-surface-600 italic">No project data ...</div>
       </div>
+      <div
+        v-if="isEmpty(rows) && !isNil(project)"
+        class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center"
+      >
+        <div class="text-surface-600 italic">
+          <ProgressSpinner class="size-6" />
+        </div>
+      </div>
       <DataTable
-        v-else
+        v-if="!isEmpty(rows) && !isNil(project)"
         v-model:filters="filters"
         :value="rows"
         data-key="id"
@@ -102,7 +148,7 @@
             </div>
           </template>
         </Column>
-        <Column field="imageCount" header="Images" />
+        <Column field="totalImageCount" header="Images" />
         <Column field="cacheStatus" header="Status">
           <template #body="{ data }">
             <Badge v-if="data.cacheStatus === false" severity="secondary">
@@ -122,8 +168,13 @@
               <Button
                 icon="iconify solar--download-square-linear"
                 size="small"
-                :disabled="hasOperation(project.id, `images.${data.id}`)"
-                @click="cacheProject(project.id, { images: [data.id] })"
+                :disabled="
+                  hasActiveOperation(project.id, `images.${data.id}`) ||
+                  hasActiveOperation(project.id, 'images')
+                "
+                @click="
+                  cacheProject(project.id, { images: [data.id], refresh: true })
+                "
               />
               <Button
                 icon="iconify solar--trash-bin-trash-linear"
@@ -131,7 +182,8 @@
                 size="small"
                 :disabled="
                   data.cacheStatus === false ||
-                  hasOperation(project.id, `images.${data.id}`)
+                  hasActiveOperation(project.id, `images.${data.id}`) ||
+                  hasActiveOperation(project.id, 'images')
                 "
               />
             </div>
@@ -141,14 +193,16 @@
               <Button
                 icon="iconify solar--download-square-linear"
                 size="small"
-                :disabled="hasOperation(project.id, `images`)"
-                @click="cacheProject(project.id, { images: true })"
+                :disabled="hasActiveOperation(project.id, `images`)"
+                @click="
+                  cacheProject(project.id, { images: true, refresh: true })
+                "
               />
               <Button
                 icon="iconify solar--trash-bin-trash-linear"
                 severity="danger"
                 size="small"
-                :disabled="hasOperation(project.id, `images`)"
+                :disabled="hasActiveOperation(project.id, `images`)"
               />
             </div>
           </template>
@@ -177,7 +231,9 @@ const {
   cacheProject,
   clearCache,
   cacheOperations,
-  hasOperation,
+  hasActiveOperation,
+  clearOperation,
+  abortCache,
 } = useViewerLibrary();
 const { resolveImage } = useImageCache();
 
