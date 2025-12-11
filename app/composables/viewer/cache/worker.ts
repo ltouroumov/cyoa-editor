@@ -7,6 +7,8 @@ import { imageIsUrl } from '~/composables/utils/imageIsUrl';
 import type {
   CacheEvent,
   CacheOptions,
+  CacheResult,
+  ClearResult,
 } from '~/composables/viewer/cache/types';
 import {
   downloadFile,
@@ -145,7 +147,7 @@ function startNextTask() {
 async function doClear(taskId: string, project: ViewerProject) {
   const fsHandle = await navigator.storage.getDirectory();
   await fsHandle.removeEntry(project.id, { recursive: true });
-  postMessage({ taskId, status: 'completed' });
+  reply({ taskId, status: 'completed' });
 }
 
 async function doCache(
@@ -175,18 +177,24 @@ async function doCache(
       projectFileHandle.read(projectBytes, { at: 0 });
       console.log(`[cache ${project.id}] project.json already cached`);
     } else {
-      postMessage({ status: 'progress', info: 'Downloading project file ...' });
+      reply({
+        taskId,
+        status: 'progress',
+        info: 'Downloading project file ...',
+      });
 
       const result = await downloadFile(
         project.file_url,
         async (progress) => {
           if (progress.type === 'stream') {
-            postMessage({
+            reply({
+              taskId,
               status: 'progress',
               info: `Downloading project file ... ${formatBytes(progress.bytes)}`,
             });
           } else if (progress.type === 'decode') {
-            postMessage({
+            reply({
+              taskId,
               status: 'progress',
               info: `Downloading project file ...`,
             });
@@ -196,7 +204,8 @@ async function doCache(
       );
 
       if ('error' in result) {
-        postMessage({
+        reply({
+          taskId,
           status: 'failure',
           error: `Failed to download project file (HTTP ${result.status})`,
         });
@@ -209,7 +218,8 @@ async function doCache(
     }
   } catch (err) {
     console.error('error in cache worker (download)', err);
-    postMessage({
+    reply({
+      taskId,
       status: 'failure',
       error: 'Failed to download project file.',
     });
@@ -242,7 +252,8 @@ async function doCache(
     const images = uniq(images0);
 
     console.log(`[cache ${project.id}] found ${images.length} images to cache`);
-    postMessage({
+    reply({
+      taskId,
       status: 'progress',
       info: `Downloading images ... 0/${images.length}`,
     });
@@ -272,19 +283,20 @@ async function doCache(
       errors += failures.length;
       cached += success.filter((result) => result.value.cached).length;
       totalBytes += success.reduce((acc, { value }) => acc + value.bytes, 0);
-      postMessage({
+      reply({
+        taskId,
         status: 'progress',
         info: `Downloading images ... ${progress}/${images.length} (${cached > 0 ? `${cached} cached, ` : ''}${errors > 0 ? `${errors} errors, ` : ''}${formatBytes(totalBytes)})`,
       });
 
       if (abortSignal.aborted) {
         console.log(`[cache ${project.id}] cancelled`);
-        postMessage({ status: 'cancelled' });
+        reply({ taskId, status: 'cancelled' });
       }
     }
   }
 
-  postMessage({ status: 'completed' });
+  reply({ taskId, status: 'completed' });
 }
 
 async function cacheImage(
@@ -323,4 +335,8 @@ function chunk<T>(input: T[], size: number): T[][] {
     if (seed.length === 0) return false;
     return [take(size, seed), drop(size, seed)];
   }, input);
+}
+
+function reply(payload: CacheResult | ClearResult) {
+  postMessage(payload);
 }

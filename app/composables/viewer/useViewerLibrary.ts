@@ -47,6 +47,7 @@ type CacheOperationStatus =
 type CacheOperation = {
   projectId: string;
   taskId: string;
+  keys: string[];
 } & CacheOperationStatus;
 
 export function useViewerLibrary() {
@@ -57,9 +58,13 @@ export function useViewerLibrary() {
 
   const cacheOperations = ref<CacheOperation[]>([]);
 
-  const startOperation = (taskId: string, projectId: string) => {
+  const startOperation = (
+    taskId: string,
+    projectId: string,
+    keys: string[],
+  ) => {
     cacheOperations.value = append(
-      { status: 'running', taskId, projectId },
+      { status: 'running', taskId, projectId, keys },
       cacheOperations.value,
     );
   };
@@ -71,6 +76,11 @@ export function useViewerLibrary() {
   const clearOperation = (taskId: string) => {
     cacheOperations.value = cacheOperations.value.filter(
       (op) => op.taskId !== taskId,
+    );
+  };
+  const hasOperation = (projectId: string, key: string) => {
+    return cacheOperations.value.some(
+      (op) => op.projectId === projectId && op.keys.includes(key),
     );
   };
 
@@ -225,7 +235,14 @@ export function useViewerLibrary() {
         options,
       });
 
-      startOperation(taskId, project.id);
+      const keys = [
+        (options.project ?? true) ? 'project' : null,
+        options.images === true ? 'images' : null,
+        ...(Array.isArray(options.images)
+          ? options.images.map((i) => `images.${i}`)
+          : []),
+      ].filter(isNotNil) as string[];
+      startOperation(taskId, project.id, keys);
 
       // read the stream of messages from the worker until the cache operation is complete
       const _sub = events.subscribe(async (msg: CacheResult) => {
@@ -285,7 +302,8 @@ export function useViewerLibrary() {
         type: 'clear',
         project: project,
       });
-      startOperation(taskId, project.id);
+
+      startOperation(taskId, project.id, ['project']);
       // read the stream of messages from the worker until the cache operation is complete
       const _sub = events.subscribe((msg: ClearResult) => {
         match(msg)
@@ -367,6 +385,7 @@ export function useViewerLibrary() {
     remoteProjectList,
     librarySettings,
     cacheOperations,
+    hasOperation,
     // methods
     getProject,
     addProject,

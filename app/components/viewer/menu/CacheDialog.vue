@@ -34,7 +34,7 @@
         </div>
         <div v-if="project.source === 'remote'">
           <Button
-            :disabled="isNotEmpty(cacheOperations)"
+            :disabled="hasOperation(project.id, 'project')"
             @click="cacheProject(project.id, { images: false })"
           >
             <span class="iconify solar--cloud-download-linear"></span>
@@ -46,7 +46,7 @@
           class="flex flex-row gap-2 justify-end"
         >
           <Button
-            :disabled="isNotEmpty(cacheOperations)"
+            :disabled="hasOperation(project.id, 'project')"
             @click="cacheProject(project.id, { refresh: true })"
           >
             <span class="iconify solar--refresh-linear"></span>
@@ -54,7 +54,7 @@
           </Button>
           <Button
             severity="danger"
-            :disabled="isNotEmpty(cacheOperations)"
+            :disabled="hasOperation(project.id, 'project')"
             @click="tryClearCache(project.id, $event)"
           >
             <span class="iconify solar--trash-bin-trash-linear"></span>
@@ -122,13 +122,17 @@
               <Button
                 icon="iconify solar--download-square-linear"
                 size="small"
+                :disabled="hasOperation(project.id, `images.${data.id}`)"
                 @click="cacheProject(project.id, { images: [data.id] })"
               />
               <Button
                 icon="iconify solar--trash-bin-trash-linear"
                 severity="danger"
                 size="small"
-                :disabled="data.cacheStatus === false"
+                :disabled="
+                  data.cacheStatus === false ||
+                  hasOperation(project.id, `images.${data.id}`)
+                "
               />
             </div>
           </template>
@@ -137,12 +141,14 @@
               <Button
                 icon="iconify solar--download-square-linear"
                 size="small"
+                :disabled="hasOperation(project.id, `images`)"
                 @click="cacheProject(project.id, { images: true })"
               />
               <Button
                 icon="iconify solar--trash-bin-trash-linear"
                 severity="danger"
                 size="small"
+                :disabled="hasOperation(project.id, `images`)"
               />
             </div>
           </template>
@@ -171,6 +177,7 @@ const {
   cacheProject,
   clearCache,
   cacheOperations,
+  hasOperation,
 } = useViewerLibrary();
 const { resolveImage } = useImageCache();
 
