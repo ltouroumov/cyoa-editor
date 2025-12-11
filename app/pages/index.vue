@@ -1,8 +1,11 @@
 <template>
   <ProjectViewWrapper />
   <ProjectMenu v-if="store.status === 'empty'" class="pb-4" />
-  <DynamicDialog />
+
   <Toast />
+  <ConfirmPopup group="popup" />
+  <ConfirmDialog group="modal" />
+  <DynamicDialog />
 </template>
 
 <script setup lang="ts">

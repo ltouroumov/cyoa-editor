@@ -1,8 +1,10 @@
 import type { ViewerProject } from '~/composables/viewer/types';
 
+export type CacheOptions = { refresh?: boolean; images?: boolean };
+
 export type CacheEvent =
   | { type: 'init' }
-  | { type: 'cache'; project: ViewerProject; refresh?: boolean }
+  | { type: 'cache'; project: ViewerProject; options: CacheOptions }
   | { type: 'clear'; project: ViewerProject }
   | { type: 'abort' };
 

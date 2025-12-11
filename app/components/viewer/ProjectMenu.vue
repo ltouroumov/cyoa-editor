@@ -9,42 +9,6 @@
     <main class="main-container">
       <div class="main-header">
         <InputText v-model="search" placeholder="Search ..." class="w-full" />
-        <Message
-          v-if="cacheOperation.status === 'running'"
-          severity="info"
-          class="mt-2"
-        >
-          <div class="flex flex-row items-center gap-1 w-full">
-            <ProgressSpinner class="size-4" />
-            <div class="grow w-full">
-              {{ cacheOperation.progress ?? 'Running ...' }}
-            </div>
-          </div>
-        </Message>
-        <Message
-          v-if="cacheOperation.status === 'completed'"
-          severity="success"
-          class="mt-2"
-          closable
-        >
-          Cache operation completed.
-        </Message>
-        <Message
-          v-if="cacheOperation.status === 'cancelled'"
-          severity="warn"
-          class="mt-2"
-          closable
-        >
-          Cache operation cancelled.
-        </Message>
-        <Message
-          v-if="cacheOperation.status === 'failure'"
-          severity="error"
-          class="mt-2"
-          closable
-        >
-          Cache operation failed.
-        </Message>
       </div>
       <div class="project-list-container">
         <div
@@ -98,10 +62,9 @@
             >
               <div class="grow"></div>
               <Button
-                v-if="cacheOperation.status !== 'running'"
                 icon="iconify solar--download-broken"
                 variant="outlined"
-                @click.stop.prevent="cacheProject(project.id)"
+                @click.stop.prevent="openCacheDialog(project.id)"
               />
             </div>
             <div
@@ -116,16 +79,9 @@
               />
               <div class="grow"></div>
               <Button
-                v-if="cacheOperation.status !== 'running'"
-                icon="iconify solar--refresh-broken"
+                icon="iconify iconify solar--settings-linear"
                 variant="outlined"
-                @click.stop.prevent="cacheProject(project.id, true)"
-              />
-              <Button
-                v-if="cacheOperation.status !== 'running'"
-                icon="iconify solar--trash-bin-minimalistic-broken"
-                variant="outlined"
-                @click.stop.prevent="clearCache(project.id)"
+                @click.stop.prevent="openCacheDialog(project.id, true)"
               />
             </div>
             <div
@@ -141,21 +97,11 @@
               <div class="grow"></div>
 
               <Button
-                v-if="cacheOperation.status !== 'running'"
-                icon="iconify solar--trash-bin-minimalistic-broken"
+                icon="iconify iconify solar--settings-linear"
                 variant="outlined"
-                @click.stop.prevent="clearCache(project.id)"
+                @click.stop.prevent="openCacheDialog(project.id, true)"
               />
             </div>
-            <Button
-              v-if="
-                cacheOperation.status === 'running' &&
-                cacheOperation.projectId === project.id
-              "
-              icon="iconify solar--forbidden-circle-broken"
-              variant="outlined"
-              @click.stop.prevent="abortCache()"
-            />
           </div>
         </div>
       </div>
@@ -178,19 +124,14 @@ import {
 
 import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
+const $dialog = useDialog();
+
 defineProps<{
   compact?: boolean;
 }>();
 
-const {
-  projectList,
-  librarySettings,
-  loadProject,
-  cacheProject,
-  abortCache,
-  clearCache,
-  cacheOperation,
-} = useViewerLibrary();
+const { projectList, librarySettings, loadProject, cacheOperation } =
+  useViewerLibrary();
 
 const search = ref<string>('');
 
@@ -205,6 +146,22 @@ const projects = computed(() => {
     });
   }
 });
+
+const LazyCacheDialog = defineAsyncComponent(
+  () => import('./menu/CacheDialog.vue'),
+);
+const openCacheDialog = async (id: string, update?: boolean) => {
+  $dialog.open(LazyCacheDialog, {
+    props: {
+      header: update ? 'Manage Project Cache' : 'Download Project',
+      modal: true,
+      style: {
+        width: '60vw',
+      },
+    },
+    data: { projectId: id },
+  });
+};
 </script>
 
 <style scoped lang="scss">

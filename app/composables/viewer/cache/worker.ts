@@ -5,7 +5,10 @@ import type { Project } from '~/composables/project/types/v1';
 import { bufferToString } from '~/composables/utils';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
 import { sleep } from '~/composables/utils/sleep';
-import type { CacheEvent } from '~/composables/viewer/cache/types';
+import type {
+  CacheEvent,
+  CacheOptions,
+} from '~/composables/viewer/cache/types';
 import { downloadFile, formatBytes } from '~/composables/viewer/cache/utils';
 import type { ViewerProject } from '~/composables/viewer/types';
 
@@ -19,10 +22,10 @@ self.addEventListener(
       const payload = JSON.parse(event) as CacheEvent;
       match(payload)
         .with({ type: 'init' }, () => {})
-        .with({ type: 'cache' }, async ({ project, refresh = false }) => {
+        .with({ type: 'cache' }, async ({ project, options = {} }) => {
           abortController = new AbortController();
           try {
-            await doCache(project, refresh, abortController.signal);
+            await doCache(project, options, abortController.signal);
           } catch (err) {
             if (
               typeof err === 'object' &&
@@ -63,7 +66,7 @@ async function doClear(project: ViewerProject) {
 
 async function doCache(
   project: ViewerProject,
-  refresh: boolean,
+  options: CacheOptions,
   abortSignal: AbortSignal,
 ) {
   const fsHandle = await navigator.storage.getDirectory();
@@ -82,7 +85,7 @@ async function doCache(
   try {
     const fileSize = projectFileHandle.getSize();
     console.log(`[cache ${project.id}] project.json size: ${fileSize}`);
-    if (!refresh && fileSize > 0) {
+    if (!options.refresh && fileSize > 0) {
       projectBytes = new Uint8Array(fileSize);
       projectFileHandle.read(projectBytes, { at: 0 });
       console.log(`[cache ${project.id}] project.json already cached`);
@@ -130,62 +133,69 @@ async function doCache(
     projectFileHandle.close();
   }
 
-  const projectJson = bufferToString(projectBytes.buffer);
-  const projectData = JSON.parse(projectJson) as Project;
+  if (options.images) {
+    const projectJson = bufferToString(projectBytes.buffer);
+    const projectData = JSON.parse(projectJson) as Project;
 
-  const imagesDir = await projectDir.getDirectoryHandle('images', {
-    create: true,
-  });
-
-  const images0: string[] = [];
-  for (const rowData of projectData.rows) {
-    if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
-      images0.push(rowData.image);
-    }
-
-    for (const objData of rowData.objects) {
-      if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
-        images0.push(objData.image);
-      }
-    }
-  }
-
-  const images = uniq(images0);
-
-  console.log(`[cache ${project.id}] found ${images.length} images to cache`);
-  postMessage({
-    status: 'progress',
-    info: `Downloading images ... 0/${images.length}`,
-  });
-  // cache the images in batches of 10
-  let progress = 0;
-  let errors = 0;
-  let cached = 0;
-  let totalBytes = 0;
-  for (const batch of chunk(images, 20)) {
-    const results = await Promise.allSettled(
-      batch.map((imageUrl) =>
-        cacheImage(new URL(imageUrl), refresh, imagesDir, abortSignal),
-      ),
-    );
-
-    const [success, failures] = partition(
-      (result) => result.status === 'fulfilled',
-      results,
-    );
-
-    progress += results.length;
-    errors += failures.length;
-    cached += success.filter((result) => result.value.cached).length;
-    totalBytes += success.reduce((acc, { value }) => acc + value.bytes, 0);
-    postMessage({
-      status: 'progress',
-      info: `Downloading images ... ${progress}/${images.length} (${cached > 0 ? `${cached} cached, ` : ''}${errors > 0 ? `${errors} errors, ` : ''}${formatBytes(totalBytes)})`,
+    const imagesDir = await projectDir.getDirectoryHandle('images', {
+      create: true,
     });
 
-    if (abortSignal.aborted) {
-      console.log(`[cache ${project.id}] cancelled`);
-      postMessage({ status: 'cancelled' });
+    const images0: string[] = [];
+    for (const rowData of projectData.rows) {
+      if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
+        images0.push(rowData.image);
+      }
+
+      for (const objData of rowData.objects) {
+        if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
+          images0.push(objData.image);
+        }
+      }
+    }
+
+    const images = uniq(images0);
+
+    console.log(`[cache ${project.id}] found ${images.length} images to cache`);
+    postMessage({
+      status: 'progress',
+      info: `Downloading images ... 0/${images.length}`,
+    });
+    // cache the images in batches of 10
+    let progress = 0;
+    let errors = 0;
+    let cached = 0;
+    let totalBytes = 0;
+    for (const batch of chunk(images, 20)) {
+      const results = await Promise.allSettled(
+        batch.map((imageUrl) =>
+          cacheImage(
+            new URL(imageUrl),
+            options.refresh ?? false,
+            imagesDir,
+            abortSignal,
+          ),
+        ),
+      );
+
+      const [success, failures] = partition(
+        (result) => result.status === 'fulfilled',
+        results,
+      );
+
+      progress += results.length;
+      errors += failures.length;
+      cached += success.filter((result) => result.value.cached).length;
+      totalBytes += success.reduce((acc, { value }) => acc + value.bytes, 0);
+      postMessage({
+        status: 'progress',
+        info: `Downloading images ... ${progress}/${images.length} (${cached > 0 ? `${cached} cached, ` : ''}${errors > 0 ? `${errors} errors, ` : ''}${formatBytes(totalBytes)})`,
+      });
+
+      if (abortSignal.aborted) {
+        console.log(`[cache ${project.id}] cancelled`);
+        postMessage({ status: 'cancelled' });
+      }
     }
   }
 

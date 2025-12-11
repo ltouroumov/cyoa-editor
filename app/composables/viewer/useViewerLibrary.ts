@@ -24,6 +24,7 @@ import { useProjectStore } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 import { bufferToString, readFileContents } from '~/composables/utils';
 import type {
+  CacheOptions,
   CacheResult,
   ClearResult,
 } from '~/composables/viewer/cache/types';
@@ -46,7 +47,6 @@ type CacheOperation =
     ));
 
 export function useViewerLibrary() {
-  const $toast = useToast();
   const dexie = useDexie();
   const worker = useCacheWorker();
   const { librarySettings, remoteProjectList } = useViewerRefs();
@@ -104,6 +104,10 @@ export function useViewerLibrary() {
         }
       });
   });
+
+  const getProject = (id: string) => {
+    return projectList.value.find(propEq(id, 'id'));
+  };
 
   const createLocalProject = async (
     data: string,
@@ -184,11 +188,11 @@ export function useViewerLibrary() {
     if (project.source === 'remote') {
       await loadRemoteFile(project);
     } else if (project.source === 'cached' || project.source === 'local') {
-      await loadCachedFile(project);
+      await loadCachedProject(project);
     }
   };
 
-  const cacheProject = async (id: string, refresh?: boolean) => {
+  const cacheProject = async (id: string, options: CacheOptions) => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 
@@ -199,7 +203,7 @@ export function useViewerLibrary() {
 
       // cache the project using the cache worker
       await worker.initWorker();
-      worker.publishSync({ type: 'cache', project: project, refresh });
+      worker.publishSync({ type: 'cache', project: project, options });
       // read the stream of messages from the worker until the cache operation is complete
       const _sub = worker.messages.subscribe(async (msg: CacheResult) => {
         await match(msg)
@@ -313,7 +317,20 @@ export function useViewerLibrary() {
     });
   };
 
-  const loadCachedFile = async (project: ViewerProject) => {
+  const loadCachedProject = async (project: ViewerProject) => {
+    await $store.loadProject(async (setProgress) => {
+      await setProgress(`Loading ${project.title} ...`);
+      const fileContents = await loadCachedData(project);
+      return {
+        projectId: project.id,
+        fileContents: fileContents,
+        fileName: project.file_url,
+        local: true,
+      };
+    });
+  };
+
+  const loadCachedData = async (project: ViewerProject) => {
     const fsHandle = await navigator.storage.getDirectory();
     // Create a directory to cache the project files
     const projectDir = await fsHandle.getDirectoryHandle(project.id, {
@@ -324,17 +341,9 @@ export function useViewerLibrary() {
       create: true,
     });
 
-    await $store.loadProject(async (setProgress) => {
-      await setProgress(`Loading ${project.title} ...`);
-      const handle = await projectFile.getFile();
-      const buffer = await handle.arrayBuffer();
-      return {
-        projectId: project.id,
-        fileContents: bufferToString(buffer),
-        fileName: handle.name,
-        local: true,
-      };
-    });
+    const handle = await projectFile.getFile();
+    const buffer = await handle.arrayBuffer();
+    return bufferToString(buffer);
   };
 
   return {
@@ -343,11 +352,14 @@ export function useViewerLibrary() {
     librarySettings,
     cacheOperation,
     // methods
+    getProject,
     addProject,
     loadProject,
     cacheProject,
     abortCache,
     clearCache,
+
+    loadCachedData,
   };
 }
 
