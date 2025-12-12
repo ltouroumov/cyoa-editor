@@ -1,3 +1,5 @@
+import type { ViewerProjectCacheFields } from '~/composables/shared/tables/viewer_projects';
+
 export type ViewerProject = {
   file_url: string;
   thumbnail_url?: string;
@@ -18,3 +20,8 @@ export type LibrarySettings = {
 export type LibraryData = LibrarySettings & {
   items: ViewerProject[];
 };
+
+export type ProjectListEntry = ViewerProject &
+  Partial<ViewerProjectCacheFields> & {
+    source: 'local' | 'remote' | 'cached';
+  };

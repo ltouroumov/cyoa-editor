@@ -15,10 +15,7 @@ import {
 import { match } from 'ts-pattern';
 
 import type { Project } from '~/composables/project/types/v1';
-import type {
-  ViewerProjectCache,
-  ViewerProjectCacheFields,
-} from '~/composables/shared/tables/viewer_projects';
+import type { ViewerProjectCache } from '~/composables/shared/tables/viewer_projects';
 import { useDexie } from '~/composables/shared/useDexie';
 import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
@@ -31,12 +28,11 @@ import type {
 } from '~/composables/viewer/cache/types';
 import { useCacheWorker } from '~/composables/viewer/cache/useCacheWorker';
 import { downloadFile, formatBytes } from '~/composables/viewer/cache/utils';
-import type { LibraryData, ViewerProject } from '~/composables/viewer/types';
-
-type ProjectListEntry = ViewerProject &
-  Partial<ViewerProjectCacheFields> & {
-    source: 'local' | 'remote' | 'cached';
-  };
+import type {
+  LibraryData,
+  ProjectListEntry,
+  ViewerProject,
+} from '~/composables/viewer/types';
 
 type CacheOperationStatus =
   | { status: 'running'; progress?: string }
@@ -44,7 +40,7 @@ type CacheOperationStatus =
   | { status: 'cancelled' }
   | { status: 'failure'; error: string };
 
-type CacheOperation = {
+export type CacheOperation = {
   projectId: string;
   taskId: string;
   keys: string[];
@@ -260,6 +256,7 @@ export function useViewerLibrary() {
             await dexie.viewer_projects_cache.put({
               ...omit(['source', 'origin'], project),
               cachedAt: new Date(),
+              cachedItems: event.cachedItems,
               origin: 'remote',
             });
 
@@ -288,7 +285,7 @@ export function useViewerLibrary() {
     worker.publishSync({ type: 'abort', taskId });
   };
 
-  const clearCache = async (id: string) => {
+  const clearCache = async (id: string, options: any) => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 

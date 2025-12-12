@@ -1,3 +1,4 @@
+import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import type { ViewerProject } from '~/composables/viewer/types';
 
 export type CacheOptions = {
@@ -25,7 +26,7 @@ export type CacheEvent =
 
 export type CacheResult =
   | { taskId: string; status: 'progress'; info: string }
-  | { taskId: string; status: 'completed' }
+  | { taskId: string; status: 'completed'; cachedItems?: CacheItem[] }
   | { taskId: string; status: 'cancelled' }
   | { taskId: string; status: 'failure'; error: string };
 
