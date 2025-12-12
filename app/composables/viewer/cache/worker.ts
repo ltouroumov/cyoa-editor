@@ -1,5 +1,6 @@
 import {
   drop,
+  flatten,
   includes,
   isNotEmpty,
   isNotNil,
@@ -12,12 +13,14 @@ import {
 import { match } from 'ts-pattern';
 
 import type { Project } from '~/composables/project/types/v1';
+import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import { bufferToString } from '~/composables/utils';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
 import type {
   CacheEvent,
   CacheOptions,
   CacheResult,
+  ClearOptions,
   ClearResult,
 } from '~/composables/viewer/cache/types';
 import {
@@ -38,6 +41,7 @@ type Task =
   | {
       taskId: string;
       type: 'clear';
+      options: ClearOptions;
       project: ViewerProject;
     };
 
@@ -64,11 +68,12 @@ self.addEventListener(
 
           startNextTask();
         })
-        .with({ type: 'clear' }, async ({ taskId, project }) => {
+        .with({ type: 'clear' }, async ({ taskId, project, options }) => {
           taskQueue.push({
             taskId,
             type: 'clear',
             project,
+            options,
           });
 
           startNextTask();
@@ -146,8 +151,8 @@ function startNextTask() {
         );
       },
     )
-    .with({ type: 'clear' }, ({ taskId, project }) => {
-      return doClear(taskId, project).catch((err) => {
+    .with({ type: 'clear' }, ({ taskId, project, options }) => {
+      return doClear(taskId, project, options).catch((err) => {
         console.error('error in cache worker', err);
 
         postMessage({
@@ -168,10 +173,108 @@ function startNextTask() {
   });
 }
 
-async function doClear(taskId: string, project: ViewerProject) {
+async function doClear(
+  taskId: string,
+  project: ViewerProject,
+  options: ClearOptions,
+) {
   const fsHandle = await navigator.storage.getDirectory();
-  await fsHandle.removeEntry(project.id, { recursive: true });
-  reply({ taskId, status: 'completed' });
+
+  if (options.project) {
+    await fsHandle.removeEntry(project.id, { recursive: true });
+    reply({ taskId, status: 'completed', deletedProject: true });
+  } else if (options.images) {
+    const projectDir = await fsHandle.getDirectoryHandle(project.id, {
+      create: false,
+    });
+
+    if (options.images === true) {
+      await projectDir.removeEntry('images', { recursive: true });
+      reply({
+        taskId,
+        status: 'completed',
+        deletedAllImages: true,
+      });
+    } else {
+      const projectFile = await projectDir.getFileHandle('project.json', {
+        create: true,
+      });
+
+      const projectFileHandle = await projectFile.createSyncAccessHandle();
+      const fileSize = projectFileHandle.getSize();
+      const projectBytes: Uint8Array<ArrayBuffer> = new Uint8Array(fileSize);
+      projectFileHandle.read(projectBytes, { at: 0 });
+
+      const projectJson = bufferToString(projectBytes.buffer);
+      const projectData = JSON.parse(projectJson) as Project;
+
+      const imagesDir = await projectDir.getDirectoryHandle('images', {
+        create: false,
+      });
+
+      const deletedCacheItems: string[] = [];
+      const images0: string[] = [];
+      for (const rowData of projectData.rows) {
+        if (!includes(rowData.id, options.images)) {
+          // Skip the row if it's not in the list of images to cache.
+          continue;
+        }
+
+        deletedCacheItems.push(rowData.id);
+        if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
+          images0.push(rowData.image);
+        }
+
+        for (const objData of rowData.objects) {
+          if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
+            images0.push(objData.image);
+          }
+
+          for (const objAddon of objData.addons) {
+            if (isNotEmpty(objAddon.image) && imageIsUrl(objAddon.image)) {
+              images0.push(objAddon.image);
+            }
+          }
+        }
+      }
+
+      const images = uniq(images0);
+
+      reply({
+        taskId,
+        status: 'progress',
+        info: `Deleting images ... 0/${images.length}`,
+      });
+      let progress = 0;
+      let errors = 0;
+      for (const batch of chunk(images, 20)) {
+        const results = await Promise.allSettled(
+          batch.map((imageUrl) => deleteImage(new URL(imageUrl), imagesDir)),
+        );
+
+        const [_success, failures] = partition(
+          (result) => result.status === 'fulfilled',
+          results,
+        );
+
+        progress += results.length;
+        errors += failures.length;
+        reply({
+          taskId,
+          status: 'progress',
+          info: `Deleting images ... ${progress}/${images.length} (${errors > 0 ? `${errors} errors` : ''})`,
+        });
+      }
+
+      reply({
+        taskId,
+        status: 'completed',
+        deletedCacheItems,
+      });
+    }
+  } else {
+    reply({ taskId, status: 'failure', error: 'Invalid clear options.' });
+  }
 }
 
 async function doCache(
@@ -180,6 +283,8 @@ async function doCache(
   options: CacheOptions,
   abortSignal: AbortSignal,
 ) {
+  const cachedItems: CacheItem[] = [];
+
   const fsHandle = await navigator.storage.getDirectory();
 
   // Create a directory to cache the project files
@@ -265,7 +370,7 @@ async function doCache(
       create: true,
     });
 
-    const images0: string[] = [];
+    const images0: string[][] = [];
     for (const rowData of projectData.rows) {
       if (
         options.images !== true &&
@@ -275,24 +380,34 @@ async function doCache(
         continue;
       }
 
+      const rowImages = [];
       if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
-        images0.push(rowData.image);
+        rowImages.push(rowData.image);
       }
 
       for (const objData of rowData.objects) {
         if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
-          images0.push(objData.image);
+          rowImages.push(objData.image);
         }
 
         for (const objAddon of objData.addons) {
           if (isNotEmpty(objAddon.image) && imageIsUrl(objAddon.image)) {
-            images0.push(objAddon.image);
+            rowImages.push(objAddon.image);
           }
         }
       }
+
+      if (rowImages.length > 0) {
+        images0.push(rowImages);
+        cachedItems.push({
+          type: 'images.row',
+          rowId: rowData.id,
+          count: rowImages.length,
+        });
+      }
     }
 
-    const images = uniq(images0);
+    const images = uniq(flatten(images0));
 
     console.log(`[cache ${project.id}] found ${images.length} images to cache`);
     reply({
@@ -339,7 +454,7 @@ async function doCache(
     }
   }
 
-  reply({ taskId, status: 'completed' });
+  reply({ taskId, status: 'completed', cachedItems });
 }
 
 async function cacheImage(
@@ -370,6 +485,18 @@ async function cacheImage(
     throw new Error(`Failed to download image ${imageName}.`);
   } finally {
     imageFileHandle?.close();
+  }
+}
+
+async function deleteImage(
+  imageUrl: URL,
+  imagesDir: FileSystemDirectoryHandle,
+): Promise<void> {
+  const imageName = last(imageUrl.pathname.split('/'))!;
+  try {
+    await imagesDir.removeEntry(imageName);
+  } catch (err) {
+    console.warn(`[cache] failed to delete image ${imageName}`, err);
   }
 }
 

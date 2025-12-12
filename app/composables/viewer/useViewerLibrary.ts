@@ -1,6 +1,7 @@
 import {
   append,
   concat,
+  includes,
   indexBy,
   isNil,
   isNotNil,
@@ -24,6 +25,7 @@ import { bufferToString, readFileContents } from '~/composables/utils';
 import type {
   CacheOptions,
   CacheResult,
+  ClearOptions,
   ClearResult,
 } from '~/composables/viewer/cache/types';
 import { useCacheWorker } from '~/composables/viewer/cache/useCacheWorker';
@@ -44,6 +46,7 @@ export type CacheOperation = {
   projectId: string;
   taskId: string;
   keys: string[];
+  name: string;
 } & CacheOperationStatus;
 
 export function useViewerLibrary() {
@@ -58,9 +61,10 @@ export function useViewerLibrary() {
     taskId: string,
     projectId: string,
     keys: string[],
+    name: string,
   ) => {
     cacheOperations.value = append(
-      { status: 'running', taskId, projectId, keys },
+      { status: 'running', taskId, projectId, keys, name },
       cacheOperations.value,
     );
   };
@@ -75,12 +79,7 @@ export function useViewerLibrary() {
     );
   };
   const hasActiveOperation = (projectId: string, key: string) => {
-    return cacheOperations.value.some(
-      (op) =>
-        op.projectId === projectId &&
-        op.keys.includes(key) &&
-        op.status === 'running',
-    );
+    return hasActiveOperation0(cacheOperations.value, projectId, key);
   };
 
   const localProjectList = useLiveQuery<ViewerProject[]>(() => {
@@ -241,7 +240,10 @@ export function useViewerLibrary() {
           ? options.images.map((i) => `images.${i}`)
           : []),
       ].filter(isNotNil) as string[];
-      startOperation(taskId, project.id, keys);
+
+      const name =
+        (options.project ?? true) ? 'Download project' : 'Download images';
+      startOperation(taskId, project.id, keys, name);
 
       // read the stream of messages from the worker until the cache operation is complete
       const _sub = events.subscribe(async (msg: CacheResult) => {
@@ -285,7 +287,7 @@ export function useViewerLibrary() {
     worker.publishSync({ type: 'abort', taskId });
   };
 
-  const clearCache = async (id: string, options: any) => {
+  const clearCache = async (id: string, options: ClearOptions) => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 
@@ -294,26 +296,52 @@ export function useViewerLibrary() {
       const fsHandle = await navigator.storage.getDirectory();
       await fsHandle.removeEntry(project.id, { recursive: true });
     } else if (project.source === 'cached') {
-      // Delete the entry from the cache table first
-      // This allows users to load the project from the remote without waiting for the cache operation to complete
-      await dexie.viewer_projects_cache.delete(project.id);
-
       const { taskId, events } = await worker.submitTask({
         type: 'clear',
         project: project,
+        options,
       });
-
-      startOperation(taskId, project.id, ['project']);
+      const keys = [
+        (options.project ?? true) ? 'project' : null,
+        options.images === true ? 'images' : null,
+        ...(Array.isArray(options.images)
+          ? options.images.map((i) => `images.${i}`)
+          : []),
+      ].filter(isNotNil) as string[];
+      const name = (options.project ?? true) ? 'Clear project' : 'Clear images';
+      startOperation(taskId, project.id, keys, name);
       // read the stream of messages from the worker until the cache operation is complete
-      const _sub = events.subscribe((msg: ClearResult) => {
-        match(msg)
-          .with({ status: 'completed' }, (event) => {
+      const _sub = events.subscribe(async (msg: ClearResult) => {
+        await match(msg)
+          .with({ status: 'progress' }, async (event) => {
+            updateOperation(event.taskId, {
+              status: 'running',
+              progress: event.info,
+            });
+            _sub.unsubscribe();
+          })
+          .with({ status: 'completed' }, async (event) => {
+            if (event.deletedProject) {
+              await dexie.viewer_projects_cache.delete(project.id);
+            } else if (event.deletedAllImages) {
+              await dexie.viewer_projects_cache.update(project.id, {
+                cachedItems: [],
+              });
+            } else if (isNotNil(event.deletedCacheItems)) {
+              await dexie.viewer_projects_cache.update(project.id, {
+                cachedItems: (project.cachedItems ?? []).filter(
+                  (item) =>
+                    !includes(item.rowId, event.deletedCacheItems ?? []),
+                ),
+              });
+            }
+
             updateOperation(event.taskId, {
               status: 'completed',
             });
             _sub.unsubscribe();
           })
-          .with({ status: 'failure' }, (event) => {
+          .with({ status: 'failure' }, async (event) => {
             updateOperation(event.taskId, {
               status: 'failure',
               error: event.error,
@@ -431,3 +459,16 @@ export async function setupLibrary() {
     library.librarySettings.value = omit(['items'], response.value);
   }
 }
+
+export const hasActiveOperation0 = (
+  cacheOperations: CacheOperation[],
+  projectId: string,
+  key: string,
+) => {
+  return cacheOperations.some(
+    (op) =>
+      op.projectId === projectId &&
+      op.keys.includes(key) &&
+      op.status === 'running',
+  );
+};

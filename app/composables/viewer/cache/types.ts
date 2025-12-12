@@ -7,6 +7,11 @@ export type CacheOptions = {
   images?: boolean | string[];
 };
 
+export type ClearOptions = {
+  project?: boolean;
+  images?: boolean | string[];
+};
+
 export type CacheTask = {
   type: 'cache';
   project: ViewerProject;
@@ -16,6 +21,7 @@ export type CacheTask = {
 export type ClearTask = {
   type: 'clear';
   project: ViewerProject;
+  options: ClearOptions;
 };
 
 export type CacheEvent =
@@ -31,7 +37,13 @@ export type CacheResult =
   | { taskId: string; status: 'failure'; error: string };
 
 export type ClearResult =
-  // | { status: 'progress'; info: string }
-  | { taskId: string; status: 'completed' }
+  | { taskId: string; status: 'progress'; info: string }
+  | {
+      taskId: string;
+      status: 'completed';
+      deletedProject?: boolean;
+      deletedAllImages?: boolean;
+      deletedCacheItems?: string[];
+    }
   // | { status: 'cancelled' }
   | { taskId: string; status: 'failure'; error: string };

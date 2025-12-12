@@ -2,7 +2,6 @@
   <div class="flex flex-col gap-2">
     <CacheOperations
       :cache-operations="cacheOperations"
-      ,
       @abort="abortCache"
       @clear="clearOperation"
     />
@@ -21,8 +20,9 @@
           <span
             v-else-if="project.source === 'remote'"
             class="font-bold italic text-gray-500"
-            >Remote</span
           >
+            Remote
+          </span>
           <span
             v-else-if="project.source === 'cached'"
             class="font-bold text-indigo-500"
@@ -54,7 +54,7 @@
         >
           <Button
             :disabled="hasActiveOperation(project.id, 'project')"
-            @click="cacheProject(project.id, { refresh: true })"
+            @click="cacheProject(project.id, { refresh: true, images: false })"
           >
             <span class="iconify solar--refresh-linear"></span>
             Update
@@ -62,7 +62,7 @@
           <Button
             severity="danger"
             :disabled="hasActiveOperation(project.id, 'project')"
-            @click="tryClearCache(project.id, $event)"
+            @click="tryClearCache(project.id, { project: true }, $event)"
           >
             <span class="iconify solar--trash-bin-trash-linear"></span>
             Delete
@@ -84,8 +84,11 @@
         <div class="flex flex-col gap-2 justify-end">
           <div v-if="!hasCachedImages" class="flex flex-row gap-2 justify-end">
             <Button
-              :disabled="hasActiveOperation(project.id, 'project')"
-              @click="cacheProject(project.id, { images: false })"
+              :disabled="
+                project.source === 'remote' ||
+                hasActiveOperation(project.id, 'images')
+              "
+              @click="cacheProject(project.id, { images: true })"
             >
               <span class="iconify solar--cloud-download-linear"></span>
               Download
@@ -93,16 +96,16 @@
           </div>
           <div v-else class="flex flex-row gap-2 justify-end">
             <Button
-              :disabled="hasActiveOperation(project.id, 'project')"
-              @click="cacheProject(project.id, { refresh: true })"
+              :disabled="hasActiveOperation(project.id, 'images')"
+              @click="cacheProject(project.id, { refresh: true, images: true })"
             >
               <span class="iconify solar--refresh-linear"></span>
               Update
             </Button>
             <Button
               severity="danger"
-              :disabled="hasActiveOperation(project.id, 'project')"
-              @click="tryClearCache(project.id, $event)"
+              :disabled="hasActiveOperation(project.id, 'images')"
+              @click="tryClearCache(project.id, { images: true }, $event)"
             >
               <span class="iconify solar--trash-bin-trash-linear"></span>
               Delete
@@ -111,7 +114,7 @@
 
           <div class="flex flex-row gap-2 items-center">
             <Checkbox
-              v-model="imagesAdvanced"
+              v-model="showImagesAdvanced"
               :binary="true"
               input-id="images-advanced-mode"
             />
@@ -119,23 +122,33 @@
           </div>
         </div>
       </div>
+      <ImageCache
+        v-if="showImagesAdvanced"
+        class="mt-2"
+        :project="project"
+        :project-data="projectData!"
+        :active-operations="cacheOperations"
+        @cache="cacheProject"
+        @clear="clearCache"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useConfirm } from 'primevue/useconfirm';
-import { find, isNotEmpty, isNotNil, propEq } from 'ramda';
+import { find, isNil, isNotEmpty, isNotNil, propEq } from 'ramda';
 
 import CacheOperations from '~/components/viewer/menu/CacheOperations.vue';
 import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
+import type { ClearOptions } from '~/composables/viewer/cache/types';
 import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
 const $confirm = useConfirm();
 const $dialog: Ref = inject('dialogRef')!;
-const imagesAdvanced = ref<boolean>(false);
+const showImagesAdvanced = ref<boolean>(false);
 
 const {
   projectList,
@@ -152,16 +165,20 @@ const project = computed(() => {
   return find(propEq($dialog.value.data.projectId, 'id'), projectList.value);
 });
 
-const rows = computedAsync(async () => {
+const projectData = computedAsync(async () => {
   if (!project.value) return null;
   if (project.value.source === 'remote') return null;
 
   const fileContents = await loadCachedData(project.value);
-  const fileData = JSON.parse(fileContents) as Project;
+  return JSON.parse(fileContents) as Project;
+});
+
+const rows = computedAsync(async () => {
+  if (isNil(projectData.value) || isNil(project.value)) return null;
 
   let totalRows = 0;
   let totalImages = 0;
-  for (const row of fileData.rows) {
+  for (const row of projectData.value.rows) {
     totalRows++;
 
     if (isNotEmpty(row.image) && imageIsUrl(row.image)) {
@@ -181,19 +198,18 @@ const rows = computedAsync(async () => {
   }
 
   const cachedItems: CacheItem[] = project.value.cachedItems ?? [];
-  const allImagesCached = cachedItems.some(
-    (item) => item.type === 'images.all',
-  );
-  const totalImagesCached = allImagesCached
-    ? totalImages
-    : cachedItems.reduce((acc, item) => {
-        if (item.type === 'images.row') return acc + item.count;
-        else return acc;
-      }, 0);
+  const totalImagesCached = cachedItems.reduce((acc, item) => {
+    if (item.type === 'images.row') return acc + item.count;
+    else return acc;
+  }, 0);
   return { totalRows, totalImages, totalImagesCached };
 }, null);
 
-const tryClearCache = async (id: string, $event: any) => {
+const tryClearCache = async (
+  id: string,
+  options: ClearOptions,
+  $event: any,
+) => {
   $confirm.require({
     target: $event.currentTarget,
     message: 'Clear cache?',
@@ -208,15 +224,15 @@ const tryClearCache = async (id: string, $event: any) => {
       label: 'Clear',
     },
     accept: async () => {
-      await clearCache(id, {});
+      await clearCache(id, options);
     },
   });
 };
 
 const hasCachedImages = computed(() => {
-  return project.value?.cachedItems?.some((cacheItem) => {
-    return cacheItem.type === 'images.all' || cacheItem.type === 'images.row';
-  });
+  return (project.value?.cachedItems ?? []).some(
+    (cacheItem) => cacheItem.type === 'images.row',
+  );
 });
 </script>
 

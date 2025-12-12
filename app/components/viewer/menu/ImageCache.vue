@@ -26,14 +26,14 @@
     >
       <template #header>
         <div class="flex flex-row gap-2">
-          <div class="grow font-bold text-primary text-xl">Images</div>
-          <IconField>
+          <IconField class="w-full">
             <InputIcon>
               <i class="pi pi-search" />
             </InputIcon>
             <InputText
               v-model="filters['global'].value"
               placeholder="Keyword Search"
+              class="w-full"
             />
           </IconField>
         </div>
@@ -67,11 +67,14 @@
               icon="iconify solar--download-square-linear"
               size="small"
               :disabled="
-                hasActiveOperation(project.id, `images.${data.id}`) ||
-                hasActiveOperation(project.id, 'images')
+                hasActiveOperation0(
+                  activeOperations,
+                  project.id,
+                  `images.${data.id}`,
+                ) || hasActiveOperation0(activeOperations, project.id, 'images')
               "
               @click="
-                cacheProject(project.id, { images: [data.id], refresh: true })
+                $emit('cache', project.id, { images: [data.id], refresh: true })
               "
             />
             <Button
@@ -80,27 +83,14 @@
               size="small"
               :disabled="
                 data.cacheStatus === false ||
-                hasActiveOperation(project.id, `images.${data.id}`) ||
-                hasActiveOperation(project.id, 'images')
+                hasActiveOperation0(
+                  activeOperations,
+                  project.id,
+                  `images.${data.id}`,
+                ) ||
+                hasActiveOperation0(activeOperations, project.id, 'images')
               "
-              @click="clearCache(project.id, { images: [data.id] })"
-            />
-          </div>
-        </template>
-        <template #header>
-          <div class="flex flex-row gap-2 items-center">
-            <Button
-              icon="iconify solar--download-square-linear"
-              size="small"
-              :disabled="hasActiveOperation(project.id, `images`)"
-              @click="cacheProject(project.id, { images: true, refresh: true })"
-            />
-            <Button
-              icon="iconify solar--trash-bin-trash-linear"
-              severity="danger"
-              size="small"
-              :disabled="hasActiveOperation(project.id, `images`)"
-              @click="clearCache(project.id, { images: true })"
+              @click="$emit('clear', project.id, { images: [data.id] })"
             />
           </div>
         </template>
@@ -115,14 +105,28 @@ import { isEmpty, isNil, isNotEmpty, isNotNil } from 'ramda';
 
 import type { Project } from '~/composables/project/types/v1';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
+import type {
+  CacheOptions,
+  ClearOptions,
+} from '~/composables/viewer/cache/types';
 import { useImageCache } from '~/composables/viewer/cache/useImageCache';
 import type { ProjectListEntry } from '~/composables/viewer/types';
-import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
+import {
+  type CacheOperation,
+  hasActiveOperation0,
+} from '~/composables/viewer/useViewerLibrary';
 
-const $props = defineProps<{ project: ProjectListEntry }>();
+const $props = defineProps<{
+  project: ProjectListEntry;
+  projectData: Project;
+  activeOperations: CacheOperation[];
+}>();
 
-const { loadCachedData, cacheProject, clearCache, hasActiveOperation } =
-  useViewerLibrary();
+defineEmits<{
+  (e: 'cache', projectId: string, options: CacheOptions): void;
+  (e: 'clear', projectId: string, options: ClearOptions): void;
+}>();
+
 const { resolveImage } = useImageCache();
 
 type RowInfo = {
@@ -134,11 +138,9 @@ type RowInfo = {
 };
 
 const rows = computedAsync(async () => {
-  if (!$props.project) return [];
   if ($props.project.source === 'remote') return [];
 
-  const fileContents = await loadCachedData($props.project);
-  const fileData = JSON.parse(fileContents) as Project;
+  const fileData = $props.projectData;
   const projectId = $props.project.id;
 
   const rows: RowInfo[] = [];
