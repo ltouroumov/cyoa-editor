@@ -1,5 +1,6 @@
 import {
   append,
+  clone,
   concat,
   includes,
   indexBy,
@@ -243,42 +244,53 @@ export function useViewerLibrary() {
 
       const name =
         (options.project ?? true) ? 'Download project' : 'Download images';
+
       startOperation(taskId, project.id, keys, name);
 
       // read the stream of messages from the worker until the cache operation is complete
       const _sub = events.subscribe(async (msg: CacheResult) => {
-        await match(msg)
-          .with({ status: 'progress' }, async (progress) => {
-            updateOperation(progress.taskId, {
-              status: 'running',
-              progress: progress.info,
-            });
-          })
-          .with({ status: 'completed' }, async (event) => {
-            await dexie.viewer_projects_cache.put({
-              ...omit(['source', 'origin'], project),
-              cachedAt: new Date(),
-              cachedItems: event.cachedItems,
-              origin: 'remote',
-            });
+        try {
+          await match(msg)
+            .with({ status: 'progress' }, async (progress) => {
+              updateOperation(progress.taskId, {
+                status: 'running',
+                progress: progress.info,
+              });
+            })
+            .with({ status: 'completed' }, async (event) => {
+              const newCachedItems = concat(
+                // need to deep clone the list otherwise it will contain vue proxy objects :/
+                clone(project.cachedItems ?? []),
+                event.cachedItems ?? [],
+              );
+              console.log('newCachedItems', newCachedItems);
+              await dexie.viewer_projects_cache.put({
+                ...omit(['source', 'origin'], project),
+                origin: 'remote',
+                cachedAt: new Date(),
+                cachedItems: newCachedItems,
+              });
 
-            updateOperation(event.taskId, {
-              status: 'completed',
-            });
-          })
-          .with({ status: 'cancelled' }, async (event) => {
-            updateOperation(event.taskId, {
-              status: 'cancelled',
-            });
-            _sub.unsubscribe();
-          })
-          .with({ status: 'failure' }, async (event) => {
-            updateOperation(event.taskId, {
-              status: 'failure',
-              error: event.error,
-            });
-          })
-          .exhaustive();
+              updateOperation(event.taskId, {
+                status: 'completed',
+              });
+            })
+            .with({ status: 'cancelled' }, async (event) => {
+              updateOperation(event.taskId, {
+                status: 'cancelled',
+              });
+              _sub.unsubscribe();
+            })
+            .with({ status: 'failure' }, async (event) => {
+              updateOperation(event.taskId, {
+                status: 'failure',
+                error: event.error,
+              });
+            })
+            .exhaustive();
+        } catch (err) {
+          console.error('failed to process event', msg, err);
+        }
       });
     }
   };
@@ -318,7 +330,6 @@ export function useViewerLibrary() {
               status: 'running',
               progress: event.info,
             });
-            _sub.unsubscribe();
           })
           .with({ status: 'completed' }, async (event) => {
             if (event.deletedProject) {
@@ -329,7 +340,7 @@ export function useViewerLibrary() {
               });
             } else if (isNotNil(event.deletedCacheItems)) {
               await dexie.viewer_projects_cache.update(project.id, {
-                cachedItems: (project.cachedItems ?? []).filter(
+                cachedItems: clone(project.cachedItems ?? []).filter(
                   (item) =>
                     !includes(item.rowId, event.deletedCacheItems ?? []),
                 ),

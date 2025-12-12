@@ -1,21 +1,6 @@
 <template>
   <div class="min-h-[400px] relative">
-    <div
-      v-if="isEmpty(rows) && isNil(project)"
-      class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center"
-    >
-      <div class="text-surface-600 italic">No project data ...</div>
-    </div>
-    <div
-      v-if="isEmpty(rows) && !isNil(project)"
-      class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center"
-    >
-      <div class="text-surface-600 italic">
-        <ProgressSpinner class="size-6" />
-      </div>
-    </div>
     <DataTable
-      v-if="!isEmpty(rows) && !isNil(project)"
       v-model:filters="filters"
       :value="rows"
       data-key="id"
@@ -23,6 +8,7 @@
       :scrollable="true"
       scroll-height="400px"
       :global-filter-fields="['id', 'title']"
+      :loading="loading"
     >
       <template #header>
         <div class="flex flex-row gap-2">
@@ -36,6 +22,13 @@
               class="w-full"
             />
           </IconField>
+        </div>
+      </template>
+      <template #empty>
+        <div
+          class="w-full flex flex-row items-center justify-center text-surface-700 min-h-[200px]"
+        >
+          <div>No sections.</div>
         </div>
       </template>
       <Column field="title" header="Section">
@@ -74,7 +67,11 @@
                 ) || hasActiveOperation0(activeOperations, project.id, 'images')
               "
               @click="
-                $emit('cache', project.id, { images: [data.id], refresh: true })
+                $emit('cache', project.id, {
+                  images: [data.id],
+                  project: false,
+                  refresh: true,
+                })
               "
             />
             <Button
@@ -101,7 +98,7 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
-import { isEmpty, isNil, isNotEmpty, isNotNil } from 'ramda';
+import { includes, isNotEmpty } from 'ramda';
 
 import type { Project } from '~/composables/project/types/v1';
 import { imageIsUrl } from '~/composables/utils/imageIsUrl';
@@ -109,7 +106,6 @@ import type {
   CacheOptions,
   ClearOptions,
 } from '~/composables/viewer/cache/types';
-import { useImageCache } from '~/composables/viewer/cache/useImageCache';
 import type { ProjectListEntry } from '~/composables/viewer/types';
 import {
   type CacheOperation,
@@ -127,73 +123,64 @@ defineEmits<{
   (e: 'clear', projectId: string, options: ClearOptions): void;
 }>();
 
-const { resolveImage } = useImageCache();
-
 type RowInfo = {
   id: string;
   title: string;
   totalImageCount: number;
-  cachedImageCount: number;
   cacheStatus: 'cached' | 'partial' | false;
 };
 
-const rows = computedAsync(async () => {
-  if ($props.project.source === 'remote') return [];
+const rows = ref<RowInfo[]>([]);
+const loading = ref<boolean>(false);
 
-  const fileData = $props.projectData;
-  const projectId = $props.project.id;
+watch(
+  [() => $props.project, () => $props.projectData],
+  async () => {
+    if ($props.project.source === 'remote') return [];
 
-  const rows: RowInfo[] = [];
-  for (const row of fileData.rows) {
-    let totalImageCount = 0;
-    let cachedImageCount = 0;
-    if (isNotEmpty(row.image) && imageIsUrl(row.image)) {
-      totalImageCount += 1;
-      const resolved = await resolveImage(projectId, row.image);
-      if (isNotNil(resolved)) {
-        cachedImageCount += 1;
-      }
-    }
-    for (const obj of row.objects) {
-      if (isNotEmpty(obj.image) && imageIsUrl(obj.image)) {
+    loading.value = true;
+    await nextTick();
+
+    const fileData = $props.projectData;
+
+    const cachedRows = ($props.project.cachedItems ?? []).map(
+      (item) => item.rowId,
+    );
+
+    const rows0: RowInfo[] = [];
+    for (const row of fileData.rows) {
+      let totalImageCount = 0;
+      if (isNotEmpty(row.image) && imageIsUrl(row.image)) {
         totalImageCount += 1;
-        const resolved = await resolveImage(projectId, obj.image);
-        if (isNotNil(resolved)) {
-          cachedImageCount += 1;
-        }
       }
-
-      for (const addon of obj.addons) {
-        if (isNotEmpty(addon.image) && imageIsUrl(addon.image)) {
+      for (const obj of row.objects) {
+        if (isNotEmpty(obj.image) && imageIsUrl(obj.image)) {
           totalImageCount += 1;
-          const resolved = await resolveImage(projectId, addon.image);
-          if (isNotNil(resolved)) {
-            cachedImageCount += 1;
+        }
+        for (const addon of obj.addons) {
+          if (isNotEmpty(addon.image) && imageIsUrl(addon.image)) {
+            totalImageCount += 1;
           }
         }
       }
+
+      if (totalImageCount <= 0) {
+        continue;
+      }
+
+      rows0.push({
+        id: row.id,
+        title: row.title,
+        totalImageCount,
+        cacheStatus: includes(row.id, cachedRows) ? 'cached' : false,
+      });
     }
 
-    if (totalImageCount <= 0) {
-      continue;
-    }
-
-    rows.push({
-      id: row.id,
-      title: row.title,
-      totalImageCount,
-      cachedImageCount,
-      cacheStatus:
-        cachedImageCount === 0
-          ? false
-          : cachedImageCount === totalImageCount
-            ? 'cached'
-            : 'partial',
-    });
-  }
-
-  return rows;
-});
+    rows.value = rows0;
+    loading.value = false;
+  },
+  { immediate: true },
+);
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },

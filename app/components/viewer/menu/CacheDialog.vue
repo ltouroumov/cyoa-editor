@@ -97,7 +97,13 @@
           <div v-else class="flex flex-row gap-2 justify-end">
             <Button
               :disabled="hasActiveOperation(project.id, 'images')"
-              @click="cacheProject(project.id, { refresh: true, images: true })"
+              @click="
+                cacheProject(project.id, {
+                  refresh: true,
+                  images: true,
+                  project: false,
+                })
+              "
             >
               <span class="iconify solar--refresh-linear"></span>
               Update
@@ -123,7 +129,7 @@
         </div>
       </div>
       <ImageCache
-        v-if="showImagesAdvanced"
+        v-if="isNotNil(project) && showImagesAdvanced"
         class="mt-2"
         :project="project"
         :project-data="projectData!"

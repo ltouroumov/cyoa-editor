@@ -158,7 +158,7 @@ function startNextTask() {
         postMessage({
           taskId: taskId,
           status: 'failure',
-          error: 'Failed to download project file (exception)',
+          error: 'Failed to clead data (exception)',
         });
       });
     })
@@ -196,17 +196,24 @@ async function doClear(
         deletedAllImages: true,
       });
     } else {
-      const projectFile = await projectDir.getFileHandle('project.json', {
-        create: true,
-      });
+      let projectData: Project;
+      let projectFileHandle: FileSystemSyncAccessHandle | undefined = undefined;
+      try {
+        const projectFile = await projectDir.getFileHandle('project.json');
+        projectFileHandle = await projectFile.createSyncAccessHandle();
+        const fileSize = projectFileHandle.getSize();
+        const projectBytes: Uint8Array<ArrayBuffer> = new Uint8Array(fileSize);
+        projectFileHandle.read(projectBytes, { at: 0 });
 
-      const projectFileHandle = await projectFile.createSyncAccessHandle();
-      const fileSize = projectFileHandle.getSize();
-      const projectBytes: Uint8Array<ArrayBuffer> = new Uint8Array(fileSize);
-      projectFileHandle.read(projectBytes, { at: 0 });
-
-      const projectJson = bufferToString(projectBytes.buffer);
-      const projectData = JSON.parse(projectJson) as Project;
+        const projectJson = bufferToString(projectBytes.buffer);
+        projectData = JSON.parse(projectJson) as Project;
+      } catch (err) {
+        console.log(`[cache] failed to load project data`, err);
+        reply({ taskId, status: 'failure', error: 'Failed to load project.' });
+        return;
+      } finally {
+        projectFileHandle?.close();
+      }
 
       const imagesDir = await projectDir.getDirectoryHandle('images', {
         create: false,
@@ -264,6 +271,7 @@ async function doClear(
           status: 'progress',
           info: `Deleting images ... ${progress}/${images.length} (${errors > 0 ? `${errors} errors` : ''})`,
         });
+        console.log(`[cache] deleted ${progress} images`);
       }
 
       reply({
@@ -494,9 +502,11 @@ async function deleteImage(
 ): Promise<void> {
   const imageName = last(imageUrl.pathname.split('/'))!;
   try {
+    console.log(`[cache] deleting image ${imageName}`);
     await imagesDir.removeEntry(imageName);
   } catch (err) {
     console.warn(`[cache] failed to delete image ${imageName}`, err);
+    throw err;
   }
 }
 

@@ -96,13 +96,11 @@ export function useCacheWorker() {
 
     const events = workerData.pipe(
       filter((data) => data.taskId === event.taskId),
-    ) as Observable<CacheResult>;
+    ) as Observable<CacheResult | ClearResult>;
     return { taskId, events };
   }
 
   return {
-    initWorker,
-    closeWorker,
     publishSync,
     publishAsync,
     submitTask,
