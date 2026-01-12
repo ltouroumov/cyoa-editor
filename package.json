@@ -57,6 +57,7 @@
     "dexie": "4.2.1",
     "dom-to-svg": "patch:dom-to-svg@npm:0.12.2#./.yarn/patches/dom-to-svg-npm-0.12.2-dfe442df49.patch",
     "handlebars": "4.7.8",
+    "js-base64": "^3.7.8",
     "nanoid": "5.1.6",
     "nuxt": "^4.2.1",
     "perfect-debounce": "2.0.0",

@@ -18,26 +18,23 @@
 <script setup lang="ts">
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
-import * as R from 'ramda';
 import { isNotEmpty } from 'ramda';
 import { ref } from 'vue';
 
-import type { Selections } from '~/composables/store/project';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { useBackpackImport } from '~/composables/viewer/useBackpackImport';
 
 const $confirm = useConfirm();
 const $toast = useToast();
-const { selected } = useProjectRefs();
+const { selected, buildNotes } = useProjectRefs();
 const { setSelected } = useProjectStore();
+const { readImportCode: parseImportCode } = useBackpackImport();
 const importCode = ref<string>();
 
-const LEGACY_RX =
-  /^(?:[a-zA-Z0-9-_!@&.]+(?:\/ON#\d+)?)(?:,[a-zA-Z0-9-_!@&.]+(?:\/ON#\d+)?)*$/;
-
 function readImportCode($event: any) {
-  let _code = importCode.value?.trim();
+  const result = parseImportCode(importCode.value);
 
-  if (!_code) {
+  if (!result) {
     if (isNotEmpty(selected.value)) {
       $confirm.require({
         header: 'Clear choices?',
@@ -65,40 +62,6 @@ function readImportCode($event: any) {
     return;
   }
 
-  // Trim any trailing comma/semicolon, if present.
-  if (_code.endsWith(',') || _code.endsWith(';')) {
-    _code = _code.substring(0, _code.length - 1);
-  }
-  // Trim any leading comma/semicolon, if present.
-  if (_code.startsWith(',') || _code.startsWith(';')) {
-    _code = _code.substring(1);
-  }
-
-  const selections: Selections = {};
-  if (LEGACY_RX.test(_code)) {
-    console.log(`Legacy Import Mode`);
-    R.split(',', _code).forEach((part) => {
-      const sepIdx = part.indexOf('/ON#');
-      if (sepIdx === -1) {
-        selections[part] = 1;
-      } else {
-        const objId = part.substring(0, sepIdx);
-        const amountS = part.substring(sepIdx + 4);
-        selections[objId] = Number.parseInt(amountS);
-      }
-    });
-  } else {
-    R.split(';', _code).forEach((part) => {
-      const sepIdx = part.indexOf(':');
-      if (sepIdx === -1) {
-        selections[part] = 1;
-      } else {
-        const [objId, amountS] = R.split(':', part);
-        selections[objId] = Number.parseInt(amountS);
-      }
-    });
-  }
-
   if (isNotEmpty(selected.value)) {
     $confirm.require({
       header: 'Load this build?',
@@ -114,7 +77,10 @@ function readImportCode($event: any) {
         label: 'Import',
       },
       accept: async () => {
-        setSelected(selections, true, true);
+        setSelected(result.selections, true, true);
+        if (result.notes) {
+          buildNotes.value = result.notes;
+        }
         importCode.value = '';
         $toast.add({
           severity: 'info',
@@ -124,7 +90,10 @@ function readImportCode($event: any) {
       },
     });
   } else {
-    setSelected(selections, true, true);
+    setSelected(result.selections, true, true);
+    if (result.notes) {
+      buildNotes.value = result.notes;
+    }
     importCode.value = '';
     $toast.add({
       severity: 'info',

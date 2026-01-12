@@ -6234,6 +6234,7 @@ __metadata:
     eslint-plugin-unused-imports: "npm:4.3.0"
     eslint-plugin-vue: "npm:10.6.1"
     handlebars: "npm:4.7.8"
+    js-base64: "npm:^3.7.8"
     nanoid: "npm:5.1.6"
     nuxt: "npm:^4.2.1"
     perfect-debounce: "npm:2.0.0"
@@ -6636,6 +6637,13 @@ __metadata:
   bin:
     jiti: lib/jiti-cli.mjs
   checksum: 10/8cd72c5fd03a0502564c3f46c49761090f6dadead21fa191b73535724f095ad86c2fa89ee6fe4bc3515337e8d406cc8fb2d37b73fa0c99a34584bac35cd4a4de
+  languageName: node
+  linkType: hard
+
+"js-base64@npm:^3.7.8":
+  version: 3.7.8
+  resolution: "js-base64@npm:3.7.8"
+  checksum: 10/4baa9a222bc094b072933e4894735653b59992477c731879784e3112f21862b08dd5c56b8b23b0b8e43bc5bb514d957621d1892a6c58950f29e12b731fe087b6
   languageName: node
   linkType: hard
 

@@ -1,8 +1,14 @@
 import * as R from 'ramda';
 
-import type { ProjectObj } from '~/composables/project/types/v1';
+import type { ProjectNote, ProjectObj } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
-import { type PackRow, useBackpack } from '~/composables/viewer/useBackpack';
+import {
+  type PackRow,
+  type PackRowChoice,
+  useBackpack,
+} from '~/composables/viewer/useBackpack';
+import { isNotEmpty } from 'ramda';
+import { Base64 } from 'js-base64';
 
 type ExportTextOptions = {
   exportHeaders: boolean;
@@ -15,7 +21,7 @@ type ExportCodeOptions = {
 export function useBackpackExport() {
   const { packRows } = useBackpack();
   const { getObject } = useProjectStore();
-  const { selected } = useProjectRefs();
+  const { selected, buildNotes } = useProjectRefs();
 
   const formatObject = (obj: ProjectObj, count: number): string => {
     let result = obj.title;
@@ -26,7 +32,7 @@ export function useBackpackExport() {
   };
 
   const createExportText = (options: ExportTextOptions) => {
-    return R.pipe(
+    let result = R.pipe(
       R.map(({ packRow, choices }: PackRow): string => {
         const choiceTitles = R.map(({ obj, addons, count }) => {
           let result = formatObject(obj, count);
@@ -45,6 +51,56 @@ export function useBackpackExport() {
       }),
       R.join(options.exportHeaders ? '\n' : ', '),
     )(packRows.value);
+
+    if (isNotEmpty(buildNotes.value)) {
+      const notes = buildNotes.value;
+      const rowNotes = R.pipe(
+        R.map(({ packRow, choices }: PackRow) => {
+          const choiceNotes = R.pipe(
+            R.map(({ obj, count }: PackRowChoice) => {
+              if (R.has(`obj:${obj.id}`, notes)) {
+                const objNotes = notes[`obj:${obj.id}`];
+                if (R.includes('\n', objNotes.text)) {
+                  return `${obj.title}:\n${objNotes.text.trim()}`;
+                } else {
+                  return `${obj.title}: ${objNotes.text.trim()}`;
+                }
+              }
+              return null;
+            }),
+            R.filter(R.isNotNil),
+            R.join('\n'),
+          )(choices);
+          if (R.has(`row:${packRow.id}`, notes)) {
+            const rowNotes = notes[`row:${packRow.id}`];
+            return `**${packRow.title}**\n${rowNotes.text.trim()}\n${choiceNotes}`;
+          } else if (R.isNotEmpty(choiceNotes)) {
+            return `**${packRow.title}**\n${choiceNotes}`;
+          } else {
+            return null;
+          }
+        }),
+        R.filter(R.isNotNil),
+        R.join('\n'),
+      )(packRows.value);
+      const globalNotes = R.pipe(
+        R.values,
+        R.filter((note: ProjectNote) => R.startsWith('build-', note.id)),
+        R.map((note: ProjectNote) => {
+          return `**${note.title}**\n${note.text}`;
+        }),
+        R.join('\n'),
+      )(notes);
+
+      if (isNotEmpty(rowNotes)) {
+        result += `\n\n==Build Notes==\n${rowNotes.trimEnd()}`;
+      }
+      if (isNotEmpty(globalNotes)) {
+        result += `\n\n==Global Notes==\n${globalNotes.trimEnd()}`;
+      }
+    }
+
+    return result;
   };
 
   const createLegacyExportCode = () => {
@@ -59,12 +115,20 @@ export function useBackpackExport() {
 
   const createNewExportCode = () => {
     // TODO: Include build notes
-    return R.pipe(
+    let result = R.pipe(
       R.map(([id, amt]) => {
         return amt > 1 ? `${id}:${amt}` : id;
       }),
       R.join(';'),
     )(R.toPairs(selected.value));
+
+    if (isNotEmpty(buildNotes.value)) {
+      const notesJson = JSON.stringify(buildNotes.value);
+      const notesB64 = Base64.toBase64(notesJson, true);
+      result += `;notes=${notesB64}`;
+    }
+
+    return result;
   };
 
   const createExportCode = (options: ExportCodeOptions) => {
