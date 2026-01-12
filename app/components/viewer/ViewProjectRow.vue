@@ -15,17 +15,13 @@
         :src="row.image"
         :alt="row.title"
       />
-      <div v-if="row.title || row.titleText" class="row-header">
+      <div v-if="hasTitle || hasTitleText" class="row-header">
         <!-- eslint-disable vue/no-v-html -->
+        <div v-if="hasTitle" class="row-title" v-html="formatText(row.title)" />
         <div
-          v-if="row.title"
-          class="row-title"
-          v-html="formatText(row.title)"
-        />
-        <div
-          v-if="row.titleText && !display?.hideRowText"
+          v-if="hasTitleText && !display?.hideRowText"
           class="row-text"
-          v-html="formatText(row.titleText)"
+          v-html="formatText(row.titleText ?? '')"
         />
         <!-- eslint-enable vue/no-v-html -->
       </div>
@@ -71,16 +67,20 @@ import type { ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
 import { formatText } from '~/composables/text';
+import { isNotEmpty } from 'ramda';
 
-const { row } = defineProps<{
+const $props = defineProps<{
   row: ProjectRow;
   display?: DisplaySettings;
 }>();
 
 const { selectedIds } = useProjectRefs();
 
-const condition = buildConditions(row);
-const isVisible = computed(() => condition(selectedIds.value));
+const condition = computed(() => buildConditions($props.row));
+const isVisible = computed(() => condition.value(selectedIds.value));
+
+const hasTitle = computed(() => isNotEmpty($props.row.title));
+const hasTitleText = computed(() => isNotEmpty($props.row.titleText));
 </script>
 
 <style lang="scss">
