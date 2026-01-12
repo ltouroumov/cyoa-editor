@@ -51,6 +51,7 @@ function readImportCode($event: any) {
         },
         accept: async () => {
           selected.value = {};
+          buildNotes.value = {};
           $toast.add({
             severity: 'info',
             summary: `Build Cleared`,
