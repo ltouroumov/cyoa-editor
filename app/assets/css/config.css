@@ -4,7 +4,7 @@
 @layer base, primevue;
 
 @plugin "@iconify/tailwind4" {
-  icons: ['carbon', 'solar'];
+  prefixes: carbon, solar;
 }
 
 @plugin "tailwind-bootstrap-grid" {
