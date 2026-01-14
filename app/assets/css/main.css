@@ -1,8 +1,4 @@
-@import 'tailwindcss';
-@import 'tailwindcss-primeui';
-@config '../../../tailwind.config.js';
-
-@layer base, primevue;
+@import './config.css';
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,

@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+@import 'tailwindcss-primeui';
+
+@layer base, primevue;
+
+@plugin "@iconify/tailwind4" {
+  icons: ['carbon', 'solar'];
+}
+
+@plugin "tailwind-bootstrap-grid" {
+  container-max-widths: ['sm', '540px', 'md', '720px', 'lg', '960px', 'xl', '1140px', '2xl', '1320px'];
+  grid-gutters: ['2', '0.5rem'];
+}
+
+@theme {
+  /* Grid Template Columns Extensions */
+  --grid-template-columns-60: repeat(60, minmax(0, 1fr));
+  --grid-template-columns-form: max-content 1fr;
+}
+
+/* Flex Grow Extensions */
+@source inline("grow-1");
+@source inline("grow-2");
+@source inline("grow-3");
+
+/* Generate grid column span utilities (13-60) */
+@source inline("col-span-13");
+@source inline("col-span-14");
+@source inline("col-span-15");
+@source inline("col-span-16");
+@source inline("col-span-17");
+@source inline("col-span-18");
+@source inline("col-span-19");
+@source inline("col-span-20");
+@source inline("col-span-21");
+@source inline("col-span-22");
+@source inline("col-span-23");
+@source inline("col-span-24");
+@source inline("col-span-25");
+@source inline("col-span-26");
+@source inline("col-span-27");
+@source inline("col-span-28");
+@source inline("col-span-29");
+@source inline("col-span-30");
+@source inline("col-span-31");
+@source inline("col-span-32");
+@source inline("col-span-33");
+@source inline("col-span-34");
+@source inline("col-span-35");
+@source inline("col-span-36");
+@source inline("col-span-37");
+@source inline("col-span-38");
+@source inline("col-span-39");
+@source inline("col-span-40");
+@source inline("col-span-41");
+@source inline("col-span-42");
+@source inline("col-span-43");
+@source inline("col-span-44");
+@source inline("col-span-45");
+@source inline("col-span-46");
+@source inline("col-span-47");
+@source inline("col-span-48");
+@source inline("col-span-49");
+@source inline("col-span-50");
+@source inline("col-span-51");
+@source inline("col-span-52");
+@source inline("col-span-53");
+@source inline("col-span-54");
+@source inline("col-span-55");
+@source inline("col-span-56");
+@source inline("col-span-57");
+@source inline("col-span-58");
+@source inline("col-span-59");
+@source inline("col-span-60");
+
+@source "../../../app/components/**/*.{js,vue,ts}";
+@source "../../../app/layouts/**/*.vue";
+@source "../../../app/pages/**/*.vue";
+@source "../../../app/plugins/**/*.{js,ts}";
+@source "../../../app/app.vue";
+@source "../../../app/error.vue";

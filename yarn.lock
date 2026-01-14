@@ -357,6 +357,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cyberalien/svg-utils@npm:^1.0.11":
+  version: 1.0.11
+  resolution: "@cyberalien/svg-utils@npm:1.0.11"
+  dependencies:
+    "@iconify/types": "npm:^2.0.0"
+  checksum: 10/9b5328ed165f3bca6a65831041c7e068bd8710843c133bd16c3e0ff05325d8bc82f65f0f3fab5df5a937f2f9999a396460399f83cdfaeab2b94566cda61e927b
+  languageName: node
+  linkType: hard
+
 "@dxup/nuxt@npm:^0.2.1":
   version: 0.2.2
   resolution: "@dxup/nuxt@npm:0.2.2"
@@ -966,12 +975,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iconify/tailwind@npm:1.2.0":
-  version: 1.2.0
-  resolution: "@iconify/tailwind@npm:1.2.0"
+"@iconify/tailwind4@npm:1.2.1":
+  version: 1.2.1
+  resolution: "@iconify/tailwind4@npm:1.2.1"
   dependencies:
+    "@iconify/tools": "npm:^5.0.2"
     "@iconify/types": "npm:^2.0.0"
-  checksum: 10/d1bec4f3fec9bcba89bda514fe1658b2a896f31f31a6b5cc7c2f109d7fb9e9b251fb5585ec8e0fe90f8553532493bee29dc4c98c668bf2c63b416050f0452990
+    "@iconify/utils": "npm:^3.1.0"
+  peerDependencies:
+    tailwindcss: ">= 4.0.0"
+  checksum: 10/c30c904a0128e3013bb05b7696c45b511befe2f91106f9389cb550ef5251b6a8fa2c5642fefa268085b0d27684c1cf7cce4e4155ffc0edd1e89b82ce6c3958c1
+  languageName: node
+  linkType: hard
+
+"@iconify/tools@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@iconify/tools@npm:5.0.2"
+  dependencies:
+    "@cyberalien/svg-utils": "npm:^1.0.11"
+    "@iconify/types": "npm:^2.0.0"
+    "@iconify/utils": "npm:^3.1.0"
+    fflate: "npm:^0.8.2"
+    modern-tar: "npm:^0.7.3"
+    pathe: "npm:^2.0.3"
+    svgo: "npm:^4.0.0"
+  checksum: 10/7dacd14d188dbcd91cf1d0138719fdb855a1ea3bc35f3d7694f481a96f6c638a192445535b6712fab79445836dc585d79117a577e7cd11f5d54ac41b3f3e6e0a
   languageName: node
   linkType: hard
 
@@ -979,6 +1007,17 @@ __metadata:
   version: 2.0.0
   resolution: "@iconify/types@npm:2.0.0"
   checksum: 10/1b3425ecbc0eef44f23d3f27355ae7ef306d5119c566f013ef1849995b016e1fdcc5af6b74c3bc0554485d70cf5179cb9c1095b14d662a55abcae1148e1a13c9
+  languageName: node
+  linkType: hard
+
+"@iconify/utils@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@iconify/utils@npm:3.1.0"
+  dependencies:
+    "@antfu/install-pkg": "npm:^1.1.0"
+    "@iconify/types": "npm:^2.0.0"
+    mlly: "npm:^1.8.0"
+  checksum: 10/28e83311ec7eca3f94a9c128c6d6f0f6aa68b7a63bcac44d08a1ea6f94d3752a7447a4354f3d02fdcdbf782ba033784ef7a65212b3afe52d9b41ef8138e96b14
   languageName: node
   linkType: hard
 
@@ -5679,6 +5718,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fflate@npm:^0.8.2":
+  version: 0.8.2
+  resolution: "fflate@npm:0.8.2"
+  checksum: 10/2bd26ba6d235d428de793c6a0cd1aaa96a06269ebd4e21b46c8fd1bd136abc631acf27e188d47c3936db090bf3e1ede11d15ce9eae9bffdc4bfe1b9dc66ca9cb
+  languageName: node
+  linkType: hard
+
 "file-entry-cache@npm:^8.0.0":
   version: 8.0.0
   resolution: "file-entry-cache@npm:8.0.0"
@@ -6202,7 +6248,7 @@ __metadata:
     "@eslint/js": "npm:9.39.1"
     "@iconify-json/carbon": "npm:1.2.14"
     "@iconify-json/solar": "npm:1.2.5"
-    "@iconify/tailwind": "npm:1.2.0"
+    "@iconify/tailwind4": "npm:1.2.1"
     "@nuxt/devtools": "npm:2.7.0"
     "@nuxt/eslint": "npm:1.10.0"
     "@nuxt/eslint-config": "npm:1.10.0"
@@ -7413,6 +7459,13 @@ __metadata:
   version: 0.1.1
   resolution: "mocked-exports@npm:0.1.1"
   checksum: 10/afb8cc084636703f329f770789be17397ea55e06628754a3be6f2bb20155b19354abd34ee1adec44057dd84b0465b26fde32749bd291fe76e1415f58dfa04084
+  languageName: node
+  linkType: hard
+
+"modern-tar@npm:^0.7.3":
+  version: 0.7.3
+  resolution: "modern-tar@npm:0.7.3"
+  checksum: 10/d76a0f67c50d255e2ddd82d6db5bb882bf124b4e8af5ebd4d5b74bf612fc5fdfb27c00d8ecb4552a722ba310609f28f42eb0b9c52474a30e5608a668096b0af6
   languageName: node
   linkType: hard
 

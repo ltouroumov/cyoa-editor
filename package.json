@@ -44,7 +44,7 @@
   "dependencies": {
     "@iconify-json/carbon": "1.2.14",
     "@iconify-json/solar": "1.2.5",
-    "@iconify/tailwind": "1.2.0",
+    "@iconify/tailwind4": "1.2.1",
     "@pinia/nuxt": "0.11.3",
     "@popperjs/core": "2.11.8",
     "@primevue/themes": "4.4.1",
