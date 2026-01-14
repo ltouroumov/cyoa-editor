@@ -81,6 +81,8 @@ function readImportCode($event: any) {
         setSelected(result.selections, true, true);
         if (result.notes) {
           buildNotes.value = result.notes;
+        } else {
+          buildNotes.value = {};
         }
         importCode.value = '';
         $toast.add({
@@ -92,9 +94,8 @@ function readImportCode($event: any) {
     });
   } else {
     setSelected(result.selections, true, true);
-    if (result.notes) {
-      buildNotes.value = result.notes;
-    }
+    buildNotes.value = {};
+
     importCode.value = '';
     $toast.add({
       severity: 'info',
