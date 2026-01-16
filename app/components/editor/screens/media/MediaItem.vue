@@ -4,16 +4,7 @@
   >
     <div class="h-20 w-20 flex-shrink-0 bg-surface-100 rounded overflow-hidden">
       <img
-        v-if="image.isRemote"
         :src="image.data"
-        :alt="image.id"
-        class="w-full h-full object-cover"
-        loading="lazy"
-        decoding="async"
-      />
-      <img
-        v-else
-        :src="`data:image/png;base64,${image.data}`"
         :alt="image.id"
         class="w-full h-full object-cover"
         loading="lazy"

@@ -4,25 +4,19 @@
   >
     <div class="aspect-video bg-surface-100 relative overflow-hidden">
       <img
-        v-if="image.isRemote"
         :src="image.data"
         :alt="image.id"
         class="w-full h-full object-cover"
         loading="lazy"
         decoding="async"
       />
-      <img
-        v-else
-        :src="`data:image/png;base64,${image.data}`"
-        :alt="image.id"
-        class="w-full h-full object-cover"
-        loading="lazy"
-        decoding="async"
-      />
       <div
-        class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs font-mono px-2 py-1 truncate"
+        class="absolute bottom-0 left-0 right-0 bg-black/70 text-xs font-mono px-2 py-1 truncate flex flex-row justify-between"
       >
-        {{ image.id }}
+        <span class="text-surface-500">
+          {{ image.isRemote ? 'Remote' : 'Local' }}
+        </span>
+        <span class="text-white">{{ image.id }}</span>
       </div>
     </div>
     <div class="p-2 flex flex-row gap-2 justify-end">
