@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-row gap-3 items-center border border-surface-500 rounded p-3 hover:border-primary transition-colors cursor-pointer"
+    class="flex flex-row gap-3 items-center border border-surface-500 rounded p-3"
   >
     <div class="h-20 w-20 flex-shrink-0 bg-surface-100 rounded overflow-hidden">
       <img
@@ -23,12 +23,14 @@
       </div>
     </div>
     <div class="flex flex-row gap-2">
-      <Button
-        size="small"
-        variant="outlined"
-        severity="secondary"
-        icon="iconify solar--pen-line-duotone"
-      />
+      <Button size="small" variant="outlined" severity="secondary">
+        <span class="iconify solar--pen-line-duotone" />
+        Edit
+      </Button>
+      <Button size="small" variant="outlined" severity="secondary">
+        <span class="iconify solar--link-line-duotone" />
+        Uses
+      </Button>
       <Button
         size="small"
         variant="outlined"

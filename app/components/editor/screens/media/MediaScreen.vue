@@ -4,7 +4,7 @@
     data-key="id"
     :dt="{ header: { padding: '1rem 0' }, content: { padding: '1rem 0' } }"
     :paginator="true"
-    :rows="48"
+    :rows="50"
   >
     <template #header>
       <div class="flex flex-row justify-between items-center">

@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="border border-surface-500 rounded overflow-hidden flex flex-col hover:border-primary transition-colors cursor-pointer"
-  >
+  <div class="border border-surface-500 rounded overflow-hidden flex flex-col">
     <div class="aspect-video bg-surface-100 relative overflow-hidden">
       <img
         :src="image.data"
@@ -25,19 +23,18 @@
         <span class="text-white">{{ image.id }}</span>
       </div>
     </div>
-    <div class="p-2 flex flex-row gap-2 justify-end">
-      <Button
-        size="small"
-        variant="outlined"
-        severity="secondary"
-        icon="iconify solar--pen-line-duotone"
-      />
-      <Button
-        size="small"
-        variant="outlined"
-        severity="danger"
-        icon="iconify solar--trash-bin-trash-line-duotone"
-      />
+    <div class="p-2 flex flex-row gap-2">
+      <Button size="small" variant="outlined" severity="secondary">
+        <span class="iconify solar--pen-line-duotone" />
+        Edit
+      </Button>
+      <Button size="small" variant="outlined" severity="secondary">
+        <span class="iconify solar--link-line-duotone" />
+      </Button>
+      <div class="grow"></div>
+      <Button size="small" variant="outlined" severity="danger">
+        <span class="iconify solar--trash-bin-trash-line-duotone" />
+      </Button>
     </div>
   </div>
 </template>
