@@ -5,7 +5,7 @@ import type {
   ObjStyles,
   ProjectStyles,
   RowStyles,
-} from '~/composables/project/types/v1';
+} from '~/composables/project/types/v1/styles';
 
 export abstract class StyleGenerator<T> {
   abstract name: string;
