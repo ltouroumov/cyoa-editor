@@ -1,18 +1,18 @@
 <template>
   <div class="flex flex-col gap-4">
     <!-- Basic Info -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-      <div class="grid grid-cols-form gap-2 items-center">
+    <div class="flex flex-row gap-2">
+      <IftaLabel class="grow">
         <label class="font-bold" for="styleName">Name</label>
         <InputText id="styleName" v-model="style.name" fluid />
-      </div>
-      <div class="grid grid-cols-form gap-2 items-center">
+      </IftaLabel>
+      <IftaLabel>
         <label class="font-bold" for="styleTarget">Target</label>
         <InputText id="styleTarget" :value="style.target" disabled fluid />
-      </div>
+      </IftaLabel>
     </div>
 
-    <div class="grid grid-cols-form gap-2 items-start">
+    <IftaLabel>
       <label class="font-bold" for="styleComment">Comment</label>
       <Textarea
         id="styleComment"
@@ -21,12 +21,11 @@
         fluid
         auto-resize
       />
-    </div>
+    </IftaLabel>
 
     <!-- Style Type Specific Forms -->
     <div v-if="style.type === StyleType.simple" class="flex flex-col gap-4">
-      <h3 class="text-lg font-bold text-primary">Simple Style Configuration</h3>
-      <SimpleStyleForm :style="style as AnySimpleStyle" />
+      <EditSimpleStyle :style-id="style.id" />
     </div>
 
     <div
@@ -53,7 +52,6 @@
 </template>
 
 <script setup lang="ts">
-import type { AnySimpleStyle } from '~/composables/project/types/v2/styles';
 import { StyleType } from '~/composables/project/types/v2/styles';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 

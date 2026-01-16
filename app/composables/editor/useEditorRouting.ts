@@ -56,6 +56,8 @@ function serializeScreen(screen: any): string {
       return `choice:${screen.choiceId}`;
     case 'edit-addon':
       return `addon:${screen.addonId}`;
+    case 'edit-style':
+      return `style:${screen.styleId}`;
     default:
       return '';
   }

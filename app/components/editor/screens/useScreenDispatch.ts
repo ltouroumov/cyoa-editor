@@ -1,5 +1,5 @@
 import type { MenuItem } from 'primevue/menuitem';
-import { isEmpty, last } from 'ramda';
+import { has, isEmpty, last } from 'ramda';
 
 import BlankScreen from '~/components/editor/screens/BlankScreen.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
@@ -28,42 +28,50 @@ const StylesScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/styles/StylesScreen.vue'),
 );
 const StyleEditScreen = defineAsyncComponent(
-  () => import('~/components/editor/screens/styles/StyleEditScreen.vue'),
+  () => import('~/components/editor/screens/styles/EditStyleScreen.vue'),
 );
 
 export function buildStackFromObjectId(objectId: string): any[] {
   const projectStore = useProjectStore();
-  const parents = projectStore.getParents(objectId);
   const stack = [];
 
-  for (const parentId of parents) {
-    const object = projectStore.objects.get(parentId)!;
-    switch (object.type) {
-      case ObjectType.page:
-        stack.push({
-          type: 'edit-page',
-          pageId: object.id,
-        });
-        break;
-      case ObjectType.row:
-        stack.push({
-          type: 'edit-row',
-          rowId: object.id,
-        });
-        break;
-      case ObjectType.choice:
-        stack.push({
-          type: 'edit-choice',
-          choiceId: object.id,
-        });
-        break;
-      case ObjectType.addon:
-        stack.push({
-          type: 'edit-addon',
-          addonId: object.id,
-        });
-        break;
+  if (projectStore.objects.has(objectId)) {
+    const parents = projectStore.getParents(objectId);
+    for (const parentId of parents) {
+      const object = projectStore.objects.get(parentId)!;
+      switch (object.type) {
+        case ObjectType.page:
+          stack.push({
+            type: 'edit-page',
+            pageId: object.id,
+          });
+          break;
+        case ObjectType.row:
+          stack.push({
+            type: 'edit-row',
+            rowId: object.id,
+          });
+          break;
+        case ObjectType.choice:
+          stack.push({
+            type: 'edit-choice',
+            choiceId: object.id,
+          });
+          break;
+        case ObjectType.addon:
+          stack.push({
+            type: 'edit-addon',
+            addonId: object.id,
+          });
+          break;
+      }
     }
+  } else if (has(objectId, projectStore.styles.rules)) {
+    stack.push({
+      type: 'edit-style',
+      styleId: objectId,
+    });
+  } else if (has(objectId, projectStore.media.images)) {
   }
 
   return stack;
@@ -86,6 +94,15 @@ export function useScreenDispatch() {
     }
   }
 
+  function dispatchStyleScreen(top: any): ScreenComponent {
+    switch (top.type) {
+      case 'edit-style':
+        return { component: StyleEditScreen, props: { styleId: top.styleId } };
+      default:
+        return { component: BlankScreen, props: {} };
+    }
+  }
+
   const screen = computed((): ScreenComponent => {
     switch (editorStore.root) {
       case 'content':
@@ -102,10 +119,7 @@ export function useScreenDispatch() {
           return { component: StylesScreen };
         } else {
           const top = last(editorStore.stack);
-          if (top.type === 'edit-style') {
-            return { component: StyleEditScreen, props: { styleId: top.styleId } };
-          }
-          return { component: BlankScreen, props: {} };
+          return dispatchStyleScreen(top);
         }
       default:
         return { component: BlankScreen, props: {} };
