@@ -231,7 +231,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
       const mediaId = createId('media');
       data.media.images[mediaId] = {
         id: mediaId,
-        isRemote: row.imageIsLink,
+        isRemote: startsWith('http', row.image),
         data: row.image,
       };
 
@@ -304,7 +304,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         const mediaId = createId('media');
         data.media.images[mediaId] = {
           id: mediaId,
-          isRemote: object.imageIsLink,
+          isRemote: startsWith('http', object.image),
           data: object.image,
         };
 
