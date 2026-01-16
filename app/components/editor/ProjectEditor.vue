@@ -42,17 +42,35 @@ import EditorBreadcrumbs from '~/components/editor/screens/EditorBreadcrumbs.vue
 import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
+import type { MenuItem } from 'primevue/menuitem';
 
 const { unloadProject, saveProject } = useEditorLibrary();
 const editorStore = useEditorStore();
 const { screen } = useScreenDispatch();
 
 const preview = ref<boolean>(false);
-const menu = [
+const menu: MenuItem[] = [
   {
     label: 'Project',
     icon: 'iconify solar--file-bold-duotone',
     items: [
+      {
+        label: 'Auto Save',
+        items: [
+          {
+            label: 'Disabled',
+          },
+          {
+            label: '1 Minute',
+            icon: 'iconify solar--check-circle-line-duotone',
+          },
+          { label: '2 Minutes' },
+          { label: '5 Minutes' },
+          { label: '10 Minutes' },
+        ],
+      },
+
+      { separator: true },
       {
         label: 'Save',
         icon: 'iconify solar--file-download-bold-duotone',
@@ -69,15 +87,37 @@ const menu = [
       },
     ],
   },
+  { separator: true, class: 'border-l border-surface-700 h-4' },
+  {
+    label: 'Content',
+    icon: 'iconify solar--documents-minimalistic-line-duotone',
+    command: () => {
+      editorStore.clearStack('content');
+    },
+  },
+  {
+    label: 'Media',
+    icon: 'iconify solar--gallery-line-duotone',
+    command: () => {
+      editorStore.clearStack('media');
+    },
+  },
+  {
+    label: 'Styles',
+    icon: 'iconify solar--pallete-2-line-duotone',
+    command: () => {
+      editorStore.clearStack('styles');
+    },
+  },
 ];
 
 const { ctrl_k, esc } = useMagicKeys({
   passive: false,
   onEventFired(e: KeyboardEvent) {
     if (e.ctrlKey && e.key === 'k' && e.type === 'keydown') {
-      e.preventDefault()
+      e.preventDefault();
     }
-  }
+  },
 });
 watch(ctrl_k, (newValue) => {
   if (newValue && !editorStore.showOmniBar) {

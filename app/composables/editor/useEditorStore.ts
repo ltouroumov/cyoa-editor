@@ -8,7 +8,7 @@ import type {
 
 type EditorStatus = 'empty' | 'loading' | 'ready';
 
-type EditorStackRoot = 'content' | 'styles';
+type EditorStackRoot = 'content' | 'media' | 'styles';
 export const useEditorStore = defineStore('editor', () => {
   const status = ref<EditorStatus>('empty');
   const project = ref<EditorProject | null>(null);

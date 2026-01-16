@@ -21,6 +21,12 @@ const RowScreen = defineAsyncComponent(
 const ChoiceScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/content/ChoiceScreen.vue'),
 );
+const MediaScreen = defineAsyncComponent(
+  () => import('~/components/editor/screens/media/MediaScreen.vue'),
+);
+const StylesScreen = defineAsyncComponent(
+  () => import('~/components/editor/screens/styles/StylesScreen.vue'),
+);
 
 export function buildStackFromObjectId(objectId: string): any[] {
   const projectStore = useProjectStore();
@@ -86,18 +92,46 @@ export function useScreenDispatch() {
           const top = last(editorStore.stack);
           return dispatchContentScreen(top);
         }
+      case 'media':
+        return { component: MediaScreen };
+      case 'styles':
+        return { component: StylesScreen };
       default:
         return { component: BlankScreen, props: {} };
     }
   });
 
   const bcHome = computed((): MenuItem => {
-    return {
-      root: true,
-      label: 'Pages',
-      icon: 'iconify solar--documents-line-duotone',
-      command: () => editorStore.clearStack(),
-    };
+    switch (editorStore.root) {
+      case 'content':
+        return {
+          root: true,
+          label: 'Pages',
+          icon: 'iconify solar--documents-line-duotone',
+          command: () => editorStore.clearStack(),
+        };
+      case 'media':
+        return {
+          root: true,
+          label: 'Media',
+          icon: 'iconify solar--gallery-line-duotone',
+          command: () => editorStore.clearStack(),
+        };
+      case 'styles':
+        return {
+          root: true,
+          label: 'Styles',
+          icon: 'iconify solar--pallete-2-line-duotone',
+          command: () => editorStore.clearStack(),
+        };
+      default:
+        return {
+          root: true,
+          label: 'Unknown',
+          icon: 'iconify solar--question-circle-line-duotone',
+          command: () => editorStore.clearStack(),
+        };
+    }
   });
 
   const bcStack = computed<MenuItem[]>(() => {
