@@ -2,10 +2,7 @@ import type {
   StyleTarget,
   StyleType,
 } from '~/composables/project/types/v2/styles/base';
-import type {
-  BaseStyle,
-  SimpleStyle,
-} from '~/composables/project/types/v2/styles/index';
+import type { BaseStyle } from '~/composables/project/types/v2/styles/index';
 
 export type ComponentStyle = string[] | { add?: string[]; remove?: string[] };
 
@@ -17,7 +14,7 @@ export interface AdvancedStyle extends BaseStyle {
   type: StyleType.advanced;
 }
 
-export interface AdvancedPageStyle extends SimpleStyle {
+export interface AdvancedPageStyle extends AdvancedStyle {
   target: StyleTarget.row;
 
   header?: {
@@ -27,7 +24,7 @@ export interface AdvancedPageStyle extends SimpleStyle {
   contents?: ComponentStyle;
 }
 
-export interface AdvancedRowStyle extends SimpleStyle {
+export interface AdvancedRowStyle extends AdvancedStyle {
   target: StyleTarget.row;
 
   header?: {
@@ -40,7 +37,7 @@ export interface AdvancedRowStyle extends SimpleStyle {
   contents?: ComponentStyle;
 }
 
-export interface AdvancedChoiceStyle extends SimpleStyle {
+export interface AdvancedChoiceStyle extends AdvancedStyle {
   target: StyleTarget.choice;
 
   header?: {

@@ -27,6 +27,9 @@ const MediaScreen = defineAsyncComponent(
 const StylesScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/styles/StylesScreen.vue'),
 );
+const StyleEditScreen = defineAsyncComponent(
+  () => import('~/components/editor/screens/styles/StyleEditScreen.vue'),
+);
 
 export function buildStackFromObjectId(objectId: string): any[] {
   const projectStore = useProjectStore();
@@ -95,7 +98,15 @@ export function useScreenDispatch() {
       case 'media':
         return { component: MediaScreen };
       case 'styles':
-        return { component: StylesScreen };
+        if (isEmpty(editorStore.stack)) {
+          return { component: StylesScreen };
+        } else {
+          const top = last(editorStore.stack);
+          if (top.type === 'edit-style') {
+            return { component: StyleEditScreen, props: { styleId: top.styleId } };
+          }
+          return { component: BlankScreen, props: {} };
+        }
       default:
         return { component: BlankScreen, props: {} };
     }
@@ -158,6 +169,14 @@ export function useScreenDispatch() {
           return {
             label: choice.name,
             icon: 'iconify solar--box-minimalistic-line-duotone',
+            command: () => editorStore.popStack(index),
+          };
+        }
+        case 'edit-style': {
+          const style = projectStore.styles.rules[item.styleId];
+          return {
+            label: style.name || style.id,
+            icon: 'iconify solar--pallete-2-line-duotone',
             command: () => editorStore.popStack(index),
           };
         }

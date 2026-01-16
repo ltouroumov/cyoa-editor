@@ -25,31 +25,15 @@
       </template>
       <template #list="{ items }">
         <div class="flex flex-col">
-          <div
+          <StylesItem
             v-for="(item, index) in items"
             :key="item.id"
+            :style="item"
             :class="{
               'border-t border-surface-200 dark:border-surface-700':
                 index !== 0,
             }"
-            class="p-4"
-          >
-            <div class="flex flex-col gap-2">
-              <div class="flex flex-row justify-between items-start">
-                <div class="flex flex-col">
-                  <div class="font-bold">
-                    {{ item.name || item.id }}
-                  </div>
-                  <div class="text-sm text-muted-color">
-                    {{ item.type }} - {{ item.target }}
-                  </div>
-                </div>
-              </div>
-              <div v-if="item.comment" class="text-sm text-muted-color">
-                {{ item.comment }}
-              </div>
-            </div>
-          </div>
+          />
         </div>
       </template>
     </DataView>
