@@ -1,6 +1,9 @@
 <template>
   <div v-if="row.header" class="grid grid-cols-3 gap-2">
-    <div class="flex flex-col gap-2 items-stretch justify-center grow">
+    <div
+      v-if="row.header.isExtended"
+      class="flex flex-col gap-2 items-stretch justify-center grow"
+    >
       <div
         class="flex flex-row justify-stretch grow relative group rounded overflow-auto"
       >
@@ -24,20 +27,30 @@
             outlined
             severity="danger"
             icon="iconify solar--trash-bin-trash-line-duotone"
-            class="absolute right-[0.5rem] bottom-[0.5rem]"
+            class="absolute right-2 bottom-2"
           />
         </div>
       </div>
     </div>
-    <div class="flex flex-col gap-2 col-span-2">
+    <div
+      class="flex flex-col gap-2"
+      :class="{
+        'col-span-3': !row.header.isExtended,
+        'col-span-2': row.header.isExtended,
+      }"
+    >
       <IftaLabel>
         <InputText v-model="row.header.title" />
         <label>Title</label>
       </IftaLabel>
-      <Editor v-model="row.header.text" editor-style="height: 12rem;" />
+      <Editor
+        v-if="row.header.isExtended"
+        v-model="row.header.text"
+        editor-style="height: 12rem;"
+      />
     </div>
   </div>
-  <div v-else class="flex flex-row justify-center items-center min-h-[10rem]">
+  <div v-else class="flex flex-row justify-center items-center min-h-40">
     <Button
       variant="outlined"
       severity="secondary"

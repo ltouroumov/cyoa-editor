@@ -14,8 +14,26 @@
         </div>
 
         <div class="flex flex-col">
-          <div class="border-b border-surface-700 pb-1 mb-2">
-            <div class="text-xl font-bold text-primary">Header</div>
+          <div
+            class="border-b border-surface-700 pb-1 mb-2 flex flex-row justify-between items-center"
+          >
+            <div class="text-xl font-bold text-primary grow">Header</div>
+            <div v-if="row.header" class="flex flex-row gap-2 items-center">
+              <div class="flex flex-row gap-1 items-center">
+                <Checkbox
+                  v-model="row.header.isExtended"
+                  binary
+                  inputId="header-extended"
+                />
+                <label for="header-extended">Extended</label>
+              </div>
+              <Button
+                variant="link"
+                icon="iconify solar--trash-bin-trash-line-duotone"
+                size="small"
+                @click="deleteRowHeader"
+              />
+            </div>
           </div>
           <RowHeaderForm :row-id="rowId" />
         </div>
@@ -52,4 +70,8 @@ const props = defineProps<{
 const row = computed((): RowObject => {
   return projectStore.get(props.rowId, ObjectType.row)!;
 });
+
+const deleteRowHeader = () => {
+  row.value.header = undefined;
+};
 </script>

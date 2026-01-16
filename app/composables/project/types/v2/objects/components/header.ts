@@ -3,6 +3,7 @@ export interface BaseHeader {
 }
 
 export interface RowHeader extends BaseHeader {
+  isExtended?: boolean;
   layout?: string;
   image?: string;
   text?: string;
