@@ -4,14 +4,7 @@
   >
     <div class="aspect-video bg-surface-100 relative overflow-hidden">
       <img
-        v-if="image.isRemote"
         :src="image.data"
-        :alt="image.id"
-        class="w-full h-full object-cover"
-      />
-      <img
-        v-else
-        :src="`data:image/png;base64,${image.data}`"
         :alt="image.id"
         class="w-full h-full object-cover"
       />
