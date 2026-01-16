@@ -10,7 +10,7 @@ export interface RowObject extends ObjectBase {
   type: ObjectType.row;
   name: string;
 
-  style?: string;
+  styles?: string[];
   header?: RowHeader;
 
   layout: RowLayoutProps;

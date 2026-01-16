@@ -12,7 +12,7 @@ export interface ChoiceObject extends ObjectBase {
   type: ObjectType.choice;
   name: string;
 
-  style?: string;
+  styles?: string[];
 
   header: ChoiceHeader;
 
@@ -24,7 +24,7 @@ export interface AddonObject extends ObjectBase {
   type: ObjectType.addon;
   name: string;
 
-  style?: string;
+  styles?: string[];
   header: AddonHeader;
   components: ComponentMap;
 }

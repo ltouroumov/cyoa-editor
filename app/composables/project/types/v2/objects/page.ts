@@ -6,4 +6,6 @@ import type {
 export interface PageObject extends ObjectBase {
   type: ObjectType.page;
   name: string;
+
+  styles?: string[];
 }
