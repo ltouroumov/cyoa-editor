@@ -10,7 +10,7 @@ import {
   RowStylesGen,
   createStyles,
 } from '~/components/viewer/style/engine';
-import type { ProjectStyles } from '~/composables/project/types/v1';
+import type { ProjectStyles } from '~/composables/project/types/v1/styles';
 
 const { styles } = defineProps<{ styles: ProjectStyles }>();
 
