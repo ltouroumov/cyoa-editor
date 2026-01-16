@@ -11,6 +11,12 @@
         decoding="async"
       />
       <div
+        v-if="image.metadata?.title"
+        class="absolute top-0 left-0 right-0 bg-black/70 text-xs font-mono px-2 py-1 truncate flex flex-row justify-between"
+      >
+        {{ image.metadata.title }}
+      </div>
+      <div
         class="absolute bottom-0 left-0 right-0 bg-black/70 text-xs font-mono px-2 py-1 truncate flex flex-row justify-between"
       >
         <span class="text-surface-500">

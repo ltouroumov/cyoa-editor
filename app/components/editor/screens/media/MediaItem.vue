@@ -12,9 +12,14 @@
       />
     </div>
     <div class="flex flex-col gap-1 grow">
-      <div class="text-primary font-mono font-bold">{{ image.id }}</div>
-      <div class="text-surface-500 text-sm">
-        {{ image.isRemote ? 'Remote' : 'Local' }}
+      <div v-if="image.metadata?.title" class="text-primary font-bold">
+        {{ image.metadata.title }}
+      </div>
+      <div class="flex flex-row gap-1 items-center">
+        <div class="font-mono">{{ image.id }}</div>
+        <div class="text-surface-500 text-sm">
+          {{ image.isRemote ? 'Remote' : 'Local' }}
+        </div>
       </div>
     </div>
     <div class="flex flex-row gap-2">

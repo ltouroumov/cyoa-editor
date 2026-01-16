@@ -56,14 +56,14 @@
           :key="item.id"
           class="col-span-60 md:col-span-10"
         >
-          <MediaCard :image="item.image" />
+          <MediaCard :image="item" />
         </div>
       </div>
       <div v-else class="flex flex-col gap-2">
         <MediaItem
           v-for="item in items"
           :key="item.id"
-          :image="item.image"
+          :image="item"
           mode="list"
         />
       </div>
@@ -83,10 +83,7 @@ const searchRaw = ref<string>('');
 const search = refDebounced(searchRaw, 100);
 
 const images = computed(() => {
-  return Object.entries(media.value.images).map(([id, image]) => ({
-    id,
-    image,
-  }));
+  return Object.values(media.value.images);
 });
 
 const filteredImages = computed(() => {
@@ -95,8 +92,12 @@ const filteredImages = computed(() => {
     return images.value;
   } else {
     const _searchLC = toLower(_search);
-    return filter(({ id }) => {
-      return includes(_searchLC, toLower(id));
+    return filter((image) => {
+      if (!image.metadata?.title) return includes(_searchLC, toLower(image.id));
+      return (
+        includes(_searchLC, toLower(image.id)) ||
+        includes(_searchLC, toLower(image.metadata?.title))
+      );
     }, images.value);
   }
 });

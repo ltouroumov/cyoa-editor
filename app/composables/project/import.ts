@@ -233,6 +233,9 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         id: mediaId,
         isRemote: startsWith('http', row.image),
         data: row.image,
+        metadata: {
+          title: row.title,
+        },
       };
 
       rowObject.header!.image = mediaId;
@@ -306,6 +309,9 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
           id: mediaId,
           isRemote: startsWith('http', object.image),
           data: object.image,
+          metadata: {
+            title: object.title,
+          },
         };
 
         choiceObject.header!.image = mediaId;
