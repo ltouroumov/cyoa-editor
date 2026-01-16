@@ -23,7 +23,7 @@
                 <Checkbox
                   v-model="row.header.isExtended"
                   binary
-                  inputId="header-extended"
+                  input-id="header-extended"
                 />
                 <label for="header-extended">Extended</label>
               </div>

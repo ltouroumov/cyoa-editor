@@ -38,11 +38,12 @@
 </template>
 
 <script setup lang="ts">
+import type { MenuItem } from 'primevue/menuitem';
+
 import EditorBreadcrumbs from '~/components/editor/screens/EditorBreadcrumbs.vue';
 import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
-import type { MenuItem } from 'primevue/menuitem';
 
 const { unloadProject, saveProject } = useEditorLibrary();
 const editorStore = useEditorStore();

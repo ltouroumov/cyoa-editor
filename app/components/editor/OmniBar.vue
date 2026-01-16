@@ -63,8 +63,8 @@ import { clone, includes, isEmpty, isNotEmpty, length, toLower } from 'ramda';
 
 import { buildStackFromObjectId } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
-import { useProjectStore } from '~/composables/project/useProjectStore';
 import type { ObjectType } from '~/composables/project/types/v2/objects/base';
+import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const editorStore = useEditorStore();
 const projectStore = useProjectStore();

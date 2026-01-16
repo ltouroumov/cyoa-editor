@@ -2,8 +2,6 @@ import { map } from 'ramda';
 import { Subject } from 'rxjs';
 import { match } from 'ts-pattern';
 
-import SearchWorker from '~/composables/viewer/search/worker?worker';
-
 import type {
   ObjAddon,
   ProjectObj,
@@ -15,6 +13,7 @@ import type {
   SearchEvent,
   WorkerSearchResult,
 } from '~/composables/viewer/search/types';
+import SearchWorker from '~/composables/viewer/search/worker?worker';
 
 export function useSearch() {
   const { getRow, getObject, getObjectAddon } = useProjectStore();

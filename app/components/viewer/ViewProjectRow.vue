@@ -57,6 +57,7 @@
 </template>
 
 <script setup lang="ts">
+import { isNotEmpty } from 'ramda';
 import { computed } from 'vue';
 
 import { getSizeClasses } from '~/components/viewer/style/sizes';
@@ -67,7 +68,6 @@ import type { ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
 import { formatText } from '~/composables/text';
-import { isNotEmpty } from 'ramda';
 
 const $props = defineProps<{
   row: ProjectRow;

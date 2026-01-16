@@ -1,5 +1,5 @@
-import { isEmpty, last } from 'ramda';
 import { watchDebounced } from '@vueuse/core';
+import { isEmpty, last } from 'ramda';
 
 import { buildStackFromObjectId } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
