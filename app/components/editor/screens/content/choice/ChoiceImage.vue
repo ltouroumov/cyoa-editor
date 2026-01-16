@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :style="{ width: width }" class="rounded overflow-hidden">
     <Image :src="media.data" />
   </div>
 </template>
@@ -11,6 +11,7 @@ import { useProjectStore } from '~/composables/project/useProjectStore';
 const projectStore = useProjectStore();
 const props = defineProps<{
   mediaId: string;
+  width?: string;
 }>();
 
 const media = computed((): ProjectImage => {
