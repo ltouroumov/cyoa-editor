@@ -56,11 +56,11 @@
           :key="item.id"
           class="col-span-60 md:col-span-10"
         >
-          <MediaCard :image="item.image" mode="grid" />
+          <MediaCard :image="item.image" />
         </div>
       </div>
       <div v-else class="flex flex-col gap-2">
-        <MediaCard
+        <MediaItem
           v-for="item in items"
           :key="item.id"
           :image="item.image"
