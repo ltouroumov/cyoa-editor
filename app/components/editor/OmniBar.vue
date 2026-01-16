@@ -61,10 +61,10 @@
 import { InputText } from 'primevue';
 import { clone, includes, isEmpty, isNotEmpty, length, toLower } from 'ramda';
 
+import { buildStackFromObjectId } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
-import type { AnyObject } from '~/composables/project/types/v2/objects';
-import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
+import type { ObjectType } from '~/composables/project/types/v2/objects/base';
 
 const editorStore = useEditorStore();
 const projectStore = useProjectStore();
@@ -126,38 +126,7 @@ const results = computed((): SearchResults => {
 });
 
 function showObject(objectId: string) {
-  const parents = projectStore.getParents(objectId);
-  const stack = [];
-
-  for (const parentId of parents) {
-    const object: AnyObject = projectStore.objects.get(parentId)!;
-    switch (object.type) {
-      case ObjectType.page:
-        stack.push({
-          type: 'edit-page',
-          pageId: object.id,
-        });
-        break;
-      case ObjectType.row:
-        stack.push({
-          type: 'edit-row',
-          rowId: object.id,
-        });
-        break;
-      case ObjectType.choice:
-        stack.push({
-          type: 'edit-choice',
-          choiceId: object.id,
-        });
-        break;
-      case ObjectType.addon:
-        stack.push({
-          type: 'edit-addon',
-          addonId: object.id,
-        });
-        break;
-    }
-  }
+  const stack = buildStackFromObjectId(objectId);
 
   editorStore.root = 'content';
   editorStore.stack = stack;

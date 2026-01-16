@@ -5,9 +5,20 @@
 </template>
 
 <script setup lang="ts">
+import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
+import { useEditorRouting } from '~/composables/editor/useEditorRouting';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 
 const editorStore = useEditorStore();
+const { initializeFromHash } = useEditorLibrary();
+
+// Initialize hash-based routing
+useEditorRouting();
+
+// Initialize from hash on mount
+onMounted(() => {
+  initializeFromHash();
+});
 </script>
 
 <style>

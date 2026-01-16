@@ -22,6 +22,44 @@ const ChoiceScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/content/ChoiceScreen.vue'),
 );
 
+export function buildStackFromObjectId(objectId: string): any[] {
+  const projectStore = useProjectStore();
+  const parents = projectStore.getParents(objectId);
+  const stack = [];
+
+  for (const parentId of parents) {
+    const object = projectStore.objects.get(parentId)!;
+    switch (object.type) {
+      case ObjectType.page:
+        stack.push({
+          type: 'edit-page',
+          pageId: object.id,
+        });
+        break;
+      case ObjectType.row:
+        stack.push({
+          type: 'edit-row',
+          rowId: object.id,
+        });
+        break;
+      case ObjectType.choice:
+        stack.push({
+          type: 'edit-choice',
+          choiceId: object.id,
+        });
+        break;
+      case ObjectType.addon:
+        stack.push({
+          type: 'edit-addon',
+          addonId: object.id,
+        });
+        break;
+    }
+  }
+
+  return stack;
+}
+
 export function useScreenDispatch() {
   const editorStore = useEditorStore();
   const projectStore = useProjectStore();

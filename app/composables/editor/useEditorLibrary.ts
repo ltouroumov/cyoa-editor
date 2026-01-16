@@ -1,5 +1,6 @@
 import { assoc, clone, isNil } from 'ramda';
 
+import { useEditorRouting } from '~/composables/editor/useEditorRouting';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import { DefaultProject } from '~/composables/project/defaults';
 import { importProject } from '~/composables/project/import';
@@ -12,6 +13,7 @@ export function useEditorLibrary() {
   const dexie = useDexie();
   const editorStore = useEditorStore();
   const projectStore = useProjectStore();
+  const { restoreFromHash, restoreStack } = useEditorRouting();
 
   async function createEmptyProject(name: string) {
     const projectId = await dexie.projects.put({
@@ -62,7 +64,7 @@ export function useEditorLibrary() {
     });
   }
 
-  async function loadProject(projectId: number) {
+  async function loadProject(projectId: number, restoreNavigation = true) {
     const project = (await dexie.projects.get(projectId))!;
     let version: EditorProjectVersion;
     if (isNil(project.currentVersionId)) {
@@ -76,7 +78,26 @@ export function useEditorLibrary() {
       editorStore.version = version;
       projectStore.importData(version.data);
       editorStore.mode = 'editor';
+
+      // Restore navigation state from hash if enabled
+      if (restoreNavigation) {
+        const hashState = restoreFromHash();
+        if (hashState.root) {
+          editorStore.root = hashState.root as any;
+        }
+        restoreStack(hashState);
+      }
     });
+  }
+
+  async function initializeFromHash() {
+    const hashState = restoreFromHash();
+    if (hashState.projectId) {
+      const project = await dexie.projects.get(hashState.projectId);
+      if (project) {
+        await loadProject(hashState.projectId, true);
+      }
+    }
   }
 
   async function unloadProject() {
@@ -105,5 +126,6 @@ export function useEditorLibrary() {
     loadProject,
     unloadProject,
     saveProject,
+    initializeFromHash,
   };
 }
