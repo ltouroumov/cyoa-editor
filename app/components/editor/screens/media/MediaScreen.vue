@@ -3,6 +3,8 @@
     :value="filteredImages"
     data-key="id"
     :dt="{ header: { padding: '1rem 0' }, content: { padding: '1rem 0' } }"
+    :paginator="true"
+    :rows="48"
   >
     <template #header>
       <div class="flex flex-row justify-between items-center">
@@ -54,20 +56,16 @@
           :key="item.id"
           class="col-span-60 md:col-span-10"
         >
-          <MediaCard :image-id="item.id" :image="item.image" />
+          <MediaCard :image="item.image" mode="grid" />
         </div>
       </div>
       <div v-else class="flex flex-col gap-2">
-        <div
+        <MediaCard
           v-for="item in items"
           :key="item.id"
-          class="flex flex-row gap-3 items-center border border-surface-500 rounded p-3"
-        >
-          <div class="text-primary font-mono">{{ item.id }}</div>
-          <div class="grow text-surface-500 text-sm">
-            {{ item.image.isRemote ? 'Remote' : 'Local' }}
-          </div>
-        </div>
+          :image="item.image"
+          mode="list"
+        />
       </div>
     </template>
   </DataView>
