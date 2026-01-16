@@ -14,6 +14,10 @@ import {
 
 import { DefaultProject } from '~/composables/project/defaults';
 import { toConditionTerm } from '~/composables/project/import/condition';
+import {
+  convertChoiceStyles,
+  convertRowStyles,
+} from '~/composables/project/import/style';
 import { V1ProjectSchema } from '~/composables/project/schema/v1-format';
 import { V2ProjectSchema } from '~/composables/project/schema/v2-format';
 import type { Project as LegacyProject } from '~/composables/project/types/v1';
@@ -93,6 +97,17 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
     name: 'Default',
   };
 
+  // Convert project-level styles to V2 defaults
+  const defaultRowStyle = convertRowStyles(legacy.styling, 'Default Row Style');
+  const defaultChoiceStyle = convertChoiceStyles(
+    legacy.styling,
+    'Default Choice Style',
+  );
+  data.styles.rules[defaultRowStyle.id] = defaultRowStyle;
+  data.styles.rules[defaultChoiceStyle.id] = defaultChoiceStyle;
+  data.styles.defaults.row = defaultRowStyle.id;
+  data.styles.defaults.choice = defaultChoiceStyle.id;
+
   data.content.children['@default'] = [];
   for (const row of legacy.rows) {
     data.content.children['@default'].push({ id: row.id });
@@ -126,6 +141,13 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
       };
 
       rowObject.header!.image = mediaId;
+    }
+
+    // Convert row-specific styles if present
+    if (row.isPrivateStyling && row.styling) {
+      const rowStyle = convertRowStyles(row.styling, row.title);
+      data.styles.rules[rowStyle.id] = rowStyle;
+      rowObject.styles = [rowStyle.id];
     }
 
     data.content.objects[row.id] = rowObject;
@@ -202,6 +224,13 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         };
 
         choiceObject.header!.image = mediaId;
+      }
+
+      // Convert choice-specific styles if present
+      if (object.isPrivateStyling && object.styling) {
+        const choiceStyle = convertChoiceStyles(object.styling, object.title);
+        data.styles.rules[choiceStyle.id] = choiceStyle;
+        choiceObject.styles = [choiceStyle.id];
       }
 
       data.content.objects[object.id] = choiceObject;
