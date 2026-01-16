@@ -54,7 +54,7 @@
         <div
           v-for="item in items"
           :key="item.id"
-          class="col-span-60 md:col-span-10"
+          class="col-span-60 md:col-span-12"
         >
           <MediaCard :image="item" />
         </div>

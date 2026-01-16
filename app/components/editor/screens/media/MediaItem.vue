@@ -23,12 +23,18 @@
       </div>
     </div>
     <div class="flex flex-row gap-2">
-      <Button size="small" variant="outlined" severity="secondary">
-        Edit
-      </Button>
-      <Button size="small" variant="outlined" severity="danger">
-        Delete
-      </Button>
+      <Button
+        size="small"
+        variant="outlined"
+        severity="secondary"
+        icon="iconify solar--pen-line-duotone"
+      />
+      <Button
+        size="small"
+        variant="outlined"
+        severity="danger"
+        icon="iconify solar--trash-bin-trash-line-duotone"
+      />
     </div>
   </div>
 </template>
