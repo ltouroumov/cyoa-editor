@@ -1,0 +1,56 @@
+{
+  "disableBypassPermissionsMode": "disable",
+
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false,
+    "excludedCommands": [],
+    "network": {
+      "allowUnixSockets": [],
+      "allowLocalBinding": true
+    }
+  },
+
+  "permissions": {
+    "ask": ["Bash(git push:*)"],
+    "allow": [
+      "Bash(sbt:*)",
+      "Edit(~/.sbt/boot/sbt.boot.lock)",
+
+      "Bash(git:*)",
+      "Bash(cd:*)",
+
+      "Bash(openssl rand:*)",
+
+      "WebFetch(domain:docs.anthropic.com)",
+
+      "Read(**)",
+      "Edit(**)",
+      "MultiEdit(**)",
+      "Write(**)",
+      "Glob(**)",
+      "Grep(**)",
+      "LS(**)",
+
+      "TodoRead",
+      "TodoWrite",
+      "Task"
+    ],
+
+    "deny": [
+      "Bash(rm -rf :*)",
+      "Bash(sudo :*)",
+      "Bash(dd :*)",
+      "Bash(mkfs :*)",
+      "Bash(fdisk :*)",
+      "Bash(parted :*)",
+
+      "Bash(git push --force :*)",
+      "Bash(git push -f :*)"
+    ]
+  },
+  "env": {
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1"
+  }
+}
