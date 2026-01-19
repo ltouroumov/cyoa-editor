@@ -9,27 +9,10 @@
       <div class="border-b border-surface-700 pb-1 mb-2">
         <div class="font-bold text-primary">Background</div>
       </div>
-      <!-- Background -->
-      <InputGroup>
-        <InputGroupAddon>
-          <Checkbox
-            binary
-            :value="isNotNil(style.header.background.color)"
-            @change="
-              $event.value ? (style.header.background.color = '#000') : null
-            "
-          />
-        </InputGroupAddon>
-        <IftaLabel>
-          <label for="header-background-color">Background Color</label>
-          <InputText
-            v-model="style.header.background.color"
-            input-id="header-background-color"
-            fluid
-          />
-        </IftaLabel>
-      </InputGroup>
-
+      <IftaLabel>
+        <label>Background Color</label>
+        <InputText v-model="style.header.background.color" fluid />
+      </IftaLabel>
       <IftaLabel>
         <label>Background Image</label>
         <InputText v-model="style.header.background.imageUrl" fluid />
@@ -41,31 +24,31 @@
       v-if="style.target === StyleTarget.choice && style.header.border"
       class="flex flex-col gap-2"
     >
-      <div class="grid grid-cols-form gap-2 items-center">
-        <label class="font-bold">Border Enabled</label>
-        <ToggleSwitch v-model="style.header.border.enabled" />
+      <div class="border-b border-surface-700 pb-1 mb-2">
+        <div class="font-bold text-primary">Border</div>
       </div>
-      <div
-        v-if="style.header.border.enabled"
-        class="grid grid-cols-1 md:grid-cols-2 gap-2"
-      >
-        <div class="grid grid-cols-form gap-2">
-          <label class="font-bold">Style</label>
+      <div class="flex flex-row items-center gap-2">
+        <Checkbox v-model="style.header.border.enabled" />
+        <label>Border Enabled</label>
+      </div>
+      <template v-if="style.header.border.enabled">
+        <IftaLabel>
+          <label>Style</label>
           <InputText v-model="style.header.border.style" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label class="font-bold">Width</label>
+        </IftaLabel>
+        <IftaLabel>
+          <label>Width</label>
           <InputText v-model="style.header.border.width" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label class="font-bold">Color</label>
+        </IftaLabel>
+        <IftaLabel>
+          <label>Color</label>
           <InputText v-model="style.header.border.color" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label class="font-bold">Radius</label>
+        </IftaLabel>
+        <IftaLabel>
+          <label>Radius</label>
           <InputText v-model="style.header.border.radius" fluid />
-        </div>
-      </div>
+        </IftaLabel>
+      </template>
     </div>
 
     <!-- Title Text -->
@@ -73,21 +56,21 @@
       v-if="style.target === StyleTarget.choice && style.header.title"
       class="flex flex-col gap-2"
     >
-      <div class="font-bold">Title Text</div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-        <div class="grid grid-cols-form gap-2">
-          <label>Font Family</label>
-          <InputText v-model="style.header.title.fontFamily" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label>Font Size</label>
-          <InputText v-model="style.header.title.fontSize" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label>Text Color</label>
-          <InputText v-model="style.header.title.textColor" fluid />
-        </div>
+      <div class="border-b border-surface-700 pb-1 mb-2">
+        <div class="font-bold text-primary">Title Text</div>
       </div>
+      <IftaLabel>
+        <label>Font Family</label>
+        <InputText v-model="style.header.title.fontFamily" fluid />
+      </IftaLabel>
+      <IftaLabel>
+        <label>Font Size</label>
+        <InputText v-model="style.header.title.fontSize" fluid />
+      </IftaLabel>
+      <IftaLabel>
+        <label>Text Color</label>
+        <InputText v-model="style.header.title.textColor" fluid />
+      </IftaLabel>
     </div>
 
     <!-- Body Text -->
@@ -95,51 +78,49 @@
       v-if="style.target === StyleTarget.choice && style.header.text"
       class="flex flex-col gap-2"
     >
-      <div class="font-bold">Body Text</div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-        <div class="grid grid-cols-form gap-2">
-          <label>Font Family</label>
-          <InputText v-model="style.header.text.fontFamily" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label>Font Size</label>
-          <InputText v-model="style.header.text.fontSize" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label>Text Color</label>
-          <InputText v-model="style.header.text.textColor" fluid />
-        </div>
+      <div class="border-b border-surface-700 pb-1 mb-2">
+        <div class="font-bold text-primary">Body Text</div>
       </div>
+      <IftaLabel>
+        <label>Font Family</label>
+        <InputText v-model="style.header.text.fontFamily" fluid />
+      </IftaLabel>
+      <IftaLabel>
+        <label>Font Size</label>
+        <InputText v-model="style.header.text.fontSize" fluid />
+      </IftaLabel>
+      <IftaLabel>
+        <label>Text Color</label>
+        <InputText v-model="style.header.text.textColor" fluid />
+      </IftaLabel>
     </div>
 
     <!-- Margins -->
     <div v-if="style.header.margins" class="flex flex-col gap-2">
-      <div class="font-bold">Margins</div>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <div class="grid grid-cols-form gap-2">
-          <label>Top</label>
-          <InputText v-model="style.header.margins.top" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label>Right</label>
-          <InputText v-model="style.header.margins.right" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label>Bottom</label>
-          <InputText v-model="style.header.margins.bottom" fluid />
-        </div>
-        <div class="grid grid-cols-form gap-2">
-          <label>Left</label>
-          <InputText v-model="style.header.margins.left" fluid />
-        </div>
+      <div class="border-b border-surface-700 pb-1 mb-2">
+        <div class="font-bold text-primary">Margins</div>
       </div>
+      <IftaLabel>
+        <label>Top</label>
+        <InputText v-model="style.header.margins.top" fluid />
+      </IftaLabel>
+      <IftaLabel>
+        <label>Right</label>
+        <InputText v-model="style.header.margins.right" fluid />
+      </IftaLabel>
+      <IftaLabel>
+        <label>Bottom</label>
+        <InputText v-model="style.header.margins.bottom" fluid />
+      </IftaLabel>
+      <IftaLabel>
+        <label>Left</label>
+        <InputText v-model="style.header.margins.left" fluid />
+      </IftaLabel>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { isNotNil } from 'ramda';
-
 import {
   type AnySimpleStyle,
   StyleTarget,
