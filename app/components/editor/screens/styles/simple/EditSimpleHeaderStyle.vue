@@ -61,22 +61,66 @@
         </div>
 
         <template v-if="style.header.border.enabled">
-          <IftaLabel>
-            <label>Style</label>
-            <InputText v-model="style.header.border.style" fluid />
-          </IftaLabel>
-          <IftaLabel>
-            <label>Width</label>
-            <InputText v-model="style.header.border.width" fluid />
-          </IftaLabel>
-          <IftaLabel>
-            <label>Color</label>
-            <InputText v-model="style.header.border.color" fluid />
-          </IftaLabel>
-          <IftaLabel>
-            <label>Radius</label>
-            <InputText v-model="style.header.border.radius" fluid />
-          </IftaLabel>
+          <OptionalInput
+            v-slot="{ disabled }"
+            v-model="style.header.border.style"
+            default-value="solid"
+          >
+            <IftaLabel>
+              <InputText
+                v-model="style.header.border.style"
+                fluid
+                :disabled="disabled"
+              />
+              <label>Style</label>
+            </IftaLabel>
+          </OptionalInput>
+          <OptionalInput
+            v-slot="{ disabled }"
+            v-model="style.header.border.width"
+            default-value="1px"
+          >
+            <IftaLabel>
+              <InputText
+                v-model="style.header.border.width"
+                fluid
+                :disabled="disabled"
+              />
+              <label>Width</label>
+            </IftaLabel>
+          </OptionalInput>
+          <OptionalInput
+            v-model="style.header.border.color"
+            default-value="#000000"
+          >
+            <template #default="{ disabled }">
+              <IftaLabel>
+                <InputText
+                  v-model="style.header.border.color"
+                  fluid
+                  :disabled="disabled"
+                />
+                <label>Color</label>
+              </IftaLabel>
+            </template>
+            <template #addon>
+              <ColorPicker v-model="style.header.border.color" />
+            </template>
+          </OptionalInput>
+          <OptionalInput
+            v-slot="{ disabled }"
+            v-model="style.header.border.radius"
+            default-value="0"
+          >
+            <IftaLabel>
+              <InputText
+                v-model="style.header.border.radius"
+                fluid
+                :disabled="disabled"
+              />
+              <label>Radius</label>
+            </IftaLabel>
+          </OptionalInput>
         </template>
       </div>
 
@@ -85,22 +129,62 @@
         <div class="border-b border-surface-700 pb-1 mb-2">
           <div class="font-bold text-primary">Margins</div>
         </div>
-        <IftaLabel>
-          <label>Top</label>
-          <InputText v-model="style.header.margins.top" fluid />
-        </IftaLabel>
-        <IftaLabel>
-          <label>Right</label>
-          <InputText v-model="style.header.margins.right" fluid />
-        </IftaLabel>
-        <IftaLabel>
-          <label>Bottom</label>
-          <InputText v-model="style.header.margins.bottom" fluid />
-        </IftaLabel>
-        <IftaLabel>
-          <label>Left</label>
-          <InputText v-model="style.header.margins.left" fluid />
-        </IftaLabel>
+        <OptionalInput
+          v-slot="{ disabled }"
+          v-model="style.header.margins.top"
+          default-value="0"
+        >
+          <IftaLabel>
+            <InputText
+              v-model="style.header.margins.top"
+              fluid
+              :disabled="disabled"
+            />
+            <label>Top</label>
+          </IftaLabel>
+        </OptionalInput>
+        <OptionalInput
+          v-slot="{ disabled }"
+          v-model="style.header.margins.right"
+          default-value="0"
+        >
+          <IftaLabel>
+            <InputText
+              v-model="style.header.margins.right"
+              fluid
+              :disabled="disabled"
+            />
+            <label>Right</label>
+          </IftaLabel>
+        </OptionalInput>
+        <OptionalInput
+          v-slot="{ disabled }"
+          v-model="style.header.margins.bottom"
+          default-value="0"
+        >
+          <IftaLabel>
+            <InputText
+              v-model="style.header.margins.bottom"
+              fluid
+              :disabled="disabled"
+            />
+            <label>Bottom</label>
+          </IftaLabel>
+        </OptionalInput>
+        <OptionalInput
+          v-slot="{ disabled }"
+          v-model="style.header.margins.left"
+          default-value="0"
+        >
+          <IftaLabel>
+            <InputText
+              v-model="style.header.margins.left"
+              fluid
+              :disabled="disabled"
+            />
+            <label>Left</label>
+          </IftaLabel>
+        </OptionalInput>
       </div>
 
       <!-- Title Text -->
@@ -111,18 +195,52 @@
         <div class="border-b border-surface-700 pb-1 mb-2">
           <div class="font-bold text-primary">Title Text</div>
         </div>
-        <IftaLabel>
-          <label>Font Family</label>
-          <InputText v-model="style.header.title.fontFamily" fluid />
-        </IftaLabel>
-        <IftaLabel>
-          <label>Font Size</label>
-          <InputText v-model="style.header.title.fontSize" fluid />
-        </IftaLabel>
-        <IftaLabel>
-          <label>Text Color</label>
-          <InputText v-model="style.header.title.textColor" fluid />
-        </IftaLabel>
+        <OptionalInput
+          v-slot="{ disabled }"
+          v-model="style.header.title.fontFamily"
+          default-value=""
+        >
+          <IftaLabel>
+            <InputText
+              v-model="style.header.title.fontFamily"
+              fluid
+              :disabled="disabled"
+            />
+            <label>Font Family</label>
+          </IftaLabel>
+        </OptionalInput>
+        <OptionalInput
+          v-slot="{ disabled }"
+          v-model="style.header.title.fontSize"
+          default-value="1rem"
+        >
+          <IftaLabel>
+            <InputText
+              v-model="style.header.title.fontSize"
+              fluid
+              :disabled="disabled"
+            />
+            <label>Font Size</label>
+          </IftaLabel>
+        </OptionalInput>
+        <OptionalInput
+          v-model="style.header.title.textColor"
+          default-value="#000000"
+        >
+          <template #default="{ disabled }">
+            <IftaLabel>
+              <InputText
+                v-model="style.header.title.textColor"
+                fluid
+                :disabled="disabled"
+              />
+              <label>Text Color</label>
+            </IftaLabel>
+          </template>
+          <template #addon>
+            <ColorPicker v-model="style.header.title.textColor" />
+          </template>
+        </OptionalInput>
       </div>
 
       <!-- Body Text -->
@@ -133,18 +251,52 @@
         <div class="border-b border-surface-700 pb-1 mb-2">
           <div class="font-bold text-primary">Body Text</div>
         </div>
-        <IftaLabel>
-          <label>Font Family</label>
-          <InputText v-model="style.header.text.fontFamily" fluid />
-        </IftaLabel>
-        <IftaLabel>
-          <label>Font Size</label>
-          <InputText v-model="style.header.text.fontSize" fluid />
-        </IftaLabel>
-        <IftaLabel>
-          <label>Text Color</label>
-          <InputText v-model="style.header.text.textColor" fluid />
-        </IftaLabel>
+        <OptionalInput
+          v-slot="{ disabled }"
+          v-model="style.header.text.fontFamily"
+          default-value=""
+        >
+          <IftaLabel>
+            <InputText
+              v-model="style.header.text.fontFamily"
+              fluid
+              :disabled="disabled"
+            />
+            <label>Font Family</label>
+          </IftaLabel>
+        </OptionalInput>
+        <OptionalInput
+          v-slot="{ disabled }"
+          v-model="style.header.text.fontSize"
+          default-value="1rem"
+        >
+          <IftaLabel>
+            <InputText
+              v-model="style.header.text.fontSize"
+              fluid
+              :disabled="disabled"
+            />
+            <label>Font Size</label>
+          </IftaLabel>
+        </OptionalInput>
+        <OptionalInput
+          v-model="style.header.text.textColor"
+          default-value="#000000"
+        >
+          <template #default="{ disabled }">
+            <IftaLabel>
+              <InputText
+                v-model="style.header.text.textColor"
+                fluid
+                :disabled="disabled"
+              />
+              <label>Text Color</label>
+            </IftaLabel>
+          </template>
+          <template #addon>
+            <ColorPicker v-model="style.header.text.textColor" />
+          </template>
+        </OptionalInput>
       </div>
     </div>
   </div>
