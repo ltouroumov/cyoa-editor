@@ -14,7 +14,7 @@
         <SimpleStyleField
           :style="style"
           :form="entry"
-          :parent="makeKey(parent, entry.key)"
+          :parent="makeKey(parent, form.key)"
           @change="(field, value) => emit('change', field, value)"
           @disable="(field) => emit('disable', field)"
         />
