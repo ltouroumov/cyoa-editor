@@ -23,6 +23,7 @@
       "Bash(openssl rand:*)",
 
       "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:primevue.org)",
 
       "Read(**)",
       "Edit(**)",

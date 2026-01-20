@@ -10,6 +10,11 @@
         <label class="font-bold" for="styleTarget">Target</label>
         <InputText id="styleTarget" :value="style.target" disabled fluid />
       </IftaLabel>
+
+      <IftaLabel>
+        <label class="font-bold" for="styleType">Type</label>
+        <InputText id="styleType" :value="style.type" disabled fluid />
+      </IftaLabel>
     </div>
 
     <IftaLabel>
@@ -25,7 +30,7 @@
 
     <!-- Style Type Specific Forms -->
     <div v-if="style.type === StyleType.simple" class="flex flex-col gap-4">
-      <EditSimpleStyle :style-id="style.id" />
+      <SimpleStyleForm v-model="style" />
     </div>
 
     <div
