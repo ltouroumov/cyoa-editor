@@ -14,7 +14,11 @@
       <label :for="makeKey(parent, form.key)">{{ form.label }}</label>
     </IftaLabel>
     <InputGroupAddon v-if="field?.addon">
-      <component :is="field.addon.type" v-bind="field.addon.props" />
+      <component
+        :is="field.addon.type"
+        v-bind="field.addon.props"
+        v-model="fieldValue"
+      />
     </InputGroupAddon>
   </InputGroup>
 </template>
@@ -22,6 +26,8 @@
 <script setup lang="ts">
 import { isNotNil, path } from 'ramda';
 
+import ColorField from '~/components/editor/screens/styles/form/simple/fields/ColorField.vue';
+import ColorFieldAddon from '~/components/editor/screens/styles/form/simple/fields/ColorFieldAddon.vue';
 import NumberField from '~/components/editor/screens/styles/form/simple/fields/NumberField.vue';
 import StringField from '~/components/editor/screens/styles/form/simple/fields/StringField.vue';
 import {
@@ -76,6 +82,11 @@ const field = computed((): null | FieldComponent => {
       return { input: { type: StringField, props: {} } };
     case 'number':
       return { input: { type: NumberField, props: {} } };
+    case 'color':
+      return {
+        input: { type: ColorField, props: {} },
+        addon: { type: ColorFieldAddon, props: {} },
+      };
     default:
       return null;
   }

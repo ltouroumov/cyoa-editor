@@ -2,21 +2,13 @@ import { isNotNil } from 'ramda';
 
 import { StyleTarget } from '~/composables/project/types/v2/styles';
 
-export type FormField =
-  | {
-      type: 'string';
-      key: string;
-      label: string;
-      prop: string[];
-      default: string;
-    }
-  | {
-      type: 'number';
-      key: string;
-      label: string;
-      prop: string[];
-      default: number;
-    };
+type FormFieldBase = { key: string; label: string; prop: string[] };
+export type FormField = FormFieldBase &
+  (
+    | { type: 'string'; default: string }
+    | { type: 'number'; default: number }
+    | { type: 'color'; default: string }
+  );
 
 export type FormGroupToggle = {
   prop: string[];
@@ -94,7 +86,7 @@ const makeBackgroundForm = (prop: string[]): FormGroup => {
     label: 'Background',
     children: [
       {
-        type: 'string',
+        type: 'color',
         key: 'color',
         label: 'Color',
         prop: [...prop, 'color'],
@@ -189,11 +181,92 @@ const makeTextForm = (label: string, prop: string[]): FormGroup => {
 export const SimpleStyleFormConfig: Record<StyleTarget, Form> = {
   [StyleTarget.page]: {
     label: 'Page Style',
-    children: [],
+    children: [
+      {
+        type: 'section',
+        key: 'header',
+        label: 'Header',
+        children: [
+          makeBackgroundForm(['header', 'background']),
+          makeMarginsForm(['header', 'margins']),
+        ],
+      },
+      {
+        type: 'section',
+        key: 'content',
+        label: 'Content',
+        children: [
+          makeMarginsForm(['content', 'margins']),
+          {
+            type: 'group',
+            key: 'layout',
+            label: 'Layout',
+            children: [
+              {
+                type: 'string',
+                key: 'layout',
+                label: 'Layout',
+                prop: ['content', 'layout'],
+                default: 'list',
+              },
+              {
+                type: 'string',
+                key: 'gap',
+                label: 'Gap',
+                prop: ['content', 'gap'],
+                default: '1rem',
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   [StyleTarget.row]: {
     label: 'Row Style',
-    children: [],
+    children: [
+      {
+        type: 'section',
+        key: 'header',
+        label: 'Header',
+        children: [
+          makeBackgroundForm(['header', 'background']),
+          makeMarginsForm(['header', 'margins']),
+          makeBorderForm(['header', 'border']),
+          makeTextForm('Title', ['header', 'title']),
+          makeTextForm('Text', ['header', 'text']),
+        ],
+      },
+      {
+        type: 'section',
+        key: 'content',
+        label: 'Content',
+        children: [
+          makeMarginsForm(['content', 'margins']),
+          {
+            type: 'group',
+            key: 'layout',
+            label: 'Layout',
+            children: [
+              {
+                type: 'string',
+                key: 'layout',
+                label: 'Layout',
+                prop: ['content', 'layout'],
+                default: 'list',
+              },
+              {
+                type: 'string',
+                key: 'gap',
+                label: 'Gap',
+                prop: ['content', 'gap'],
+                default: '1rem',
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   [StyleTarget.choice]: {
     label: 'Choice Style',
@@ -214,7 +287,30 @@ export const SimpleStyleFormConfig: Record<StyleTarget, Form> = {
         type: 'section',
         key: 'content',
         label: 'Content',
-        children: [],
+        children: [
+          makeMarginsForm(['content', 'margins']),
+          {
+            type: 'group',
+            key: 'layout',
+            label: 'Layout',
+            children: [
+              {
+                type: 'string',
+                key: 'layout',
+                label: 'Layout',
+                prop: ['content', 'layout'],
+                default: 'list',
+              },
+              {
+                type: 'string',
+                key: 'gap',
+                label: 'Gap',
+                prop: ['content', 'gap'],
+                default: '1rem',
+              },
+            ],
+          },
+        ],
       },
     ],
   },
