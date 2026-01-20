@@ -3,7 +3,7 @@
     <div
       class="border-b border-surface-700 pb-1 mb-2 flex flex-row items-center"
     >
-      <div class="font-bold text-primary grow">Background</div>
+      <div class="font-bold text-primary grow">{{ form.label }}</div>
       <div v-if="canToggle" class="flex flex-row gap-2 items-center">
         <Checkbox v-model="isEnabled" binary />
         <label>{{ form.toggle?.label }}</label>

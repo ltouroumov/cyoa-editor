@@ -86,21 +86,22 @@ export function convertRowStyles(
         color: v1Styles.rowBgColorIsOn ? v1Styles.rowBgColor : undefined,
         imageUrl: v1Styles.rowBackgroundImage,
       },
-      border: {
-        enabled: v1Styles.rowBorderIsOn,
-        style: v1Styles.rowBorderStyle,
-        width: v1Styles.rowBorderWidth
-          ? `${v1Styles.rowBorderWidth}px`
-          : undefined,
-        color: v1Styles.rowBorderColor,
-        radius: convertBorderRadius(
-          v1Styles.rowBorderRadiusTopLeft,
-          v1Styles.rowBorderRadiusTopRight,
-          v1Styles.rowBorderRadiusBottomRight,
-          v1Styles.rowBorderRadiusBottomLeft,
-          v1Styles.rowBorderRadiusIsPixels,
-        ),
-      },
+      border: v1Styles.rowBorderIsOn
+        ? {
+            style: v1Styles.rowBorderStyle,
+            width: v1Styles.rowBorderWidth
+              ? `${v1Styles.rowBorderWidth}px`
+              : undefined,
+            color: v1Styles.rowBorderColor,
+            radius: convertBorderRadius(
+              v1Styles.rowBorderRadiusTopLeft,
+              v1Styles.rowBorderRadiusTopRight,
+              v1Styles.rowBorderRadiusBottomRight,
+              v1Styles.rowBorderRadiusBottomLeft,
+              v1Styles.rowBorderRadiusIsPixels,
+            ),
+          }
+        : undefined,
       title: {
         fontFamily: v1Styles.rowTitle,
         fontSize: v1Styles.rowTitleTextSize
@@ -156,21 +157,22 @@ export function convertChoiceStyles(
         color: v1Styles.objectBgColorIsOn ? v1Styles.objectBgColor : undefined,
         imageUrl: v1Styles.objectBackgroundImage,
       },
-      border: {
-        enabled: v1Styles.objectBorderIsOn,
-        style: v1Styles.objectBorderStyle,
-        width: v1Styles.objectBorderWidth
-          ? `${v1Styles.objectBorderWidth}px`
-          : undefined,
-        color: v1Styles.objectBorderColor,
-        radius: convertBorderRadius(
-          v1Styles.objectBorderRadiusTopLeft,
-          v1Styles.objectBorderRadiusTopRight,
-          v1Styles.objectBorderRadiusBottomRight,
-          v1Styles.objectBorderRadiusBottomLeft,
-          v1Styles.objectBorderRadiusIsPixels,
-        ),
-      },
+      border: v1Styles.objectBorderIsOn
+        ? {
+            style: v1Styles.objectBorderStyle,
+            width: v1Styles.objectBorderWidth
+              ? `${v1Styles.objectBorderWidth}px`
+              : undefined,
+            color: v1Styles.objectBorderColor,
+            radius: convertBorderRadius(
+              v1Styles.objectBorderRadiusTopLeft,
+              v1Styles.objectBorderRadiusTopRight,
+              v1Styles.objectBorderRadiusBottomRight,
+              v1Styles.objectBorderRadiusBottomLeft,
+              v1Styles.objectBorderRadiusIsPixels,
+            ),
+          }
+        : undefined,
       title: {
         fontFamily: v1Styles.objectTitle,
         fontSize: v1Styles.objectTitleTextSize

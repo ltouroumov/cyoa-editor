@@ -11,7 +11,6 @@ export interface SimpleTextStyle {
 }
 
 export interface SimpleBorderStyle {
-  enabled?: boolean;
   style?: string;
   width?: string;
   color?: string;
