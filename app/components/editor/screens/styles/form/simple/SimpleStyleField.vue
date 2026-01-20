@@ -13,7 +13,7 @@
       />
       <label :for="makeKey(parent, form.key)">{{ form.label }}</label>
     </IftaLabel>
-    <InputGroupAddon v-if="field?.addon">
+    <InputGroupAddon v-if="field?.addon && isEnabled">
       <component
         :is="field.addon.type"
         v-bind="field.addon.props"
