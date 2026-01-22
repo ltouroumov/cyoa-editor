@@ -33,6 +33,7 @@ import type {
   SearchEvent,
   WorkerSearchResult,
 } from '~/composables/viewer/search/types';
+import { sanitizeString } from '~/composables/viewer/search/norm';
 
 const project = ref<Project | null>(null);
 
@@ -91,8 +92,12 @@ self.addEventListener(
   },
 );
 
+function normalizeSearchQuery(query: string) {
+  return sanitizeString(query.trim().toLowerCase().normalize('NFD'));
+}
+
 function doSearch(query: string) {
-  const searchTextLC = query.trim().toLowerCase();
+  const searchTextLC = normalizeSearchQuery(query);
   if (isEmpty(searchTextLC)) {
     return [];
   }
