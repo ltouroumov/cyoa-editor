@@ -107,7 +107,7 @@ function doSearch(query: string) {
 
   for (const row of project.value!.rows) {
     for (const obj of row.objects) {
-      const objMatch = searchFn({ type: 'object', data: obj, parent: row });
+      const objMatch = searchFn({ type: 'object', data: obj, parentRow: row });
       if (objMatch) {
         results.push({
           type: 'object',
@@ -121,7 +121,8 @@ function doSearch(query: string) {
         const addonMatch = searchFn({
           type: 'addon',
           data: addon,
-          parent: obj,
+          parentObj: obj,
+          parentRow: row,
         });
         if (addonMatch) {
           results.push({
@@ -191,8 +192,13 @@ function parseSearch(input: string): SearchTerm {
 
 type SearchFn = (
   entry:
-    | { type: 'object'; data: ProjectObj; parent: ProjectRow }
-    | { type: 'addon'; data: ObjAddon; parent: ProjectObj },
+    | { type: 'object'; data: ProjectObj; parentRow: ProjectRow }
+    | {
+        type: 'addon';
+        data: ObjAddon;
+        parentObj: ProjectObj;
+        parentRow: ProjectRow;
+      },
 ) => boolean;
 type ScoreMatchFn = (score: Score) => boolean;
 
@@ -244,19 +250,28 @@ function createSearchFunction(searchText: string) {
 
   const compileMatcher = (matcher: {
     onObject?: (data: ProjectObj, parent: ProjectRow) => boolean;
-    onAddon?: (data: ObjAddon, parent: ProjectObj) => boolean;
+    onAddon?: (
+      data: ObjAddon,
+      parentObj: ProjectObj,
+      parentRow: ProjectRow,
+    ) => boolean;
     onBoth?: (
       data: ProjectObj | ObjAddon,
-      parent: ProjectObj | ProjectRow,
+      parentRow: ProjectRow,
+      parentObj?: ProjectObj,
     ) => boolean;
   }): SearchFn => {
     return (entry) => {
       if (entry.type === 'object' && matcher.onObject) {
-        return matcher.onObject(entry.data, entry.parent);
+        return matcher.onObject(entry.data, entry.parentRow);
       } else if (entry.type === 'addon' && matcher.onAddon) {
-        return matcher.onAddon(entry.data, entry.parent);
+        return matcher.onAddon(entry.data, entry.parentObj, entry.parentRow);
       } else if (matcher.onBoth) {
-        return matcher.onBoth(entry.data, entry.parent);
+        return matcher.onBoth(
+          entry.data,
+          entry.parentRow,
+          'parentObj' in entry ? entry.parentObj : undefined,
+        );
       } else {
         return false;
       }
@@ -368,14 +383,17 @@ function createSearchFunction(searchText: string) {
       if ('parent' in kwargs) {
         searchFns.push(
           compileMatcher({
-            onBoth: (_obj, parent) => matchesAll(kwargs.parent, parent.title),
+            onBoth: (_obj, parentRow, parentObj) =>
+              matchesAll(kwargs.parent, parentRow.title) ||
+              (parentObj ? matchesAll(kwargs.parent, parentObj.title) : false),
           }),
         );
       }
       if ('row' in kwargs) {
         searchFns.push(
           compileMatcher({
-            onObject: (_obj, parent) => matchesAll(kwargs.row, parent.title),
+            onBoth: (_obj, parentRow) =>
+              matchesAll(kwargs.row, parentRow.title),
           }),
         );
       }
