@@ -230,17 +230,13 @@ function createSearchFunction(searchText: string) {
 
   const resolveReqIds = (reqs: ConditionTerm[]): string[] => {
     const resolveReq = (req: ConditionTerm): string[] => {
-      if (req.showRequired) {
-        return reject(
-          isEmpty,
-          concat(
-            [req.reqId, req.reqId1, req.reqId2, req.reqId3],
-            map(prop('req'), req.orRequired),
-          ),
-        );
-      } else {
-        return [];
-      }
+      return reject(
+        isEmpty,
+        concat(
+          [req.reqId, req.reqId1, req.reqId2, req.reqId3],
+          map(prop('req'), req.orRequired),
+        ),
+      );
     };
 
     return chain(resolveReq, reqs);
