@@ -5,19 +5,30 @@
     </InputGroupAddon>
     <IftaLabel>
       <component
-        :is="field.input.type"
-        v-if="isNotNil(field)"
-        v-bind="field.input.props"
+        :is="fieldComponent.input.type"
+        v-if="isNotNil(fieldComponent)"
+        v-bind="fieldComponent.input.props"
         v-model="fieldValue"
         :disabled="!isEnabled"
+        :invalid="!isValid"
       />
-      <label :for="makeKey(parent, form.key)">{{ form.label }}</label>
+      <label
+        :for="makeKey(parent, form.key)"
+        class="inline-flex items-center gap-1"
+      >
+        <span>{{ form.label }}</span>
+
+        <span
+          v-if="!isValid"
+          class="iconify solar--danger-bold-duotone text-red-500"
+        />
+      </label>
     </IftaLabel>
-    <InputGroupAddon v-if="field?.addon && isEnabled">
+    <InputGroupAddon v-if="fieldComponent?.addon && isEnabled">
       <component
-        :is="field.addon.type"
-        v-bind="field.addon.props"
-        v-model="fieldValue"
+        :is="fieldComponent.addon.type"
+        v-bind="fieldComponent.addon.props"
+        v-model="addonValue"
       />
     </InputGroupAddon>
   </InputGroup>
@@ -26,10 +37,7 @@
 <script setup lang="ts">
 import { isNotNil, path } from 'ramda';
 
-import ColorField from '~/components/editor/screens/styles/form/simple/fields/ColorField.vue';
-import ColorFieldAddon from '~/components/editor/screens/styles/form/simple/fields/ColorFieldAddon.vue';
-import NumberField from '~/components/editor/screens/styles/form/simple/fields/NumberField.vue';
-import StringField from '~/components/editor/screens/styles/form/simple/fields/StringField.vue';
+import { useField } from '~/components/editor/screens/styles/form/simple/fields';
 import {
   type FormField,
   makeKey,
@@ -48,10 +56,10 @@ const emit = defineEmits<{
 }>();
 
 const isEnabled = computed<boolean>((): boolean => {
-  return isNotNil(fieldValue.value);
+  return isNotNil(dataValue.value);
 });
 
-const fieldValue = computed({
+const dataValue = computed({
   get: (): any => {
     return path(props.form.prop, props.style);
   },
@@ -60,6 +68,11 @@ const fieldValue = computed({
     emit('change', fieldKey, value);
   },
 });
+
+const { fieldComponent, fieldValue, addonValue, isValid } = useField(
+  computed(() => props.form),
+  dataValue,
+);
 
 const onEnabledChange = (event: Event) => {
   if (!event.target || !(event.target instanceof HTMLInputElement)) return;
@@ -71,26 +84,6 @@ const onEnabledChange = (event: Event) => {
     emit('change', fieldKey, props.form.default);
   }
 };
-
-type FieldComponent = {
-  input: { type: any; props: any };
-  addon?: { type: any; props: any };
-};
-const field = computed((): null | FieldComponent => {
-  switch (props.form.type) {
-    case 'string':
-      return { input: { type: StringField, props: {} } };
-    case 'number':
-      return { input: { type: NumberField, props: {} } };
-    case 'color':
-      return {
-        input: { type: ColorField, props: {} },
-        addon: { type: ColorFieldAddon, props: {} },
-      };
-    default:
-      return null;
-  }
-});
 </script>
 
 <style scoped lang="scss"></style>

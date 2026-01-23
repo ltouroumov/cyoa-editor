@@ -90,7 +90,7 @@ const makeBackgroundForm = (prop: string[]): FormGroup => {
         key: 'color',
         label: 'Color',
         prop: [...prop, 'color'],
-        default: 'ffffff',
+        default: '#ffffff',
       },
       {
         type: 'string',
@@ -128,7 +128,7 @@ const makeBorderForm = (prop: string[]): FormGroup => {
         key: 'color',
         label: 'Color',
         prop: [...prop, 'color'],
-        default: 'ffffff',
+        default: '#ffffff',
       },
       {
         type: 'string',
