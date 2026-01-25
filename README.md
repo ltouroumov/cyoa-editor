@@ -1,4 +1,4 @@
-# Interactive CYOA Creator NG
+# Interactive CYOA Creator Neo
 
 ## Standalone Usage
 
