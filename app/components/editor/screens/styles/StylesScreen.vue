@@ -24,15 +24,12 @@
         </div>
       </template>
       <template #list="{ items }">
-        <div class="flex flex-col">
-          <StylesItem
+        <div class="grid grid-cols-4 gap-2 pt-2">
+          <StyleCard
             v-for="(item, index) in items"
             :key="item.id"
             :style="item"
-            :class="{
-              'border-t border-surface-200 dark:border-surface-700':
-                index !== 0,
-            }"
+            :is-default="includes(item.id, defaultStyles)"
           />
         </div>
       </template>
@@ -48,6 +45,10 @@ const projectStore = useProjectStore();
 
 const allStyles = computed(() => {
   return values(projectStore.styles.rules);
+});
+
+const defaultStyles = computed(() => {
+  return values(projectStore.styles.defaults);
 });
 
 const filteredStyles = computed(() => {

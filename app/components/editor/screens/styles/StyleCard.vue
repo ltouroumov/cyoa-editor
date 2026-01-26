@@ -1,5 +1,11 @@
 <template>
-  <div class="flex flex-row gap-3 items-center p-4">
+  <div
+    class="flex flex-row gap-3 items-start p-2 border rounded"
+    :class="{
+      'border-primary': isDefault,
+      'border-surface-700': !isDefault,
+    }"
+  >
     <div class="flex flex-col gap-2 grow">
       <div class="flex flex-col">
         <div class="font-bold">
@@ -41,6 +47,7 @@ const editorStore = useEditorStore();
 
 const props = defineProps<{
   style: AnyStyle;
+  isDefault?: boolean;
 }>();
 
 function editStyle() {
