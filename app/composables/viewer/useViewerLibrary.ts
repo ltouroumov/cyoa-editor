@@ -23,6 +23,7 @@ import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 import { bufferToString, readFileContents } from '~/composables/utils';
+import { resolveProjectUrl } from '~/composables/utils/resolveUrl';
 import type {
   CacheOptions,
   CacheResult,
@@ -55,6 +56,7 @@ export function useViewerLibrary() {
   const worker = useCacheWorker();
   const { librarySettings, remoteProjectList } = useViewerRefs();
   const $store = useProjectStore();
+  const runtimeConfig = useRuntimeConfig();
 
   const cacheOperations = ref<CacheOperation[]>([]);
 
@@ -228,9 +230,12 @@ export function useViewerLibrary() {
     if (project.source === 'local') {
       return; // nothing to do for local projects
     } else {
+      const resolvedFileUrl = resolveProjectUrl(project.file_url);
+      const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
+
       const { taskId, events } = await worker.submitTask({
         type: 'cache',
-        project: project,
+        project: projectWithResolvedUrl,
         options,
       });
 
@@ -365,7 +370,7 @@ export function useViewerLibrary() {
   };
 
   const loadRemoteFile = async (project: ViewerProject) => {
-    const fileURL = project.file_url;
+    const fileURL = resolveProjectUrl(project.file_url);
     if (!fileURL) return;
 
     await $store.loadProject(async (setProgress) => {

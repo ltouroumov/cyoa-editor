@@ -24,3 +24,5 @@ logs
 !.env.example
 
 tmp/
+.exp/
+public/project.json
