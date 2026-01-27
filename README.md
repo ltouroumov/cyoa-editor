@@ -1,66 +1,54 @@
-# Interactive CYOA Creator Neo
+# ICC Neo (Interactive CYOA Creator Neo)
 
-## Standalone Usage
+A Nuxt.js web application for creating and viewing interactive Choose Your Own Adventure (CYOA) projects. Designed to be compatible with the MeanDelay iCYOA viewer format.
 
-1. Download the latest version from https://github.com/ltouroumov/cyoa-editor/releases/
-2. Update the `config/viewer/projects.json` file to add your project(s)
-3. Upload the **root directory** of your domain
+## Current Focus
 
-### Configure the viewer
+The **Viewer** is the primary focus of development. It reads V1 format projects (MeanDelay compatible) and provides an enhanced viewing experience with:
 
-#### `projects.json` file
+- Project browsing and selection
+- Choice tracking and backpack system
+- Build saving and loading
+- Search functionality
+- Responsive design with dark/light themes
 
-This file defines the list of projects displayed on the landing page of the viewer and the side menu.
-If no value is specified in `default` (set to `null`), no CYOA will be automatically loaded.
+The **Editor** is an early-stage prototype intended to eventually replace the original ICC editor.
 
-```json5
-{
-  "items": [
-    {
-      // URL of the project.json file
-      "remoteFileUrl": "https://raw.githubusercontent.com/ltouroumov/worm-cyoa-v6-fork/master/extract-v6.0.json",
-      // Title displayed in the list
-      "title": "Worm V6.0 (Pixel's Version)",
-      // Internal identifier, used by the software
-      "id": "worm-v6.0-pixel"
-    }
-    // ...
-  ],
-  // Default CYOA to display when the page loads
-  // Set to `null` to show the list
-  "default": "worm-v6-lt"
-}
+## Documentation
+
+| Document                                   | Description                         |
+| ------------------------------------------ | ----------------------------------- |
+| [Getting Started](docs/getting-started.md) | Quick setup guide for developers    |
+| [Viewer Guide](docs/viewer-guide.md)       | Viewer configuration and deployment |
+| [Architecture](docs/architecture.md)       | Project structure and concepts      |
+| [Data Formats](docs/data-formats.md)       | V1 and V2 format specifications     |
+
+## Quick Start
+
+```bash
+# Prerequisites: Node.js 24+, Corepack enabled
+corepack enable
+
+# Clone and install
+git clone https://github.com/ltouroumov/cyoa-editor.git
+cd cyoa-editor
+yarn install
+
+# Run development server
+yarn dev
 ```
 
-#### `backgrounds.json` file
+See [Getting Started](getting-started.md) for detailed setup instructions.
 
-Controls the loading backgrounds.
+## Tech Stack
 
-```json5
-{
-  // Enable or Disable the loading backgrounds
-  "enabled": true,
-  // List of images to randomly choose from
-  // If there is only one file, it will always be displayed
-  "images": [
-    {
-      // Relative path or URL
-      "url": "bgs/load-01.webp"
-    }
-    // ...
-  ]
-}
-```
-### Installation is a sub-folder (advanced)
+- **Framework**: Nuxt 4 (SPA mode)
+- **Language**: TypeScript (strict mode)
+- **UI**: PrimeVue 4, TailwindCSS v4
+- **State**: Pinia with persistence
+- **Storage**: Dexie (IndexedDB)
+- **Package Manager**: Yarn 4 (Berry)
 
-It is possible to install the viewer in a sub-folder of a domain.
+## License
 
-#### Update `index.html`
-
-1) In the file `index.html`
-   1) Replace all instances of `/assets/` with `/your-folder/assets/`.
-   2) Replace `baseURL:"/"` with `baseURL:"/your-folder/"`
-
-#### Custom Build
-
-The simple way is to build the software with your custom URL with the `NUXT_APP_BASE_URL` environment variable. This requires knowledge of software development and the right environment.
+See [LICENSE.txt](../LICENSE.txt) for license information.
