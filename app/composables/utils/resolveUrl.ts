@@ -1,22 +1,25 @@
 /**
- * Resolves a project URL against the application base.
- * In a Nuxt SPA, `document.baseURI` is set correctly based on `app.baseURL`.
+ * Resolves a URL against a base URL.
+ * Works in both main thread and Web Workers.
  *
- * Resolution examples (assuming base is `https://example.com/cyoa/`):
- * - `https://cdn.com/p.json` → `https://cdn.com/p.json` (absolute, unchanged)
- * - `project.json` → `https://example.com/cyoa/project.json`
- * - `./data/p.json` → `https://example.com/cyoa/data/p.json`
- * - `/project.json` → `https://example.com/project.json` (root-relative)
- *
- * @param fileUrl - The URL or path from projects.json
+ * @param url - The URL to resolve (absolute or relative)
+ * @param baseUrl - The base URL to resolve against
  * @returns Fully resolved absolute URL
  */
-export function resolveProjectUrl(fileUrl: string): string {
+export function resolveUrl(url: string, baseUrl: string): string {
   // If already absolute, return as-is
-  if (/^https?:\/\//i.test(fileUrl)) {
-    return fileUrl;
+  if (/^https?:\/\//i.test(url)) {
+    return url;
   }
 
-  return new URL(fileUrl, document.baseURI).href;
+  try {
+    return new URL(url, baseUrl).href;
+  } catch {
+    // If URL resolution fails, return original
+    console.warn(`Failed to resolve URL: ${url} against ${baseUrl}`);
+    return url;
+  }
 }
+
+
 

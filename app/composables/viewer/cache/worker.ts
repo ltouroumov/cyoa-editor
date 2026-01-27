@@ -15,7 +15,8 @@ import { match } from 'ts-pattern';
 import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import { bufferToString } from '~/composables/utils';
-import { imageIsUrl } from '~/composables/utils/imageIsUrl';
+import { imageIsCacheable } from '~/composables/utils/imageIsUrl';
+import { resolveUrl } from '~/composables/utils/resolveUrl';
 import type {
   CacheEvent,
   CacheOptions,
@@ -36,12 +37,14 @@ type Task =
       type: 'cache';
       project: ViewerProject;
       options: CacheOptions;
+      baseUrl: string;
       abortController: AbortController;
     }
   | {
       taskId: string;
       type: 'clear';
       options: ClearOptions;
+      baseUrl: string;
       project: ViewerProject;
     };
 
@@ -56,24 +59,26 @@ self.addEventListener(
       const payload = JSON.parse(event) as CacheEvent;
       match(payload)
         .with({ type: 'init' }, () => {})
-        .with({ type: 'cache' }, async ({ taskId, project, options = {} }) => {
+        .with({ type: 'cache' }, async ({ taskId, project, options = {}, baseUrl }) => {
           const abortController = new AbortController();
           taskQueue.push({
             taskId,
             type: 'cache',
             project,
             options,
+            baseUrl,
             abortController,
           });
 
           startNextTask();
         })
-        .with({ type: 'clear' }, async ({ taskId, project, options }) => {
+        .with({ type: 'clear' }, async ({ taskId, project, options, baseUrl }) => {
           taskQueue.push({
             taskId,
             type: 'clear',
             project,
             options,
+            baseUrl,
           });
 
           startNextTask();
@@ -130,14 +135,19 @@ function startNextTask() {
   const fiber = match(task)
     .with(
       { type: 'cache' },
-      ({ taskId, project, options, abortController }) => {
-        return doCache(taskId, project, options, abortController.signal).catch(
-          (err) => {
-            if (isAbortError(err)) {
-              postMessage({
-                taskId: task.taskId,
-                status: 'cancelled',
-              });
+      ({ taskId, project, options, baseUrl, abortController }) => {
+        return doCache(
+          taskId,
+          project,
+          options,
+          baseUrl,
+          abortController.signal,
+        ).catch((err) => {
+          if (isAbortError(err)) {
+            postMessage({
+              taskId: task.taskId,
+              status: 'cancelled',
+            });
             } else {
               console.error('error in cache worker', err);
 
@@ -151,8 +161,8 @@ function startNextTask() {
         );
       },
     )
-    .with({ type: 'clear' }, ({ taskId, project, options }) => {
-      return doClear(taskId, project, options).catch((err) => {
+    .with({ type: 'clear' }, ({ taskId, project, options, baseUrl }) => {
+      return doClear(taskId, project, options, baseUrl).catch((err) => {
         console.error('error in cache worker', err);
 
         postMessage({
@@ -177,6 +187,7 @@ async function doClear(
   taskId: string,
   project: ViewerProject,
   options: ClearOptions,
+  baseUrl: string,
 ) {
   const fsHandle = await navigator.storage.getDirectory();
 
@@ -219,6 +230,26 @@ async function doClear(
         create: false,
       });
 
+      // Optimization: Check if we are clearing ALL rows
+      // If so, use the fast directory delete instead of iterating files
+      const isDeletingAll =
+        projectData.rows.length > 0 &&
+        projectData.rows.every((r) => includes(r.id, options.images as string[]));
+
+      if (isDeletingAll) {
+        try {
+          await projectDir.removeEntry('images', { recursive: true });
+        } catch (e) {
+          // Ignore if images dir doesn't exist
+        }
+        reply({
+          taskId,
+          status: 'completed',
+          deletedAllImages: true,
+        });
+        return;
+      }
+
       const deletedCacheItems: string[] = [];
       const images0: string[] = [];
       for (const rowData of projectData.rows) {
@@ -228,18 +259,18 @@ async function doClear(
         }
 
         deletedCacheItems.push(rowData.id);
-        if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
-          images0.push(rowData.image);
+        if (isNotEmpty(rowData.image) && imageIsCacheable(rowData.image)) {
+          images0.push(resolveUrl(rowData.image, baseUrl));
         }
 
         for (const objData of rowData.objects) {
-          if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
-            images0.push(objData.image);
+          if (isNotEmpty(objData.image) && imageIsCacheable(objData.image)) {
+            images0.push(resolveUrl(objData.image, baseUrl));
           }
 
           for (const objAddon of objData.addons) {
-            if (isNotEmpty(objAddon.image) && imageIsUrl(objAddon.image)) {
-              images0.push(objAddon.image);
+            if (isNotEmpty(objAddon.image) && imageIsCacheable(objAddon.image)) {
+              images0.push(resolveUrl(objAddon.image, baseUrl));
             }
           }
         }
@@ -254,7 +285,7 @@ async function doClear(
       });
       let progress = 0;
       let errors = 0;
-      for (const batch of chunk(images, 20)) {
+      for (const batch of chunk(images, 100)) {
         const results = await Promise.allSettled(
           batch.map((imageUrl) => deleteImage(new URL(imageUrl), imagesDir)),
         );
@@ -289,6 +320,7 @@ async function doCache(
   taskId: string,
   project: ViewerProject,
   options: CacheOptions,
+  baseUrl: string,
   abortSignal: AbortSignal,
 ) {
   const cachedItems: CacheItem[] = [];
@@ -378,7 +410,7 @@ async function doCache(
       create: true,
     });
 
-    const images0: string[][] = [];
+    const rowsToUpdate: { rowId: string; images: string[] }[] = [];
     for (const rowData of projectData.rows) {
       if (
         options.images !== true &&
@@ -389,33 +421,29 @@ async function doCache(
       }
 
       const rowImages = [];
-      if (isNotEmpty(rowData.image) && imageIsUrl(rowData.image)) {
-        rowImages.push(rowData.image);
+      if (isNotEmpty(rowData.image) && imageIsCacheable(rowData.image)) {
+        rowImages.push(resolveUrl(rowData.image, baseUrl));
       }
 
       for (const objData of rowData.objects) {
-        if (isNotEmpty(objData.image) && imageIsUrl(objData.image)) {
-          rowImages.push(objData.image);
+        if (isNotEmpty(objData.image) && imageIsCacheable(objData.image)) {
+          rowImages.push(resolveUrl(objData.image, baseUrl));
         }
 
         for (const objAddon of objData.addons) {
-          if (isNotEmpty(objAddon.image) && imageIsUrl(objAddon.image)) {
-            rowImages.push(objAddon.image);
+          if (isNotEmpty(objAddon.image) && imageIsCacheable(objAddon.image)) {
+            rowImages.push(resolveUrl(objAddon.image, baseUrl));
           }
         }
       }
 
       if (rowImages.length > 0) {
-        images0.push(rowImages);
-        cachedItems.push({
-          type: 'images.row',
-          rowId: rowData.id,
-          count: rowImages.length,
-        });
+        rowsToUpdate.push({ rowId: rowData.id, images: rowImages });
       }
     }
 
-    const images = uniq(flatten(images0));
+    const images = uniq(flatten(rowsToUpdate.map((r) => r.images)));
+    const successfulImages = new Set<string>();
 
     console.log(`[cache ${project.id}] found ${images.length} images to cache`);
     reply({
@@ -440,15 +468,18 @@ async function doCache(
         ),
       );
 
-      const [success, failures] = partition(
-        (result) => result.status === 'fulfilled',
-        results,
-      );
+      results.forEach((result, i) => {
+        if (result.status === 'fulfilled') {
+          successfulImages.add(batch[i]);
+          if (result.value.cached) cached++;
+          totalBytes += result.value.bytes;
+        } else {
+          errors++;
+        }
+      });
 
       progress += results.length;
-      errors += failures.length;
-      cached += success.filter((result) => result.value.cached).length;
-      totalBytes += success.reduce((acc, { value }) => acc + value.bytes, 0);
+ 
       reply({
         taskId,
         status: 'progress',
@@ -457,9 +488,19 @@ async function doCache(
 
       if (abortSignal.aborted) {
         console.log(`[cache ${project.id}] cancelled`);
-        reply({ taskId, status: 'cancelled' });
+        
+        // Populate cachedItems based on successful downloads so far
+        const items = calculateCacheResults(rowsToUpdate, successfulImages);
+
+        reply({ taskId, status: 'cancelled', cachedItems: items });
+        return;
       }
     }
+
+    // Populate cachedItems based on successful downloads
+    const items = calculateCacheResults(rowsToUpdate, successfulImages);
+
+    cachedItems.push(...items);
   }
 
   reply({ taskId, status: 'completed', cachedItems });
@@ -476,7 +517,7 @@ async function cacheImage(
     create: true,
   });
 
-  let imageFileHandle = null;
+  let imageFileHandle: FileSystemSyncAccessHandle | null = null;
   try {
     imageFileHandle = await imageFile.createSyncAccessHandle();
     const imageSize = imageFileHandle.getSize();
@@ -485,12 +526,35 @@ async function cacheImage(
     }
 
     const imageResponse = await fetch(imageUrl, { signal: abortSignal });
+
+    // Check if the response is successful
+    if (!imageResponse.ok) {
+      throw new Error(
+        `HTTP ${imageResponse.status}: Failed to download ${imageName}`,
+      );
+    }
+
+    // Validate content-type is an image (not HTML error page)
+    // Allow empty content-type as some servers don't set it
+    const contentType = imageResponse.headers.get('content-type') || '';
+    if (contentType && !contentType.startsWith('image/')) {
+      throw new Error(
+        `Invalid content-type for ${imageName}: ${contentType}`,
+      );
+    }
+
     const imageBlob = await imageResponse.blob();
-    imageFileHandle.write(await imageBlob.arrayBuffer());
+    const imageBuffer = await imageBlob.arrayBuffer();
+
+    // Truncate to 0 first to handle overwrites, then write new data
+    imageFileHandle.truncate(0);
+    imageFileHandle.write(imageBuffer, { at: 0 });
+    imageFileHandle.flush();
 
     return { name: imageName, bytes: imageBlob.size, cached: false };
   } catch (e) {
-    throw new Error(`Failed to download image ${imageName}.`);
+    console.error(`[cache] Error caching ${imageName}:`, e);
+    throw e;
   } finally {
     imageFileHandle?.close();
   }
@@ -502,7 +566,6 @@ async function deleteImage(
 ): Promise<void> {
   const imageName = last(imageUrl.pathname.split('/'))!;
   try {
-    console.log(`[cache] deleting image ${imageName}`);
     await imagesDir.removeEntry(imageName);
   } catch (err) {
     console.warn(`[cache] failed to delete image ${imageName}`, err);
@@ -519,4 +582,17 @@ function chunk<T>(input: T[], size: number): T[][] {
 
 function reply(payload: CacheResult | ClearResult) {
   postMessage(payload);
+}
+
+function calculateCacheResults(
+  rows: { rowId: string; images: string[] }[],
+  successfulImages: Set<string>,
+): CacheItem[] {
+  return rows
+    .map((row) => ({
+      type: 'images.row' as const,
+      rowId: row.rowId,
+      count: row.images.filter((url) => successfulImages.has(url)).length,
+    }))
+    .filter((item) => item.count > 0);
 }

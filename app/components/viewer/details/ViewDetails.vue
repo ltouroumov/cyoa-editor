@@ -3,15 +3,14 @@
     class="project-obj obj-details w-full lg:w-[60rem] h-full overflow-auto flex flex-col md:flex-row relative"
   >
     <div
-      v-if="obj.image && !display.hideObjectImages"
+      v-if="imageSrc && !display.hideObjectImages"
       class="obj-image-wrapper absolute top-0 left-0 right-0 bottom-0 overflow-hidden z-0"
     >
       <img
         class="obj-image w-full"
         :decoding="`sync`"
         :loading="`eager`"
-        :src="obj.image"
-        :href="objImageIsURL ? obj.image : ''"
+        :src="imageSrc"
         :alt="obj.title"
       />
     </div>
@@ -102,9 +101,11 @@ import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
+import { useImageCache } from '~/composables/viewer/cache/useImageCache';
 
 const store = useProjectStore();
 const { selectedIds, selected } = useProjectRefs();
+const { loadImageSrc } = useImageCache();
 
 const $props = defineProps<{
   row: ProjectRow;
@@ -112,9 +113,27 @@ const $props = defineProps<{
   display: DisplaySettings;
 }>();
 
-const objImageIsURL = computed(() => {
-  return R.match(/^https?:\/\//, $props.obj.image);
+// Image cache integration
+const imageSrc = ref<string | null>(null);
+
+async function loadImage() {
+  if ($props.obj.image) {
+    imageSrc.value = await loadImageSrc($props.obj);
+  } else {
+    imageSrc.value = null;
+  }
+}
+
+onMounted(() => {
+  loadImage();
 });
+
+watch(
+  () => $props.obj.id,
+  () => {
+    loadImage();
+  },
+);
 
 const showTab = ref<'main' | 'addon'>('main');
 const showAddonIdx = ref<number>(-1);

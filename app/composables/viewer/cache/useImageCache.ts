@@ -4,7 +4,10 @@ import { match } from 'ts-pattern';
 
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
-import { imageIsUrl } from '~/composables/utils/imageIsUrl';
+import {
+  imageIsCacheable,
+  imageIsUrl,
+} from '~/composables/utils/imageIsUrl';
 
 export function useImageCache() {
   const { project, isLocal } = useProjectRefs();
@@ -14,11 +17,15 @@ export function useImageCache() {
   ): Promise<string | null> => {
     // If there is no image, return null
     if (!element.image) return null;
-    // If the image isn't an URL, return the value as-is
-    if (!imageIsUrl(element.image)) return element.image;
+    // If the image isn't cacheable (data URL, blob, etc.), return the value as-is
+    if (!imageIsCacheable(element.image)) return element.image;
 
     if (!isLocal.value) {
       // If remote, use the link image from the project file
+      // For relative paths, resolve against document.baseURI
+      if (!imageIsUrl(element.image)) {
+        return new URL(element.image, document.baseURI).href;
+      }
       return element.image;
     } else if (isNotNil(project.value) && isNotNil(project.value.projectId)) {
       // When local, load the image from the local file system
@@ -67,8 +74,15 @@ export function useImageCache() {
       create: true,
     });
 
-    const imageUrl = new URL(image);
-    const imageName = last(imageUrl.pathname.split('/'))!;
+    // Handle both absolute URLs and relative paths
+    let imageName: string;
+    if (imageIsUrl(image)) {
+      const imageUrl = new URL(image);
+      imageName = last(imageUrl.pathname.split('/'))!;
+    } else {
+      // For relative paths, just get the filename
+      imageName = last(image.split('/'))!;
+    }
     try {
       const imageHandle = await imagesDir.getFileHandle(imageName);
       const imageFile = await imageHandle.getFile();

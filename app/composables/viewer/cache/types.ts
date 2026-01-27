@@ -16,12 +16,14 @@ export type CacheTask = {
   type: 'cache';
   project: ViewerProject;
   options: CacheOptions;
+  baseUrl: string;
 };
 
 export type ClearTask = {
   type: 'clear';
   project: ViewerProject;
   options: ClearOptions;
+  baseUrl: string;
 };
 
 export type CacheEvent =
@@ -33,7 +35,7 @@ export type CacheEvent =
 export type CacheResult =
   | { taskId: string; status: 'progress'; info: string }
   | { taskId: string; status: 'completed'; cachedItems?: CacheItem[] }
-  | { taskId: string; status: 'cancelled' }
+  | { taskId: string; status: 'cancelled'; cachedItems?: CacheItem[] }
   | { taskId: string; status: 'failure'; error: string };
 
 export type ClearResult =
