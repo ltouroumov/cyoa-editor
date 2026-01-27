@@ -114,25 +114,14 @@ const $props = defineProps<{
 }>();
 
 // Image cache integration
-const imageSrc = ref<string | null>(null);
-
-async function loadImage() {
-  if ($props.obj.image) {
-    imageSrc.value = await loadImageSrc($props.obj);
-  } else {
-    imageSrc.value = null;
-  }
-}
-
-onMounted(() => {
-  loadImage();
-});
-
-watch(
-  () => $props.obj.id,
-  () => {
-    loadImage();
+const imageSrc = computedAsync(
+  async () => {
+    if ($props.obj.image) {
+      return await loadImageSrc($props.obj);
+    }
+    return null;
   },
+  null, // initial value
 );
 
 const showTab = ref<'main' | 'addon'>('main');
