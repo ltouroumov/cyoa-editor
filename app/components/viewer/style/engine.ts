@@ -104,7 +104,7 @@ export class RowStylesGen extends StyleGenerator<RowStyles> {
   }
 
   static TEMPLATE: string = `
-    {{#if global}}.project-row:not(.hasPrivateStyling){{/if}}{{#if container}}{{container}}{{/if}} {
+    {{#if container}}{{container}} {{/if}}.project-row{{#if global}}:not(.hasPrivateStyling){{/if}} {
       --row-title-font: {{quote rowTitle}};
       --row-title-size: {{rowTitleTextSize}}%;
       --row-title-align: {{rowTitleAlign}};
@@ -168,7 +168,7 @@ export class ObjStylesGen extends StyleGenerator<ObjStyles> {
   }
 
   static TEMPLATE: string = `
-    {{#if global}}.project-obj:not(.hasPrivateStyling){{/if}}{{#if container}}{{container}}{{/if}} {
+    {{#if container}}{{container}} {{/if}}.project-obj{{#if global}}:not(.hasPrivateStyling){{/if}} {
       --obj-title-font: {{quote objectTitle}};
       --obj-title-size: {{objectTitleTextSize}}%;
       --obj-title-align: {{objectTitleAlign}};
