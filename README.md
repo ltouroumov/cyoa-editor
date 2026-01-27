@@ -16,12 +16,12 @@ The **Editor** is an early-stage prototype intended to eventually replace the or
 
 ## Documentation
 
-| Document                                   | Description                         |
-| ------------------------------------------ | ----------------------------------- |
-| [Getting Started](docs/getting-started.md) | Quick setup guide for developers    |
-| [Viewer Guide](docs/viewer-guide.md)       | Viewer configuration and deployment |
-| [Architecture](docs/architecture.md)       | Project structure and concepts      |
-| [Data Formats](docs/data-formats.md)       | V1 and V2 format specifications     |
+| Document                                     | Description                         |
+|----------------------------------------------| ----------------------------------- |
+| [Getting Started](./docs/getting-started.md) | Quick setup guide for developers    |
+| [Viewer Guide](./docs/viewer-guide.md)       | Viewer configuration and deployment |
+| [Architecture](./docs/architecture.md)       | Project structure and concepts      |
+| [Data Formats](./docs/data-formats.md)       | V1 and V2 format specifications     |
 
 ## Quick Start
 
@@ -38,7 +38,7 @@ yarn install
 yarn dev
 ```
 
-See [Getting Started](getting-started.md) for detailed setup instructions.
+See [Getting Started](./docs/getting-started.md) for detailed setup instructions.
 
 ## Tech Stack
 
@@ -51,4 +51,4 @@ See [Getting Started](getting-started.md) for detailed setup instructions.
 
 ## License
 
-See [LICENSE.txt](../LICENSE.txt) for license information.
+See [LICENSE.txt](./LICENSE.txt) for license information.
