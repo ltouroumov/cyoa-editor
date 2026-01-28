@@ -23,7 +23,7 @@ import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 import { bufferToString, readFileContents } from '~/composables/utils';
-import { resolveProjectUrl } from '~/composables/utils/resolveUrl';
+import { resolveUrl } from '~/composables/utils/resolveUrl';
 import type {
   CacheOptions,
   CacheResult,
@@ -230,13 +230,14 @@ export function useViewerLibrary() {
     if (project.source === 'local') {
       return; // nothing to do for local projects
     } else {
-      const resolvedFileUrl = resolveProjectUrl(project.file_url);
+      const resolvedFileUrl = resolveUrl(project.file_url, document.baseURI);
       const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
 
       const { taskId, events } = await worker.submitTask({
         type: 'cache',
         project: projectWithResolvedUrl,
         options,
+        baseUrl: document.baseURI,
       });
 
       const keys = [
@@ -281,6 +282,19 @@ export function useViewerLibrary() {
               });
             })
             .with({ status: 'cancelled' }, async (event) => {
+              if (event.cachedItems) {
+                const newCachedItems = concat(
+                  clone(project.cachedItems ?? []),
+                  event.cachedItems,
+                );
+                await dexie.viewer_projects_cache.put({
+                  ...omit(['source', 'origin'], project),
+                  origin: 'remote',
+                  cachedAt: new Date(),
+                  cachedItems: newCachedItems,
+                });
+              }
+
               updateOperation(event.taskId, {
                 status: 'cancelled',
               });
@@ -313,10 +327,14 @@ export function useViewerLibrary() {
       const fsHandle = await navigator.storage.getDirectory();
       await fsHandle.removeEntry(project.id, { recursive: true });
     } else if (project.source === 'cached') {
+      const resolvedFileUrl = resolveUrl(project.file_url, document.baseURI);
+      const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
+
       const { taskId, events } = await worker.submitTask({
         type: 'clear',
-        project: project,
+        project: projectWithResolvedUrl,
         options,
+        baseUrl: document.baseURI,
       });
       const keys = [
         (options.project ?? true) ? 'project' : null,
@@ -370,7 +388,7 @@ export function useViewerLibrary() {
   };
 
   const loadRemoteFile = async (project: ViewerProject) => {
-    const fileURL = resolveProjectUrl(project.file_url);
+    const fileURL = resolveUrl(project.file_url, document.baseURI);
     if (!fileURL) return;
 
     await $store.loadProject(async (setProgress) => {

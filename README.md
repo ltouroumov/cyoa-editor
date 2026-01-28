@@ -17,7 +17,7 @@ The **Editor** is an early-stage prototype intended to eventually replace the or
 ## Documentation
 
 | Document                                     | Description                         |
-|----------------------------------------------| ----------------------------------- |
+| -------------------------------------------- | ----------------------------------- |
 | [Getting Started](./docs/getting-started.md) | Quick setup guide for developers    |
 | [Viewer Guide](./docs/viewer-guide.md)       | Viewer configuration and deployment |
 | [Architecture](./docs/architecture.md)       | Project structure and concepts      |

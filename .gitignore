@@ -25,4 +25,4 @@ logs
 
 tmp/
 .exp/
-public/project.json
+public/projects/
