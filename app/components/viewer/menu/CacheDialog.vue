@@ -148,7 +148,7 @@ import { find, isNil, isNotEmpty, isNotNil, propEq } from 'ramda';
 import CacheOperations from '~/components/viewer/menu/CacheOperations.vue';
 import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
-import { isCacheable } from '~/composables/utils/resolveUrl';
+import { isCacheable } from '~/composables/utils/url';
 import type { ClearOptions } from '~/composables/viewer/cache/types';
 import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 

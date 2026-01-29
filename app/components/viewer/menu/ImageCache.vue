@@ -101,7 +101,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { includes, isNotEmpty } from 'ramda';
 
 import type { Project } from '~/composables/project/types/v1';
-import { isCacheable } from '~/composables/utils/resolveUrl';
+import { isCacheable } from '~/composables/utils/url';
 import type {
   CacheOptions,
   ClearOptions,

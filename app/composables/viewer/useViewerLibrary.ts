@@ -23,7 +23,7 @@ import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 import { bufferToString, readFileContents } from '~/composables/utils';
-import { resolveUrl } from '~/composables/utils/resolveUrl';
+import { resolveUrl } from '~/composables/utils/url';
 import type {
   CacheOptions,
   CacheResult,
@@ -150,9 +150,7 @@ export function useViewerLibrary() {
     let project0 = await dexie.viewer_projects_cache.get(projectId);
     if (isNil(project0)) {
       project0 = await dexie.viewer_projects_cache
-        .where('title')
-        .equals(projectTitle)
-        .filter((p) => p.origin === 'local')
+        .where({ title: projectTitle, origin: 'local' })
         .first();
     }
 
@@ -207,8 +205,9 @@ export function useViewerLibrary() {
         return {
           fileContents: data,
           fileName: file.name,
-          cached: true,
+          local: true,
           projectId: project.id,
+          origin: 'local',
         };
       });
     }
@@ -410,12 +409,13 @@ export function useViewerLibrary() {
           projectId: project.id,
           fileContents: bufferToString(result.data.buffer),
           fileName: fileURL.toString(),
+          origin: 'remote',
         };
       }
     });
   };
 
-  const loadCachedProject = async (project: ViewerProject) => {
+  const loadCachedProject = async (project: ProjectListEntry) => {
     await $store.loadProject(async (setProgress) => {
       await setProgress(`Loading ${project.title} ...`);
       const fileContents = await loadCachedData(project);
@@ -423,7 +423,8 @@ export function useViewerLibrary() {
         projectId: project.id,
         fileContents: fileContents,
         fileName: project.file_url,
-        cached: true,
+        local: true,
+        origin: project.origin,
       };
     });
   };

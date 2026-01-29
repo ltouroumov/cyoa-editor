@@ -3,30 +3,18 @@ import { isNil, isNotNil, last } from 'ramda';
 import { match } from 'ts-pattern';
 
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
-import { useDexie } from '~/composables/shared/useDexie';
 import { useProjectRefs } from '~/composables/store/project';
 import { useSettingStore } from '~/composables/store/settings';
 import {
   isCacheable,
-  isAbsoluteUrl,
+  isUrl,
   resolveUrl,
-} from '~/composables/utils/resolveUrl';
+} from '~/composables/utils/url';
 
-// variables to memoize state for reducing database lookups
-let memoizedOrigin: Promise<string | undefined> | null = null;
-let memoizedProjectId: string | undefined;
 
-const getProjectOrigin = (id: string, dexie: ReturnType<typeof useDexie>) => {
-  if (id !== memoizedProjectId || !memoizedOrigin) {
-    memoizedProjectId = id;
-    memoizedOrigin = dexie.viewer_projects_cache.get(id).then((p) => p?.origin);
-  }
-  return memoizedOrigin;
-};
 
 export function useImageCache() {
-  const { project, isCached } = useProjectRefs();
-  const dexie = useDexie();
+  const { project, isLocal, isOriginLocal } = useProjectRefs();
   const settingsStore = useSettingStore();
   
   const loadImageSrc = async (
@@ -36,9 +24,8 @@ export function useImageCache() {
     // Check if image isn't cacheable (data URL, blob, empty etc.), return the value as-is
     if (!isCacheable(element.image)) return element.image;
 
-    let origin: string | undefined;
     // Check if Project is in OPFS Cache
-    if (isCached.value && isNotNil(project.value) && isNotNil(project.value.projectId)) {
+    if (isLocal.value && isNotNil(project.value) && isNotNil(project.value.projectId)) {
       const cachedSrc = await loadImage(
         project.value.projectId,
         element.image,
@@ -46,21 +33,18 @@ export function useImageCache() {
 
       // Check if OPFS cache has an image, return it
       if (isNotNil(cachedSrc)) return cachedSrc;
-
-      // get project origin for future checks
-      origin = await getProjectOrigin(project.value.projectId, dexie);
     }
     
     // if fetching is not allowed, return null
-    if (settingsStore.hideUncachedImages) return null;
+    if (settingsStore.hideRemoteImages) return null;
 
     // fetching is allowed, check if origin is local and image is relative
-    if(origin === 'local' && !isAbsoluteUrl(element.image)) {
+    if(isOriginLocal.value && !isUrl(element.image)) {
       return null;
     }
 
     // Project is not in OPFS cache
-    // Either origin is remote OR image is absolute URL
+    // Either origin is remote OR image is URL
     return resolveUrl(element.image, document.baseURI);
   };
 
@@ -97,9 +81,9 @@ export function useImageCache() {
       create: true,
     });
 
-    // Handle both absolute URLs and relative paths
+    // Handle both URLs and relative paths
     let imageName: string;
-    if (isAbsoluteUrl(image)) {
+    if (isUrl(image)) {
       const imageUrl = new URL(image);
       imageName = last(imageUrl.pathname.split('/'))!;
     } else {

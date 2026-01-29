@@ -1,4 +1,5 @@
 import {
+  assoc,
   drop,
   flatten,
   includes,
@@ -15,7 +16,7 @@ import { match } from 'ts-pattern';
 import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import { bufferToString } from '~/composables/utils';
-import { isCacheable, resolveUrl } from '~/composables/utils/resolveUrl';
+import { isCacheable, resolveUrl } from '~/composables/utils/url';
 import type {
   CacheEvent,
   CacheOptions,
@@ -463,20 +464,30 @@ async function doCache(
             options.refresh ?? false,
             imagesDir,
             abortSignal,
-          ),
+          ).then(assoc('url', imageUrl)),
         ),
       );
 
-      results.forEach((result, i) => {
-        if (result.status === 'fulfilled') {
-          successfulImages.add(batch[i]);
-          if (result.value.cached) cached++;
-          totalBytes += result.value.bytes;
-        } else {
-          errors++;
-        }
-      });
+      const [succeeded, failed] = partition(
+        (r) => r.status === 'fulfilled',
+        results,
+      );
 
+      for (const result of succeeded) {
+        const val = (
+          result as PromiseFulfilledResult<{
+            url: string;
+            name: string;
+            bytes: number;
+            local: boolean;
+          }>
+        ).value;
+        successfulImages.add(val.url);
+        if (val.local) cached++;
+        totalBytes += val.bytes;
+      }
+
+      errors += failed.length;
       progress += results.length;
  
       reply({
@@ -510,7 +521,7 @@ async function cacheImage(
   refresh: boolean,
   imagesDir: FileSystemDirectoryHandle,
   abortSignal: AbortSignal,
-): Promise<{ name: string; bytes: number; cached: boolean }> {
+): Promise<{ name: string; bytes: number; local: boolean }> {
   const imageName = last(imageUrl.pathname.split('/'))!;
   const imageFile = await imagesDir.getFileHandle(imageName, {
     create: true,
@@ -521,7 +532,7 @@ async function cacheImage(
     imageFileHandle = await imageFile.createSyncAccessHandle();
     const imageSize = imageFileHandle.getSize();
     if (!refresh && imageSize > 0) {
-      return { name: imageName, bytes: imageSize, cached: true };
+      return { name: imageName, bytes: imageSize, local: true };
     }
 
     const imageResponse = await fetch(imageUrl, { signal: abortSignal });
@@ -550,7 +561,7 @@ async function cacheImage(
     imageFileHandle.write(imageBuffer, { at: 0 });
     imageFileHandle.flush();
 
-    return { name: imageName, bytes: imageBlob.size, cached: false };
+    return { name: imageName, bytes: imageBlob.size, local: false };
   } catch (e) {
     console.error(`[cache] Error caching ${imageName}:`, e);
     throw e;

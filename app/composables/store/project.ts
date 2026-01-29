@@ -31,7 +31,8 @@ export type LoadProjectData =
       fileContents: string;
       fileName: string;
       projectId?: string;
-      cached?: boolean;
+      local?: boolean;
+      origin?: 'local' | 'remote';
     }
   | {
       project: EditorProject;
@@ -57,8 +58,12 @@ export const useProjectStore = defineStore('project', () => {
     if (store.value.status === 'loaded') return store.value.file;
     else return null;
   });
-  const isCached = computed<boolean>(() => {
-    if (store.value.status === 'loaded') return store.value.cached;
+  const isLocal = computed<boolean>(() => {
+    if (store.value.status === 'loaded') return store.value.local;
+    else return false;
+  });
+  const isOriginLocal = computed<boolean>(() => {
+    if (store.value.status === 'loaded') return store.value.origin === 'local';
     else return false;
   });
 
@@ -201,7 +206,8 @@ export const useProjectStore = defineStore('project', () => {
         store.value = {
           status: 'loaded',
           file: projectFile,
-          cached: result.cached ?? false,
+          local: result.local ?? false,
+          origin: result.origin,
         };
         triggerRef(store);
       } else {
@@ -454,7 +460,8 @@ export const useProjectStore = defineStore('project', () => {
   return {
     store,
     project,
-    isCached,
+    isLocal,
+    isOriginLocal,
     projectRows,
     backpack,
     pointTypes,
