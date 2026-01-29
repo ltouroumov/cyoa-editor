@@ -101,7 +101,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { includes, isNotEmpty } from 'ramda';
 
 import type { Project } from '~/composables/project/types/v1';
-import { imageIsCacheable } from '~/composables/utils/imageIsUrl';
+import { isCacheable } from '~/composables/utils/resolveUrl';
 import type {
   CacheOptions,
   ClearOptions,
@@ -150,15 +150,15 @@ watch(
     const rows0: RowInfo[] = [];
     for (const row of fileData.rows) {
       let totalImageCount = 0;
-      if (isNotEmpty(row.image) && imageIsCacheable(row.image)) {
+      if (isNotEmpty(row.image) && isCacheable(row.image)) {
         totalImageCount += 1;
       }
       for (const obj of row.objects) {
-        if (isNotEmpty(obj.image) && imageIsCacheable(obj.image)) {
+        if (isNotEmpty(obj.image) && isCacheable(obj.image)) {
           totalImageCount += 1;
         }
         for (const addon of obj.addons) {
-          if (isNotEmpty(addon.image) && imageIsCacheable(addon.image)) {
+          if (isNotEmpty(addon.image) && isCacheable(addon.image)) {
             totalImageCount += 1;
           }
         }

@@ -3,42 +3,65 @@ import { isNil, isNotNil, last } from 'ramda';
 import { match } from 'ts-pattern';
 
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
+import { useDexie } from '~/composables/shared/useDexie';
 import { useProjectRefs } from '~/composables/store/project';
+import { useSettingStore } from '~/composables/store/settings';
 import {
-  imageIsCacheable,
-  imageIsUrl,
-} from '~/composables/utils/imageIsUrl';
+  isCacheable,
+  isAbsoluteUrl,
+  resolveUrl,
+} from '~/composables/utils/resolveUrl';
+
+// variables to memoize state for reducing database lookups
+let memoizedOrigin: Promise<string | undefined> | null = null;
+let memoizedProjectId: string | undefined;
+
+const getProjectOrigin = (id: string, dexie: ReturnType<typeof useDexie>) => {
+  if (id !== memoizedProjectId || !memoizedOrigin) {
+    memoizedProjectId = id;
+    memoizedOrigin = dexie.viewer_projects_cache.get(id).then((p) => p?.origin);
+  }
+  return memoizedOrigin;
+};
 
 export function useImageCache() {
-  const { project, isLocal } = useProjectRefs();
-
+  const { project, isCached } = useProjectRefs();
+  const dexie = useDexie();
+  const settingsStore = useSettingStore();
+  
   const loadImageSrc = async (
     element: ProjectObj | ProjectRow,
   ): Promise<string | null> => {
-    // If there is no image, return null
-    if (!element.image) return null;
-    // If the image isn't cacheable (data URL, blob, etc.), return the value as-is
-    if (!imageIsCacheable(element.image)) return element.image;
 
-    if (!isLocal.value) {
-      // If remote, use the link image from the project file
-      // For relative paths, resolve against document.baseURI
-      if (!imageIsUrl(element.image)) {
-        return new URL(element.image, document.baseURI).href;
-      }
-      return element.image;
-    } else if (isNotNil(project.value) && isNotNil(project.value.projectId)) {
-      // When local, load the image from the local file system
-      const localSrc = await loadImage(
-        project.value!.projectId!,
+    // Check if image isn't cacheable (data URL, blob, empty etc.), return the value as-is
+    if (!isCacheable(element.image)) return element.image;
+
+    let origin: string | undefined;
+    // Check if Project is in OPFS Cache
+    if (isCached.value && isNotNil(project.value) && isNotNil(project.value.projectId)) {
+      const cachedSrc = await loadImage(
+        project.value.projectId,
         element.image,
       );
-      // Fall back to the URL if the image is not cached locally
-      if (isNil(localSrc)) return element.image;
-      else return localSrc;
+
+      // Check if OPFS cache has an image, return it
+      if (isNotNil(cachedSrc)) return cachedSrc;
+
+      // get project origin for future checks
+      origin = await getProjectOrigin(project.value.projectId, dexie);
+    }
+    
+    // if fetching is not allowed, return null
+    if (settingsStore.hideUncachedImages) return null;
+
+    // fetching is allowed, check if origin is local and image is relative
+    if(origin === 'local' && !isAbsoluteUrl(element.image)) {
+      return null;
     }
 
-    return null;
+    // Project is not in OPFS cache
+    // Either origin is remote OR image is absolute URL
+    return resolveUrl(element.image, document.baseURI);
   };
 
   async function loadImage(
@@ -76,7 +99,7 @@ export function useImageCache() {
 
     // Handle both absolute URLs and relative paths
     let imageName: string;
-    if (imageIsUrl(image)) {
+    if (isAbsoluteUrl(image)) {
       const imageUrl = new URL(image);
       imageName = last(imageUrl.pathname.split('/'))!;
     } else {

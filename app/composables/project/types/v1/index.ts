@@ -245,7 +245,7 @@ export type LoadingProjectStore = {
 export type LoadedProjectStore = {
   status: 'loaded';
   file: ProjectFile;
-  local: boolean;
+  cached: boolean;
 };
 
 export type ProjectStore =

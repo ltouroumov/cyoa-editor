@@ -117,6 +117,28 @@
           </small>
         </div>
       </li>
+      <li
+        class="flex flex-row items-center gap-2 py-2 border-b border-surface-700 font-bold text-primary"
+      >
+        Cache Settings
+      </li>
+      <li
+        class="flex flex-row items-center gap-2 py-2 border-b border-surface-700"
+      >
+        <Checkbox
+          v-model="hideUncachedImages"
+          input-id="hideUncachedImages"
+          binary
+        />
+        <div class="flex flex-col gap-1">
+          <label class="form-check-label" for="hideUncachedImages">
+            Hide Uncached Images
+          </label>
+          <small class="text-slate-500 text-sm">
+            Only show images that have been cached
+          </small>
+        </div>
+      </li>
     </ul>
   </div>
 </template>
@@ -139,6 +161,7 @@ const {
   lockBackpackObjects,
   displaySettings,
   lightThemeUI,
+  hideUncachedImages,
   loadProjectOnStartup,
 } = useSettingRefs();
 

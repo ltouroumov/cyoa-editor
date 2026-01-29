@@ -15,8 +15,7 @@ import { match } from 'ts-pattern';
 import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import { bufferToString } from '~/composables/utils';
-import { imageIsCacheable } from '~/composables/utils/imageIsUrl';
-import { resolveUrl } from '~/composables/utils/resolveUrl';
+import { isCacheable, resolveUrl } from '~/composables/utils/resolveUrl';
 import type {
   CacheEvent,
   CacheOptions,
@@ -259,17 +258,17 @@ async function doClear(
         }
 
         deletedCacheItems.push(rowData.id);
-        if (isNotEmpty(rowData.image) && imageIsCacheable(rowData.image)) {
+        if (isNotEmpty(rowData.image) && isCacheable(rowData.image)) {
           images0.push(resolveUrl(rowData.image, baseUrl));
         }
 
         for (const objData of rowData.objects) {
-          if (isNotEmpty(objData.image) && imageIsCacheable(objData.image)) {
+          if (isNotEmpty(objData.image) && isCacheable(objData.image)) {
             images0.push(resolveUrl(objData.image, baseUrl));
           }
 
           for (const objAddon of objData.addons) {
-            if (isNotEmpty(objAddon.image) && imageIsCacheable(objAddon.image)) {
+            if (isNotEmpty(objAddon.image) && isCacheable(objAddon.image)) {
               images0.push(resolveUrl(objAddon.image, baseUrl));
             }
           }
@@ -421,17 +420,17 @@ async function doCache(
       }
 
       const rowImages = [];
-      if (isNotEmpty(rowData.image) && imageIsCacheable(rowData.image)) {
+      if (isNotEmpty(rowData.image) && isCacheable(rowData.image)) {
         rowImages.push(resolveUrl(rowData.image, baseUrl));
       }
 
       for (const objData of rowData.objects) {
-        if (isNotEmpty(objData.image) && imageIsCacheable(objData.image)) {
+        if (isNotEmpty(objData.image) && isCacheable(objData.image)) {
           rowImages.push(resolveUrl(objData.image, baseUrl));
         }
 
         for (const objAddon of objData.addons) {
-          if (isNotEmpty(objAddon.image) && imageIsCacheable(objAddon.image)) {
+          if (isNotEmpty(objAddon.image) && isCacheable(objAddon.image)) {
             rowImages.push(resolveUrl(objAddon.image, baseUrl));
           }
         }

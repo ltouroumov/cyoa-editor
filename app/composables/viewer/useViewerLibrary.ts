@@ -150,7 +150,9 @@ export function useViewerLibrary() {
     let project0 = await dexie.viewer_projects_cache.get(projectId);
     if (isNil(project0)) {
       project0 = await dexie.viewer_projects_cache
-        .where({ title: projectTitle, origin: 'local' })
+        .where('title')
+        .equals(projectTitle)
+        .filter((p) => p.origin === 'local')
         .first();
     }
 
@@ -205,7 +207,7 @@ export function useViewerLibrary() {
         return {
           fileContents: data,
           fileName: file.name,
-          local: true,
+          cached: true,
           projectId: project.id,
         };
       });
@@ -421,7 +423,7 @@ export function useViewerLibrary() {
         projectId: project.id,
         fileContents: fileContents,
         fileName: project.file_url,
-        local: true,
+        cached: true,
       };
     });
   };

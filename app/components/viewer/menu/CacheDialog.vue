@@ -148,7 +148,7 @@ import { find, isNil, isNotEmpty, isNotNil, propEq } from 'ramda';
 import CacheOperations from '~/components/viewer/menu/CacheOperations.vue';
 import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
-import { imageIsCacheable } from '~/composables/utils/imageIsUrl';
+import { isCacheable } from '~/composables/utils/resolveUrl';
 import type { ClearOptions } from '~/composables/viewer/cache/types';
 import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
@@ -187,16 +187,16 @@ const rows = computedAsync(async () => {
   for (const row of projectData.value.rows) {
     totalRows++;
 
-    if (isNotEmpty(row.image) && imageIsCacheable(row.image)) {
+    if (isNotEmpty(row.image) && isCacheable(row.image)) {
       totalImages++;
     }
     for (const obj of row.objects) {
-      if (isNotEmpty(obj.image) && imageIsCacheable(obj.image)) {
+      if (isNotEmpty(obj.image) && isCacheable(obj.image)) {
         totalImages++;
       }
 
       for (const addon of obj.addons) {
-        if (isNotEmpty(addon.image) && imageIsCacheable(addon.image)) {
+        if (isNotEmpty(addon.image) && isCacheable(addon.image)) {
           totalImages++;
         }
       }

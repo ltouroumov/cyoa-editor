@@ -80,6 +80,7 @@ export const useSettingStore = defineStore(
     const lockBackpackObjects = ref<boolean>(true);
     const loadProjectOnStartup = ref<string>('');
     const lightThemeUI = ref<boolean>(false);
+    const hideUncachedImages = ref<boolean>(false);
     const displaySettings = ref<DisplaySettingsValue>({
       type: 'preset',
       name: 'default',
@@ -108,6 +109,7 @@ export const useSettingStore = defineStore(
       lockBackpackObjects,
       loadProjectOnStartup,
       lightThemeUI,
+      hideUncachedImages,
       displaySettings,
       resolveDisplaySettings,
       hasPreference,
