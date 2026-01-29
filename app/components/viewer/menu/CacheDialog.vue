@@ -49,10 +49,11 @@
           </Button>
         </div>
         <div
-          v-if="project.source === 'cached'"
+          v-if="project.source === 'cached' || project.source === 'local'"
           class="flex flex-row gap-2 justify-end"
         >
           <Button
+            v-if="project.source === 'cached'"
             :disabled="hasActiveOperation(project.id, 'project')"
             @click="cacheProject(project.id, { refresh: true, images: false })"
           >
@@ -169,6 +170,12 @@ const {
 
 const project = computed(() => {
   return find(propEq($dialog.value.data.projectId, 'id'), projectList.value);
+});
+
+watch(project, (p) => {
+  if (!p) {
+    $dialog.value.close();
+  }
 });
 
 const projectData = computedAsync(async () => {

@@ -16,7 +16,7 @@ import { match } from 'ts-pattern';
 import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import { bufferToString } from '~/composables/utils';
-import { isCacheable, resolveUrl } from '~/composables/utils/url';
+import { isCacheable, isUrl, resolveUrl } from '~/composables/utils/url';
 import type {
   CacheEvent,
   CacheOptions,
@@ -402,6 +402,13 @@ async function doCache(
     projectFileHandle.close();
   }
 
+  const shouldCache = (url: string) => {
+    // If the project origin is local, we should only cache URLs
+    // Relative paths in local projects are assumed to be local files that we can't access/cache
+    if (options.isOriginLocal && !isUrl(url)) return false;
+    return true;
+  };
+
   if (isNotNil(options.images)) {
     const projectJson = bufferToString(projectBytes.buffer);
     const projectData = JSON.parse(projectJson) as Project;
@@ -421,17 +428,29 @@ async function doCache(
       }
 
       const rowImages = [];
-      if (isNotEmpty(rowData.image) && isCacheable(rowData.image)) {
+      if (
+        isNotEmpty(rowData.image) &&
+        isCacheable(rowData.image) &&
+        shouldCache(rowData.image)
+      ) {
         rowImages.push(resolveUrl(rowData.image, baseUrl));
       }
 
       for (const objData of rowData.objects) {
-        if (isNotEmpty(objData.image) && isCacheable(objData.image)) {
+        if (
+          isNotEmpty(objData.image) &&
+          isCacheable(objData.image) &&
+          shouldCache(objData.image)
+        ) {
           rowImages.push(resolveUrl(objData.image, baseUrl));
         }
 
         for (const objAddon of objData.addons) {
-          if (isNotEmpty(objAddon.image) && isCacheable(objAddon.image)) {
+          if (
+            isNotEmpty(objAddon.image) &&
+            isCacheable(objAddon.image) &&
+            shouldCache(objAddon.image)
+          ) {
             rowImages.push(resolveUrl(objAddon.image, baseUrl));
           }
         }

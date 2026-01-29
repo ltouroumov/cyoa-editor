@@ -5,6 +5,7 @@ export type CacheOptions = {
   refresh?: boolean;
   project?: boolean;
   images?: boolean | string[];
+  isOriginLocal?: boolean;
 };
 
 export type ClearOptions = {

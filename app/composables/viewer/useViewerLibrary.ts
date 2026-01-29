@@ -227,92 +227,95 @@ export function useViewerLibrary() {
   const cacheProject = async (id: string, options: CacheOptions) => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
-
+    
     if (project.source === 'local') {
-      return; // nothing to do for local projects
-    } else {
-      const resolvedFileUrl = resolveUrl(project.file_url, document.baseURI);
-      const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
+      // For local projects, we only support caching images (as the project file is already local)
+      if (!options.images) return;
+      options.project = false;
+    }
 
-      const { taskId, events } = await worker.submitTask({
-        type: 'cache',
-        project: projectWithResolvedUrl,
-        options,
-        baseUrl: document.baseURI,
-      });
+    options.isOriginLocal = project.origin === 'local';
+    const resolvedFileUrl = resolveUrl(project.file_url, document.baseURI);
+    const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
 
-      const keys = [
-        (options.project ?? true) ? 'project' : null,
-        options.images === true ? 'images' : null,
-        ...(Array.isArray(options.images)
-          ? options.images.map((i) => `images.${i}`)
-          : []),
-      ].filter(isNotNil) as string[];
+    const { taskId, events } = await worker.submitTask({
+      type: 'cache',
+      project: projectWithResolvedUrl,
+      options,
+      baseUrl: document.baseURI,
+    });
 
-      const name =
-        (options.project ?? true) ? 'Download project' : 'Download images';
+    const keys = [
+      (options.project ?? true) ? 'project' : null,
+      options.images === true ? 'images' : null,
+      ...(Array.isArray(options.images)
+        ? options.images.map((i) => `images.${i}`)
+        : []),
+    ].filter(isNotNil) as string[];
 
-      startOperation(taskId, project.id, keys, name);
+    const name =
+      (options.project ?? true) ? 'Download project' : 'Download images';
 
-      // read the stream of messages from the worker until the cache operation is complete
-      const _sub = events.subscribe(async (msg: CacheResult) => {
-        try {
-          await match(msg)
-            .with({ status: 'progress' }, async (progress) => {
-              updateOperation(progress.taskId, {
-                status: 'running',
-                progress: progress.info,
-              });
-            })
-            .with({ status: 'completed' }, async (event) => {
+    startOperation(taskId, project.id, keys, name);
+
+    // read the stream of messages from the worker until the cache operation is complete
+    const _sub = events.subscribe(async (msg: CacheResult) => {
+      try {
+        await match(msg)
+          .with({ status: 'progress' }, async (progress) => {
+            updateOperation(progress.taskId, {
+              status: 'running',
+              progress: progress.info,
+            });
+          })
+          .with({ status: 'completed' }, async (event) => {
+            const newCachedItems = concat(
+              // need to deep clone the list otherwise it will contain vue proxy objects :/
+              clone(project.cachedItems ?? []),
+              event.cachedItems ?? [],
+            );
+            console.log('newCachedItems', newCachedItems);
+            await dexie.viewer_projects_cache.put({
+              ...omit(['source', 'origin'], project),
+              origin: 'remote',
+              cachedAt: new Date(),
+              cachedItems: newCachedItems,
+            });
+
+            updateOperation(event.taskId, {
+              status: 'completed',
+            });
+          })
+          .with({ status: 'cancelled' }, async (event) => {
+            if (event.cachedItems) {
               const newCachedItems = concat(
-                // need to deep clone the list otherwise it will contain vue proxy objects :/
                 clone(project.cachedItems ?? []),
-                event.cachedItems ?? [],
+                event.cachedItems,
               );
-              console.log('newCachedItems', newCachedItems);
               await dexie.viewer_projects_cache.put({
                 ...omit(['source', 'origin'], project),
                 origin: 'remote',
                 cachedAt: new Date(),
                 cachedItems: newCachedItems,
               });
+            }
 
-              updateOperation(event.taskId, {
-                status: 'completed',
-              });
-            })
-            .with({ status: 'cancelled' }, async (event) => {
-              if (event.cachedItems) {
-                const newCachedItems = concat(
-                  clone(project.cachedItems ?? []),
-                  event.cachedItems,
-                );
-                await dexie.viewer_projects_cache.put({
-                  ...omit(['source', 'origin'], project),
-                  origin: 'remote',
-                  cachedAt: new Date(),
-                  cachedItems: newCachedItems,
-                });
-              }
-
-              updateOperation(event.taskId, {
-                status: 'cancelled',
-              });
-              _sub.unsubscribe();
-            })
-            .with({ status: 'failure' }, async (event) => {
-              updateOperation(event.taskId, {
-                status: 'failure',
-                error: event.error,
-              });
-            })
-            .exhaustive();
-        } catch (err) {
-          console.error('failed to process event', msg, err);
-        }
-      });
-    }
+            updateOperation(event.taskId, {
+              status: 'cancelled',
+            });
+            _sub.unsubscribe();
+          })
+          .with({ status: 'failure' }, async (event) => {
+            updateOperation(event.taskId, {
+              status: 'failure',
+              error: event.error,
+            });
+          })
+          .exhaustive();
+      } catch (err) {
+        console.error('failed to process event', msg, err);
+      }
+    });
   };
 
   const abortCache = async (taskId: string) => {
@@ -323,11 +326,18 @@ export function useViewerLibrary() {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 
-    if (project.source === 'local') {
+    if (project.source === 'local' && options.project) {
       await dexie.viewer_projects_cache.delete(project.id);
       const fsHandle = await navigator.storage.getDirectory();
-      await fsHandle.removeEntry(project.id, { recursive: true });
-    } else if (project.source === 'cached') {
+      try {
+        await fsHandle.removeEntry(project.id, { recursive: true });
+      } catch (e) {
+        // ignore
+      }
+    } else if (
+      project.source === 'cached' ||
+      (project.source === 'local' && options.images)
+    ) {
       const resolvedFileUrl = resolveUrl(project.file_url, document.baseURI);
       const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
 
