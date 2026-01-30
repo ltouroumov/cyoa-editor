@@ -30,7 +30,7 @@ const $props = defineProps<{
   objId: string;
   index: number;
   addon: ObjAddon;
-  display?: DisplaySettings;
+  display?: Partial<DisplaySettings>;
   parentEnabled?: boolean;
 }>();
 

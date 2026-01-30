@@ -69,6 +69,7 @@
               :index="idx"
               :addon="addon"
               :obj-id="obj.id"
+              :display="display"
             />
           </div>
         </div>
