@@ -90,17 +90,19 @@ export function useImageCache() {
       // For relative paths, just get the filename
       imageName = last(image.split('/'))!;
     }
-    try {
-      const imageHandle = await imagesDir.getFileHandle(imageName);
-      const imageFile = await imageHandle.getFile();
-      if (imageFile.size === 0) return null;
-      else return { name: imageName, file: imageFile };
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'NotFoundError') {
-        return null;
-      }
-      throw err;
-    }
+    return imagesDir
+      .getFileHandle(imageName)
+      .then((imageHandle) => imageHandle.getFile())
+      .then((imageFile) => {
+        if (imageFile.size === 0) return null;
+        else return { name: imageName, file: imageFile };
+      })
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'NotFoundError') {
+          return null;
+        }
+        throw err;
+      });
   };
 
   return { loadImageSrc, resolveImage };

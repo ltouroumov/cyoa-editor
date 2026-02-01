@@ -32,100 +32,148 @@
         </div>
       </div>
       <div class="flex flex-row gap-2 items-center">
-        <div class="grow flex flex-row items-center gap-2">
+        <div class="grow flex flex-col items-start gap-1">
           <span class="text-xl">Project</span>
-          <span v-if="isNotNil(rows)" class="text-sm">
-            (sections: {{ rows.totalRows }})
+          <span v-if="isNotNil(rows)" class="text-sm text-surface-400">
+             Sections: {{ rows.totalRows }} ({{ formatBytes(rows.projectFileSize) }})
           </span>
         </div>
 
         <div v-if="project.source === 'remote'">
           <Button
             :disabled="hasActiveOperation(project.id, 'project')"
-            @click="cacheProject(project.id, { images: false })"
+            @click="
+              cacheProject(project.id, {
+                images: false,
+                project: true,
+                mode: 'refresh-missing',
+              })
+            "
           >
-            <span class="iconify solar--cloud-download-linear"></span>
-            Download
+            <span class="iconify solar--cloud-download-linear sm:mr-2"></span>
+            <span class="hidden sm:inline">Download</span>
           </Button>
         </div>
         <div
           v-if="project.source === 'cached' || project.source === 'local'"
           class="flex flex-row gap-2 justify-end"
         >
-          <Button
+          <SplitButton
             v-if="project.source === 'cached'"
-            :disabled="hasActiveOperation(project.id, 'project')"
-            @click="cacheProject(project.id, { refresh: true, images: false })"
+            label="Update"
+            icon="iconify solar--refresh-linear"
+            :model="[
+              {
+                label: 'Delete',
+                icon: 'iconify solar--trash-bin-trash-linear',
+                class: 'text-red-500',
+                command: (event: CommandEvent) => {
+                  if (project) {
+                    tryClearCache(
+                      project.id,
+                      { project: true },
+                      event.originalEvent,
+                    );
+                  }
+                },
+              },
+            ]"
+            @click="
+              cacheProject(project.id, {
+                mode: 'refresh-all',
+                images: false,
+                project: true,
+              })
+            "
           >
-            <span class="iconify solar--refresh-linear"></span>
-            Update
-          </Button>
+            <span class="iconify solar--refresh-linear sm:mr-2"></span>
+            <span class="hidden sm:inline">Update</span>
+          </SplitButton>
           <Button
+            v-else
             severity="danger"
             :disabled="hasActiveOperation(project.id, 'project')"
             @click="tryClearCache(project.id, { project: true }, $event)"
           >
-            <span class="iconify solar--trash-bin-trash-linear"></span>
-            Delete
+            <span class="iconify solar--trash-bin-trash-linear sm:mr-2"></span>
+            <span class="hidden sm:inline">Delete</span>
           </Button>
         </div>
       </div>
       <div class="w-full border-t border-surface-700 my-2"></div>
       <div class="flex flex-row gap-2 items-start">
         <div class="grow flex flex-col gap-2">
-          <div class="flex flex-row items-center gap-2">
-            <span class="text-xl">Images</span>
-            <span v-if="isNotNil(rows)" class="text-sm">
-              (total: {{ rows.totalImages }}, cached:
-              {{ rows.totalImagesCached }})
-            </span>
+          <div class="flex flex-col gap-1">
+             <div class="flex flex-row items-center gap-2">
+                 <span class="text-xl">Images</span>
+             </div>
+             
+             <div v-if="isNotNil(rows)" class="flex flex-col gap-1">
+                <div class="text-sm text-surface-400">
+                     Cached: {{ rows.totalImagesCached }} / {{ rows.totalImages }} ({{ formatBytes(rows.totalImagesSize) }})
+                </div>
+             </div>
+          </div>
+          <div class="flex flex-col">
+            <div 
+              v-if="project.source !== 'remote'"
+              class="text-sm text-surface-400"
+            >
+              {{ downloadButtonConfig.statusMode }}
+            </div>
+            <div
+              v-if="downloadButtonConfig.statusInfo"
+              class="text-sm text-surface-400"
+            >
+              {{ downloadButtonConfig.statusInfo }}
+            </div>
           </div>
         </div>
 
-        <div class="flex flex-col gap-2 justify-end">
-          <div v-if="!hasCachedImages" class="flex flex-row gap-2 justify-end">
-            <Button
-              :disabled="
-                project.source === 'remote' ||
-                hasActiveOperation(project.id, 'images')
-              "
-              @click="cacheProject(project.id, { images: true })"
-            >
-              <span class="iconify solar--cloud-download-linear"></span>
-              Download
-            </Button>
-          </div>
-          <div v-else class="flex flex-row gap-2 justify-end">
-            <Button
-              :disabled="hasActiveOperation(project.id, 'images')"
-              @click="
-                cacheProject(project.id, {
-                  refresh: true,
-                  images: true,
-                  project: false,
-                })
-              "
-            >
-              <span class="iconify solar--refresh-linear"></span>
-              Update
-            </Button>
-            <Button
-              severity="danger"
-              :disabled="hasActiveOperation(project.id, 'images')"
-              @click="tryClearCache(project.id, { images: true }, $event)"
-            >
-              <span class="iconify solar--trash-bin-trash-linear"></span>
-              Delete
-            </Button>
-          </div>
+        <div class="flex flex-row gap-2 justify-between items-center">
 
-          <div class="flex flex-row gap-2 items-center">
-            <Checkbox
-              v-model="showImagesAdvanced"
-              :binary="true"
-              input-id="images-advanced-mode"
-            />
-            <label for="images-advanced-mode">Advanced Mode</label>
+          <div class="flex flex-col gap-2 justify-end">
+            <div class="flex flex-row gap-2 justify-end">
+            <SplitButton
+              v-if="downloadButtonConfig.model.length > 0"
+              :model="downloadButtonConfig.model"
+              :disabled="hasActiveOperation(project.id, 'images') || project.source === 'remote'"
+              @click="downloadButtonConfig.command"
+            >
+              <span class="iconify sm:mr-2" :class="downloadButtonConfig.icon"></span>
+              <span class="hidden sm:inline">{{
+                downloadButtonConfig.label
+              }}</span>
+            </SplitButton>
+            <Button
+              v-else
+              :disabled="hasActiveOperation(project.id, 'images') || project.source === 'remote'"
+              @click="downloadButtonConfig.command"
+            >
+              <span
+                class="iconify sm:mr-2"
+                :class="downloadButtonConfig.icon"
+              ></span>
+              <span class="hidden sm:inline">{{
+                downloadButtonConfig.label
+              }}</span>
+            </Button>
+            </div>
+
+            <div class="flex flex-row gap-2 items-center">
+              <Checkbox
+                v-model="showImagesAdvanced"
+                :binary="true"
+                input-id="images-advanced-mode"
+                :disabled="project.source === 'remote'"
+              />
+              <label
+                for="images-advanced-mode"
+                :class="{ 'text-surface-500': project.source === 'remote' }"
+              >
+                Advanced Mode
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -135,6 +183,7 @@
         :project="project"
         :project-data="projectData!"
         :active-operations="cacheOperations"
+        v-model:selection="selectedRows"
         @cache="cacheProject"
         @clear="clearCache"
       />
@@ -143,14 +192,18 @@
 </template>
 
 <script setup lang="ts">
+import type { MenuItem } from 'primevue/menuitem';
+import SplitButton from 'primevue/splitbutton';
 import { useConfirm } from 'primevue/useconfirm';
-import { find, isNil, isNotEmpty, isNotNil, propEq } from 'ramda';
+import { find, isNil, isNotNil, propEq } from 'ramda';
 
 import CacheOperations from '~/components/viewer/menu/CacheOperations.vue';
 import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import { isCacheable } from '~/composables/utils/url';
 import type { ClearOptions } from '~/composables/viewer/cache/types';
+import type { RowInfo } from '~/composables/viewer/types';
+import { formatBytes } from '~/composables/viewer/cache/utils';
 import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
 const $confirm = useConfirm();
@@ -178,15 +231,18 @@ watch(project, (p) => {
   }
 });
 
+const projectFileSize = ref<number>(0);
+
 const projectData = computedAsync(async () => {
   if (!project.value) return null;
   if (project.value.source === 'remote') return null;
 
   const fileContents = await loadCachedData(project.value);
+  projectFileSize.value = fileContents.length;
   return JSON.parse(fileContents) as Project;
 });
 
-const rows = computedAsync(async () => {
+const projectStats = computedAsync(async () => {
   if (isNil(projectData.value) || isNil(project.value)) return null;
 
   let totalRows = 0;
@@ -194,29 +250,45 @@ const rows = computedAsync(async () => {
   for (const row of projectData.value.rows) {
     totalRows++;
 
-    if (isNotEmpty(row.image) && isCacheable(row.image)) {
+    if (isCacheable(row.image)) {
       totalImages++;
     }
     for (const obj of row.objects) {
-      if (isNotEmpty(obj.image) && isCacheable(obj.image)) {
+      if (isCacheable(obj.image)) {
         totalImages++;
       }
 
       for (const addon of obj.addons) {
-        if (isNotEmpty(addon.image) && isCacheable(addon.image)) {
+        if (isCacheable(addon.image)) {
           totalImages++;
         }
       }
     }
   }
 
+  return { totalRows, totalImages, projectFileSize: projectFileSize.value };
+}, null);
+
+const rows = computed(() => {
+  if (!project.value || !projectStats.value) return null;
+
   const cachedItems: CacheItem[] = project.value.cachedItems ?? [];
   const totalImagesCached = cachedItems.reduce((acc, item) => {
     if (item.type === 'images.row') return acc + item.count;
     else return acc;
   }, 0);
-  return { totalRows, totalImages, totalImagesCached };
-}, null);
+
+  const totalImagesSize = cachedItems.reduce((acc, item) => {
+    if (item.type === 'images.row') return acc + (item.size ?? 0);
+    else return acc;
+  }, 0);
+
+  return {
+    ...projectStats.value,
+    totalImagesCached,
+    totalImagesSize,
+  };
+});
 
 const tryClearCache = async (
   id: string,
@@ -242,10 +314,156 @@ const tryClearCache = async (
   });
 };
 
-const hasCachedImages = computed(() => {
-  return (project.value?.cachedItems ?? []).some(
-    (cacheItem) => cacheItem.type === 'images.row',
+type CommandEvent = {
+  originalEvent: Event;
+  item: MenuItem;
+};
+
+const selectedRows = ref<RowInfo[]>([]);
+
+const globalStats = computed(() => {
+  if (!rows.value) return { total: 0, cached: 0 };
+  return {
+    total: rows.value.totalImages,
+    cached: rows.value.totalImagesCached,
+  };
+});
+
+const selectionStats = computed(() => {
+  if (selectedRows.value.length === 0) return { total: 0, cached: 0 };
+  
+  const total = selectedRows.value.reduce(
+    (acc, r) => acc + (r.totalImageCount || 0),
+    0,
   );
+
+  const cachedMap = (project.value?.cachedItems ?? []).reduce(
+    (acc, item) => {
+      if (item.type === 'images.row') acc[item.rowId] = item.count;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const cached = selectedRows.value.reduce(
+    (acc, r) => acc + (cachedMap[r.id] ?? 0),
+    0,
+  );
+
+  return { total, cached };
+});
+
+const effectiveStats = computed(() => {
+  const isSelection = selectedRows.value.length > 0;
+  return isSelection ? selectionStats.value : globalStats.value;
+});
+
+const getTargetIds = () => {
+  return selectedRows.value.length > 0
+    ? selectedRows.value.map((r) => r.id)
+    : true;
+};
+
+// Actions
+const doDownloadMissing = () => {
+  if (!project.value) return;
+  cacheProject(project.value.id, {
+    images: getTargetIds(),
+    project: false,
+    mode: 'refresh-missing',
+  });
+};
+
+const doForceRefresh = () => {
+  if (!project.value) return;
+  cacheProject(project.value.id, {
+    images: getTargetIds(),
+    project: false,
+    mode: 'refresh-existing', // or refresh-all based on context, keeping logic consistent
+  });
+};
+
+const doUpdate = () => {
+  if (!project.value) return;
+  cacheProject(project.value.id, {
+    images: getTargetIds(),
+    project: false,
+    mode: 'refresh-all',
+  });
+};
+
+const doDeleteLogic = (event: CommandEvent) => {
+  if (!project.value) return;
+  tryClearCache(
+    project.value.id,
+    { images: getTargetIds() },
+    event.originalEvent,
+  );
+};
+
+const downloadButtonConfig = computed(() => {
+  const proj = project.value;
+  if (!proj) return { label: '', model: [] };
+
+  const { total, cached } = effectiveStats.value;
+  const isPartial = cached < total || total === 0;
+  const isSelection = selectedRows.value.length > 0;
+
+  // Generate Info Text
+  const parts: string[] = [];
+  if (isSelection) {
+    parts.push(`Selected: ${selectedRows.value.length} Rows`);
+    if (isPartial) parts.push(`(${total - cached} Images to Download)`);
+    else parts.push(`(${total} Images)`);
+  }
+
+  const infoText = parts.join(' ');
+
+  if (isPartial) {
+    // "Download Missing" Mode
+    return {
+      label: 'Download',
+      statusInfo: infoText,
+      statusMode: 'Cache Mode: Download Missing',
+      icon: 'iconify solar--cloud-download-linear',
+      command: doDownloadMissing,
+      model:
+        cached > 0
+          ? [
+              {
+                label: 'Force Refresh',
+                icon: 'iconify solar--refresh-linear',
+                command: doForceRefresh,
+              },
+              { separator: true },
+              {
+                label: 'Delete',
+                icon: 'iconify solar--trash-bin-trash-linear',
+                severity: 'danger',
+                class: 'text-red-500',
+                command: doDeleteLogic,
+              },
+            ]
+          : [],
+    };
+  } else {
+    // "Update" Mode (Complete)
+    return {
+      label: 'Update',
+      statusInfo: infoText,
+      statusMode: 'Cache Mode: Force Refresh',
+      icon: 'iconify solar--refresh-linear',
+      command: doUpdate,
+      model: [
+        {
+          label: 'Delete',
+          icon: 'iconify solar--trash-bin-trash-linear',
+          class: 'text-red-500',
+          command: doDeleteLogic,
+        },
+      ],
+    };
+  }
 });
 </script>
 

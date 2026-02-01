@@ -1,16 +1,19 @@
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import type { ViewerProject } from '~/composables/viewer/types';
 
+export type CacheMode = 'refresh-missing' | 'refresh-existing' | 'refresh-all';
+
 export type CacheOptions = {
-  refresh?: boolean;
-  project?: boolean;
-  images?: boolean | string[];
+  project: boolean;
+  images: boolean | string[];
+  mode: CacheMode;
   isOriginLocal?: boolean;
 };
 
 export type ClearOptions = {
   project?: boolean;
   images?: boolean | string[];
+  abortSignal?: AbortSignal;
 };
 
 export type CacheTask = {

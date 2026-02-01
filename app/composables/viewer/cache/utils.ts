@@ -11,7 +11,10 @@ export async function downloadFile(
 > {
   const response = await fetch(fileURL, { signal });
   if (response.ok) {
-    const reader = response.body!.getReader();
+    if (!response.body) {
+      throw new Error('Response body is empty');
+    }
+    const reader = response.body.getReader();
 
     let received = 0;
     const chunks = [];

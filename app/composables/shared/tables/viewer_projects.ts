@@ -4,6 +4,7 @@ export type CacheItem = {
   type: 'images.row';
   rowId: string;
   count: number;
+  size: number;
 };
 
 export type ViewerProjectCacheFields = {

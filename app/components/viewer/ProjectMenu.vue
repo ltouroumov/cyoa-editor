@@ -157,6 +157,11 @@ const openCacheDialog = async (id: string, update?: boolean) => {
       style: {
         width: '60vw',
       },
+      breakpoints: {
+        '960px': '75vw',
+        '640px': '90vw',
+        '480px': '100vw',
+      },
     },
     data: { projectId: id },
   });
