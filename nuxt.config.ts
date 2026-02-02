@@ -13,6 +13,10 @@ export default defineNuxtConfig({
       viewport: 'width=device-width, initial-scale=1',
       link: [
         {
+          rel: 'manifest',
+          href: 'manifest.webmanifest',
+        },
+        {
           rel: 'icon',
           type: 'image/x-icon',
           href: 'favicon.ico',
@@ -30,13 +34,13 @@ export default defineNuxtConfig({
           href: 'favicon-16x16.png',
         },
         {
-          rel: 'android-chrome',
+          rel: 'icon',
           type: 'image/png',
-          sizes: '92x192',
-          href: 'android-chrome-92x192.png',
+          sizes: '192x192',
+          href: 'android-chrome-192x192.png',
         },
         {
-          rel: 'andriod-chrome',
+          rel: 'icon',
           type: 'image/png',
           sizes: '512x512',
           href: 'android-chrome-512x512.png',
@@ -92,53 +96,59 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@vueuse/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    // '@vite-pwa/nuxt',
+    '@vite-pwa/nuxt',
   ],
 
-  // pwa: {
-  //   strategies: 'generateSW',
-  //   injectRegister: 'script',
-  //   registerType: 'autoUpdate',
-  //   manifest: {
-  //     name: 'ICC-NEO',
-  //     short_name: 'ICC',
-  //     description: 'Interactive CYOA Creator',
-  //     theme_color: '#ffffff',
-  //     icons: [
-  //       {
-  //         src: '/android-chrome-192x192.png',
-  //         sizes: '192x192',
-  //         type: 'image/png',
-  //       },
-  //       {
-  //         src: '/android-chrome-512x512.png',
-  //         sizes: '512x512',
-  //         type: 'image/png',
-  //       },
-  //     ],
-  //     display: 'standalone',
-  //   },
-  //   workbox: {
-  //     globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-  //   },
-  //   injectManifest: {
-  //     globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-  //   },
-  //   client: {
-  //     installPrompt: true,
-  //     // you don't need to include this: only for testing purposes
-  //     // if enabling periodic sync for update use 1 hour or so (periodicSyncForUpdates: 3600)
-  //     periodicSyncForUpdates: 20,
-  //   },
-  //   experimental: {
-  //     // includeAllowlist: true,
-  //   },
-  //   devOptions: {
-  //     enabled: true,
-  //     suppressWarnings: true,
-  //     type: 'module',
-  //   },
-  // },
+  pwa: {
+    strategies: 'generateSW',
+    injectRegister: 'script',
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Interactive CYOA Creator Neo',
+      short_name: 'ICC-Neo',
+      description: 'Interactive CYOA Creator Neo',
+      theme_color: '#1a1a1a',
+      background_color: '#1a1a1a',
+      display: 'standalone',
+      id: 'iccneo',
+      icons: [
+        {
+          src: 'android-chrome-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: 'android-chrome-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+        {
+          src: 'android-chrome-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable',
+        },
+      ],
+    },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
+    // injectManifest: {
+    //   globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    // },
+    client: {
+      installPrompt: true,
+      // you don't need to include this: only for testing purposes
+      // if enabling periodic sync for update use 1 hour or so (periodicSyncForUpdates: 3600)
+      periodicSyncForUpdates: 3600,
+    },
+    devOptions: {
+      enabled: true,
+      suppressWarnings: true,
+      navigateFallback: '/',
+      type: 'module',
+    },
+  },
 
   primevue: {
     usePrimeVue: true,
