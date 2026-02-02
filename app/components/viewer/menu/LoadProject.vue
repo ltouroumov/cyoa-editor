@@ -11,7 +11,6 @@
         choose-label="Upload Project"
         @select="onFileSelect"
       />
-      <Button icon="iconify solar--settings-linear" />
     </div>
     <div v-if="error" class="alert alert-danger load-error mb-3" role="alert">
       {{ error }}
