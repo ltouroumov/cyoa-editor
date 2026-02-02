@@ -130,6 +130,28 @@
       <label class="grow" for="showObjectAddons"> Show Object Addons </label>
     </li>
     <li
+      class="flex flex-row items-center gap-2 py-2 border-b border-surface-700"
+    >
+      <div
+        class="w-[var(--p-checkbox-width)] h-[var(--p-checkbox-width)]"
+      ></div>
+      <label class="grow" for="multiSelectControl">
+        Multi-Select Control
+      </label>
+      <SelectButton
+        v-model="displaySettings.settings.multiSelectControl"
+        input-id="multiSelectControl"
+        :options="[
+          { label: 'Buttons', value: 'buttons' },
+          { label: 'Slider', value: 'slider' },
+          { label: 'Input', value: 'input' },
+        ]"
+        option-label="label"
+        option-value="value"
+        size="small"
+      />
+    </li>
+    <li
       class="flex flex-row items-center gap-2 py-2 border-b border-surface-700 font-bold text-primary"
     >
       Addon Settings

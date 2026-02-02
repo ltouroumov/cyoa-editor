@@ -32,17 +32,17 @@ export function useObject({
     );
   });
 
-  const selectedAmount = computed(() => {
+  const selectedValue = computed(() => {
     if (obj.value.isSelectableMultiple)
-      return selected.value[obj.value.id] ?? 0;
-    else return 0;
+      return selected.value[obj.value.id] ?? minValue.value;
+    else return minValue.value;
   });
 
-  const minSelectedAmount = computed(() =>
-    Number.parseInt(obj.value.numMultipleTimesMinus),
+  const minValue = computed(() =>
+    Number.parseInt(obj.value.numMultipleTimesMinus) || 0,
   );
-  const maxSelectedAmount = computed(() =>
-    Number.parseInt(obj.value.numMultipleTimesPluss),
+  const maxValue = computed(() =>
+    Number.parseInt(obj.value.numMultipleTimesPluss) || 0,
   );
 
   const toggle = () => {
@@ -62,15 +62,27 @@ export function useObject({
     }
   };
 
+  const setValue = (val: number): void => {
+    if (canToggle.value) {
+      const clampedVal = Math.min(Math.max(val, minValue.value), maxValue.value);
+      if (clampedVal <= minValue.value) {
+        store.setSelected(obj.value.id, false);
+      } else {
+        store.setSelected({ [obj.value.id]: clampedVal }, true);
+      }
+    }
+  };
+
   return {
     isEnabled,
     isSelected,
     canToggle,
-    selectedAmount,
-    minSelectedAmount,
-    maxSelectedAmount,
+    selectedValue,
+    minValue,
+    maxValue,
     toggle,
     increment,
     decrement,
+    setValue,
   };
 }
