@@ -13,6 +13,7 @@ export type DisplaySettings = {
   showObjectControls: 'auto' | 'always' | 'never';
   showObjectOverflow: boolean;
   showObjectAddons: boolean;
+  multiSelectControl: 'buttons' | 'slider' | 'input';
 
   hideDisabledAddons: boolean;
 
@@ -34,6 +35,7 @@ const DefaultSettings: DisplaySettings = Object.freeze({
   showObjectControls: 'auto',
   showObjectOverflow: false,
   showObjectAddons: false,
+  multiSelectControl: 'buttons',
   hideDisabledAddons: false,
   hideAddonRequirements: false,
   hideAddonText: false,
@@ -68,6 +70,7 @@ export const DisplaySettingsPresets: Record<
     hideDisabledAddons: false,
     hideAddonRequirements: false,
     hideAddonText: true,
+    multiSelectControl: 'buttons',
   }),
 });
 
