@@ -17,7 +17,7 @@
         class="w-full mt-1"
       />
     </div>
-    <div v-else-if="controlMode === 'input'" class="w-4/5 lg:w-3/5 px-2 mb-1">
+    <div v-else-if="controlMode === 'input'" class="w-1/2 sm:w-3/5 md:w-4/5 lg:w-3/5 px-2 mb-1">
       <InputNumber
         v-if="canToggle"
         v-model="inputVal"
