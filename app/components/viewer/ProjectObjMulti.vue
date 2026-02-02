@@ -53,7 +53,7 @@
       </div>
       <div
         v-if="mode === 'edit'"
-        class="absolute right-0 left-0 top-9 flex flex-col px-2 py-1 rounded-md bg-surface-600/30 backdrop-blur-md z-10"
+        class="absolute right-0 left-0 top-[45px] flex flex-col px-2 py-1 rounded-md bg-surface-600/30 backdrop-blur-md z-10"
       >
         <div class="h-6 flex flex-row items-center px-2">
           <Slider
