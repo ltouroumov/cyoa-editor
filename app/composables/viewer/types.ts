@@ -25,3 +25,12 @@ export type ProjectListEntry = ViewerProject &
   Partial<ViewerProjectCacheFields> & {
     source: 'local' | 'remote' | 'cached';
   };
+
+export type RowInfo = {
+  id: string;
+  title: string;
+  totalImageCount: number;
+  cachedImageCount: number;
+  cachedImageSize: number;
+  cacheStatus: 'cached' | 'partial' | false;
+};

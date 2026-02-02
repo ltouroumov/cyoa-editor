@@ -1,8 +1,9 @@
+import { onScopeDispose } from 'vue';
 import {
   append,
   clone,
   concat,
-  includes,
+  values,
   indexBy,
   isNil,
   isNotNil,
@@ -17,13 +18,13 @@ import {
 import { match } from 'ts-pattern';
 
 import type { Project } from '~/composables/project/types/v1';
-import type { ViewerProjectCache } from '~/composables/shared/tables/viewer_projects';
+import type { CacheItem, ViewerProjectCache } from '~/composables/shared/tables/viewer_projects';
 import { useDexie } from '~/composables/shared/useDexie';
 import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
 import { useViewerRefs } from '~/composables/store/viewer';
 import { bufferToString, readFileContents } from '~/composables/utils';
-import { resolveProjectUrl } from '~/composables/utils/resolveUrl';
+import { resolveUrl } from '~/composables/utils/url';
 import type {
   CacheOptions,
   CacheResult,
@@ -51,6 +52,11 @@ export type CacheOperation = {
   name: string;
 } & CacheOperationStatus;
 
+type Subscription = { unsubscribe: () => void };
+
+const CLEANUP_DELAY_SUCCESS = 3000;
+const CLEANUP_DELAY_FAILURE = 10000;
+
 export function useViewerLibrary() {
   const dexie = useDexie();
   const worker = useCacheWorker();
@@ -59,27 +65,71 @@ export function useViewerLibrary() {
   const runtimeConfig = useRuntimeConfig();
 
   const cacheOperations = ref<CacheOperation[]>([]);
+  const subscriptions: Subscription[] = [];
+  let isDisposed = false;
+
+  const performCleanup = () => {
+    // Kill the worker
+    worker.closeWorker();
+    // Clear subscriptions
+    subscriptions.forEach((sub) => sub.unsubscribe());
+  };
+
+  const checkAndCleanup = () => {
+    if (!isDisposed) return;
+    
+    // Check if there are any running tasks left
+    const hasRunningTasks = cacheOperations.value.some(
+      (op) => op.status === 'running',
+    );
+
+    if (!hasRunningTasks) {
+      performCleanup();
+    }
+  };
+
+  onScopeDispose(() => {
+    isDisposed = true;
+    
+    // Cancel all running tasks
+    cacheOperations.value.forEach((op) => {
+      if (op.status === 'running') {
+        worker.publishSync({ type: 'abort', taskId: op.taskId });
+      }
+    });
+
+     checkAndCleanup();
+  });
 
   const startOperation = (
     taskId: string,
     projectId: string,
     keys: string[],
     name: string,
-  ) => {
+  ): void => {
     cacheOperations.value = append(
       { status: 'running', taskId, projectId, keys, name },
       cacheOperations.value,
     );
   };
-  const updateOperation = (taskId: string, status: CacheOperationStatus) => {
+  const updateOperation = (taskId: string, status: CacheOperationStatus): void => {
     cacheOperations.value = cacheOperations.value.map((op) =>
       op.taskId === taskId ? mergeRight(op, status) : op,
     );
   };
-  const clearOperation = (taskId: string) => {
+  const clearOperation = (taskId: string): void => {
     cacheOperations.value = cacheOperations.value.filter(
       (op) => op.taskId !== taskId,
     );
+  };
+
+  const scheduleCleanup = (
+    taskId: string,
+    delay: number = CLEANUP_DELAY_SUCCESS,
+  ) => {
+    setTimeout(() => {
+      clearOperation(taskId);
+    }, delay);
   };
   const hasActiveOperation = (projectId: string, key: string) => {
     return hasActiveOperation0(cacheOperations.value, projectId, key);
@@ -136,7 +186,7 @@ export function useViewerLibrary() {
       });
   });
 
-  const getProject = (id: string) => {
+  const getProject = (id: string): ProjectListEntry | undefined => {
     return projectList.value.find(propEq(id, 'id'));
   };
 
@@ -207,6 +257,7 @@ export function useViewerLibrary() {
           fileName: file.name,
           local: true,
           projectId: project.id,
+          origin: 'local',
         };
       });
     }
@@ -223,100 +274,147 @@ export function useViewerLibrary() {
     }
   };
 
-  const cacheProject = async (id: string, options: CacheOptions) => {
+  const cacheProject = async (id: string, options: CacheOptions): Promise<void> => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
-
+    
     if (project.source === 'local') {
-      return; // nothing to do for local projects
-    } else {
-      const resolvedFileUrl = resolveProjectUrl(project.file_url);
-      const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
-
-      const { taskId, events } = await worker.submitTask({
-        type: 'cache',
-        project: projectWithResolvedUrl,
-        options,
-      });
-
-      const keys = [
-        (options.project ?? true) ? 'project' : null,
-        options.images === true ? 'images' : null,
-        ...(Array.isArray(options.images)
-          ? options.images.map((i) => `images.${i}`)
-          : []),
-      ].filter(isNotNil) as string[];
-
-      const name =
-        (options.project ?? true) ? 'Download project' : 'Download images';
-
-      startOperation(taskId, project.id, keys, name);
-
-      // read the stream of messages from the worker until the cache operation is complete
-      const _sub = events.subscribe(async (msg: CacheResult) => {
-        try {
-          await match(msg)
-            .with({ status: 'progress' }, async (progress) => {
-              updateOperation(progress.taskId, {
-                status: 'running',
-                progress: progress.info,
-              });
-            })
-            .with({ status: 'completed' }, async (event) => {
-              const newCachedItems = concat(
-                // need to deep clone the list otherwise it will contain vue proxy objects :/
-                clone(project.cachedItems ?? []),
-                event.cachedItems ?? [],
-              );
-              console.log('newCachedItems', newCachedItems);
-              await dexie.viewer_projects_cache.put({
-                ...omit(['source', 'origin'], project),
-                origin: 'remote',
-                cachedAt: new Date(),
-                cachedItems: newCachedItems,
-              });
-
-              updateOperation(event.taskId, {
-                status: 'completed',
-              });
-            })
-            .with({ status: 'cancelled' }, async (event) => {
-              updateOperation(event.taskId, {
-                status: 'cancelled',
-              });
-              _sub.unsubscribe();
-            })
-            .with({ status: 'failure' }, async (event) => {
-              updateOperation(event.taskId, {
-                status: 'failure',
-                error: event.error,
-              });
-            })
-            .exhaustive();
-        } catch (err) {
-          console.error('failed to process event', msg, err);
-        }
-      });
+      // For local projects, we only support caching images (as the project file is already local)
+      if (!options.images) return;
+      options.project = false;
     }
+
+    options.isOriginLocal = project.origin === 'local';
+    const resolvedFileUrl = resolveUrl(project.file_url, document.baseURI);
+    const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
+
+    const { taskId, events } = await worker.submitTask({
+      type: 'cache',
+      project: projectWithResolvedUrl,
+      options,
+      baseUrl: document.baseURI,
+    });
+
+    const keys = [
+      (options.project ?? true) ? 'project' : null,
+      options.images === true ? 'images' : null,
+      ...(Array.isArray(options.images)
+        ? options.images.map((i) => `images.${i}`)
+        : []),
+    ].filter(isNotNil) as string[];
+
+    const name =
+      (options.project ?? true) ? 'Download project' : 'Download images';
+
+    startOperation(taskId, project.id, keys, name);
+
+    const updateProjectCacheState = async (
+      projectId: string,
+      newItems: CacheItem[] = [],
+    ) => {
+      const modifications = await dexie.viewer_projects_cache
+        .where('id')
+        .equals(projectId)
+        .modify((p) => {
+          const baseCachedItems = p.cachedItems ?? [];
+          const mergedCachedItems = values(
+            mergeRight(
+              indexBy(prop('rowId'), baseCachedItems),
+              indexBy(prop('rowId'), newItems),
+            ),
+          );
+          p.cachedItems = mergedCachedItems;
+          p.cachedAt = new Date();
+        });
+
+      if (modifications === 0) {
+        // deep clone the project otherwise it will contain vue proxy objects :/
+        const rawProject = clone(project);
+        await dexie.viewer_projects_cache.put({
+          ...omit(['source', 'origin'], rawProject),
+          origin: 'remote',
+          cachedAt: new Date(),
+          cachedItems: newItems,
+        });
+      }
+    };
+
+    // read the stream of messages from the worker until the cache operation is complete
+    const subscription = events.subscribe(async (msg: CacheResult) => {
+      subscriptions.push(subscription);
+      await match(msg)
+        .with({ status: 'progress' }, async (progress) => {
+          updateOperation(progress.taskId, {
+            status: 'running',
+            progress: progress.info,
+          });
+        })
+        .with({ status: 'completed' }, async (event) => {
+          await updateProjectCacheState(project.id, event.cachedItems);
+
+          updateOperation(event.taskId, {
+            status: 'completed',
+          });
+          scheduleCleanup(event.taskId, CLEANUP_DELAY_SUCCESS);
+        })
+        .with({ status: 'cancelled' }, async (event) => {
+          console.log(
+            `[useViewerLibrary] Received cancelled event for ${event.taskId}`,
+            event,
+          );
+          if (event.cachedItems) {
+            await updateProjectCacheState(project.id, event.cachedItems);
+          }
+
+          updateOperation(event.taskId, {
+            status: 'cancelled',
+          });
+          subscription.unsubscribe();
+          scheduleCleanup(event.taskId, CLEANUP_DELAY_SUCCESS);
+        })
+        .with({ status: 'failure' }, async (event) => {
+          updateOperation(event.taskId, {
+            status: 'failure',
+            error: event.error,
+          });
+          scheduleCleanup(event.taskId, CLEANUP_DELAY_FAILURE);
+        })
+          .exhaustive()
+          .catch((err) => {
+            console.error('failed to process event', msg, err);
+          })
+          .finally(() => {
+            checkAndCleanup();
+          });
+      });
   };
 
   const abortCache = async (taskId: string) => {
     worker.publishSync({ type: 'abort', taskId });
   };
 
-  const clearCache = async (id: string, options: ClearOptions) => {
+  const clearCache = async (id: string, options: ClearOptions): Promise<void> => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 
-    if (project.source === 'local') {
+    if (project.source === 'local' && options.project) {
       await dexie.viewer_projects_cache.delete(project.id);
       const fsHandle = await navigator.storage.getDirectory();
-      await fsHandle.removeEntry(project.id, { recursive: true });
-    } else if (project.source === 'cached') {
+      await fsHandle.removeEntry(project.id, { recursive: true }).catch((e) => {
+        // ignore
+      });
+    } else if (
+      project.source === 'cached' ||
+      (project.source === 'local' && options.images)
+    ) {
+      const resolvedFileUrl = resolveUrl(project.file_url, document.baseURI);
+      const projectWithResolvedUrl = { ...project, file_url: resolvedFileUrl };
+
       const { taskId, events } = await worker.submitTask({
         type: 'clear',
-        project: project,
+        project: projectWithResolvedUrl,
         options,
+        baseUrl: document.baseURI,
       });
       const keys = [
         (options.project ?? true) ? 'project' : null,
@@ -328,49 +426,70 @@ export function useViewerLibrary() {
       const name = (options.project ?? true) ? 'Clear project' : 'Clear images';
       startOperation(taskId, project.id, keys, name);
       // read the stream of messages from the worker until the cache operation is complete
-      const _sub = events.subscribe(async (msg: ClearResult) => {
+      const subscription = events.subscribe(async (msg: ClearResult) => {
+        subscriptions.push(subscription);
+
         await match(msg)
-          .with({ status: 'progress' }, async (event) => {
-            updateOperation(event.taskId, {
+          .with({ status: 'progress' }, async (progress) => {
+            updateOperation(progress.taskId, {
               status: 'running',
-              progress: event.info,
+              progress: progress.info,
             });
           })
           .with({ status: 'completed' }, async (event) => {
-            if (event.deletedProject) {
-              await dexie.viewer_projects_cache.delete(project.id);
-            } else if (event.deletedAllImages) {
-              await dexie.viewer_projects_cache.update(project.id, {
-                cachedItems: [],
-              });
-            } else if (isNotNil(event.deletedCacheItems)) {
-              await dexie.viewer_projects_cache.update(project.id, {
-                cachedItems: clone(project.cachedItems ?? []).filter(
-                  (item) =>
-                    !includes(item.rowId, event.deletedCacheItems ?? []),
-                ),
-              });
-            }
+            const { deletedProject, deletedAllImages, deletedCacheItems } = event;
 
-            updateOperation(event.taskId, {
-              status: 'completed',
-            });
-            _sub.unsubscribe();
+            if (deletedProject) {
+              await dexie.viewer_projects_cache.delete(id);
+            } else {
+              await dexie.viewer_projects_cache
+                .where('id')
+                .equals(id)
+                .modify((p) => {
+                  if (deletedAllImages) {
+                    // Remove all image entries
+                    p.cachedItems = (p.cachedItems || []).filter(
+                      (item) => item.type !== 'images.row',
+                    );
+                  } else if (deletedCacheItems) {
+                    // Remove specific images
+                    p.cachedItems = (p.cachedItems || [])
+                      .map((item) => {
+                        if (
+                          item.type === 'images.row' &&
+                          deletedCacheItems.includes(item.rowId)
+                        ) {
+                          return { ...item, count: 0, size: 0 };
+                        }
+                        return item;
+                      })
+                      .filter((item) => item.count > 0);
+                  }
+                });
+            }
+            updateOperation(event.taskId, { status: 'completed' });
+            scheduleCleanup(event.taskId, CLEANUP_DELAY_SUCCESS);
           })
           .with({ status: 'failure' }, async (event) => {
             updateOperation(event.taskId, {
               status: 'failure',
               error: event.error,
             });
-            _sub.unsubscribe();
+            scheduleCleanup(event.taskId, CLEANUP_DELAY_FAILURE);
           })
-          .exhaustive();
+          .exhaustive()
+          .catch((err) => {
+            console.error('failed to process clear event', msg, err);
+          })
+          .finally(() => {
+            checkAndCleanup();
+          });
       });
     }
   };
 
   const loadRemoteFile = async (project: ViewerProject) => {
-    const fileURL = resolveProjectUrl(project.file_url);
+    const fileURL = resolveUrl(project.file_url, document.baseURI);
     if (!fileURL) return;
 
     await $store.loadProject(async (setProgress) => {
@@ -390,12 +509,13 @@ export function useViewerLibrary() {
           projectId: project.id,
           fileContents: bufferToString(result.data.buffer),
           fileName: fileURL.toString(),
+          origin: 'remote',
         };
       }
     });
   };
 
-  const loadCachedProject = async (project: ViewerProject) => {
+  const loadCachedProject = async (project: ProjectListEntry): Promise<void> => {
     await $store.loadProject(async (setProgress) => {
       await setProgress(`Loading ${project.title} ...`);
       const fileContents = await loadCachedData(project);
@@ -404,6 +524,7 @@ export function useViewerLibrary() {
         fileContents: fileContents,
         fileName: project.file_url,
         local: true,
+        origin: project.origin,
       };
     });
   };

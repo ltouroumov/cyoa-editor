@@ -2,6 +2,7 @@
   <div class="min-h-[400px] relative">
     <DataTable
       v-model:filters="filters"
+      v-model:selection="selectedRows"
       :value="rows"
       data-key="id"
       size="small"
@@ -31,6 +32,7 @@
           <div>No sections.</div>
         </div>
       </template>
+      <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
       <Column field="title" header="Section">
         <template #body="{ data }">
           <div class="flex flex-row gap-2 items-center">
@@ -39,57 +41,23 @@
           </div>
         </template>
       </Column>
-      <Column field="totalImageCount" header="Images" />
+      <Column field="totalImageCount" header="Images">
+        <template #body="{ data }">
+          {{ data.cachedImageCount }} / {{ data.totalImageCount }}
+        </template>
+      </Column>
       <Column field="cacheStatus" header="Status">
         <template #body="{ data }">
           <Badge v-if="data.cacheStatus === false" severity="secondary">
             Not Cached
           </Badge>
-          <Badge v-if="data.cacheStatus === 'partial'" severity="warning">
-            Partial ({{ data.cachedImageCount }})
-          </Badge>
-          <Badge v-if="data.cacheStatus === 'cached'" severity="info">
-            Cached
-          </Badge>
+          <Badge v-if="data.cacheStatus === 'partial'" severity="warning"> Partial </Badge>
+          <Badge v-if="data.cacheStatus === 'cached'" severity="info"> Cached </Badge>
         </template>
       </Column>
-      <Column header-style="width: 3rem">
+      <Column field="cachedImageSize" header="Size">
         <template #body="{ data }">
-          <div class="flex flex-row gap-2 items-center">
-            <Button
-              icon="iconify solar--download-square-linear"
-              size="small"
-              :disabled="
-                hasActiveOperation0(
-                  activeOperations,
-                  project.id,
-                  `images.${data.id}`,
-                ) || hasActiveOperation0(activeOperations, project.id, 'images')
-              "
-              @click="
-                $emit('cache', project.id, {
-                  images: [data.id],
-                  project: false,
-                  refresh: true,
-                })
-              "
-            />
-            <Button
-              icon="iconify solar--trash-bin-trash-linear"
-              severity="danger"
-              size="small"
-              :disabled="
-                data.cacheStatus === false ||
-                hasActiveOperation0(
-                  activeOperations,
-                  project.id,
-                  `images.${data.id}`,
-                ) ||
-                hasActiveOperation0(activeOperations, project.id, 'images')
-              "
-              @click="$emit('clear', project.id, { images: [data.id] })"
-            />
-          </div>
+          {{ formatBytes(data.cachedImageSize) }}
         </template>
       </Column>
     </DataTable>
@@ -98,19 +66,17 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
-import { includes, isNotEmpty } from 'ramda';
+import { ref, watch } from 'vue';
 
 import type { Project } from '~/composables/project/types/v1';
-import { imageIsUrl } from '~/composables/utils/imageIsUrl';
+import { isCacheable } from '~/composables/utils/url';
 import type {
   CacheOptions,
   ClearOptions,
 } from '~/composables/viewer/cache/types';
-import type { ProjectListEntry } from '~/composables/viewer/types';
-import {
-  type CacheOperation,
-  hasActiveOperation0,
-} from '~/composables/viewer/useViewerLibrary';
+import type { ProjectListEntry, RowInfo } from '~/composables/viewer/types';
+import { formatBytes } from '~/composables/viewer/cache/utils';
+import type { CacheOperation } from '~/composables/viewer/useViewerLibrary';
 
 const $props = defineProps<{
   project: ProjectListEntry;
@@ -118,20 +84,16 @@ const $props = defineProps<{
   activeOperations: CacheOperation[];
 }>();
 
-defineEmits<{
+// Define model for selection
+const selectedRows = defineModel<RowInfo[]>('selection', { default: [] });
+
+const $emit = defineEmits<{
   (e: 'cache', projectId: string, options: CacheOptions): void;
   (e: 'clear', projectId: string, options: ClearOptions): void;
 }>();
 
-type RowInfo = {
-  id: string;
-  title: string;
-  totalImageCount: number;
-  cacheStatus: 'cached' | 'partial' | false;
-};
-
 const rows = ref<RowInfo[]>([]);
-const loading = ref<boolean>(false);
+const loading = ref<boolean>(true);
 
 watch(
   [() => $props.project, () => $props.projectData],
@@ -143,22 +105,28 @@ watch(
 
     const fileData = $props.projectData;
 
-    const cachedRows = ($props.project.cachedItems ?? []).map(
-      (item) => item.rowId,
+    const cachedRows = ($props.project.cachedItems ?? []).reduce(
+      (acc, item) => {
+        if (item.type === 'images.row') {
+          acc[item.rowId] = { count: item.count, size: item.size };
+        }
+        return acc;
+      },
+      {} as Record<string, { count: number; size: number }>,
     );
 
-    const rows0: RowInfo[] = [];
+    const nextRows: RowInfo[] = [];
     for (const row of fileData.rows) {
       let totalImageCount = 0;
-      if (isNotEmpty(row.image) && imageIsUrl(row.image)) {
+      if (isCacheable(row.image)) {
         totalImageCount += 1;
       }
       for (const obj of row.objects) {
-        if (isNotEmpty(obj.image) && imageIsUrl(obj.image)) {
+        if (isCacheable(obj.image)) {
           totalImageCount += 1;
         }
         for (const addon of obj.addons) {
-          if (isNotEmpty(addon.image) && imageIsUrl(addon.image)) {
+          if (isCacheable(addon.image)) {
             totalImageCount += 1;
           }
         }
@@ -168,15 +136,25 @@ watch(
         continue;
       }
 
-      rows0.push({
+      const cachedInfo = cachedRows[row.id] ?? { count: 0, size: 0 };
+      const cachedCount = cachedInfo.count;
+      
+      nextRows.push({
         id: row.id,
         title: row.title,
         totalImageCount,
-        cacheStatus: includes(row.id, cachedRows) ? 'cached' : false,
+        cachedImageCount: cachedCount,
+        cachedImageSize: cachedInfo.size,
+        cacheStatus:
+          cachedCount === 0
+            ? false
+            : cachedCount >= totalImageCount
+              ? 'cached'
+              : 'partial',
       });
     }
 
-    rows.value = rows0;
+    rows.value = nextRows;
     loading.value = false;
   },
   { immediate: true },

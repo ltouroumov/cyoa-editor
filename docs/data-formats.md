@@ -5,7 +5,7 @@ ICC Neo works with two data formats. This document describes their structure and
 ## Format Overview
 
 | Format                    | Used By | Purpose                                |
-|---------------------------| ------- | -------------------------------------- |
+| ------------------------- | ------- | -------------------------------------- |
 | [**V1**](./formats/v1.md) | Viewer  | MeanDelay iCYOA compatibility          |
 | [**V2**](./formats/v2.md) | Editor  | Internal editor format (not finalized) |
 

@@ -4,34 +4,48 @@ import { match } from 'ts-pattern';
 
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
-import { imageIsUrl } from '~/composables/utils/imageIsUrl';
+import { useSettingStore } from '~/composables/store/settings';
+import {
+  isCacheable,
+  isUrl,
+  resolveUrl,
+} from '~/composables/utils/url';
+
+
 
 export function useImageCache() {
-  const { project, isLocal } = useProjectRefs();
-
+  const { project, isLocal, isOriginLocal } = useProjectRefs();
+  const settingsStore = useSettingStore();
+  
   const loadImageSrc = async (
     element: ProjectObj | ProjectRow,
   ): Promise<string | null> => {
-    // If there is no image, return null
-    if (!element.image) return null;
-    // If the image isn't an URL, return the value as-is
-    if (!imageIsUrl(element.image)) return element.image;
 
-    if (!isLocal.value) {
-      // If remote, use the link image from the project file
-      return element.image;
-    } else if (isNotNil(project.value) && isNotNil(project.value.projectId)) {
-      // When local, load the image from the local file system
-      const localSrc = await loadImage(
-        project.value!.projectId!,
+    // Check if image isn't cacheable (data URL, blob, empty etc.), return the value as-is
+    if (!isCacheable(element.image)) return element.image;
+
+    // Check if Project is in OPFS Cache
+    if (isLocal.value && isNotNil(project.value) && isNotNil(project.value.projectId)) {
+      const cachedSrc = await loadImage(
+        project.value.projectId,
         element.image,
       );
-      // Fall back to the URL if the image is not cached locally
-      if (isNil(localSrc)) return element.image;
-      else return localSrc;
+
+      // Check if OPFS cache has an image, return it
+      if (isNotNil(cachedSrc)) return cachedSrc;
+    }
+    
+    // if fetching is not allowed, return null
+    if (settingsStore.hideRemoteImages) return null;
+
+    // fetching is allowed, check if origin is local and image is relative
+    if(isOriginLocal.value && !isUrl(element.image)) {
+      return null;
     }
 
-    return null;
+    // Project is not in OPFS cache
+    // Either origin is remote OR image is URL
+    return resolveUrl(element.image, document.baseURI);
   };
 
   async function loadImage(
@@ -67,19 +81,28 @@ export function useImageCache() {
       create: true,
     });
 
-    const imageUrl = new URL(image);
-    const imageName = last(imageUrl.pathname.split('/'))!;
-    try {
-      const imageHandle = await imagesDir.getFileHandle(imageName);
-      const imageFile = await imageHandle.getFile();
-      if (imageFile.size === 0) return null;
-      else return { name: imageName, file: imageFile };
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'NotFoundError') {
-        return null;
-      }
-      throw err;
+    // Handle both URLs and relative paths
+    let imageName: string;
+    if (isUrl(image)) {
+      const imageUrl = new URL(image);
+      imageName = last(imageUrl.pathname.split('/'))!;
+    } else {
+      // For relative paths, just get the filename
+      imageName = last(image.split('/'))!;
     }
+    return imagesDir
+      .getFileHandle(imageName)
+      .then((imageHandle) => imageHandle.getFile())
+      .then((imageFile) => {
+        if (imageFile.size === 0) return null;
+        else return { name: imageName, file: imageFile };
+      })
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'NotFoundError') {
+          return null;
+        }
+        throw err;
+      });
   };
 
   return { loadImageSrc, resolveImage };

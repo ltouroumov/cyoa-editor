@@ -101,6 +101,7 @@ export function useCacheWorker() {
   }
 
   return {
+    closeWorker,
     publishSync,
     publishAsync,
     submitTask,

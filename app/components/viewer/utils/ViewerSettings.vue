@@ -118,6 +118,26 @@
         </div>
       </li>
     </ul>
+    <h5 class="text-xl text-primary font-bold">Cache</h5>
+    <ul class="flex flex-col gap-0">
+      <li
+        class="flex flex-row items-center gap-2 py-2 border-b border-surface-700"
+      >
+        <Checkbox
+          v-model="hideRemoteImages"
+          input-id="hideRemoteImages"
+          binary
+        />
+        <div class="flex flex-col gap-1">
+          <label class="form-check-label" for="hideRemoteImages">
+            Hide Remote Images
+          </label>
+          <small class="text-slate-500 text-sm">
+            Only show images that have been cached
+          </small>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -139,6 +159,7 @@ const {
   lockBackpackObjects,
   displaySettings,
   lightThemeUI,
+  hideRemoteImages,
   loadProjectOnStartup,
 } = useSettingRefs();
 
