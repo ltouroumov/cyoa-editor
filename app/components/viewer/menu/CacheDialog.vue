@@ -35,7 +35,9 @@
         <div class="grow flex flex-col items-start gap-1">
           <span class="text-xl">Project</span>
           <span v-if="isNotNil(rows)" class="text-sm text-surface-400">
-             Sections: {{ rows.totalRows }} ({{ formatBytes(rows.projectFileSize) }})
+            Sections: {{ rows.totalRows }} ({{
+              formatBytes(rows.projectFileSize)
+            }})
           </span>
         </div>
 
@@ -104,18 +106,19 @@
       <div class="flex flex-row gap-2 items-start">
         <div class="grow flex flex-col gap-2">
           <div class="flex flex-col gap-1">
-             <div class="flex flex-row items-center gap-2">
-                 <span class="text-xl">Images</span>
-             </div>
-             
-             <div v-if="isNotNil(rows)" class="flex flex-col gap-1">
-                <div class="text-sm text-surface-400">
-                     Cached: {{ rows.totalImagesCached }} / {{ rows.totalImages }} ({{ formatBytes(rows.totalImagesSize) }})
-                </div>
-             </div>
+            <div class="flex flex-row items-center gap-2">
+              <span class="text-xl">Images</span>
+            </div>
+
+            <div v-if="isNotNil(rows)" class="flex flex-col gap-1">
+              <div class="text-sm text-surface-400">
+                Cached: {{ rows.totalImagesCached }} /
+                {{ rows.totalImages }} ({{ formatBytes(rows.totalImagesSize) }})
+              </div>
+            </div>
           </div>
           <div class="flex flex-col">
-            <div 
+            <div
               v-if="project.source !== 'remote'"
               class="text-sm text-surface-400"
             >
@@ -131,33 +134,41 @@
         </div>
 
         <div class="flex flex-row gap-2 justify-between items-center">
-
           <div class="flex flex-col gap-2 justify-end">
             <div class="flex flex-row gap-2 justify-end">
-            <SplitButton
-              v-if="downloadButtonConfig.model.length > 0"
-              :model="downloadButtonConfig.model"
-              :disabled="hasActiveOperation(project.id, 'images') || project.source === 'remote'"
-              @click="downloadButtonConfig.command"
-            >
-              <span class="iconify sm:mr-2" :class="downloadButtonConfig.icon"></span>
-              <span class="hidden sm:inline">{{
-                downloadButtonConfig.label
-              }}</span>
-            </SplitButton>
-            <Button
-              v-else
-              :disabled="hasActiveOperation(project.id, 'images') || project.source === 'remote'"
-              @click="downloadButtonConfig.command"
-            >
-              <span
-                class="iconify sm:mr-2"
-                :class="downloadButtonConfig.icon"
-              ></span>
-              <span class="hidden sm:inline">{{
-                downloadButtonConfig.label
-              }}</span>
-            </Button>
+              <SplitButton
+                v-if="downloadButtonConfig.model.length > 0"
+                :model="downloadButtonConfig.model"
+                :disabled="
+                  hasActiveOperation(project.id, 'images') ||
+                  project.source === 'remote'
+                "
+                @click="downloadButtonConfig.command"
+              >
+                <span
+                  class="iconify sm:mr-2"
+                  :class="downloadButtonConfig.icon"
+                ></span>
+                <span class="hidden sm:inline">{{
+                  downloadButtonConfig.label
+                }}</span>
+              </SplitButton>
+              <Button
+                v-else
+                :disabled="
+                  hasActiveOperation(project.id, 'images') ||
+                  project.source === 'remote'
+                "
+                @click="downloadButtonConfig.command"
+              >
+                <span
+                  class="iconify sm:mr-2"
+                  :class="downloadButtonConfig.icon"
+                ></span>
+                <span class="hidden sm:inline">{{
+                  downloadButtonConfig.label
+                }}</span>
+              </Button>
             </div>
 
             <div class="flex flex-row gap-2 items-center">
@@ -179,11 +190,11 @@
       </div>
       <ImageCache
         v-if="isNotNil(project) && isNotNil(projectData) && showImagesAdvanced"
+        v-model:selection="selectedRows"
         class="mt-2"
         :project="project"
         :project-data="projectData!"
         :active-operations="cacheOperations"
-        v-model:selection="selectedRows"
         @cache="cacheProject"
         @clear="clearCache"
       />
@@ -202,8 +213,8 @@ import type { Project } from '~/composables/project/types/v1';
 import type { CacheItem } from '~/composables/shared/tables/viewer_projects';
 import { isCacheable } from '~/composables/utils/url';
 import type { ClearOptions } from '~/composables/viewer/cache/types';
-import type { RowInfo } from '~/composables/viewer/types';
 import { formatBytes } from '~/composables/viewer/cache/utils';
+import type { RowInfo } from '~/composables/viewer/types';
 import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
 const $confirm = useConfirm();
@@ -331,7 +342,7 @@ const globalStats = computed(() => {
 
 const selectionStats = computed(() => {
   if (selectedRows.value.length === 0) return { total: 0, cached: 0 };
-  
+
   const total = selectedRows.value.reduce(
     (acc, r) => acc + (r.totalImageCount || 0),
     0,

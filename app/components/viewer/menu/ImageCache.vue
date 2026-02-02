@@ -32,7 +32,7 @@
           <div>No sections.</div>
         </div>
       </template>
-      <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+      <Column selection-mode="multiple" header-style="width: 3rem"></Column>
       <Column field="title" header="Section">
         <template #body="{ data }">
           <div class="flex flex-row gap-2 items-center">
@@ -51,8 +51,12 @@
           <Badge v-if="data.cacheStatus === false" severity="secondary">
             Not Cached
           </Badge>
-          <Badge v-if="data.cacheStatus === 'partial'" severity="warning"> Partial </Badge>
-          <Badge v-if="data.cacheStatus === 'cached'" severity="info"> Cached </Badge>
+          <Badge v-if="data.cacheStatus === 'partial'" severity="warning">
+            Partial
+          </Badge>
+          <Badge v-if="data.cacheStatus === 'cached'" severity="info">
+            Cached
+          </Badge>
         </template>
       </Column>
       <Column field="cachedImageSize" header="Size">
@@ -74,8 +78,8 @@ import type {
   CacheOptions,
   ClearOptions,
 } from '~/composables/viewer/cache/types';
-import type { ProjectListEntry, RowInfo } from '~/composables/viewer/types';
 import { formatBytes } from '~/composables/viewer/cache/utils';
+import type { ProjectListEntry, RowInfo } from '~/composables/viewer/types';
 import type { CacheOperation } from '~/composables/viewer/useViewerLibrary';
 
 const $props = defineProps<{
@@ -138,7 +142,7 @@ watch(
 
       const cachedInfo = cachedRows[row.id] ?? { count: 0, size: 0 };
       const cachedCount = cachedInfo.count;
-      
+
       nextRows.push({
         id: row.id,
         title: row.title,

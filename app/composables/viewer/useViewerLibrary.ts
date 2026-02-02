@@ -1,9 +1,7 @@
-import { onScopeDispose } from 'vue';
 import {
   append,
   clone,
   concat,
-  values,
   indexBy,
   isNil,
   isNotNil,
@@ -14,11 +12,16 @@ import {
   prop,
   propEq,
   uniq,
+  values,
 } from 'ramda';
 import { match } from 'ts-pattern';
+import { onScopeDispose } from 'vue';
 
 import type { Project } from '~/composables/project/types/v1';
-import type { CacheItem, ViewerProjectCache } from '~/composables/shared/tables/viewer_projects';
+import type {
+  CacheItem,
+  ViewerProjectCache,
+} from '~/composables/shared/tables/viewer_projects';
 import { useDexie } from '~/composables/shared/useDexie';
 import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 import { useProjectStore } from '~/composables/store/project';
@@ -62,7 +65,6 @@ export function useViewerLibrary() {
   const worker = useCacheWorker();
   const { librarySettings, remoteProjectList } = useViewerRefs();
   const $store = useProjectStore();
-  const runtimeConfig = useRuntimeConfig();
 
   const cacheOperations = ref<CacheOperation[]>([]);
   const subscriptions: Subscription[] = [];
@@ -77,7 +79,7 @@ export function useViewerLibrary() {
 
   const checkAndCleanup = () => {
     if (!isDisposed) return;
-    
+
     // Check if there are any running tasks left
     const hasRunningTasks = cacheOperations.value.some(
       (op) => op.status === 'running',
@@ -85,12 +87,15 @@ export function useViewerLibrary() {
 
     if (!hasRunningTasks) {
       performCleanup();
+    } else {
+      // Check again after a short delay
+      setTimeout(() => checkAndCleanup(), 1000);
     }
   };
 
   onScopeDispose(() => {
     isDisposed = true;
-    
+
     // Cancel all running tasks
     cacheOperations.value.forEach((op) => {
       if (op.status === 'running') {
@@ -98,7 +103,7 @@ export function useViewerLibrary() {
       }
     });
 
-     checkAndCleanup();
+    checkAndCleanup();
   });
 
   const startOperation = (
@@ -112,7 +117,10 @@ export function useViewerLibrary() {
       cacheOperations.value,
     );
   };
-  const updateOperation = (taskId: string, status: CacheOperationStatus): void => {
+  const updateOperation = (
+    taskId: string,
+    status: CacheOperationStatus,
+  ): void => {
     cacheOperations.value = cacheOperations.value.map((op) =>
       op.taskId === taskId ? mergeRight(op, status) : op,
     );
@@ -274,10 +282,13 @@ export function useViewerLibrary() {
     }
   };
 
-  const cacheProject = async (id: string, options: CacheOptions): Promise<void> => {
+  const cacheProject = async (
+    id: string,
+    options: CacheOptions,
+  ): Promise<void> => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
-    
+
     if (project.source === 'local') {
       // For local projects, we only support caching images (as the project file is already local)
       if (!options.images) return;
@@ -379,21 +390,24 @@ export function useViewerLibrary() {
           });
           scheduleCleanup(event.taskId, CLEANUP_DELAY_FAILURE);
         })
-          .exhaustive()
-          .catch((err) => {
-            console.error('failed to process event', msg, err);
-          })
-          .finally(() => {
-            checkAndCleanup();
-          });
-      });
+        .exhaustive()
+        .catch((err) => {
+          console.error('failed to process event', msg, err);
+        })
+        .finally(() => {
+          checkAndCleanup();
+        });
+    });
   };
 
   const abortCache = async (taskId: string) => {
     worker.publishSync({ type: 'abort', taskId });
   };
 
-  const clearCache = async (id: string, options: ClearOptions): Promise<void> => {
+  const clearCache = async (
+    id: string,
+    options: ClearOptions,
+  ): Promise<void> => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 
@@ -437,7 +451,8 @@ export function useViewerLibrary() {
             });
           })
           .with({ status: 'completed' }, async (event) => {
-            const { deletedProject, deletedAllImages, deletedCacheItems } = event;
+            const { deletedProject, deletedAllImages, deletedCacheItems } =
+              event;
 
             if (deletedProject) {
               await dexie.viewer_projects_cache.delete(id);
@@ -515,7 +530,9 @@ export function useViewerLibrary() {
     });
   };
 
-  const loadCachedProject = async (project: ProjectListEntry): Promise<void> => {
+  const loadCachedProject = async (
+    project: ProjectListEntry,
+  ): Promise<void> => {
     await $store.loadProject(async (setProgress) => {
       await setProgress(`Loading ${project.title} ...`);
       const fileContents = await loadCachedData(project);

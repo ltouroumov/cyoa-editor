@@ -1,6 +1,5 @@
 import { Base64 } from 'js-base64';
 import * as R from 'ramda';
-import { isNotEmpty } from 'ramda';
 
 import type { ProjectNote } from '~/composables/project/types/v1';
 import type { Selections } from '~/composables/store/project';

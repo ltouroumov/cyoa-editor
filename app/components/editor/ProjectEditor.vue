@@ -75,9 +75,9 @@ const { ctrl_k, esc } = useMagicKeys({
   passive: false,
   onEventFired(e: KeyboardEvent) {
     if (e.ctrlKey && e.key === 'k' && e.type === 'keydown') {
-      e.preventDefault()
+      e.preventDefault();
     }
-  }
+  },
 });
 watch(ctrl_k, (newValue) => {
   if (newValue && !editorStore.showOmniBar) {

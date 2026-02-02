@@ -45,6 +45,3 @@ export function resolveUrl(file_url: string, baseUrl?: string): string {
     return file_url;
   }
 }
-
-
-

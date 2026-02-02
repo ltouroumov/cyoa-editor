@@ -5,41 +5,35 @@ import { match } from 'ts-pattern';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import { useSettingStore } from '~/composables/store/settings';
-import {
-  isCacheable,
-  isUrl,
-  resolveUrl,
-} from '~/composables/utils/url';
-
-
+import { isCacheable, isUrl, resolveUrl } from '~/composables/utils/url';
 
 export function useImageCache() {
   const { project, isLocal, isOriginLocal } = useProjectRefs();
   const settingsStore = useSettingStore();
-  
+
   const loadImageSrc = async (
     element: ProjectObj | ProjectRow,
   ): Promise<string | null> => {
-
     // Check if image isn't cacheable (data URL, blob, empty etc.), return the value as-is
     if (!isCacheable(element.image)) return element.image;
 
     // Check if Project is in OPFS Cache
-    if (isLocal.value && isNotNil(project.value) && isNotNil(project.value.projectId)) {
-      const cachedSrc = await loadImage(
-        project.value.projectId,
-        element.image,
-      );
+    if (
+      isLocal.value &&
+      isNotNil(project.value) &&
+      isNotNil(project.value.projectId)
+    ) {
+      const cachedSrc = await loadImage(project.value.projectId, element.image);
 
       // Check if OPFS cache has an image, return it
       if (isNotNil(cachedSrc)) return cachedSrc;
     }
-    
+
     // if fetching is not allowed, return null
     if (settingsStore.hideRemoteImages) return null;
 
     // fetching is allowed, check if origin is local and image is relative
-    if(isOriginLocal.value && !isUrl(element.image)) {
+    if (isOriginLocal.value && !isUrl(element.image)) {
       return null;
     }
 

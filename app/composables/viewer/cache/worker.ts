@@ -1,8 +1,10 @@
 import {
+  always,
   assoc,
   drop,
   flatten,
   includes,
+  isNil,
   isNotEmpty,
   isNotNil,
   last,
@@ -64,38 +66,44 @@ self.addEventListener(
       const payload = JSON.parse(event) as CacheEvent;
       match(payload)
         .with({ type: 'init' }, () => {})
-        .with({ type: 'cache' }, async ({ taskId, project, options, baseUrl }) => {
-          const abortController = new AbortController();
-          taskQueue.push({
-            taskId,
-            type: 'cache',
-            project,
-            options,
-            baseUrl,
-            abortController,
-          });
+        .with(
+          { type: 'cache' },
+          async ({ taskId, project, options, baseUrl }) => {
+            const abortController = new AbortController();
+            taskQueue.push({
+              taskId,
+              type: 'cache',
+              project,
+              options,
+              baseUrl,
+              abortController,
+            });
 
-          startNextTask();
-        })
-        .with({ type: 'clear' }, async ({ taskId, project, options, baseUrl }) => {
-          taskQueue.push({
-            taskId,
-            type: 'clear',
-            project,
-            options,
-            baseUrl,
-          });
+            startNextTask();
+          },
+        )
+        .with(
+          { type: 'clear' },
+          async ({ taskId, project, options, baseUrl }) => {
+            taskQueue.push({
+              taskId,
+              type: 'clear',
+              project,
+              options,
+              baseUrl,
+            });
 
-          startNextTask();
-        })
+            startNextTask();
+          },
+        )
         .with({ type: 'abort' }, ({ taskId }) => {
-          console.log(`[cache] aborting task ${taskId}`);
+          console.log(`[cache] abort task ${taskId}`);
 
           // First, check if we need to abort the current task.
           if (currentTask && currentTask.taskId === taskId) {
             // Use the abort controller (if present) to abort the task.
             if ('abortController' in currentTask) {
-              console.log(`[cache] aborting task ${taskId} (controller)`);
+              console.log(`[cache] abort task ${taskId} (controller)`);
               currentTask.abortController.abort();
             }
           }
@@ -163,7 +171,7 @@ function startNextTask(): void {
             });
           }
         });
-    },
+      },
     )
     .with({ type: 'clear' }, ({ taskId, project, options, baseUrl }) => {
       return doClear(taskId, project, options, baseUrl).catch((err) => {
@@ -194,7 +202,7 @@ const safeDelete = async (
 ): Promise<boolean> => {
   return handle
     .removeEntry(name, options)
-    .then(() => true)
+    .then(always(true))
     .catch((err: unknown) => {
       if (err instanceof DOMException && err.name === 'NotFoundError') {
         return false; // Inherently "success" as it's already gone
@@ -207,13 +215,14 @@ const getImageName = (url: string | URL): string => {
   const urlObj = typeof url === 'string' ? new URL(url) : url;
   const parts = urlObj.pathname.split('/');
   const name = last(parts);
-  return name && isNotEmpty(name) ? name : 'unknown_image';
+  // We want to fail if we can't extract a meaningful name from the URL
+  if (isNil(name)) throw new Error('invalid image URL');
+  else return name;
 };
 
 const shouldCacheUrl = (url: string, isOriginLocal: boolean): boolean => {
   // If the project origin is local, we should only cache URLs
-  if (isOriginLocal && !isUrl(url)) return false;
-  return true;
+  return !(isOriginLocal && !isUrl(url));
 };
 
 const collectProjectImages = (
@@ -226,7 +235,9 @@ const collectProjectImages = (
   return projectData.rows
     .filter((row) => {
       if (options.images === true) return true;
-      if (Array.isArray(options.images)) return includes(row.id, options.images);
+      if (Array.isArray(options.images)) {
+        return includes(row.id, options.images);
+      }
       return false;
     })
     .map((row) => {
@@ -303,7 +314,9 @@ async function doClear(
   const isDeletingAll =
     options.images === true ||
     (projectData.rows.length > 0 &&
-     projectData.rows.every((r) => includes(r.id, options.images as string[])));
+      projectData.rows.every((r) =>
+        includes(r.id, options.images as string[]),
+      ));
 
   if (isDeletingAll) {
     await safeDelete(projectDir, 'images', { recursive: true });
@@ -394,7 +407,7 @@ async function doCache(
     } else {
       const isUpdateMode =
         options.mode === 'refresh-all' || options.mode === 'refresh-existing';
-      const isProjectRequested = options.project !== false;
+      const isProjectRequested = options.project;
 
       if (isUpdateMode && isProjectRequested) {
         shouldDownloadProject = true;
@@ -466,8 +479,6 @@ async function doCache(
     projectFileHandle?.close();
   }
 
-
-
   if (isNotNil(options.images)) {
     const projectJson = bufferToString(projectBytes.buffer as ArrayBuffer);
     const projectData = JSON.parse(projectJson) as Project;
@@ -489,24 +500,28 @@ async function doCache(
     });
     // Pre-scan the directory to get a set of existing files
     // Required for 'refresh-existing' and optimization for 'refresh-missing'
-    let existingFiles = new Map<string, number>();
+    const existingFiles = new Map<string, number>();
     if (
       options.mode === 'refresh-existing' ||
       options.mode === 'refresh-missing'
     ) {
       // For small batches, check files individually
       if (images.length < BATCH_CHECK_THRESHOLD) {
-        await Promise.allSettled(
+        await Promise.all(
           images.map(async (url) => {
             if (abortSignal.aborted) return;
-              const name = getImageName(url);
-              await imagesDir
-                .getFileHandle(name)
-                .then((handle) => handle.getFile())
-                .then((file) => existingFiles.set(name, file.size))
-                .catch(() => {
-                  // File doesn't exist, ignore
-                });
+            const name = getImageName(url);
+            try {
+              const handle = await imagesDir.getFileHandle(name);
+              const file = await handle.getFile();
+              existingFiles.set(name, file.size);
+            } catch (err) {
+              if (err instanceof DOMException && err.name === 'NotFoundError') {
+                // file doesn't exist, do nothing
+              } else {
+                throw err;
+              }
+            }
           }),
         );
       } else {
@@ -519,7 +534,7 @@ async function doCache(
         }
       }
     }
-    
+
     if (abortSignal.aborted) {
       console.log(`[cache ${project.id}] cancelled during pre-scan`);
 
@@ -650,8 +665,8 @@ async function cacheImage(
   let imageFileHandle: FileSystemSyncAccessHandle | null = null;
   try {
     imageFileHandle = await imageFile.createSyncAccessHandle();
-    
-    // Double check size after lock in case of race (rare)
+
+    // Double-check size after lock in case of race (rare)
     if (!refresh) {
       const imageSize = imageFileHandle.getSize();
       if (imageSize > 0) {
@@ -672,15 +687,13 @@ async function cacheImage(
     // Allow empty content-type as some servers don't set it
     const contentType = imageResponse.headers.get('content-type') || '';
     if (contentType && !contentType.startsWith('image/')) {
-      throw new Error(
-        `Invalid content-type for ${imageName}: ${contentType}`,
-      );
+      throw new Error(`Invalid content-type for ${imageName}: ${contentType}`);
     }
 
     const imageBlob = await imageResponse.blob();
     const imageBuffer = await imageBlob.arrayBuffer();
 
-    // Truncate to 0 first to handle overwrites, then write new data
+    // Truncate to 0 first to handle overwriting, then write new data
     imageFileHandle.truncate(0);
     imageFileHandle.write(imageBuffer, { at: 0 });
     imageFileHandle.flush();
