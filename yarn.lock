@@ -6242,7 +6242,7 @@ __metadata:
     pinia-plugin-persistedstate: "npm:4.7.1"
     postcss: "npm:8.5.6"
     prettier: "npm:3.6.2"
-    primeicons: "npm:7.0.0"
+    primeicons: "npm:^7.0.0"
     primevue: "npm:4.4.1"
     quill: "npm:2.0.3"
     ramda: "npm:0.32.0"
@@ -8768,7 +8768,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"primeicons@npm:7.0.0":
+"primeicons@npm:^7.0.0":
   version: 7.0.0
   resolution: "primeicons@npm:7.0.0"
   checksum: 10/ff1d698a4d5932105393cd3288c6b1fd92ad30b6fbce1b49de86bcc1917d74d6769c12061d43aa8657fe52ac79d9336527f0708d8c5a0347a1ddcd3e47d0eb73

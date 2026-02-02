@@ -32,10 +32,25 @@ export function useObject({
     );
   });
 
-  const selectedAmount = computed(() => {
-    if (obj.value.isSelectableMultiple)
-      return selected.value[obj.value.id] ?? 0;
-    else return 0;
+  const selectedAmount = computed({
+    get: () => {
+      if (obj.value.isSelectableMultiple)
+        return selected.value[obj.value.id] ?? 0;
+      else return 0;
+    },
+    set: (newValue: number) => {
+      if (obj.value.isSelectableMultiple) {
+        let curValue = selected.value[obj.value.id] ?? 0;
+        console.log(
+          `Set selected amount for ${obj.value.id} to ${newValue} (was ${curValue ?? 0})`,
+        );
+        if (newValue > curValue) {
+          store.incSelected(obj.value.id, newValue - curValue);
+        } else if (newValue < curValue) {
+          store.decSelected(obj.value.id, curValue - newValue);
+        }
+      }
+    },
   });
 
   const minSelectedAmount = computed(() =>
