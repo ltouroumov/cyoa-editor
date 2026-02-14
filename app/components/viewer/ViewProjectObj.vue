@@ -46,7 +46,8 @@
           <ViewRequirements
             v-if="!display?.hideObjectRequirements"
             :requireds="obj.requireds"
-            :enable-show-more="true"
+            :enable-show-more="!display?.hideObjectRequirementMore"
+            :show-active="!display?.hideObjectRequirementStatus"
             @show-more="showParents()"
           />
         </div>

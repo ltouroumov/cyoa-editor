@@ -5,7 +5,10 @@
     :class="{ disabled: !isEnabled }"
   >
     <span>{{ condText }}</span>
-    <span v-if="isActive" class="iconify solar--check-circle-bold ms-1"></span>
+    <span
+      v-if="isActive && showActive"
+      class="iconify solar--check-circle-bold ms-1"
+    ></span>
   </div>
 </template>
 
@@ -17,6 +20,7 @@ import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 const $props = defineProps<{
   req: ConditionTerm;
   showAlways?: boolean;
+  showActive?: boolean;
 }>();
 
 const { getObject } = useProjectStore();

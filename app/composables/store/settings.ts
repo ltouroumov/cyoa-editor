@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
-import { mergeDeepRight } from 'ramda';
+import { isNil, isNotEmpty, mergeDeepRight, symmetricDifference } from 'ramda';
 
 export type DisplaySettings = {
   hideRowImages: boolean;
@@ -9,6 +9,8 @@ export type DisplaySettings = {
   hideObjectImages: boolean;
   hideObjectScores: boolean;
   hideObjectRequirements: boolean;
+  hideObjectRequirementStatus: boolean;
+  hideObjectRequirementMore: boolean;
   hideObjectText: boolean;
   showObjectControls: 'auto' | 'always' | 'never';
   showObjectOverflow: boolean;
@@ -30,6 +32,8 @@ const DefaultSettings: DisplaySettings = Object.freeze({
   hideObjectImages: false,
   hideObjectScores: false,
   hideObjectRequirements: false,
+  hideObjectRequirementStatus: false,
+  hideObjectRequirementMore: false,
   hideObjectText: false,
   showObjectControls: 'auto',
   showObjectOverflow: false,
@@ -61,6 +65,8 @@ export const DisplaySettingsPresets: Record<
     hideObjectImages: true,
     hideObjectScores: false,
     hideObjectRequirements: false,
+    hideObjectRequirementStatus: false,
+    hideObjectRequirementMore: false,
     hideObjectText: true,
     showObjectControls: 'always',
     showObjectOverflow: false,
@@ -83,6 +89,12 @@ export const useSettingStore = defineStore(
     const displaySettings = ref<DisplaySettingsValue>({
       type: 'preset',
       name: 'default',
+    });
+
+    watch(displaySettings, (newVal, oldValue) => {
+      console.log(
+        `displaySettings changed from ${JSON.stringify(oldValue)} to ${JSON.stringify(newVal)}`,
+      );
     });
 
     const hasPreference = (): boolean => {
@@ -116,6 +128,24 @@ export const useSettingStore = defineStore(
   {
     persist: {
       storage: piniaPluginPersistedstate.localStorage(),
+      afterHydrate: (ctx) => {
+        const displaySettings = ctx.store.displaySettings;
+        if (displaySettings.type === 'custom') {
+          if (
+            isNil(displaySettings.settings) ||
+            isNotEmpty(
+              // Compute the keys that are in only one of the sets
+              symmetricDifference(
+                Object.keys(displaySettings.settings),
+                Object.keys(DefaultSettings),
+              ),
+            )
+          ) {
+            console.log(`reset displaySettings to default`);
+            ctx.store.displaySettings.settings = DefaultSettings;
+          }
+        }
+      },
     },
   },
 );

@@ -5,7 +5,8 @@
       v-if="!display?.hideAddonRequirements"
       :requireds="addon.requireds"
       :show-always="true"
-      :enable-show-more="true"
+      :enable-show-more="!display?.hideObjectRequirementMore"
+      :show-active="!display?.hideObjectRequirementStatus"
       @show-more="showParents()"
     />
     <!-- eslint-disable vue/no-v-html -->
