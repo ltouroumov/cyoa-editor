@@ -46,8 +46,9 @@ const condText = computed(() => {
   } else if ($props.req.type === 'or') {
     for (const [idx, { req }] of $props.req.orRequired.entries()) {
       if (!req) continue;
-      if (idx === $props.req.orRequired.length - 1) body += ', or ';
-      else if (idx > 0) body += ', ';
+      if (idx > 0) {
+        body += idx === $props.req.orRequired.length - 1 ? ', or ' : ', ';
+      }
       body += getObject(req)?.title ?? '???';
     }
   } else {
