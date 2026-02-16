@@ -1,6 +1,13 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
-import { isNil, isNotEmpty, mergeDeepRight, symmetricDifference } from 'ramda';
+import {
+  clone,
+  has,
+  isNil,
+  isNotEmpty,
+  mergeDeepRight,
+  symmetricDifference,
+} from 'ramda';
 
 export type DisplaySettings = {
   hideRowImages: boolean;
@@ -127,27 +134,52 @@ export const useSettingStore = defineStore(
   },
   {
     persist: {
-      storage: piniaPluginPersistedstate.localStorage(),
+      storage: {
+        getItem: (key: string) => {
+          const data = localStorage.getItem(key);
+          console.log(`getItem: ${key}`, data);
+          return data;
+        },
+        setItem: (key: string, value: string) => {
+          console.log(`setItem: ${key}`, value);
+          localStorage.setItem(key, value);
+        },
+      },
       afterHydrate: (ctx) => {
-        const displaySettings = ctx.store.displaySettings;
-        if (displaySettings.type === 'custom') {
-          if (
-            isNil(displaySettings.settings) ||
-            isNotEmpty(
-              // Compute the keys that are in only one of the sets
-              symmetricDifference(
-                Object.keys(displaySettings.settings),
-                Object.keys(DefaultSettings),
-              ),
-            )
-          ) {
-            console.log(`reset displaySettings to default`);
-            ctx.store.displaySettings.settings = DefaultSettings;
-          }
-        }
+        recoverCorruptedDisplaySettings(ctx.store);
       },
     },
   },
 );
 
 export const useSettingRefs = () => storeToRefs(useSettingStore());
+
+function recoverCorruptedDisplaySettings(data: any) {
+  const displaySettings = data.displaySettings;
+  if (displaySettings.type === 'custom') {
+    // Strip leaked keys from deep merge (e.g. 'name' from preset initial state)
+    delete displaySettings.name;
+
+    if (!has('settings', displaySettings) || isNil(displaySettings.settings)) {
+      data.displaySettings = {
+        type: 'custom',
+        settings: clone(DefaultSettings),
+      };
+      return;
+    }
+    // Ensure settings keys match the expected shape
+    const missingKeys = symmetricDifference(
+      Object.keys(displaySettings.settings),
+      Object.keys(DefaultSettings),
+    );
+    if (isNotEmpty(missingKeys)) {
+      data.displaySettings = {
+        type: 'custom',
+        settings: clone(DefaultSettings),
+      };
+    }
+  } else if (displaySettings.type === 'preset') {
+    // Strip leaked keys from deep merge (e.g. 'settings' from custom state)
+    delete displaySettings.settings;
+  }
+}
