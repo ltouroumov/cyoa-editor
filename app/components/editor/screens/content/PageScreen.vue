@@ -37,7 +37,7 @@
             v-for="(item, index) in items"
             :key="index"
             :row-id="item.id"
-            :index="index"
+            :index="index as number"
             :class="{
               'border-t border-surface-200 dark:border-surface-700':
                 index !== 0,

@@ -21,7 +21,7 @@ export default withNuxt(
     },
     eslint.configs.recommended,
     ...tslint.configs.recommended,
-    ...vue.configs['flat/recommended'],
+    // ...vue.configs['flat/recommended'],
     prettier,
     {
       languageOptions: {

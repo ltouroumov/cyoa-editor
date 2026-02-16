@@ -114,9 +114,15 @@ export const useSettingStore = defineStore(
       const displaySettings0 = displaySettings.value;
       if (displaySettings0.type === 'preset') {
         const preset = DisplaySettingsPresets[displaySettings0.name];
-        return mergeDeepRight(preset, overrides ?? {});
+        return mergeDeepRight<DisplaySettings, Partial<DisplaySettings>>(
+          preset,
+          overrides ?? {},
+        );
       } else {
-        return mergeDeepRight(displaySettings0.settings, overrides ?? {});
+        return mergeDeepRight<DisplaySettings, Partial<DisplaySettings>>(
+          displaySettings0.settings,
+          overrides ?? {},
+        );
       }
     };
 

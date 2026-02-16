@@ -55,7 +55,7 @@
           v-for="(item, index) in items"
           :key="index"
           :addon-id="item.id"
-          :index="index"
+          :index="index as number"
         />
       </div>
     </template>
