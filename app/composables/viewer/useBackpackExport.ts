@@ -1,4 +1,6 @@
+import { Base64 } from 'js-base64';
 import * as R from 'ramda';
+import { isNotEmpty } from 'ramda';
 
 import type { ProjectNote, ProjectObj } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
@@ -7,8 +9,6 @@ import {
   type PackRowChoice,
   useBackpack,
 } from '~/composables/viewer/useBackpack';
-import { isNotEmpty } from 'ramda';
-import { Base64 } from 'js-base64';
 
 type ExportTextOptions = {
   exportHeaders: boolean;
