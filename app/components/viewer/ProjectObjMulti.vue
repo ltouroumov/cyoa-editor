@@ -22,8 +22,8 @@
         </div>
         <div v-if="mode === 'edit'" class="grow flex flex-row gap-1 relative">
           <input
-            type="text"
             v-model="amountInput"
+            type="text"
             class="w-full focus:outline-none text-center"
           />
           <div
@@ -53,8 +53,8 @@
       >
         <div class="h-6 flex flex-row items-center px-2">
           <Slider
-            class="w-full"
             v-model="selectedAmount"
+            class="w-full"
             :min="minSelectedAmount"
             :max="maxSelectedAmount"
           />

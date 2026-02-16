@@ -29,11 +29,11 @@ import type {
   ProjectRow,
   Score,
 } from '~/composables/project/types/v1';
+import { sanitizeString } from '~/composables/viewer/search/norm';
 import type {
   SearchEvent,
   WorkerSearchResult,
 } from '~/composables/viewer/search/types';
-import { sanitizeString } from '~/composables/viewer/search/norm';
 
 const project = ref<Project | null>(null);
 

@@ -2,7 +2,7 @@
 @import 'tailwindcss-primeui';
 @import 'primeicons/primeicons.css';
 
-@config '../../../tailwind.config.js';
+@config '../../../tailwind.config.mjs';
 
 @layer base, primevue;
 

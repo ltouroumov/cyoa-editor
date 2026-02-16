@@ -1,7 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 import { GoldMorning } from './prime/gold-morning.style.mjs';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   app: {

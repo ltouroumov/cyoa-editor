@@ -6,8 +6,8 @@
       :dt="{
         header: { padding: '0 0.5rem 1rem 0.5rem' },
       }"
-      :sortOrder="sortOrder"
-      :sortField="sortField"
+      :sort-order="sortOrder"
+      :sort-field="sortField"
     >
       <template #header>
         <div class="flex flex-col gap-2">
@@ -60,11 +60,11 @@
 
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
+import * as R from 'ramda';
 
 import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import { readFileContents } from '~/composables/utils';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
-import * as R from 'ramda';
 
 const $toast = useToast();
 

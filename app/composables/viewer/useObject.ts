@@ -40,7 +40,7 @@ export function useObject({
     },
     set: (newValue: number) => {
       if (obj.value.isSelectableMultiple) {
-        let curValue = selected.value[obj.value.id] ?? 0;
+        const curValue = selected.value[obj.value.id] ?? 0;
         console.log(
           `Set selected amount for ${obj.value.id} to ${newValue} (was ${curValue ?? 0})`,
         );
