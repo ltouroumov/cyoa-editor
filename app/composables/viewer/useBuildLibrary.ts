@@ -114,7 +114,7 @@ export function useBuildLibrary() {
       exportedAt: new Date().toISOString(),
       builds: allBuilds,
     };
-    const json = JSON.stringify(envelope, null, 2);
+    const json = JSON.stringify(envelope);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 

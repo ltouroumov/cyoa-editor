@@ -10,38 +10,31 @@
       :sort-field="sortField"
     >
       <template #header>
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-row gap-1">
-            <InputText v-model="buildName" placeholder="Name of build" fluid />
-            <Button @click="saveBuild"> Save </Button>
-            <Select
-              v-model="sortOrder"
-              :options="sortOptions"
-              option-label="name"
-              option-value="value"
-              class="ml-2"
-              style="width: 10rem"
-              placeholder="Sort by"
-            />
-          </div>
-          <div class="flex flex-row gap-1">
-            <Button
-              severity="secondary"
-              icon="pi pi-download"
-              label="Export Backup"
-              @click="exportBackup"
-            />
-            <FileUpload
-              mode="basic"
-              :custom-upload="true"
-              accept="application/json,.json"
-              :auto="true"
-              choose-icon="pi pi-upload"
-              choose-label="Import Backup"
-              severity="secondary"
-              @select="onImportSelect"
-            />
-          </div>
+        <div class="flex flex-row gap-1">
+          <InputText v-model="buildName" placeholder="Name of build" fluid />
+          <Button @click="saveBuild"> Save </Button>
+          <Select
+            v-model="sortOrder"
+            :options="sortOptions"
+            option-label="name"
+            option-value="value"
+            class="ml-2"
+            style="width: 10rem"
+            placeholder="Sort by"
+          />
+          <Button
+            severity="secondary"
+            icon="pi pi-ellipsis-v"
+            @click="toggleMenu"
+          />
+          <Menu ref="menuRef" :model="menuItems" :popup="true" />
+          <input
+            ref="fileInputRef"
+            type="file"
+            accept="application/json,.json"
+            class="hidden"
+            @change="onFileChange"
+          />
         </div>
       </template>
       <template #list="{ items }">
@@ -73,6 +66,23 @@ const $lib = useBuildLibrary();
 const loading = ref<boolean>(false);
 const builds = ref<SavedBuildData[]>([]);
 const buildName = ref<string>('');
+
+// Menu
+const menuRef = ref();
+const fileInputRef = ref<HTMLInputElement>();
+const toggleMenu = (event: Event) => menuRef.value.toggle(event);
+const menuItems = [
+  {
+    label: 'Export Backup',
+    icon: 'pi pi-download',
+    command: () => exportBackup(),
+  },
+  {
+    label: 'Import Backup',
+    icon: 'pi pi-upload',
+    command: () => fileInputRef.value?.click(),
+  },
+];
 
 // Sorting
 const sortOrder = ref<number>(-1); // -1: desc, 1: asc
@@ -112,9 +122,13 @@ const exportBackup = async () => {
   $toast.add({ severity: 'success', summary: 'Backup exported', life: 2000 });
 };
 
-const onImportSelect = async (event: { files: File[] }) => {
-  const file = event.files[0];
+const onFileChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
   if (!file) return;
+
+  // Reset so the same file can be re-selected
+  input.value = '';
 
   try {
     const content = await readFileContents(file);
