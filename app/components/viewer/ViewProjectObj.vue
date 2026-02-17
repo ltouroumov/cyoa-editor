@@ -97,7 +97,10 @@
               <span v-else>More ...</span>
             </div>
           </div>
-          <div class="background"></div>
+          <div
+            v-if="showStickyControls || showFloatingControls"
+            class="background"
+          ></div>
         </div>
       </div>
     </div>
@@ -392,6 +395,8 @@ const isInBackpack = computed<boolean>(() => {
     justify-content: center;
     align-items: center;
 
+    position: relative;
+
     &.floating {
       position: absolute;
       bottom: 0;
@@ -413,6 +418,7 @@ const isInBackpack = computed<boolean>(() => {
       z-index: 10;
 
       height: 3rem;
+
       .controls {
         padding-top: 1rem;
       }
