@@ -1,6 +1,13 @@
 import { defineStore, storeToRefs } from 'pinia';
 import * as R from 'ramda';
-import { mergeDeepRight } from 'ramda';
+import {
+  clone,
+  has,
+  isNil,
+  isNotEmpty,
+  mergeDeepRight,
+  symmetricDifference,
+} from 'ramda';
 
 export type DisplaySettings = {
   hideRowImages: boolean;
@@ -9,6 +16,8 @@ export type DisplaySettings = {
   hideObjectImages: boolean;
   hideObjectScores: boolean;
   hideObjectRequirements: boolean;
+  hideObjectRequirementStatus: boolean;
+  hideObjectRequirementMore: boolean;
   hideObjectText: boolean;
   showObjectControls: 'auto' | 'always' | 'never';
   showObjectOverflow: boolean;
@@ -30,6 +39,8 @@ const DefaultSettings: DisplaySettings = Object.freeze({
   hideObjectImages: false,
   hideObjectScores: false,
   hideObjectRequirements: false,
+  hideObjectRequirementStatus: false,
+  hideObjectRequirementMore: false,
   hideObjectText: false,
   showObjectControls: 'auto',
   showObjectOverflow: false,
@@ -61,6 +72,8 @@ export const DisplaySettingsPresets: Record<
     hideObjectImages: true,
     hideObjectScores: false,
     hideObjectRequirements: false,
+    hideObjectRequirementStatus: false,
+    hideObjectRequirementMore: false,
     hideObjectText: true,
     showObjectControls: 'always',
     showObjectOverflow: false,
@@ -85,6 +98,12 @@ export const useSettingStore = defineStore(
       name: 'default',
     });
 
+    watch(displaySettings, (newVal, oldValue) => {
+      console.log(
+        `displaySettings changed from ${JSON.stringify(oldValue)} to ${JSON.stringify(newVal)}`,
+      );
+    });
+
     const hasPreference = (): boolean => {
       return R.isNotEmpty(loadProjectOnStartup.value);
     };
@@ -95,9 +114,15 @@ export const useSettingStore = defineStore(
       const displaySettings0 = displaySettings.value;
       if (displaySettings0.type === 'preset') {
         const preset = DisplaySettingsPresets[displaySettings0.name];
-        return mergeDeepRight(preset, overrides ?? {});
+        return mergeDeepRight<DisplaySettings, Partial<DisplaySettings>>(
+          preset,
+          overrides ?? {},
+        );
       } else {
-        return mergeDeepRight(displaySettings0.settings, overrides ?? {});
+        return mergeDeepRight<DisplaySettings, Partial<DisplaySettings>>(
+          displaySettings0.settings,
+          overrides ?? {},
+        );
       }
     };
 
@@ -115,9 +140,52 @@ export const useSettingStore = defineStore(
   },
   {
     persist: {
-      storage: piniaPluginPersistedstate.localStorage(),
+      storage: {
+        getItem: (key: string) => {
+          const data = localStorage.getItem(key);
+          console.log(`getItem: ${key}`, data);
+          return data;
+        },
+        setItem: (key: string, value: string) => {
+          console.log(`setItem: ${key}`, value);
+          localStorage.setItem(key, value);
+        },
+      },
+      afterHydrate: (ctx) => {
+        recoverCorruptedDisplaySettings(ctx.store);
+      },
     },
   },
 );
 
 export const useSettingRefs = () => storeToRefs(useSettingStore());
+
+function recoverCorruptedDisplaySettings(data: any) {
+  const displaySettings = data.displaySettings;
+  if (displaySettings.type === 'custom') {
+    // Strip leaked keys from deep merge (e.g. 'name' from preset initial state)
+    delete displaySettings.name;
+
+    if (!has('settings', displaySettings) || isNil(displaySettings.settings)) {
+      data.displaySettings = {
+        type: 'custom',
+        settings: clone(DefaultSettings),
+      };
+      return;
+    }
+    // Ensure settings keys match the expected shape
+    const missingKeys = symmetricDifference(
+      Object.keys(displaySettings.settings),
+      Object.keys(DefaultSettings),
+    );
+    if (isNotEmpty(missingKeys)) {
+      data.displaySettings = {
+        type: 'custom',
+        settings: clone(DefaultSettings),
+      };
+    }
+  } else if (displaySettings.type === 'preset') {
+    // Strip leaked keys from deep merge (e.g. 'settings' from custom state)
+    delete displaySettings.settings;
+  }
+}

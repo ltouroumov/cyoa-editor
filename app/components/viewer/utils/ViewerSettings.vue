@@ -123,7 +123,7 @@
 
 <script setup lang="ts">
 import type { SelectChangeEvent } from 'primevue';
-import { append, clone, isEmpty, isNil, map, prepend } from 'ramda';
+import { append, clone, isEmpty, isNil, map, omit, prepend } from 'ramda';
 
 import {
   DisplaySettingsPresets,
@@ -186,7 +186,7 @@ const loadDisplayPreset = (event: SelectChangeEvent) => {
   if (value === '--custom') {
     displaySettings.value = {
       type: 'custom',
-      settings: clone(DisplaySettingsPresets['default']),
+      settings: clone(omit(['name'], DisplaySettingsPresets['default'])),
     };
   } else {
     displaySettings.value = {

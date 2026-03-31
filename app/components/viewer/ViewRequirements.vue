@@ -9,6 +9,7 @@
       :key="idx"
       :req="req"
       :show-always="showAlways"
+      :show-active="showActive"
     />
     <div
       v-if="enableShowMore && hasVisibleReqs"
@@ -29,6 +30,7 @@ import type { ConditionTerm } from '~/composables/project/types/v1';
 const $props = defineProps<{
   requireds: ConditionTerm[];
   showAlways?: boolean;
+  showActive?: boolean;
   enableShowMore?: boolean;
 }>();
 defineEmits(['show-more']);

@@ -70,6 +70,7 @@
         <div class="pack-actions-download">
           <Button @click="exportToImage()"> Download Image (Beta)</Button>
           <Button @click="exportToHtml()"> Download HTML</Button>
+          <Button @click="downloadMarkdown()"> Download Markdown</Button>
         </div>
       </div>
       <BackpackView
@@ -98,6 +99,7 @@ import ExportCode from '~/components/viewer/utils/ExportCode.vue';
 import ImportCode from '~/components/viewer/utils/ImportCode.vue';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
 import { useViewerRefs } from '~/composables/store/viewer';
+import { useBackpackExport } from '~/composables/viewer/useBackpackExport';
 import { useBackpackRender } from '~/composables/viewer/useBackpackRender';
 
 const { resolveDisplaySettings } = useSettingStore();
@@ -109,6 +111,7 @@ const {
   lockBackpackObjects,
 } = useSettingRefs();
 const { exportToImage, exportToHtml } = useBackpackRender();
+const { downloadMarkdown } = useBackpackExport();
 
 const backpackRef = ref<InstanceType<typeof BackpackView>>();
 const settingsPopover = ref();

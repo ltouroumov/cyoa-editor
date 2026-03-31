@@ -46,7 +46,8 @@
           <ViewRequirements
             v-if="!display?.hideObjectRequirements"
             :requireds="obj.requireds"
-            :enable-show-more="true"
+            :enable-show-more="!display?.hideObjectRequirementMore"
+            :show-active="!display?.hideObjectRequirementStatus"
             @show-more="showParents()"
           />
         </div>
@@ -69,6 +70,7 @@
               :index="idx"
               :addon="addon"
               :obj-id="obj.id"
+              :display="display"
             />
           </div>
         </div>
@@ -95,7 +97,10 @@
               <span v-else>More ...</span>
             </div>
           </div>
-          <div class="background"></div>
+          <div
+            v-if="showStickyControls || showFloatingControls"
+            class="background"
+          ></div>
         </div>
       </div>
     </div>
@@ -390,6 +395,8 @@ const isInBackpack = computed<boolean>(() => {
     justify-content: center;
     align-items: center;
 
+    position: relative;
+
     &.floating {
       position: absolute;
       bottom: 0;
@@ -411,6 +418,7 @@ const isInBackpack = computed<boolean>(() => {
       z-index: 10;
 
       height: 3rem;
+
       .controls {
         padding-top: 1rem;
       }

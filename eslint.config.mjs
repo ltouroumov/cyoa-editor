@@ -11,11 +11,17 @@ import withNuxt from './.nuxt/eslint.config.mjs';
 export default withNuxt(
   tslint.config(
     {
-      ignores: ['**/node_modules', '**/dist', '.nuxt/'],
+      ignores: [
+        '**/node_modules',
+        '**/dist',
+        '.nuxt/',
+        'eslint.config.mjs',
+        'tailwind.config.mjs',
+      ],
     },
     eslint.configs.recommended,
     ...tslint.configs.recommended,
-    ...vue.configs['flat/recommended'],
+    // ...vue.configs['flat/recommended'],
     prettier,
     {
       languageOptions: {

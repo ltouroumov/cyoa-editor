@@ -13,18 +13,15 @@ export interface BaseComponent<T extends ComponentType> {
   type: T;
 }
 
-export interface VisibilityComponent
-  extends BaseComponent<ComponentType.Visibility> {
+export interface VisibilityComponent extends BaseComponent<ComponentType.Visibility> {
   condition: ConditionTerm;
 }
 
-export interface RequirementsComponent
-  extends BaseComponent<ComponentType.Requirements> {
+export interface RequirementsComponent extends BaseComponent<ComponentType.Requirements> {
   requirements: ObjectCondition[];
 }
 
-export interface MultiSelectComponent
-  extends BaseComponent<ComponentType.MultiSelect> {
+export interface MultiSelectComponent extends BaseComponent<ComponentType.MultiSelect> {
   minAmount: number;
   maxAmount: number;
 }

@@ -107,5 +107,65 @@ export function useBuildLibrary() {
     $store.buildModified.value = false;
   };
 
-  return { loadBuilds, loadBuild, saveBuild, updateBuild, deleteBuild };
+  const exportBuilds = async () => {
+    const allBuilds = await db.builds.toArray();
+    const envelope = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      builds: allBuilds,
+    };
+    const json = JSON.stringify(envelope);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const date = new Date().toISOString().slice(0, 10);
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.download = `cyoa-builds-backup-${date}.json`;
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const importBuilds = async (
+    importedBuilds: SavedBuildData[],
+  ): Promise<{ imported: number; skipped: number }> => {
+    let imported = 0;
+    let skipped = 0;
+
+    for (const build of importedBuilds) {
+      // Deserialize date strings back to Date objects
+      build.createdAt = new Date(build.createdAt);
+      build.updatedAt = new Date(build.updatedAt);
+
+      const existing = await db.builds.get(build.id);
+      if (existing) {
+        const existingUpdated = new Date(existing.updatedAt).getTime();
+        const importedUpdated = build.updatedAt.getTime();
+        if (importedUpdated > existingUpdated) {
+          await db.builds.put(build);
+          imported++;
+        } else {
+          skipped++;
+        }
+      } else {
+        await db.builds.put(build);
+        imported++;
+      }
+    }
+
+    return { imported, skipped };
+  };
+
+  return {
+    loadBuilds,
+    loadBuild,
+    saveBuild,
+    updateBuild,
+    deleteBuild,
+    exportBuilds,
+    importBuilds,
+  };
 }

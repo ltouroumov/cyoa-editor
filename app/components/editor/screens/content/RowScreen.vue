@@ -30,7 +30,7 @@
           :key="index"
           :choice-id="item.id"
           :parent-id="rowId"
-          :index="index"
+          :index="index as number"
           :class="`col-span-${item.layout?.width ?? row.layout?.itemWidth ?? 12}`"
         />
       </div>

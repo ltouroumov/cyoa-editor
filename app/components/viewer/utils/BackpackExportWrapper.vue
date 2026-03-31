@@ -31,6 +31,8 @@ const display = computed(() => {
   return resolveDisplaySettings({
     hideObjectImages: hideImages,
     hideObjectText: hideText,
+    hideObjectRequirementMore: true,
+    hideObjectRequirementStatus: true,
     hideDisabledAddons: true,
     hideAddonText: hideText,
   });

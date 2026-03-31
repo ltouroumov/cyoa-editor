@@ -4,28 +4,11 @@
     class="obj-requirement break-normal"
     :class="{ disabled: !isEnabled }"
   >
-    <span v-if="!req.required && showAlways" class="req-before-text">
-      Incompatible:
-    </span>
-    <span v-else-if="req.beforeText" class="req-before-text">
-      {{ req.beforeText }}
-    </span>
-    <span v-if="req.type === 'id'" class="inline-flex items-center">
-      <span>{{ getObject(req.reqId)?.title ?? '???' }}</span>
-    </span>
-    <template v-else-if="req.type === 'or'">
-      <span v-for="(orReq, idx) in req.orRequired" :key="idx">
-        <template v-if="orReq.req">
-          {{
-            idx > 0 ? (idx >= req.orRequired.length - 1 ? ', or ' : ', ') : ''
-          }}
-          {{ getObject(orReq.req)?.title ?? '???' }}
-        </template>
-      </span>
-    </template>
-    <div v-else>Unknown Condition</div>
-    <span v-if="req.afterText">{{ req.afterText }}</span>
-    <span v-if="isActive" class="iconify solar--check-circle-bold ms-1"></span>
+    <span>{{ condText }}</span>
+    <span
+      v-if="isActive && showActive"
+      class="iconify solar--check-circle-bold ms-1"
+    ></span>
   </div>
 </template>
 
@@ -37,6 +20,7 @@ import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 const $props = defineProps<{
   req: ConditionTerm;
   showAlways?: boolean;
+  showActive?: boolean;
 }>();
 
 const { getObject } = useProjectStore();
@@ -50,6 +34,37 @@ const activeCond = computed(() => buildRootCondition([$props.req]));
 const isActive = computed<boolean>(() => {
   const { exec } = activeCond.value;
   return exec(selectedIds.value);
+});
+
+const condText = computed(() => {
+  let prefix: string = '';
+  if (!$props.req.required && $props.showAlways) {
+    prefix = 'Incompatible: ';
+  } else if ($props.req.beforeText) {
+    prefix = `${$props.req.beforeText.trim()} `;
+  }
+
+  let body: string = '';
+  if ($props.req.type === 'id') {
+    body = `${getObject($props.req.reqId)?.title}`;
+  } else if ($props.req.type === 'or') {
+    for (const [idx, { req }] of $props.req.orRequired.entries()) {
+      if (!req) continue;
+      if (idx > 0) {
+        body += idx === $props.req.orRequired.length - 1 ? ', or ' : ', ';
+      }
+      body += getObject(req)?.title ?? '???';
+    }
+  } else {
+    body = '(err:unknown-condition)';
+  }
+
+  let suffix: string = '';
+  if ($props.req.afterText) {
+    suffix = ` ${$props.req.afterText.trim()}`;
+  }
+
+  return `${prefix}${body}${suffix}`;
 });
 </script>
 
