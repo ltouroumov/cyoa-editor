@@ -76,7 +76,9 @@ export function useField(form: Ref<FormField>, value: Ref) {
 
   const isValid = computed(() => {
     const { validate } = fieldData.value ?? {};
-    return isNotNil(validate) ? validate(value.value) : true;
+    return isNotNil(validate) && isNotNil(value.value)
+      ? validate(value.value)
+      : true;
   });
 
   return {

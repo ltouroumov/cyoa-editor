@@ -75,6 +75,20 @@ export default defineNuxtConfig({
     },
   },
 
+  vite: {
+    optimizeDeps: {
+      include: [
+        'dexie',
+        'ramda',
+        'yup',
+        'nanoid',
+        'ts-pattern',
+        'rxjs',
+        'quill',
+      ],
+    },
+  },
+
   components: [
     {
       path: '~/components',
