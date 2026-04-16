@@ -140,7 +140,15 @@ Example `projects.json` for this structure:
 }
 ```
 
-### Option 1: Build from Source
+### Option 1: GitHub Releases
+
+For root domain deployment:
+
+1. Download `release.zip` from [Releases](https://github.com/ltouroumov/cyoa-editor/releases)
+2. Extract and configure `config/viewer/projects.json`
+3. Upload to your host
+
+### Option 2: Build from Source
 
 For custom base URLs or subfolder deployment:
 
@@ -152,14 +160,6 @@ NUXT_APP_BASE_URL=/your-path/ yarn generate
 ```
 
 Output is in `.output/public/`.
-
-### Option 2: GitHub Releases
-
-For root domain deployment:
-
-1. Download `release.zip` from [Releases](https://github.com/ltouroumov/cyoa-editor/releases)
-2. Extract and configure `config/viewer/projects.json`
-3. Upload to your host
 
 ---
 
