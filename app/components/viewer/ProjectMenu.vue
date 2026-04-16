@@ -79,6 +79,12 @@
               />
               <div class="grow"></div>
               <Button
+                v-tooltip="`Load live version`"
+                icon="iconify iconify solar--cloud-download-linear"
+                variant="outlined"
+                @click.stop.prevent="loadProject(project.id, { live: true })"
+              />
+              <Button
                 icon="iconify iconify solar--settings-linear"
                 variant="outlined"
                 @click.stop.prevent="openCacheDialog(project.id, true)"

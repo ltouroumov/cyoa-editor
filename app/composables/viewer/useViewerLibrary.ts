@@ -271,11 +271,14 @@ export function useViewerLibrary() {
     }
   };
 
-  const loadProject = async (id: string) => {
+  const loadProject = async (id: string, options?: { live?: boolean }) => {
     const project = projectList.value.find(propEq(id, 'id'));
     if (!project) return; // project not found
 
-    if (project.source === 'remote') {
+    if (
+      project.source === 'remote' ||
+      (project.origin === 'remote' && options?.live)
+    ) {
       await loadRemoteFile(project);
     } else if (project.source === 'cached' || project.source === 'local') {
       await loadCachedProject(project);
