@@ -1,10 +1,21 @@
 # ICC Neo (Interactive CYOA Creator Neo)
 
-A Nuxt.js web application for creating and viewing interactive Choose Your Own Adventure (CYOA) projects. Designed to be compatible with the MeanDelay iCYOA viewer format.
+A Nuxt.js web application for creating and viewing interactive Choose Your Own Adventure (CYOA) projects. Designed to be
+compatible with the MeanDelay iCYOA viewer format.
+
+## Documentation
+
+| Document                                     | Description                         |
+|----------------------------------------------|-------------------------------------|
+| [Viewer Guide](./docs/viewer-guide.md)       | Viewer configuration and deployment |
+| [Getting Started](./docs/getting-started.md) | Quick setup guide for developers    |
+| [Architecture](./docs/architecture.md)       | Project structure and concepts      |
+| [Data Formats](./docs/data-formats.md)       | V1 and V2 format specifications     |
 
 ## Current Focus
 
-The **Viewer** is the primary focus of development. It reads V1 format projects (MeanDelay compatible) and provides an enhanced viewing experience with:
+The **Viewer** is the primary focus of development. It reads V1 format projects (MeanDelay compatible) and provides an
+enhanced viewing experience with:
 
 - Project browsing and selection
 - Choice tracking and backpack system
@@ -13,15 +24,6 @@ The **Viewer** is the primary focus of development. It reads V1 format projects 
 - Responsive design with dark/light themes
 
 The **Editor** is an early-stage prototype intended to eventually replace the original ICC editor.
-
-## Documentation
-
-| Document                                     | Description                         |
-|----------------------------------------------| ----------------------------------- |
-| [Getting Started](./docs/getting-started.md) | Quick setup guide for developers    |
-| [Viewer Guide](./docs/viewer-guide.md)       | Viewer configuration and deployment |
-| [Architecture](./docs/architecture.md)       | Project structure and concepts      |
-| [Data Formats](./docs/data-formats.md)       | V1 and V2 format specifications     |
 
 ## Quick Start
 

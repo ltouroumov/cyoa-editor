@@ -16,11 +16,11 @@ import type {
   ProjectRow,
   ProjectStore,
 } from '~/composables/project/types/v1';
-import type { SavedBuildData } from '~/composables/shared/tables/builds';
 import type {
   EditorProject,
   EditorProjectVersion,
-} from '~/composables/shared/tables/projects';
+} from '~/composables/shared/tables/editor_projects';
+import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
 import { bufferToHex, stringToBuffer } from '~/composables/utils';
 
 export type Selections = Record<string, number>;
@@ -30,6 +30,9 @@ export type LoadProjectData =
   | {
       fileContents: string;
       fileName: string;
+      projectId?: string;
+      local?: boolean;
+      origin?: 'local' | 'remote';
     }
   | {
       project: EditorProject;
@@ -54,6 +57,14 @@ export const useProjectStore = defineStore('project', () => {
   const project = computed<ProjectFile | null>(() => {
     if (store.value.status === 'loaded') return store.value.file;
     else return null;
+  });
+  const isLocal = computed<boolean>(() => {
+    if (store.value.status === 'loaded') return store.value.local;
+    else return false;
+  });
+  const isOriginLocal = computed<boolean>(() => {
+    if (store.value.status === 'loaded') return store.value.origin === 'local';
+    else return false;
   });
 
   const selected = ref<Selections>({});
@@ -187,7 +198,7 @@ export const useProjectStore = defineStore('project', () => {
         const projectFile: ProjectFile = {
           data: data,
           fileName: fileName,
-          projectId: data?.$projectId,
+          projectId: result.projectId ?? data?.$projectId,
           projectName: data.rows[0].title,
           projectHash: hashHex,
         };
@@ -195,6 +206,8 @@ export const useProjectStore = defineStore('project', () => {
         store.value = {
           status: 'loaded',
           file: projectFile,
+          local: result.local ?? false,
+          origin: result.origin,
         };
         triggerRef(store);
       } else {
@@ -447,6 +460,8 @@ export const useProjectStore = defineStore('project', () => {
   return {
     store,
     project,
+    isLocal,
+    isOriginLocal,
     projectRows,
     backpack,
     pointTypes,

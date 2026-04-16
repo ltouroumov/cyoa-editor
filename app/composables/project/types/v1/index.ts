@@ -158,6 +158,7 @@ export type ObjAddon = Partial<HasId> &
   HasRequirements & {
     title: string;
     text: string;
+    image: string;
   };
 
 export type ProjectObj = HasId &
@@ -229,7 +230,7 @@ export type Project = {
 export type ProjectFile = {
   data: Project;
   fileName?: string;
-  projectId?: string | number;
+  projectId?: string;
   projectName: string;
   projectHash: string;
 };
@@ -244,6 +245,8 @@ export type LoadingProjectStore = {
 export type LoadedProjectStore = {
   status: 'loaded';
   file: ProjectFile;
+  local: boolean;
+  origin?: 'local' | 'remote';
 };
 
 export type ProjectStore =

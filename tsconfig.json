@@ -3,5 +3,14 @@
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "noUncheckedIndexedAccess": false,
-  }
+    "lib": [
+      "ESNext",
+      "dom",
+      "dom.iterable",
+      "dom.asynciterable",
+      "webworker",
+      "webworker.asynciterable"
+    ]
+  },
+  "exclude": ["eslint.config.mjs"]
 }

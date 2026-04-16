@@ -45,7 +45,7 @@ import {
   type ObjectCondition,
 } from '~/composables/project/types/v2/objects/components/condition';
 import type { LayoutChildProps } from '~/composables/project/types/v2/objects/layout';
-import type { EditorProject } from '~/composables/shared/tables/projects';
+import type { EditorProject } from '~/composables/shared/tables/editor_projects';
 
 type ImportResult = { project: Omit<EditorProject, 'id'>; data: Project };
 

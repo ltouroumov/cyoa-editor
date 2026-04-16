@@ -8,7 +8,7 @@ import {
 import type {
   SavedBuildData,
   SavedBuildItem,
-} from '~/composables/shared/tables/builds';
+} from '~/composables/shared/tables/viewer_builds';
 import { useDexie } from '~/composables/shared/useDexie';
 import {
   type Selections,
@@ -28,7 +28,7 @@ export function useBuildLibrary() {
   const $store = useProjectRefs();
 
   const loadBuilds = async (): Promise<SavedBuildData[]> => {
-    return db.builds.toArray();
+    return db.viewer_builds.toArray();
   };
 
   const saveBuild = async (buildName: string): Promise<SavedBuildData> => {
@@ -47,7 +47,7 @@ export function useBuildLibrary() {
       ),
       notes: clone($store.buildNotes.value),
     };
-    const entryId = await db.builds.add(entry);
+    const entryId = await db.viewer_builds.add(entry);
     return R.assoc('id', entryId, entry);
   };
 
@@ -80,13 +80,13 @@ export function useBuildLibrary() {
         $store.getRow.value,
       );
     }
-    await db.builds.put(entry);
+    await db.viewer_builds.put(entry);
 
     return entry;
   };
 
   const deleteBuild = async (build: SavedBuildData) => {
-    await db.builds.delete(build.id);
+    await db.viewer_builds.delete(build.id);
   };
 
   const loadBuild = (build: SavedBuildData) => {
