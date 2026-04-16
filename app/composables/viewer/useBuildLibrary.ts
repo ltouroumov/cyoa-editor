@@ -108,7 +108,7 @@ export function useBuildLibrary() {
   };
 
   const exportBuilds = async () => {
-    const allBuilds = await db.builds.toArray();
+    const allBuilds = await db.viewer_builds.toArray();
     const envelope = {
       version: 1,
       exportedAt: new Date().toISOString(),
@@ -140,18 +140,18 @@ export function useBuildLibrary() {
       build.createdAt = new Date(build.createdAt);
       build.updatedAt = new Date(build.updatedAt);
 
-      const existing = await db.builds.get(build.id);
+      const existing = await db.viewer_builds.get(build.id);
       if (existing) {
         const existingUpdated = new Date(existing.updatedAt).getTime();
         const importedUpdated = build.updatedAt.getTime();
         if (importedUpdated > existingUpdated) {
-          await db.builds.put(build);
+          await db.viewer_builds.put(build);
           imported++;
         } else {
           skipped++;
         }
       } else {
-        await db.builds.put(build);
+        await db.viewer_builds.put(build);
         imported++;
       }
     }

@@ -121,8 +121,11 @@ export function useViewerLibrary() {
     taskId: string,
     status: CacheOperationStatus,
   ): void => {
-    cacheOperations.value = cacheOperations.value.map((op) =>
-      op.taskId === taskId ? mergeRight(op, status) : op,
+    cacheOperations.value = cacheOperations.value.map(
+      (op: CacheOperation): CacheOperation =>
+        op.taskId === taskId
+          ? mergeRight<CacheOperation, CacheOperationStatus>(op, status)
+          : op,
     );
   };
   const clearOperation = (taskId: string): void => {
