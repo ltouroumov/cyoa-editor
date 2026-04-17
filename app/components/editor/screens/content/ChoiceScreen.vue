@@ -18,11 +18,19 @@
         </div>
         <ChoiceHeaderForm :choice-id="choiceId" />
       </div>
-      <div class="flex flex-col">
-        <div class="border-b border-surface-700 pb-1 mb-2">
-          <div class="text-xl font-bold text-primary">Components</div>
+      <div class="flex flex-row gap-2">
+        <div class="flex flex-col flex-2">
+          <div class="border-b border-surface-700 pb-1 mb-2">
+            <div class="text-xl font-bold text-primary">Components</div>
+          </div>
+          <ChoiceComponentsForm :choice-id="choiceId" />
         </div>
-        <ChoiceComponentsForm :choice-id="choiceId" />
+        <div class="flex flex-col flex-1">
+          <div class="border-b border-surface-700 pb-1 mb-2">
+            <div class="text-xl font-bold text-primary">Choice Styles</div>
+          </div>
+          <ChoiceStyleForm :choice-id="choiceId" />
+        </div>
       </div>
     </div>
   </Fluid>

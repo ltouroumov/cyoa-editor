@@ -72,22 +72,22 @@
 <script setup lang="ts">
 import { append, equals, indexOf, reject, swap, uniq } from 'ramda';
 
-import type { RowObject } from '~/composables/project/types/v2/objects';
+import type { ChoiceObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { StyleTarget } from '~/composables/project/types/v2/styles';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const projectStore = useProjectStore();
 const props = defineProps<{
-  rowId: string;
+  choiceId: string;
 }>();
 
-const row = computed((): RowObject => {
-  return projectStore.get(props.rowId, ObjectType.row)!;
+const choice = computed((): ChoiceObject => {
+  return projectStore.get(props.choiceId, ObjectType.choice)!;
 });
 
 const rowStyles = computed(() => {
-  return (row.value.styles ?? []).map((styleId) => {
+  return (choice.value.styles ?? []).map((styleId) => {
     return projectStore.styles.rules[styleId];
   });
 });
@@ -95,31 +95,33 @@ const addStyleId = ref();
 
 const StylesList = computed(() => {
   return Object.values(projectStore.styles.rules).filter(
-    (style) => style.target === StyleTarget.row,
+    (style) => style.target === StyleTarget.choice,
   );
 });
 
 const doAddStyle = () => {
   if (!addStyleId.value) return;
-  row.value.styles = uniq(append(addStyleId.value, row.value.styles ?? []));
+  choice.value.styles = uniq(
+    append(addStyleId.value, choice.value.styles ?? []),
+  );
   addStyleId.value = undefined;
 };
 
 const doRemoveStyle = (styleId: string) => {
-  row.value.styles = reject(equals(styleId), row.value.styles ?? []);
+  choice.value.styles = reject(equals(styleId), choice.value.styles ?? []);
 };
 
 const doMoveUp = (styleId: string) => {
-  const idx = indexOf(styleId, row.value.styles ?? []);
+  const idx = indexOf(styleId, choice.value.styles ?? []);
   // not found or at the first position
   if (idx === -1 || idx === 0) return;
-  row.value.styles = swap(idx, idx - 1, row.value.styles ?? []);
+  choice.value.styles = swap(idx, idx - 1, choice.value.styles ?? []);
 };
 const doMoveDown = (styleId: string) => {
-  const idx = indexOf(styleId, row.value.styles ?? []);
+  const idx = indexOf(styleId, choice.value.styles ?? []);
   // not found or at the last position
-  if (idx === -1 || idx === (row.value.styles ?? []).length - 1) return;
-  row.value.styles = swap(idx, idx + 1, row.value.styles ?? []);
+  if (idx === -1 || idx === (choice.value.styles ?? []).length - 1) return;
+  choice.value.styles = swap(idx, idx + 1, choice.value.styles ?? []);
 };
 </script>
 
