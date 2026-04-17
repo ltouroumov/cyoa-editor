@@ -6,7 +6,7 @@ import { DefaultProject } from '~/composables/project/defaults';
 import { importProject } from '~/composables/project/import';
 import type { Project } from '~/composables/project/types/v2';
 import { useProjectStore } from '~/composables/project/useProjectStore';
-import type { EditorProjectVersion } from '~/composables/shared/tables/projects';
+import type { EditorProjectVersion } from '~/composables/shared/tables/editor_projects';
 import { useDexie } from '~/composables/shared/useDexie';
 
 export function useEditorLibrary() {
@@ -16,7 +16,7 @@ export function useEditorLibrary() {
   const { restoreFromHash, restoreStack } = useEditorRouting();
 
   async function createEmptyProject(name: string) {
-    const projectId = await dexie.projects.put({
+    const projectId = await dexie.editor_projects.put({
       name: name,
       tags: [],
       createdAt: new Date(),
@@ -24,7 +24,7 @@ export function useEditorLibrary() {
     });
 
     const version = await createEmptyVersion(projectId);
-    await dexie.projects.update(projectId, {
+    await dexie.editor_projects.update(projectId, {
       currentVersionId: version.id,
     });
   }
@@ -45,32 +45,34 @@ export function useEditorLibrary() {
       data: clone(data),
     };
 
-    const versionId = await dexie.projects_versions.put(version);
+    const versionId = await dexie.editor_projects_versions.put(version);
     return assoc('id', versionId, version);
   }
 
   async function importProjectFile(projectData: any) {
     const { project, data } = await importProject(projectData);
 
-    const projectId = await dexie.projects.add(project);
-    const versionId = await dexie.projects_versions.add({
+    const projectId = await dexie.editor_projects.add(project);
+    const versionId = await dexie.editor_projects_versions.add({
       projectId: projectId,
       data: data,
       createdAt: new Date(),
     });
 
-    await dexie.projects.update(projectId, {
+    await dexie.editor_projects.update(projectId, {
       currentVersionId: versionId,
     });
   }
 
   async function loadProject(projectId: number, restoreNavigation = true) {
-    const project = (await dexie.projects.get(projectId))!;
+    const project = (await dexie.editor_projects.get(projectId))!;
     let version: EditorProjectVersion;
     if (isNil(project.currentVersionId)) {
       version = await createEmptyVersion(project.id);
     } else {
-      version = (await dexie.projects_versions.get(project.currentVersionId!))!;
+      version = (await dexie.editor_projects_versions.get(
+        project.currentVersionId!,
+      ))!;
     }
 
     await editorStore.withLoadingState(async () => {
@@ -114,7 +116,7 @@ export function useEditorLibrary() {
     await editorStore.withLoadingState(async () => {
       const projectId = editorStore.project!.id;
       const version = await createVersion(projectId, projectStore.exportData());
-      await dexie.projects.update(projectId, {
+      await dexie.editor_projects.update(projectId, {
         currentVersionId: version.id,
       });
     });

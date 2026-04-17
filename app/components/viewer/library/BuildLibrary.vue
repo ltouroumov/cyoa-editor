@@ -55,7 +55,7 @@
 import { useToast } from 'primevue/usetoast';
 import * as R from 'ramda';
 
-import type { SavedBuildData } from '~/composables/shared/tables/builds';
+import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
 import { readFileContents } from '~/composables/utils';
 import { useBuildLibrary } from '~/composables/viewer/useBuildLibrary';
 

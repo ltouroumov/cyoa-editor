@@ -8,7 +8,7 @@ import {
 import type {
   SavedBuildData,
   SavedBuildItem,
-} from '~/composables/shared/tables/builds';
+} from '~/composables/shared/tables/viewer_builds';
 import { useDexie } from '~/composables/shared/useDexie';
 import {
   type Selections,
@@ -28,7 +28,7 @@ export function useBuildLibrary() {
   const $store = useProjectRefs();
 
   const loadBuilds = async (): Promise<SavedBuildData[]> => {
-    return db.builds.toArray();
+    return db.viewer_builds.toArray();
   };
 
   const saveBuild = async (buildName: string): Promise<SavedBuildData> => {
@@ -47,7 +47,7 @@ export function useBuildLibrary() {
       ),
       notes: clone($store.buildNotes.value),
     };
-    const entryId = await db.builds.add(entry);
+    const entryId = await db.viewer_builds.add(entry);
     return R.assoc('id', entryId, entry);
   };
 
@@ -80,13 +80,13 @@ export function useBuildLibrary() {
         $store.getRow.value,
       );
     }
-    await db.builds.put(entry);
+    await db.viewer_builds.put(entry);
 
     return entry;
   };
 
   const deleteBuild = async (build: SavedBuildData) => {
-    await db.builds.delete(build.id);
+    await db.viewer_builds.delete(build.id);
   };
 
   const loadBuild = (build: SavedBuildData) => {
@@ -108,7 +108,7 @@ export function useBuildLibrary() {
   };
 
   const exportBuilds = async () => {
-    const allBuilds = await db.builds.toArray();
+    const allBuilds = await db.viewer_builds.toArray();
     const envelope = {
       version: 1,
       exportedAt: new Date().toISOString(),
@@ -140,18 +140,18 @@ export function useBuildLibrary() {
       build.createdAt = new Date(build.createdAt);
       build.updatedAt = new Date(build.updatedAt);
 
-      const existing = await db.builds.get(build.id);
+      const existing = await db.viewer_builds.get(build.id);
       if (existing) {
         const existingUpdated = new Date(existing.updatedAt).getTime();
         const importedUpdated = build.updatedAt.getTime();
         if (importedUpdated > existingUpdated) {
-          await db.builds.put(build);
+          await db.viewer_builds.put(build);
           imported++;
         } else {
           skipped++;
         }
       } else {
-        await db.builds.put(build);
+        await db.viewer_builds.put(build);
         imported++;
       }
     }

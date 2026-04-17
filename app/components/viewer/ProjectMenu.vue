@@ -2,32 +2,49 @@
   <div class="container" :class="{ compact: $props.compact ?? false }">
     <div class="toolbar" :class="{ compact: $props.compact ?? false }">
       <h1 class="title text-3xl">Interactive CYOA Viewer (NEO)</h1>
-      <div v-if="projectList.show_load_file" class="load-container">
+      <div v-if="librarySettings.show_load_file" class="load-container">
         <LoadProject :inline="true" />
       </div>
     </div>
     <main class="main-container">
       <div class="main-header">
-        <InputText v-model="search" placeholder="Search ..." />
+        <InputText v-model="search" placeholder="Search ..." class="w-full" />
       </div>
       <div class="project-list-container">
         <div
           v-for="project in projects"
           :key="project.id"
           class="project-list-item"
-          :class="{ compact: $props.compact ?? false }"
-          @click.prevent="loadRemoteFile(project)"
+          :class="{
+            compact: $props.compact ?? false,
+            cached: project.source === 'cached',
+            local: project.source === 'local',
+          }"
         >
-          <div v-if="isNotNil(project.thumbnail_url)" class="thumbnail">
+          <div
+            v-if="isNotNil(project.thumbnail_url)"
+            class="thumbnail"
+            @click.prevent="loadProject(project.id)"
+          >
             <img :src="project.thumbnail_url" class="thumbnail-img" />
           </div>
-          <div v-if="isNil(project.thumbnail_url)" class="thumbnail-ph">
+          <div
+            v-if="isNil(project.thumbnail_url)"
+            class="thumbnail-ph"
+            @click.prevent="loadProject(project.id)"
+          >
             <span>No Thumbnail</span>
           </div>
-          <div class="project-info">
+          <div class="project-info" @click.prevent="loadProject(project.id)">
             <h2 class="project-title text-xl text-primary font-bold">
               {{ project.title }}
             </h2>
+            <div
+              v-if="project.source === 'local'"
+              class="text-sm text-surface-600 italic mt-2"
+            >
+              Local Project
+            </div>
             <div
               v-if="isNotNil(project.description)"
               class="project-description"
@@ -38,6 +55,60 @@
               By {{ project.author }}
             </div>
           </div>
+          <div class="project-actions">
+            <div
+              v-if="project.source === 'remote'"
+              class="flex flex-col items-center gap-1 grow"
+            >
+              <div class="grow"></div>
+              <Button
+                icon="iconify solar--download-broken"
+                variant="outlined"
+                @click.stop.prevent="openCacheDialog(project.id)"
+              />
+            </div>
+            <div
+              v-if="project.source === 'cached'"
+              class="flex flex-col items-center gap-1 grow"
+            >
+              <div
+                v-tooltip.bottom="
+                  `Cached on ${isNotNil(project.cachedAt) ? format(project.cachedAt, 'yyyy-MM-dd') : 'unknown time'}`
+                "
+                class="iconify solar--archive-broken size-6 text-emerald-500"
+              />
+              <div class="grow"></div>
+              <Button
+                v-tooltip="`Load live version`"
+                icon="iconify iconify solar--cloud-download-linear"
+                variant="outlined"
+                @click.stop.prevent="loadProject(project.id, { live: true })"
+              />
+              <Button
+                icon="iconify iconify solar--settings-linear"
+                variant="outlined"
+                @click.stop.prevent="openCacheDialog(project.id, true)"
+              />
+            </div>
+            <div
+              v-if="project.source === 'local'"
+              class="flex flex-col items-center gap-1 grow"
+            >
+              <div
+                v-tooltip.bottom="
+                  `Cached on ${isNotNil(project.cachedAt) ? format(project.cachedAt, 'yyyy-MM-dd') : 'unknown time'}`
+                "
+                class="iconify solar--archive-broken size-6 text-emerald-500"
+              />
+              <div class="grow"></div>
+
+              <Button
+                icon="iconify iconify solar--settings-linear"
+                variant="outlined"
+                @click.stop.prevent="openCacheDialog(project.id, true)"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -45,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+import { format } from 'date-fns';
 import {
   __,
   all,
@@ -56,79 +128,48 @@ import {
   toLower,
 } from 'ramda';
 
-import { useProjectStore } from '~/composables/store/project';
-import { useViewerStore } from '~/composables/store/viewer';
-import { bufferToString } from '~/composables/utils';
-import { sleep } from '~/composables/utils/sleep';
-import type { ViewerProjectList } from '~/composables/viewer';
+import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
-const { projectList } = defineProps<{
-  projectList: ViewerProjectList;
+const $dialog = useDialog();
+
+defineProps<{
   compact?: boolean;
 }>();
 
-const { loadProject } = useProjectStore();
-const { toggleProjectMenu } = useViewerStore();
+const { projectList, librarySettings, loadProject } = useViewerLibrary();
 
 const search = ref<string>('');
 
 const projects = computed(() => {
-  if (isEmpty(search.value)) return projectList.items;
+  if (isEmpty(search.value)) return projectList.value;
   else {
     const searchStr = toLower(search.value);
     const terms = split(' ', searchStr);
-    return projectList.items.filter((project) => {
+    return projectList.value.filter((project) => {
       const title = toLower(project.title);
       return all(includes(__, title), terms);
     });
   }
 });
 
-const loadRemoteFile = async (project: ViewerProject) => {
-  const fileURL = project.file_url;
-  if (!fileURL) return;
-
-  toggleProjectMenu(false);
-  await loadProject(async (setProgress) => {
-    const response = await fetch(fileURL);
-    if (response.ok) {
-      const reader = response.body!.getReader();
-
-      let received = 0;
-      const chunks = [];
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        chunks.push(value);
-        received += value.length;
-
-        const receivedMB = received / (1024 * 1024);
-        const neat = Math.round(receivedMB * 100) / 100;
-        await setProgress(`Downloaded ${neat} Mb`);
-      }
-
-      await setProgress(`Loading ${project.title} ...`);
-      // A hack, but otherwise the progress value never updates before loadProject is called
-      await sleep(100);
-
-      const bodyBytes = new Uint8Array(received);
-      let pos = 0;
-      for (const chunk of chunks) {
-        bodyBytes.set(chunk, pos);
-        pos += chunk.length;
-      }
-
-      return {
-        fileContents: bufferToString(bodyBytes.buffer),
-        fileName: fileURL.toString(),
-      };
-    } else {
-      throw new Error(
-        `HTTP Request failed with ${response.status}: ${response.statusText}`,
-      );
-    }
+const LazyCacheDialog = defineAsyncComponent(
+  () => import('./menu/CacheDialog.vue'),
+);
+const openCacheDialog = async (id: string, update?: boolean) => {
+  $dialog.open(LazyCacheDialog, {
+    props: {
+      header: update ? 'Manage Project Cache' : 'Download Project',
+      modal: true,
+      style: {
+        width: '60vw',
+      },
+      breakpoints: {
+        '960px': '75vw',
+        '640px': '90vw',
+        '480px': '100vw',
+      },
+    },
+    data: { projectId: id },
   });
 };
 </script>
@@ -161,6 +202,14 @@ const loadRemoteFile = async (project: ViewerProject) => {
   overflow: clip;
   align-items: center;
   cursor: pointer;
+
+  &.cached {
+    border-color: var(--p-indigo-500);
+  }
+
+  &.local {
+    border-color: var(--p-cyan-500);
+  }
 
   .thumbnail {
     flex-grow: 0;
@@ -224,6 +273,15 @@ const loadRemoteFile = async (project: ViewerProject) => {
     font-size: 0.8rem;
     color: var(--p-stone-600);
     font-style: italic;
+  }
+
+  .project-actions {
+    flex-grow: 0;
+    padding: 0.75rem;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
   }
 
   &.compact {

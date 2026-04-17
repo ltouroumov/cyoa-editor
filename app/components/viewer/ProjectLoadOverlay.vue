@@ -22,12 +22,13 @@ import { isEmpty, isNotNil, map, reverse, sortBy, sum } from 'ramda';
 
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import { useSettingRefs, useSettingStore } from '~/composables/store/settings';
-import { useViewerRefs } from '~/composables/store/viewer';
 import { sleep } from '~/composables/utils/sleep';
+import type { ViewerProject } from '~/composables/viewer/types';
+import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
 const { store } = useProjectRefs();
 const config = useRuntimeConfig();
-const { viewerProjectList } = useViewerRefs();
+const { projectList, librarySettings } = useViewerLibrary();
 const { loadProject } = useProjectStore();
 const { hasPreference } = useSettingStore();
 const { loadProjectOnStartup } = useSettingRefs();
@@ -92,7 +93,7 @@ randomizeBackground();
 useIntervalFn(randomizeBackground, 5000);
 
 const getProjectData = (projectId: string): ViewerProject | undefined => {
-  return R.find(R.propEq(projectId, 'id'), viewerProjectList.value.items);
+  return R.find(R.propEq(projectId, 'id'), projectList.value);
 };
 
 onMounted(async () => {
@@ -108,9 +109,9 @@ onMounted(async () => {
     project = getProjectData(loadProjectOnStartup.value)!;
   }
 
-  if (isNotNil(viewerProjectList.value.default)) {
+  if (isNotNil(librarySettings.value.default)) {
     shouldLoadProject = true;
-    project = getProjectData(viewerProjectList.value.default)!;
+    project = getProjectData(librarySettings.value.default)!;
   }
 
   if (shouldLoadProject && project) {

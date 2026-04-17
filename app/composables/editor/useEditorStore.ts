@@ -4,7 +4,7 @@ import { append, dropLast, take } from 'ramda';
 import type {
   EditorProject,
   EditorProjectVersion,
-} from '~/composables/shared/tables/projects';
+} from '~/composables/shared/tables/editor_projects';
 
 type EditorStatus = 'empty' | 'loading' | 'ready';
 

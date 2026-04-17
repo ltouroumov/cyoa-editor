@@ -14,14 +14,14 @@
         </div>
       </li>
       <li
-        v-if="isNil(viewerProjectList.default)"
+        v-if="isNil(librarySettings.default)"
         class="flex flex-col gap-2 py-2"
       >
         <label class="grow" for="hideDisabledAddons"> Default Project </label>
         <Select
           v-model="loadOnStartup"
           aria-label="Default CYOA to load at Startup"
-          :options="projectList"
+          :options="projectListItems"
           option-label="name"
           option-value="value"
           class="grow"
@@ -118,6 +118,26 @@
         </div>
       </li>
     </ul>
+    <h5 class="text-xl text-primary font-bold">Cache</h5>
+    <ul class="flex flex-col gap-0">
+      <li
+        class="flex flex-row items-center gap-2 py-2 border-b border-surface-700"
+      >
+        <Checkbox
+          v-model="hideRemoteImages"
+          input-id="hideRemoteImages"
+          binary
+        />
+        <div class="flex flex-col gap-1">
+          <label class="form-check-label" for="hideRemoteImages">
+            Hide Remote Images
+          </label>
+          <small class="text-slate-500 text-sm">
+            Only show images that have been cached
+          </small>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -129,9 +149,9 @@ import {
   DisplaySettingsPresets,
   useSettingRefs,
 } from '~/composables/store/settings';
-import { useViewerRefs } from '~/composables/store/viewer';
+import { useViewerLibrary } from '~/composables/viewer/useViewerLibrary';
 
-const { viewerProjectList } = useViewerRefs();
+const { projectList, librarySettings } = useViewerLibrary();
 const {
   showDisabledAddonsInBackpack,
   hideImagesInBackpack,
@@ -139,6 +159,7 @@ const {
   lockBackpackObjects,
   displaySettings,
   lightThemeUI,
+  hideRemoteImages,
   loadProjectOnStartup,
 } = useSettingRefs();
 
@@ -156,13 +177,13 @@ const loadOnStartup = computed({
   },
 });
 
-const projectList = computed(() => {
+const projectListItems = computed(() => {
   return prepend(
     {
       name: 'None (show menu)',
       value: '--none',
     },
-    viewerProjectList.value.items.map((project) => {
+    projectList.value.map((project) => {
       return { name: project.title, value: project.id };
     }),
   );

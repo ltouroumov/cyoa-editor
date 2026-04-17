@@ -77,7 +77,7 @@
 import { assoc, includes, isEmpty, isNotNil, omit, pipe } from 'ramda';
 
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
-import type { EditorProject } from '~/composables/shared/tables/projects';
+import type { EditorProject } from '~/composables/shared/tables/editor_projects';
 import { useDexie } from '~/composables/shared/useDexie';
 import { useLiveQuery } from '~/composables/shared/useLiveQuery';
 
@@ -86,7 +86,7 @@ const dexie = useDexie();
 
 const search = ref<string>('');
 const projects = useLiveQuery<EditorProject[]>(() => {
-  return dexie.projects
+  return dexie.editor_projects
     .filter(
       (project) =>
         !project.deleted &&
@@ -101,9 +101,9 @@ const doLoad = async (id: number) => {
 };
 
 const doDownload = async (id: number) => {
-  const project = (await dexie.projects.get(id))!;
+  const project = (await dexie.editor_projects.get(id))!;
   if (project.currentVersionId) {
-    const version = (await dexie.projects_versions.get(
+    const version = (await dexie.editor_projects_versions.get(
       project.currentVersionId,
     ))!;
     const projectData = JSON.stringify(version?.data);
@@ -124,20 +124,20 @@ const doDownload = async (id: number) => {
 
 const doDelete = async (id: number) => {
   // Soft-delete the project
-  await dexie.projects.update(id, (project) => {
+  await dexie.editor_projects.update(id, (project) => {
     project.deleted = true;
   });
 };
 
 const doClone = async (id: number) => {
-  const project = await dexie.projects.get(id);
+  const project = await dexie.editor_projects.get(id);
   if (isNotNil(project)) {
     const newProject = pipe(
       omit(['id', 'currentVersionId']),
       assoc('createdAt', new Date()),
       assoc('updatedAt', new Date()),
     )(project);
-    await dexie.projects.add(newProject);
+    await dexie.editor_projects.add(newProject);
   }
 };
 </script>
