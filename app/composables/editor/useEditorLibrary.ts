@@ -95,7 +95,7 @@ export function useEditorLibrary() {
   async function initializeFromHash() {
     const hashState = restoreFromHash();
     if (hashState.projectId) {
-      const project = await dexie.projects.get(hashState.projectId);
+      const project = await dexie.editor_projects.get(hashState.projectId);
       if (project) {
         await loadProject(hashState.projectId, true);
       }

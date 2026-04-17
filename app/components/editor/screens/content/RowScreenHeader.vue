@@ -38,21 +38,21 @@
           <RowHeaderForm :row-id="rowId" />
         </div>
         <div class="flex flex-row gap-2">
-          <div class="flex flex-col grow">
+          <div class="flex flex-col grow flex-1">
             <div class="border-b border-surface-700 pb-1 mb-2">
               <div class="text-xl font-bold text-primary">Layout</div>
             </div>
             <RowLayoutForm :row-id="rowId" />
           </div>
-          <div class="flex flex-col grow">
+          <div class="flex flex-col grow flex-1">
             <div class="border-b border-surface-700 pb-1 mb-2">
               <div class="text-xl font-bold text-primary">Requirements</div>
             </div>
             <RowRequirementsForm :row-id="rowId" />
           </div>
-          <div class="flex flex-col grow">
+          <div class="flex flex-col grow flex-1">
             <div class="border-b border-surface-700 pb-1 mb-2">
-              <div class="text-xl font-bold text-primary">Requirements</div>
+              <div class="text-xl font-bold text-primary">Row Styles</div>
             </div>
             <RowStyleForm :row-id="rowId" />
           </div>
