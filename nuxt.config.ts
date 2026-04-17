@@ -132,6 +132,7 @@ export default defineNuxtConfig({
     },
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      navigateFallbackDenylist: [/\/export\.html$/],
     },
     // injectManifest: {
     //   globPatterns: ['**/*.{js,css,html,png,svg,ico}'],

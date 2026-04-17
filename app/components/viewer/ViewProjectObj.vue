@@ -311,22 +311,22 @@ const isInBackpack = computed<boolean>(() => {
     &.obj-template-top {
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: auto auto auto;
-      grid-template-areas: 'image' 'header' 'content';
+      grid-template-rows: auto auto auto auto;
+      grid-template-areas: 'image' 'header' 'content' 'controls';
       align-content: start;
     }
     &.obj-template-left {
       display: grid;
       grid-template-columns: 1fr 2fr;
-      grid-template-rows: auto 1fr;
-      grid-template-areas: 'image header' 'image content';
+      grid-template-rows: auto 1fr auto;
+      grid-template-areas: 'image header' 'image content' 'controls controls';
       align-content: start;
     }
     &.obj-template-right {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      grid-template-rows: auto 1fr;
-      grid-template-areas: 'header image' 'content image';
+      grid-template-rows: auto 1fr auto;
+      grid-template-areas: 'header image' 'content image' 'controls controls';
       align-content: start;
     }
 
@@ -387,6 +387,7 @@ const isInBackpack = computed<boolean>(() => {
     justify-content: center;
     align-items: center;
 
+    grid-area: controls;
     position: relative;
 
     &.floating {
