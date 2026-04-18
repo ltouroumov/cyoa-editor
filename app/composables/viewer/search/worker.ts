@@ -29,7 +29,7 @@ import type {
   ProjectRow,
   Score,
 } from '~/composables/project/types/v1';
-import { sanitizeString } from '~/composables/viewer/search/norm';
+import { foldDiacritics, sanitizeString } from '~/composables/viewer/search/norm';
 import type {
   SearchEvent,
   WorkerSearchResult,
@@ -93,7 +93,7 @@ self.addEventListener(
 );
 
 function normalizeSearchQuery(query: string) {
-  return sanitizeString(query.trim().toLowerCase().normalize('NFD'));
+  return foldDiacritics(sanitizeString(query.trim().toLowerCase()));
 }
 
 function doSearch(query: string) {
@@ -220,12 +220,12 @@ function createSearchFunction(searchText: string) {
   };
 
   const matchesOne = (args: string[], text: string): boolean => {
-    const textLC = text.toLowerCase();
+    const textLC = foldDiacritics(text.toLowerCase());
     return any((term) => matchTerm(term, textLC), args);
   };
 
   const matchesAll = (args: string[], text: string): boolean => {
-    const textLC = text.toLowerCase();
+    const textLC = foldDiacritics(text.toLowerCase());
     return all((term) => matchTerm(term, textLC), args);
   };
 
