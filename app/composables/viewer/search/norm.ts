@@ -50,3 +50,7 @@ export const sanitizeString = (query: string) => {
     return acc.replaceAll(char, stdChar);
   }, query);
 };
+
+/** Strips combining diacritical marks after NFD decomposition. */
+export const foldDiacritics = (s: string): string =>
+  s.normalize('NFD').replace(/\p{M}/gu, '');
