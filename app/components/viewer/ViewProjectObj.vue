@@ -73,34 +73,34 @@
             />
           </div>
         </div>
+      </div>
+      <div
+        class="obj-controls"
+        :class="{
+          show: showControls,
+          floating: showFloatingControls,
+          sticky: showStickyControls,
+        }"
+        @click.stop.prevent="showMore()"
+      >
         <div
-          class="obj-controls"
-          :class="{
-            show: showControls,
-            floating: showFloatingControls,
-            sticky: showStickyControls,
-          }"
-          @click.stop.prevent="showMore()"
+          class="controls flex flex-row justify-center items-center cursor-pointer py-1"
         >
-          <div
-            class="controls flex flex-row justify-center items-center cursor-pointer py-1"
-          >
-            <div class="scroll-btn flex flex-row items-center">
-              <div
-                class="iconify size-6 carbon--zoom-in bg-surface-200 text-surface-200"
-              />
-              <span v-if="isNotEmpty(obj.addons)">
-                {{ length(obj.addons) }}
-                {{ length(obj.addons) > 1 ? 'Addons' : 'Addon' }} ...
-              </span>
-              <span v-else>More ...</span>
-            </div>
+          <div class="scroll-btn flex flex-row items-center">
+            <div
+              class="iconify size-6 carbon--zoom-in bg-surface-200 text-surface-200"
+            />
+            <span v-if="isNotEmpty(obj.addons)">
+              {{ length(obj.addons) }}
+              {{ length(obj.addons) > 1 ? 'Addons' : 'Addon' }} ...
+            </span>
+            <span v-else>More ...</span>
           </div>
-          <div
-            v-if="showStickyControls || showFloatingControls"
-            class="background"
-          ></div>
         </div>
+        <div
+          v-if="showStickyControls || showFloatingControls"
+          class="background"
+        ></div>
       </div>
     </div>
   </div>
@@ -213,6 +213,14 @@ const objBgColor = computed(() => {
 
 const objContentRef = useTemplateRef('objContentRef');
 const objContentSize = useElementSize(objContentRef);
+const hasOverflow = computed<boolean>(() => {
+  // showObjectControls is 'auto'
+  // Access these properties to trigger reactivity on changes
+  const _ = [objContentSize.height.value, objContentSize.width.value];
+  const objContentEl = objContentRef.value;
+  if (!objContentEl) return false;
+  return objContentEl.scrollHeight > objContentEl.clientHeight;
+});
 const showControls = computed<boolean>(() => {
   if ($props.display?.showObjectControls === 'always') {
     return isNotEmpty($props.obj.text) || isNotEmpty($props.obj.addons);
@@ -226,8 +234,7 @@ const showControls = computed<boolean>(() => {
     if (!objContentEl) return false;
     return (
       !$props.allowOverflow &&
-      (objContentEl.scrollHeight > objContentEl.clientHeight ||
-        isNotEmpty($props.obj.addons))
+      (hasOverflow.value || isNotEmpty($props.obj.addons))
     );
   } else {
     return false;
@@ -296,6 +303,7 @@ const isInBackpack = computed<boolean>(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   &.hideDisabledAddons {
     .addon.disabled {
@@ -311,22 +319,22 @@ const isInBackpack = computed<boolean>(() => {
     &.obj-template-top {
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: auto auto auto auto;
-      grid-template-areas: 'image' 'header' 'content' 'controls';
+      grid-template-rows: auto auto auto;
+      grid-template-areas: 'image' 'header' 'content';
       align-content: start;
     }
     &.obj-template-left {
       display: grid;
       grid-template-columns: 1fr 2fr;
-      grid-template-rows: auto 1fr auto;
-      grid-template-areas: 'image header' 'image content' 'controls controls';
+      grid-template-rows: auto 1fr;
+      grid-template-areas: 'image header' 'image content';
       align-content: start;
     }
     &.obj-template-right {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      grid-template-rows: auto 1fr auto;
-      grid-template-areas: 'header image' 'content image' 'controls controls';
+      grid-template-rows: auto 1fr;
+      grid-template-areas: 'header image' 'content image';
       align-content: start;
     }
 
@@ -387,7 +395,7 @@ const isInBackpack = computed<boolean>(() => {
     justify-content: center;
     align-items: center;
 
-    grid-area: controls;
+    // grid-area: controls;
     position: relative;
 
     &.floating {
