@@ -24,6 +24,7 @@ const $props = defineProps<{
   alwaysEnable?: boolean;
 }>();
 
+const isVisible = ref<boolean>(false);
 const imageSrc = ref<string | null>(null);
 
 const wrapper = ref<HTMLDivElement>();
@@ -34,9 +35,7 @@ const handleObserver: IntersectionObserverCallback = (entries) => {
       entry.target === wrapper.value &&
       isNil(imageSrc.value)
     ) {
-      loadImageSrc($props.element).then((src) => {
-        imageSrc.value = src;
-      });
+      isVisible.value = true;
     }
   });
 };
@@ -51,6 +50,14 @@ onMounted(() => {
 });
 onUnmounted(() => {
   observer.disconnect();
+});
+
+watch([isVisible, () => $props.element], ([isVisible0, newValue]) => {
+  if (isVisible0) {
+    loadImageSrc(newValue).then((src) => {
+      imageSrc.value = src;
+    });
+  }
 });
 </script>
 
