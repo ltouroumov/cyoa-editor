@@ -93,6 +93,12 @@ export default defineNuxtConfig({
         'ts-pattern',
         'rxjs',
         'quill',
+        'workbox-window',
+        'date-fns',
+        'js-base64',
+        'canvas-size',
+        'dom-to-svg',
+        'handlebars', // CJS
       ],
     },
   },

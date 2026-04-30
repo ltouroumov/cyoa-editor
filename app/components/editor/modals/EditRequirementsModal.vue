@@ -3,11 +3,12 @@
 </template>
 
 <script setup lang="ts">
-const dialogRef = inject<Ref<{ data: any }>>('dialogRef');
+type DialogProps = { objectId: string; objectType: 'row' | 'obj' };
+const dialogRef = inject<Ref<{ data: DialogProps }>>('dialogRef');
 
 onMounted(() => {
-  const params = dialogRef?.value?.data;
-  console.log('Edit Requirements modal opened with params:', params);
+  const { objectId, objectType } = dialogRef?.value?.data ?? {};
+  console.log('Edit Requirements for', objectId, objectType);
 });
 </script>
 
