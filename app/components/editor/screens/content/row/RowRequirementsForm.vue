@@ -67,6 +67,8 @@ const doEditRequirements = () => {
     props: {
       header: `Edit Requirements for ${row.value.name}`,
       modal: true,
+      draggable: false,
+      position: 'top',
     },
   });
 };

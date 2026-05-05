@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-row gap-1">
     <div class="flex flex-col items-center">
-      <!--      <div class="border-b border-surface-600 my-2 w-1/2"></div>-->
-      <!--      <div class="border-s border-surface-600 flex-1"></div>-->
       <div class="bg-surface-800 px-2 py-1 rounded mb-2">OR</div>
       <div class="border-s border-surface-600 flex-1"></div>
       <div class="border-b border-surface-600 my-2 w-1/2"></div>

@@ -15,13 +15,17 @@
         size="small"
         variant="text"
         severity="secondary"
+        @click="$emit('remove')"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { IsSelectedCondition } from '~/composables/project/types/v2/condition';
+import type {
+  ConditionTerm,
+  IsSelectedCondition,
+} from '~/composables/project/types/v2/condition';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
@@ -29,6 +33,11 @@ const $project = useProjectStore();
 
 const $props = defineProps<{
   term: IsSelectedCondition;
+}>();
+
+const $emit = defineEmits<{
+  (e: 'update', term: ConditionTerm): void;
+  (e: 'remove'): void;
 }>();
 
 const name = computed(() => {

@@ -9,13 +9,19 @@
         icon="iconify solar--trash-bin-trash-line-duotone"
         size="small"
         variant="text"
+        @click="$emit('update', undefined)"
       />
     </div>
     <div
       v-if="isNotNil($props.condition)"
       class="p-2 bg-surface-900 border border-surface-700 font-mono"
     >
-      <EditConditionTerm :term="$props.condition" :depth="0" />
+      <EditConditionTerm
+        :term="$props.condition"
+        :depth="0"
+        @update="(newValue) => $emit('update', newValue)"
+        @remove="$emit('update', undefined)"
+      />
     </div>
     <div v-else>add condition</div>
   </div>
@@ -32,7 +38,7 @@ const $props = defineProps<{
 }>();
 
 const $emit = defineEmits<{
-  (e: 'update', condition: ConditionTerm): void;
+  (e: 'update', condition: ConditionTerm | undefined): void;
 }>();
 </script>
 

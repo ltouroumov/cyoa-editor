@@ -4,27 +4,20 @@
     <EditCondition
       title="Display Condition"
       :condition="object.requirements.display"
-      @update="
-        (condition) => {
-          console.log('update display condition', condition);
-        }
-      "
+      @update="(condition) => setRowDisplay(condition)"
     />
     <EditCondition
       title="Choices Condition"
       :condition="object.requirements.choices"
-      @update="
-        (condition) => {
-          console.log('update choices condition', condition);
-        }
-      "
+      @update="(condition) => setRowChoices(condition)"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { isNil } from 'ramda';
+import { assocPath, isNil, isNotNil } from 'ramda';
 
+import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 import type { AnyObject } from '~/composables/project/types/v2/objects';
 import type { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
@@ -42,6 +35,26 @@ onMounted(() => {
     object.value = $project.get(objectId, objectType);
   }
 });
+
+const setRowDisplay = (condition: ConditionTerm | undefined) => {
+  if (isNotNil(object.value) && object.value.type === 'row') {
+    object.value = assocPath(
+      ['requirements', 'display'],
+      condition,
+      object.value,
+    );
+  }
+};
+
+const setRowChoices = (condition: ConditionTerm | undefined) => {
+  if (isNotNil(object.value) && object.value.type === 'row') {
+    object.value = assocPath(
+      ['requirements', 'choices'],
+      condition,
+      object.value,
+    );
+  }
+};
 </script>
 
 <style scoped lang="scss"></style>

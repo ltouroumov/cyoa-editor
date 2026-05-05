@@ -4,6 +4,8 @@
       :is="dispatch.component"
       :term="$props.term"
       :depth="$props.depth"
+      @update="(newValue: ConditionTerm) => $emit('update', newValue)"
+      @remove="$emit('remove')"
     />
     <div v-if="depth === 0" class="flex flex-row mt-4 items-center">
       <div class="border-t border-surface-600 flex-1"></div>
@@ -35,8 +37,11 @@ import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 const $props = defineProps<{
   term: ConditionTerm;
   depth: number;
-  showHandles?: boolean;
-  showCombine?: boolean;
+}>();
+
+const $emit = defineEmits<{
+  (e: 'update', term: ConditionTerm): void;
+  (e: 'remove'): void;
 }>();
 
 const dispatch = computed<{ component: any }>(() => {
