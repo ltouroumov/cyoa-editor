@@ -2029,6 +2029,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@iconify-json/material-symbols-light@npm:1.2.69":
+  version: 1.2.69
+  resolution: "@iconify-json/material-symbols-light@npm:1.2.69"
+  dependencies:
+    "@iconify/types": "npm:*"
+  checksum: 10/af5b8fc8f0828d4913a3983636e5b290a9fb37490a3d581c52bdb4e830634669513a5cfbf659a9747b12ecebfde172b8b43ff2121e3a8e7ace44a3d35812c121
+  languageName: node
+  linkType: hard
+
+"@iconify-json/material-symbols@npm:^1.2.69":
+  version: 1.2.69
+  resolution: "@iconify-json/material-symbols@npm:1.2.69"
+  dependencies:
+    "@iconify/types": "npm:*"
+  checksum: 10/7c1c4b3eb9bbd715caf8257b8828a64ea060c2bc0e16aeaaed68ec320ca5d2a7bc366f5cb968167b6163f70cae3c19bd1d5069684a7b9a1823b4390e6c03581f
+  languageName: node
+  linkType: hard
+
 "@iconify-json/solar@npm:1.2.5":
   version: 1.2.5
   resolution: "@iconify-json/solar@npm:1.2.5"
@@ -8627,6 +8645,8 @@ __metadata:
   dependencies:
     "@eslint/js": "npm:10.0.1"
     "@iconify-json/carbon": "npm:1.2.20"
+    "@iconify-json/material-symbols": "npm:^1.2.69"
+    "@iconify-json/material-symbols-light": "npm:1.2.69"
     "@iconify-json/solar": "npm:1.2.5"
     "@iconify/tailwind4": "npm:1.2.1"
     "@nuxt/devtools": "npm:3.2.4"

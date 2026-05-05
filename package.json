@@ -43,6 +43,8 @@
   },
   "dependencies": {
     "@iconify-json/carbon": "1.2.20",
+    "@iconify-json/material-symbols": "1.2.69",
+    "@iconify-json/material-symbols-light": "1.2.69",
     "@iconify-json/solar": "1.2.5",
     "@iconify/tailwind4": "1.2.1",
     "@pinia/nuxt": "0.11.3",
