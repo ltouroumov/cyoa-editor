@@ -8,14 +8,15 @@
       <label>Display Condition</label>
       <div
         v-if="row.requirements.display"
-        class="p-component p-inputtext flex flex-row gap-1 items-start"
+        class="p-component p-inputtext flex flex-row gap-1 items-center"
       >
-        <ConditionDisplayShort :term="row.requirements.display" class="grow" />
+        <ConditionDisplayShort :term="row.requirements.display" />
         <IconButton
           severity="secondary"
           icon="iconify solar--pen-line-duotone"
           class="shrink-0"
-          @click="doEditRequirements()"
+          size="small"
+          @click="doEditDisplayRequirements()"
         />
       </div>
       <div
@@ -23,12 +24,39 @@
         class="p-component p-inputtext flex flex-row gap-1 items-center"
       >
         <div class="text-secondary grow">Always Visible</div>
-
         <IconButton
           severity="secondary"
           icon="iconify solar--add-circle-line-duotone"
           class="shrink-0"
-          @click="doEditRequirements()"
+          @click="doEditDisplayRequirements()"
+        />
+      </div>
+    </IftaLabel>
+    <IftaLabel>
+      <label>Choice Condition</label>
+      <div
+        v-if="row.requirements.choices"
+        class="p-component p-inputtext flex flex-row gap-1 items-center"
+      >
+        <ConditionDisplayShort :term="row.requirements.choices" />
+        <IconButton
+          severity="secondary"
+          icon="iconify solar--pen-line-duotone"
+          class="shrink-0"
+          size="small"
+          @click="doEditChoiceRequirements()"
+        />
+      </div>
+      <div
+        v-else
+        class="p-component p-inputtext flex flex-row gap-1 items-center"
+      >
+        <div class="text-muted-color grow">Always Enabled</div>
+        <IconButton
+          severity="secondary"
+          icon="iconify solar--add-circle-line-duotone"
+          class="shrink-0"
+          @click="doEditChoiceRequirements()"
         />
       </div>
     </IftaLabel>
@@ -37,17 +65,15 @@
 
 <script setup lang="ts">
 import type { DynamicDialogCloseOptions } from 'primevue/dynamicdialogoptions';
-import { isNil, mergeRight } from 'ramda';
+import { P, match } from 'ts-pattern';
 
-import type {
-  RowObject,
-  RowRequirements,
-} from '~/composables/project/types/v2/objects';
+import type { ConditionTerm } from '~/composables/project/types/v2/condition';
+import type { RowObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
-const LazyEditRequirementsModal = defineAsyncComponent(
-  () => import('~/components/editor/modals/EditRequirementsModal.vue'),
+const LazyEditConditionModal = defineAsyncComponent(
+  () => import('~/components/editor/modals/EditConditionModal.vue'),
 );
 const $dialog = useDialog();
 
@@ -60,25 +86,56 @@ const row = computed((): RowObject => {
   return projectStore.get(props.rowId, ObjectType.row)!;
 });
 
-const doEditRequirements = () => {
-  console.log('Editing requirements for row', row.value.name);
-  $dialog.open(LazyEditRequirementsModal, {
+const doEditDisplayRequirements = () => {
+  $dialog.open(LazyEditConditionModal, {
     data: {
-      objectId: props.rowId,
-      objectType: ObjectType.row,
+      term: row.value.requirements.display,
     },
     onClose: (
       options: DynamicDialogCloseOptions<
-        Omit<RowRequirements, 'allowedChoices'>
+        { update: ConditionTerm } | { remove: true }
       >,
     ) => {
-      if (isNil(options.data)) return;
+      match(options.data)
+        .with({ update: P.select() }, (term: ConditionTerm) => {
+          row.value.requirements.display = term;
+        })
+        .with({ remove: true }, () => {
+          row.value.requirements.display = undefined;
+        })
+        .otherwise(() => {
+          // no changes, the operation was cancelled
+        });
+    },
+    props: {
+      header: `Edit Requirements for ${row.value.name}`,
+      modal: true,
+      draggable: false,
+      position: 'top',
+    },
+  });
+};
 
-      console.log('Edit Requirements modal closed', options?.data);
-      row.value.requirements = mergeRight(
-        row.value.requirements,
-        options?.data,
-      );
+const doEditChoiceRequirements = () => {
+  $dialog.open(LazyEditConditionModal, {
+    data: {
+      term: row.value.requirements.choices,
+    },
+    onClose: (
+      options: DynamicDialogCloseOptions<
+        { update: ConditionTerm } | { remove: true }
+      >,
+    ) => {
+      match(options.data)
+        .with({ update: P.select() }, (term: ConditionTerm) => {
+          row.value.requirements.choices = term;
+        })
+        .with({ remove: true }, () => {
+          row.value.requirements.choices = undefined;
+        })
+        .otherwise(() => {
+          // no changes, the operation was cancelled
+        });
     },
     props: {
       header: `Edit Requirements for ${row.value.name}`,

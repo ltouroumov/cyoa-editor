@@ -1,6 +1,6 @@
 <template>
-  <div class="overflow-x-hidden">
-    <span class="float-left">{{ termText }}</span>
+  <div class="truncate">
+    {{ termText }}
   </div>
 </template>
 

@@ -37,7 +37,7 @@
           </div>
           <RowHeaderForm :row-id="rowId" />
         </div>
-        <div class="flex flex-row gap-2">
+        <div class="grid grid-cols-3 gap-2">
           <div class="flex flex-col grow flex-1">
             <div class="border-b border-surface-700 pb-1 mb-2">
               <div class="text-xl font-bold text-primary">Layout</div>

@@ -1,15 +1,6 @@
 <template>
   <div class="flex flex-col gap-2">
     <div class="flex flex-row items-center gap-2">
-      <IconButton
-        variant="text"
-        :icon="
-          expand
-            ? 'iconify solar--alt-arrow-down-bold'
-            : 'iconify solar--alt-arrow-right-bold'
-        "
-        @click="expand = !expand"
-      />
       <span class="font-bold text-primary text-md flex-1">
         {{ title }}
       </span>
@@ -20,9 +11,16 @@
         variant="text"
         @click="$emit('update', undefined)"
       />
+      <IconButton
+        v-if="isNil($props.condition)"
+        icon="iconify solar--add-circle-line-duotone"
+        size="small"
+        variant="text"
+        @click="addCondition()"
+      />
     </div>
     <div
-      v-if="isNotNil($props.condition) && expand"
+      v-if="isNotNil($props.condition)"
       class="p-2 bg-surface-900 border border-surface-700 font-mono"
     >
       <EditConditionTerm
@@ -32,14 +30,22 @@
         @remove="$emit('update', undefined)"
       />
     </div>
-    <div v-else>add condition</div>
+    <div
+      v-else
+      class="p-2 bg-surface-900 border border-surface-700 font-mono min-h-50 text-muted-color"
+    >
+      No Condition
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { isNotNil } from 'ramda';
+import { isNil, isNotNil } from 'ramda';
 
+import { useAddConditionModal } from '~/components/editor/modals/requirements/useAddConditionModal';
 import type { ConditionTerm } from '~/composables/project/types/v2/condition';
+
+const { showAddConditionModal } = useAddConditionModal();
 
 const $props = defineProps<{
   title: string;
@@ -50,7 +56,9 @@ const $emit = defineEmits<{
   (e: 'update', condition: ConditionTerm | undefined): void;
 }>();
 
-const expand = ref<boolean>(false);
+const addCondition = () => {
+  showAddConditionModal((term) => $emit('update', term));
+};
 </script>
 
 <style scoped lang="scss"></style>
