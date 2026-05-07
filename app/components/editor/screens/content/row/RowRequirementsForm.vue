@@ -36,7 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import type { RowObject } from '~/composables/project/types/v2/objects';
+import type { DynamicDialogCloseOptions } from 'primevue/dynamicdialogoptions';
+import { isNil, mergeRight } from 'ramda';
+
+import type {
+  RowObject,
+  RowRequirements,
+} from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
@@ -61,8 +67,18 @@ const doEditRequirements = () => {
       objectId: props.rowId,
       objectType: ObjectType.row,
     },
-    onClose: (options) => {
+    onClose: (
+      options: DynamicDialogCloseOptions<
+        Omit<RowRequirements, 'allowedChoices'>
+      >,
+    ) => {
+      if (isNil(options.data)) return;
+
       console.log('Edit Requirements modal closed', options?.data);
+      row.value.requirements = mergeRight(
+        row.value.requirements,
+        options?.data,
+      );
     },
     props: {
       header: `Edit Requirements for ${row.value.name}`,

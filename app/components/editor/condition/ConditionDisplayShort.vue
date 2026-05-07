@@ -1,5 +1,7 @@
 <template>
-  <span>{{ termText }}</span>
+  <div class="overflow-x-hidden">
+    <span class="float-left">{{ termText }}</span>
+  </div>
 </template>
 
 <script setup lang="ts">

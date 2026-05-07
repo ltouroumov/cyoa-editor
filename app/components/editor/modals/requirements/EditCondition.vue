@@ -1,6 +1,15 @@
 <template>
   <div class="flex flex-col gap-2">
     <div class="flex flex-row items-center gap-2">
+      <IconButton
+        variant="text"
+        :icon="
+          expand
+            ? 'iconify solar--alt-arrow-down-bold'
+            : 'iconify solar--alt-arrow-right-bold'
+        "
+        @click="expand = !expand"
+      />
       <span class="font-bold text-primary text-md flex-1">
         {{ title }}
       </span>
@@ -13,7 +22,7 @@
       />
     </div>
     <div
-      v-if="isNotNil($props.condition)"
+      v-if="isNotNil($props.condition) && expand"
       class="p-2 bg-surface-900 border border-surface-700 font-mono"
     >
       <EditConditionTerm
@@ -40,6 +49,8 @@ const $props = defineProps<{
 const $emit = defineEmits<{
   (e: 'update', condition: ConditionTerm | undefined): void;
 }>();
+
+const expand = ref<boolean>(false);
 </script>
 
 <style scoped lang="scss"></style>

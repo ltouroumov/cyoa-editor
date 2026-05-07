@@ -6,6 +6,15 @@ import type {
 import type { RowHeader } from '~/composables/project/types/v2/objects/components/header';
 import type { RowLayoutProps } from '~/composables/project/types/v2/objects/layout';
 
+export type RowRequirements = {
+  // Condition to display the row
+  display?: ConditionTerm;
+  // Condition that applies to all choices
+  choices?: ConditionTerm;
+  // Number of allowed choices
+  allowedChoices?: number;
+};
+
 export interface RowObject extends ObjectBase {
   type: ObjectType.row;
   name: string;
@@ -14,13 +23,5 @@ export interface RowObject extends ObjectBase {
   header?: RowHeader;
 
   layout: RowLayoutProps;
-
-  requirements: {
-    // Condition to display the row
-    display?: ConditionTerm;
-    // Condition that applies to all choices
-    choices?: ConditionTerm;
-    // Number of allowed choices
-    allowedChoices?: number;
-  };
+  requirements: RowRequirements;
 }

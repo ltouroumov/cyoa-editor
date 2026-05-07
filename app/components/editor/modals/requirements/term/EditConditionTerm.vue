@@ -11,12 +11,14 @@
       <div class="border-t border-surface-600 flex-1"></div>
       <div class="flex flex-row gap-2 mx-2">
         <div
-          class="bg-surface-800 px-2 py-1 rounded text-muted-color text-sm flex flex-row items-center gap-1"
+          class="bg-surface-800 px-2 py-1 rounded text-muted-color text-sm flex flex-row items-center gap-1 cursor-pointer"
+          @click="handleAddCondition('allOf')"
         >
           <span class="iconify solar--add-circle-line-duotone"></span> AND
         </div>
         <div
-          class="bg-surface-800 px-2 py-1 rounded text-muted-color text-sm flex flex-row items-center gap-1"
+          class="bg-surface-800 px-2 py-1 rounded text-muted-color text-sm flex flex-row items-center gap-1 cursor-pointer"
+          @click="handleAddCondition('anyOf')"
         >
           <span class="iconify solar--add-circle-line-duotone"></span> OR
         </div>
@@ -32,7 +34,10 @@ import { P, match } from 'ts-pattern';
 import EditAllOfTerm from '~/components/editor/modals/requirements/term/EditAllOfTerm.vue';
 import EditAnyOfTerm from '~/components/editor/modals/requirements/term/EditAnyOfTerm.vue';
 import EditSelectedTerm from '~/components/editor/modals/requirements/term/EditSelectedTerm.vue';
+import { useAddConditionModal } from '~/components/editor/modals/requirements/useAddConditionModal';
 import type { ConditionTerm } from '~/composables/project/types/v2/condition';
+
+const { showAddConditionModal } = useAddConditionModal();
 
 const $props = defineProps<{
   term: ConditionTerm;
@@ -57,6 +62,13 @@ const dispatch = computed<{ component: any }>(() => {
     }))
     .otherwise(() => ({ component: null }));
 });
+
+const handleAddCondition = (type: 'allOf' | 'anyOf') => {
+  showAddConditionModal((result) => {
+    const newTerm = { [type]: [$props.term, result] } as ConditionTerm;
+    $emit('update', newTerm);
+  });
+};
 </script>
 
 <style scoped lang="scss"></style>
