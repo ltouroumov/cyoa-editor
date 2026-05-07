@@ -1,5 +1,8 @@
 import type { ConditionTerm } from '~/composables/project/types/v2/condition';
-import type { ObjectCondition } from '~/composables/project/types/v2/objects/components/condition';
+import type {
+  ConditionMode,
+  ObjectCondition,
+} from '~/composables/project/types/v2/objects/components/condition';
 import type { ObjectScore } from '~/composables/project/types/v2/score';
 
 export enum ComponentType {
@@ -19,6 +22,7 @@ export interface VisibilityComponent extends BaseComponent<ComponentType.Visibil
 
 export interface RequirementsComponent extends BaseComponent<ComponentType.Requirements> {
   requirements: ObjectCondition[];
+  mode: ConditionMode;
 }
 
 export interface MultiSelectComponent extends BaseComponent<ComponentType.MultiSelect> {

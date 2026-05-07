@@ -209,6 +209,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         choiceObject.components[ComponentType.Requirements] = {
           type: ComponentType.Requirements,
           requirements: requirements,
+          mode: ConditionMode.all,
         };
       }
 

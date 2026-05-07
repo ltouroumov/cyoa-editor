@@ -1,7 +1,7 @@
 <template>
-  <div class="truncate">
+  <span class="truncate">
     {{ termText }}
-  </div>
+  </span>
 </template>
 
 <script setup lang="ts">
