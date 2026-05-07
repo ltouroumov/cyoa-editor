@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2 grow">
-    <div class="flex flex-col gap-2">
+    <div v-if="isNotEmpty(rowStyles)" class="flex flex-col gap-2">
       <div
         v-for="(style, idx) in rowStyles"
         :key="style.id"
@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { append, equals, indexOf, reject, swap, uniq } from 'ramda';
+import { append, equals, indexOf, isNotEmpty, reject, swap, uniq } from 'ramda';
 
 import type { RowObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
