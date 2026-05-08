@@ -22,11 +22,13 @@
                 outlined
                 severity="secondary"
                 icon="iconify solar--pen-line-duotone"
+                @click="editScore(score.id)"
               />
               <IconButton
                 outlined
                 severity="danger"
                 icon="iconify solar--trash-bin-trash-line-duotone"
+                @click="removeScore(score.id)"
               />
             </div>
           </div>
@@ -44,6 +46,7 @@
         <IconButton
           severity="secondary"
           icon="iconify solar--add-circle-line-duotone"
+          @click="addScore()"
         />
       </div>
     </div>
@@ -51,18 +54,39 @@
 </template>
 
 <script setup lang="ts">
-import { find, isNotNil } from 'ramda';
+import type { DynamicDialogCloseOptions } from 'primevue/dynamicdialogoptions';
+import {
+  append,
+  assoc,
+  clone,
+  find,
+  findIndex,
+  isNil,
+  isNotNil,
+  reject,
+  update,
+} from 'ramda';
 
 import IconButton from '~/components/utils/IconButton.vue';
 import { ScoreTypes } from '~/composables/editor/const';
+import { createId } from '~/composables/project/types/v2/id';
 import type { ChoiceObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import {
   ComponentType,
   type ScoresComponent,
 } from '~/composables/project/types/v2/objects/components/choice';
-import type { ScoreType } from '~/composables/project/types/v2/score';
+import {
+  type ObjectScore,
+  ScoreType,
+} from '~/composables/project/types/v2/score';
 import { useProjectStore } from '~/composables/project/useProjectStore';
+
+const LazyEditScoreModal = defineAsyncComponent(
+  () => import('~/components/editor/modals/EditScoreModal.vue'),
+);
+
+const $dialog = useDialog();
 
 const projectStore = useProjectStore();
 const props = defineProps<{
@@ -83,6 +107,67 @@ function getScoreTypeLabel(type: ScoreType): string {
 function getScoreName(scoreId: string) {
   return projectStore.scores.get(scoreId)?.title ?? 'Unknown';
 }
+
+const editScore = (id: string) => {
+  const condIdx = findIndex((cond) => cond.id === id, component.value.scores);
+  if (condIdx === -1) return;
+
+  $dialog.open(LazyEditScoreModal, {
+    data: {
+      score: clone(component.value.scores[condIdx]),
+    },
+    onClose: (options: DynamicDialogCloseOptions<{ update: ObjectScore }>) => {
+      if (isNil(options.data)) return;
+
+      component.value.scores = update(
+        condIdx,
+        options.data.update,
+        component.value.scores,
+      );
+    },
+    props: {
+      header: `Edit Requirement for ${choice.value.name}`,
+      modal: true,
+      draggable: false,
+      position: 'top',
+      style: { width: '60vw' },
+    },
+  });
+};
+
+const DefaultScore: Partial<ObjectScore> = {
+  type: ScoreType.Cost,
+};
+
+const addScore = () => {
+  $dialog.open(LazyEditScoreModal, {
+    data: {
+      score: clone(assoc('id', createId(), DefaultScore)),
+    },
+    onClose: (options: DynamicDialogCloseOptions<{ update: ObjectScore }>) => {
+      if (isNil(options.data)) return;
+
+      component.value.scores = append(
+        options.data.update,
+        component.value.scores,
+      );
+    },
+    props: {
+      header: `Edit Requirement for ${choice.value.name}`,
+      modal: true,
+      draggable: false,
+      position: 'top',
+      style: { width: '60vw' },
+    },
+  });
+};
+
+const removeScore = (id: string) => {
+  component.value.scores = reject(
+    (cond) => cond.id === id,
+    component.value.scores,
+  );
+};
 </script>
 
 <style scoped lang="scss"></style>
