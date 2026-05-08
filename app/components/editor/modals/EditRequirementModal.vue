@@ -102,73 +102,7 @@
         :compact="true"
         @update="updateActiveWhen($event)"
       />
-      <div class="flex flex-col gap-2">
-        <div class="flex flex-row items-center">
-          <div class="text-primary font-bold grow">Preview</div>
-          <div>
-            <SelectButton
-              v-model="previewSize"
-              option-label="label"
-              option-value="size"
-              :options="[
-                { label: 'Wide', size: 'w-full' },
-                { label: 'Medium', size: 'w-1/2' },
-                { label: 'Narrow', size: 'w-1/4' },
-              ]"
-            />
-          </div>
-        </div>
-        <div
-          class="flex flex-row border rounded border-surface-700 p-2 justify-center"
-        >
-          <div
-            class="flex flex-col gap-2 p-2 border rounded-xl border-primary"
-            :class="previewSize"
-          >
-            <div class="flex flex-row justify-center">
-              <Skeleton animation="none" height="2rem" width="60%" />
-            </div>
-            <div class="inline-flex flex-row flex-wrap gap-1 text-wrap">
-              <span>
-                {{
-                  isNotNil(object.beforeText) && isNotEmpty(object.beforeText)
-                    ? object.beforeText
-                    : getConditionTypeLabel(object.type)
-                }}:
-              </span>
-              <span
-                v-for="(objectId, idx) in object.objectIds"
-                :key="objectId"
-                class="inline-flex flex-row gap-0 text-wrap"
-              >
-                <span>{{ getChoiceName(objectId) }}</span>
-                <span
-                  v-if="
-                    isNotNil(object.termText) && isNotEmpty(object.termText)
-                  "
-                  class="ms-1"
-                >
-                  {{ object.termText }}
-                </span>
-                <span v-if="idx < object.objectIds.length - 1">, </span>
-              </span>
-              <span
-                v-if="
-                  isNotNil(object.afterText) && isNotEmpty(object.afterText)
-                "
-              >
-                {{ object.afterText }}
-              </span>
-            </div>
-            <div class="flex flex-col gap-1">
-              <Skeleton animation="none" />
-              <Skeleton animation="none" />
-              <Skeleton animation="none" />
-              <Skeleton animation="none" />
-            </div>
-          </div>
-        </div>
-      </div>
+
       <div class="flex flex-row justify-end gap-2">
         <Button severity="secondary" @click="close(undefined)">Cancel</Button>
         <Button @click="close({ update: object })">Save</Button>
@@ -179,7 +113,7 @@
 
 <script setup lang="ts">
 import type { DynamicDialogCloseOptions } from 'primevue/dynamicdialogoptions';
-import { append, find, isNil, isNotEmpty, isNotNil, reject } from 'ramda';
+import { append, find, isNil, isNotNil, reject } from 'ramda';
 
 import { useModalClient } from '~/components/editor/utils/useModalClient';
 import { ConditionTypes } from '~/composables/editor/const';
@@ -206,8 +140,6 @@ const { data: object, close } = useModalClient<
   ObjectCondition,
   DialogResult
 >((input: DialogInput) => input.condition);
-
-const previewSize = ref<string>('w-full');
 
 function getConditionTypeLabel(type: ConditionType): string {
   return find((ct) => ct.value === type, ConditionTypes)?.label ?? 'Unknown';
