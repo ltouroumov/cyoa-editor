@@ -51,13 +51,13 @@
               size="small"
               variant="text"
               severity="secondary"
-              @click="$emit('remove')"
+              @click="removeRequirement(objectId)"
             />
           </div>
           <div class="flex flex-row items-center">
             <div class="border-t border-surface-600 grow my-2"></div>
             <div class="mx-2">
-              <Button size="small" severity="secondary">
+              <Button size="small" severity="secondary" @click="addRequirement">
                 <span class="iconify solar--add-circle-line-duotone"></span>
                 Add
               </Button>
@@ -73,12 +73,13 @@
           @update="updateActiveWhen($event)"
         />
       </div>
+      <div></div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { find, isNil, isNotNil } from 'ramda';
+import { find, isNil, isNotNil, reject } from 'ramda';
 
 import { ConditionTypes } from '~/composables/editor/const';
 import type { ConditionTerm } from '~/composables/project/types/v2/condition';
@@ -119,6 +120,19 @@ function getChoiceName(choiceId: string) {
 const updateActiveWhen = (newCondition: ConditionTerm | undefined) => {
   if (isNil(object.value)) return;
   object.value.activeWhen = newCondition;
+};
+
+const removeRequirement = (objectId: string) => {
+  if (isNil(object.value)) return;
+  object.value.objectIds = reject(
+    (reqId) => reqId === objectId,
+    object.value.objectIds,
+  );
+};
+
+const addRequirement = () => {
+  if (isNil(object.value)) return;
+  //
 };
 </script>
 
