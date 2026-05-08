@@ -34,7 +34,7 @@
       v-else
       class="p-2 bg-surface-900 border border-surface-700 font-mono min-h-50 text-muted-color"
     >
-      No Condition
+      <div>No Condition</div>
     </div>
   </div>
 </template>

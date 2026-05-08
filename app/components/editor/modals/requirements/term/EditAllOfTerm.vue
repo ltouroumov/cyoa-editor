@@ -16,12 +16,9 @@
       />
 
       <div class="flex flex-row items-center justify-start">
-        <div
-          class="bg-surface-800 px-2 py-1 rounded text-muted-color text-sm flex flex-row items-center gap-1 cursor-pointer"
-          @click="addChild()"
-        >
+        <Button size="small" severity="secondary" @click="addChild()">
           <span class="iconify solar--add-circle-line-duotone"></span> AND
-        </div>
+        </Button>
         <div
           class="flex-1 border-t border-dashed border-surface-600 mx-2"
         ></div>

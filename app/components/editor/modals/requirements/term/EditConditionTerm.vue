@@ -10,18 +10,20 @@
     <div v-if="depth === 0" class="flex flex-row mt-4 items-center">
       <div class="border-t border-surface-600 flex-1"></div>
       <div class="flex flex-row gap-2 mx-2">
-        <div
-          class="bg-surface-800 px-2 py-1 rounded text-muted-color text-sm flex flex-row items-center gap-1 cursor-pointer"
+        <Button
+          size="small"
+          severity="secondary"
           @click="handleAddCondition('allOf')"
         >
           <span class="iconify solar--add-circle-line-duotone"></span> AND
-        </div>
-        <div
-          class="bg-surface-800 px-2 py-1 rounded text-muted-color text-sm flex flex-row items-center gap-1 cursor-pointer"
+        </Button>
+        <Button
+          size="small"
+          severity="secondary"
           @click="handleAddCondition('anyOf')"
         >
           <span class="iconify solar--add-circle-line-duotone"></span> OR
-        </div>
+        </Button>
       </div>
       <div class="border-t border-surface-600 my-2 flex-1"></div>
     </div>
