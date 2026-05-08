@@ -14,7 +14,9 @@
         <Button variant="outlined" @click="commitChoice('isSelected')">
           Is Selected
         </Button>
-        <Button variant="outlined">Not Selected</Button>
+        <Button variant="outlined" @click="commitChoice('isNotSelected')">
+          Not Selected
+        </Button>
       </div>
     </div>
     <div class="border-t border-surface-500 my-2"></div>

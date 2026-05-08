@@ -143,6 +143,7 @@ const addRequirement = () => {
       modal: true,
       draggable: false,
       position: 'top',
+      style: { width: '60vw' },
     },
   });
 };

@@ -29,6 +29,7 @@ export function useAddConditionModal() {
         modal: true,
         draggable: false,
         position: 'top',
+        style: { width: '60vw' },
       },
     });
   };

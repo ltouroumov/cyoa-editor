@@ -131,6 +131,7 @@ const editRequirement = (id: string) => {
       modal: true,
       draggable: false,
       position: 'top',
+      style: { width: '60vw' },
     },
   });
 };

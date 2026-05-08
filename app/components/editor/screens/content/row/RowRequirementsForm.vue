@@ -112,6 +112,7 @@ const doEditDisplayRequirements = () => {
       modal: true,
       draggable: false,
       position: 'top',
+      style: { width: '60vw' },
     },
   });
 };
@@ -142,6 +143,7 @@ const doEditChoiceRequirements = () => {
       modal: true,
       draggable: false,
       position: 'top',
+      style: { width: '60vw' },
     },
   });
 };

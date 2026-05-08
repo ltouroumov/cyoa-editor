@@ -35,6 +35,7 @@ import { P, match } from 'ts-pattern';
 
 import EditAllOfTerm from '~/components/editor/modals/requirements/term/EditAllOfTerm.vue';
 import EditAnyOfTerm from '~/components/editor/modals/requirements/term/EditAnyOfTerm.vue';
+import EditNotSelectedTerm from '~/components/editor/modals/requirements/term/EditNotSelectedTerm.vue';
 import EditSelectedTerm from '~/components/editor/modals/requirements/term/EditSelectedTerm.vue';
 import { useAddConditionModal } from '~/components/editor/modals/requirements/useAddConditionModal';
 import type { ConditionTerm } from '~/composables/project/types/v2/condition';
@@ -61,6 +62,9 @@ const dispatch = computed<{ component: any }>(() => {
     }))
     .with({ isSelected: P.string }, () => ({
       component: EditSelectedTerm,
+    }))
+    .with({ isNotSelected: P.string }, () => ({
+      component: EditNotSelectedTerm,
     }))
     .otherwise(() => ({ component: null }));
 });
