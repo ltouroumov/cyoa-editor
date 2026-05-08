@@ -64,6 +64,7 @@
         <IconButton
           severity="secondary"
           icon="iconify solar--add-circle-line-duotone"
+          @click="addRequirement()"
         />
       </div>
     </div>
@@ -72,10 +73,21 @@
 
 <script setup lang="ts">
 import type { DynamicDialogCloseOptions } from 'primevue/dynamicdialogoptions';
-import { find, isNotNil } from 'ramda';
+import {
+  append,
+  assoc,
+  clone,
+  find,
+  findIndex,
+  isNil,
+  isNotNil,
+  reject,
+  update,
+} from 'ramda';
 
 import IconButton from '~/components/utils/IconButton.vue';
 import { ConditionTypes } from '~/composables/editor/const';
+import { createId } from '~/composables/project/types/v2/id';
 import type { ChoiceObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import {
@@ -84,7 +96,7 @@ import {
 } from '~/composables/project/types/v2/objects/components/choice';
 import {
   ConditionMode,
-  type ConditionType,
+  ConditionType,
   type ObjectCondition,
 } from '~/composables/project/types/v2/objects/components/condition';
 import { useProjectStore } from '~/composables/project/useProjectStore';
@@ -115,16 +127,58 @@ function getChoiceName(choiceId: string) {
 }
 
 const editRequirement = (id: string) => {
+  const condIdx = findIndex(
+    (cond) => cond.id === id,
+    component.value.requirements,
+  );
+  if (condIdx === -1) return;
+
   $dialog.open(LazyEditRequirementModal, {
     data: {
-      condition: component.value.requirements.find((cond) => cond.id === id),
+      condition: clone(component.value.requirements[condIdx]),
     },
     onClose: (
-      options: DynamicDialogCloseOptions<
-        { update: ObjectCondition } | { remove: true }
-      >,
+      options: DynamicDialogCloseOptions<{ update: ObjectCondition }>,
     ) => {
-      console.log(options.data);
+      if (isNil(options.data)) return;
+
+      component.value.requirements = update(
+        condIdx,
+        options.data.update,
+        component.value.requirements,
+      );
+    },
+    props: {
+      header: `Edit Requirement for ${choice.value.name}`,
+      modal: true,
+      draggable: false,
+      position: 'top',
+      style: { width: '60vw' },
+    },
+  });
+};
+
+const DefaultCondition: Omit<ObjectCondition, 'id'> = {
+  type: ConditionType.required,
+  mode: ConditionMode.all,
+  objectIds: [],
+  display: true,
+};
+
+const addRequirement = () => {
+  $dialog.open(LazyEditRequirementModal, {
+    data: {
+      condition: clone(assoc('id', createId(), DefaultCondition)),
+    },
+    onClose: (
+      options: DynamicDialogCloseOptions<{ update: ObjectCondition }>,
+    ) => {
+      if (isNil(options.data)) return;
+
+      component.value.requirements = append(
+        options.data.update,
+        component.value.requirements,
+      );
     },
     props: {
       header: `Edit Requirement for ${choice.value.name}`,
@@ -137,7 +191,10 @@ const editRequirement = (id: string) => {
 };
 
 const removeRequirement = (id: string) => {
-  // TODO
+  component.value.requirements = reject(
+    (cond) => cond.id === id,
+    component.value.requirements,
+  );
 };
 </script>
 

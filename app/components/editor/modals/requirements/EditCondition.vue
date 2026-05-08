@@ -32,7 +32,8 @@
     </div>
     <div
       v-else
-      class="p-2 bg-surface-900 border border-surface-700 font-mono min-h-50 text-muted-color"
+      class="p-2 bg-surface-900 border border-surface-700 font-mono text-muted-color"
+      :class="{ 'min-h-50': !compact }"
     >
       <div>No Condition</div>
     </div>
@@ -50,6 +51,7 @@ const { showAddConditionModal } = useAddConditionModal();
 const $props = defineProps<{
   title: string;
   condition?: ConditionTerm;
+  compact?: boolean;
 }>();
 
 const $emit = defineEmits<{
