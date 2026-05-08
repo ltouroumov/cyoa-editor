@@ -128,7 +128,7 @@
             <div class="flex flex-row justify-center">
               <Skeleton animation="none" height="2rem" width="60%" />
             </div>
-            <div class="inline-flex flex-row flex-wrap gap-1">
+            <div class="inline-flex flex-row flex-wrap gap-1 text-wrap">
               <span>
                 {{
                   isNotNil(object.beforeText) && isNotEmpty(object.beforeText)
@@ -139,7 +139,7 @@
               <span
                 v-for="(objectId, idx) in object.objectIds"
                 :key="objectId"
-                class="inline-flex flex-row gap-0"
+                class="inline-flex flex-row gap-0 text-wrap"
               >
                 <span>{{ getChoiceName(objectId) }}</span>
                 <span
