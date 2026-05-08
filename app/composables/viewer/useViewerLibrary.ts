@@ -235,7 +235,7 @@ export function useViewerLibrary() {
     await dexie.viewer_projects_cache.put(project);
 
     const fsHandle = await navigator.storage.getDirectory();
-    const projectDir = await fsHandle.getDirectoryHandle(projectId, {
+    const projectDir = await fsHandle.getDirectoryHandle(project.id, {
       create: true,
     });
     const projectFile = await projectDir.getFileHandle('project.json', {
@@ -565,6 +565,7 @@ export function useViewerLibrary() {
 
     const handle = await projectFile.getFile();
     const buffer = await handle.arrayBuffer();
+
     return bufferToString(buffer);
   };
 
