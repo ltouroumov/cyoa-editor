@@ -35,6 +35,10 @@ import {
   type ObjectCondition,
 } from '~/composables/project/types/v2/objects/components/condition';
 import type { LayoutChildProps } from '~/composables/project/types/v2/objects/layout';
+import {
+  type ObjectScore,
+  ScoreType,
+} from '~/composables/project/types/v2/score';
 import type { EditorProject } from '~/composables/shared/tables/editor_projects';
 
 type ImportResult = { project: Omit<EditorProject, 'id'>; data: Project };
@@ -108,6 +112,18 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
   data.styles.defaults.row = defaultRowStyle.id;
   data.styles.defaults.choice = defaultChoiceStyle.id;
 
+  if (isNotEmpty(legacy.pointTypes)) {
+    for (const pointType of legacy.pointTypes) {
+      data.content.scores[pointType.id] = {
+        id: pointType.id,
+        title: pointType.name,
+        unit: pointType.afterText,
+        defaultValue: pointType.startingSum,
+        // enabledWhen: ???
+      };
+    }
+  }
+
   data.content.children['@default'] = [];
   for (const row of legacy.rows) {
     data.content.children['@default'].push({ id: row.id });
@@ -176,6 +192,26 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         components: {},
       };
 
+      if (isNotEmpty(object.scores)) {
+        const scores: ObjectScore[] = [];
+
+        for (const score of object.scores) {
+          const value = Number.parseInt(score.value);
+          scores.push({
+            id: createId(),
+            scoreId: score.id,
+            type: value > 0 ? ScoreType.Cost : ScoreType.Gain,
+            value: Math.abs(value),
+            activeWhen: toConditionTerm(score.requireds),
+          });
+        }
+
+        choiceObject.components[ComponentType.Scores] = {
+          type: ComponentType.Scores,
+          scores: scores,
+        };
+      }
+
       if (isNotEmpty(object.requireds)) {
         const requirements: ObjectCondition[] = [];
 
@@ -202,7 +238,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
             activeWhen: isNotEmpty(required.requireds)
               ? toConditionTerm(required.requireds)
               : undefined,
-            display: required.showRequired,
+            hidden: !required.showRequired,
           });
         }
 

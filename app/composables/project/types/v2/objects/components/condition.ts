@@ -17,7 +17,7 @@ export type ObjectCondition = {
   objectIds: string[];
   activeWhen?: ConditionTerm;
 
-  display?: boolean;
+  hidden?: boolean;
   beforeText?: string;
   afterText?: string;
   termText?: string;

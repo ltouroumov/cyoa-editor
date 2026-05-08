@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-2 border border-surface-700 rounded p-2">
     <div class="text-md text-primary font-bold">Requirements</div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 grow">
       <div
         v-for="(requirement, index) in component.requirements"
         :key="requirement.id"
@@ -22,7 +22,7 @@
           </div>
           <div class="flex flex-row gap-1 items-center">
             <span v-if="isNotNil(requirement.activeWhen)">*</span>
-            <span v-if="!requirement.display" class="text-surface-500">
+            <span v-if="requirement.hidden" class="text-surface-500">
               Hidden
             </span>
             <IconButton
@@ -162,7 +162,7 @@ const DefaultCondition: Omit<ObjectCondition, 'id'> = {
   type: ConditionType.required,
   mode: ConditionMode.all,
   objectIds: [],
-  display: true,
+  hidden: true,
 };
 
 const addRequirement = () => {

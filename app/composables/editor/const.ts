@@ -1,4 +1,5 @@
 import { ConditionType } from '~/composables/project/types/v2/objects/components/condition';
+import { ScoreType } from '~/composables/project/types/v2/score';
 
 export const GridItemPositions: { label: string; value: string }[] = [
   { label: 'Left-Aligned', value: 'left' },
@@ -26,4 +27,10 @@ export const GridItemWidths: { label: string; value: number }[] = [
 export const ConditionTypes: { label: string; value: ConditionType }[] = [
   { label: 'Required', value: ConditionType.required },
   { label: 'Incompatible', value: ConditionType.incompatible },
+];
+
+export const ScoreTypes: { label: string; value: ScoreType }[] = [
+  { label: 'Cost', value: ScoreType.Cost },
+  { label: 'Gain', value: ScoreType.Gain },
+  { label: 'Set', value: ScoreType.Set },
 ];

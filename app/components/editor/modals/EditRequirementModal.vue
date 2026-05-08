@@ -31,12 +31,12 @@
           </IftaLabel>
           <IftaLabel class="flex flex-col gap-2 flex-1">
             <Select
-              v-model="object.display"
+              v-model="object.hidden"
               option-label="label"
               option-value="value"
               :options="[
-                { label: 'Visible', value: true },
-                { label: 'Hidden', value: false },
+                { label: 'Visible', value: false },
+                { label: 'Hidden', value: true },
               ]"
               fluid
             />

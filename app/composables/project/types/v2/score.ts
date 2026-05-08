@@ -3,14 +3,17 @@ import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 export enum ScoreType {
   Gain = 'gain',
   Cost = 'cost',
+  Set = 'set',
 }
 
 export interface ObjectScore {
+  id: string;
   scoreId: string;
   type: ScoreType;
 
   value: number;
-  when: ConditionTerm;
+  activeWhen?: ConditionTerm;
+  hidden?: boolean;
 }
 
 export interface ProjectScore {
@@ -22,4 +25,6 @@ export interface ProjectScore {
   unit: string;
 
   defaultValue: number;
+
+  activeWhen?: ConditionTerm;
 }

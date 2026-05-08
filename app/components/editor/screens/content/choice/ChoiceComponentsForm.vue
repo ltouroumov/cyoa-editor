@@ -1,8 +1,8 @@
 <template>
-  <div class="grid grid-cols-2 auto-rows-auto">
-    <div v-for="component in components" :key="component.key">
+  <div class="grid grid-cols-2 gap-2 auto-rows-auto">
+    <template v-for="component in components" :key="component.key">
       <component :is="component.component" v-bind="component.props ?? {}" />
-    </div>
+    </template>
   </div>
 </template>
 
