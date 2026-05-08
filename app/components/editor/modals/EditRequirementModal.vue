@@ -79,8 +79,10 @@
 </template>
 
 <script setup lang="ts">
-import { find, isNil, isNotNil, reject } from 'ramda';
+import type { DynamicDialogCloseOptions } from 'primevue/dynamicdialogoptions';
+import { append, find, isNil, isNotNil, reject } from 'ramda';
 
+import { useModalClient } from '~/components/editor/utils/useModalClient';
 import { ConditionTypes } from '~/composables/editor/const';
 import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
@@ -91,23 +93,20 @@ import {
 } from '~/composables/project/types/v2/objects/components/condition';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
+const $dialog = useDialog();
 const projectStore = useProjectStore();
+
+const LazyPickChoiceModal = defineAsyncComponent(
+  () => import('~/components/editor/modals/PickChoiceModal.vue'),
+);
 
 type DialogInput = { condition: ObjectCondition };
 type DialogResult = { condition: ObjectCondition } | { remove: true };
-type DialogProps = {
-  data: DialogInput;
-  close(result: DialogResult | null): void;
-};
-const dialogRef = inject<Ref<DialogProps>>('dialogRef');
-const object = ref<ObjectCondition | undefined>(undefined);
-
-onMounted(() => {
-  const { condition } = dialogRef?.value?.data ?? {};
-  if (condition) {
-    object.value = condition;
-  }
-});
+const { data: object, close } = useModalClient<
+  DialogInput,
+  ObjectCondition,
+  DialogResult
+>((input: DialogInput) => input.condition);
 
 function getConditionTypeLabel(type: ConditionType): string {
   return find((ct) => ct.value === type, ConditionTypes)?.label ?? 'Unknown';
@@ -132,7 +131,20 @@ const removeRequirement = (objectId: string) => {
 
 const addRequirement = () => {
   if (isNil(object.value)) return;
-  //
+  $dialog.open(LazyPickChoiceModal, {
+    onClose: (options: DynamicDialogCloseOptions<string | undefined>) => {
+      if (isNil(object.value)) return;
+      if (isNotNil(options.data)) {
+        object.value.objectIds = append(options.data, object.value.objectIds);
+      }
+    },
+    props: {
+      header: `Add Requirements`,
+      modal: true,
+      draggable: false,
+      position: 'top',
+    },
+  });
 };
 </script>
 

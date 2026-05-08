@@ -2038,7 +2038,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iconify-json/material-symbols@npm:^1.2.69":
+"@iconify-json/material-symbols@npm:1.2.69":
   version: 1.2.69
   resolution: "@iconify-json/material-symbols@npm:1.2.69"
   dependencies:
@@ -8645,7 +8645,7 @@ __metadata:
   dependencies:
     "@eslint/js": "npm:10.0.1"
     "@iconify-json/carbon": "npm:1.2.20"
-    "@iconify-json/material-symbols": "npm:^1.2.69"
+    "@iconify-json/material-symbols": "npm:1.2.69"
     "@iconify-json/material-symbols-light": "npm:1.2.69"
     "@iconify-json/solar": "npm:1.2.5"
     "@iconify/tailwind4": "npm:1.2.1"
