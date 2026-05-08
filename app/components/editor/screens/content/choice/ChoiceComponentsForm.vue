@@ -9,6 +9,7 @@
 <script setup lang="ts">
 import { filter, isNotNil, map, values } from 'ramda';
 
+import ChoiceScoreForm from '~/components/editor/screens/content/choice/components/ChoiceScoreForm.vue';
 import type { ChoiceObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import {
@@ -47,6 +48,12 @@ function dispatchComponent(
       return {
         key: component.type,
         component: ChoiceRequirementsForm,
+        props: { choiceId: props.choiceId },
+      };
+    case ComponentType.Scores:
+      return {
+        key: component.type,
+        component: ChoiceScoreForm,
         props: { choiceId: props.choiceId },
       };
     default:
