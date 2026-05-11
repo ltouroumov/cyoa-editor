@@ -25,6 +25,22 @@
             <span v-if="requirement.hidden" class="text-surface-500">
               Hidden
             </span>
+            <ButtonGroup>
+              <IconButton
+                outlined
+                icon="iconify solar--arrow-up-line-duotone"
+                size="small"
+                severity="secondary"
+                @click="moveRequirement(requirement.id, 'up')"
+              />
+              <IconButton
+                outlined
+                icon="iconify solar--arrow-down-line-duotone"
+                size="small"
+                severity="secondary"
+                @click="moveRequirement(requirement.id, 'down')"
+              />
+            </ButtonGroup>
             <IconButton
               outlined
               severity="secondary"
@@ -82,6 +98,7 @@ import {
   isNil,
   isNotNil,
   reject,
+  swap,
   update,
 } from 'ramda';
 
@@ -193,6 +210,25 @@ const addRequirement = () => {
 const removeRequirement = (id: string) => {
   component.value.requirements = reject(
     (cond) => cond.id === id,
+    component.value.requirements,
+  );
+};
+
+const moveRequirement = (id: string, direction: 'up' | 'down') => {
+  const scoreIdx = findIndex(
+    (cond) => cond.id === id,
+    component.value.requirements,
+  );
+
+  if (scoreIdx === -1) return;
+
+  const destIdx = direction === 'up' ? scoreIdx - 1 : scoreIdx + 1;
+
+  if (destIdx < 0 || destIdx >= component.value.requirements.length) return;
+
+  component.value.requirements = swap(
+    scoreIdx,
+    destIdx,
     component.value.requirements,
   );
 };

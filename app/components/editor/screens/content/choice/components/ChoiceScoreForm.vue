@@ -18,6 +18,23 @@
             <div class="flex flex-row gap-1 items-center">
               <span v-if="isNotNil(score.activeWhen)">*</span>
               <span v-if="score.hidden" class="text-surface-500">Hidden</span>
+              <ButtonGroup>
+                <IconButton
+                  outlined
+                  icon="iconify solar--arrow-up-line-duotone"
+                  size="small"
+                  severity="secondary"
+                  @click="moveScore(score.id, 'up')"
+                />
+                <IconButton
+                  outlined
+                  icon="iconify solar--arrow-down-line-duotone"
+                  size="small"
+                  severity="secondary"
+                  @click="moveScore(score.id, 'down')"
+                />
+              </ButtonGroup>
+
               <IconButton
                 outlined
                 severity="secondary"
@@ -64,6 +81,7 @@ import {
   isNil,
   isNotNil,
   reject,
+  swap,
   update,
 } from 'ramda';
 
@@ -167,6 +185,21 @@ const removeScore = (id: string) => {
     (cond) => cond.id === id,
     component.value.scores,
   );
+};
+
+const moveScore = (id: string, direction: 'up' | 'down') => {
+  const scoreIdx = findIndex(
+    (score) => score.id === id,
+    component.value.scores,
+  );
+
+  if (scoreIdx === -1) return;
+
+  const destIdx = direction === 'up' ? scoreIdx - 1 : scoreIdx + 1;
+
+  if (destIdx < 0 || destIdx >= component.value.scores.length) return;
+
+  component.value.scores = swap(scoreIdx, destIdx, component.value.scores);
 };
 </script>
 
