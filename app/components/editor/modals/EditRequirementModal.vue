@@ -108,6 +108,7 @@
         <Button @click="close({ update: object })">Save</Button>
       </div>
     </template>
+    <Skeleton v-else height="30rem" />
   </div>
 </template>
 
