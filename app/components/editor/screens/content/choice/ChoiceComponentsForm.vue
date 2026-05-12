@@ -1,11 +1,7 @@
 <template>
   <div class="grid grid-cols-2 gap-2 auto-rows-auto">
     <template v-for="component in components" :key="component.key">
-      <component
-        :is="component.component"
-        v-bind="component.props ?? {}"
-        v-model="choice"
-      />
+      <component :is="component.component" v-model="choice" />
     </template>
   </div>
 </template>
@@ -32,12 +28,10 @@ const components = computed((): ChoiceComponent[] => {
   );
 });
 
-type ChoiceComponent = { key: ComponentType; component: any; props?: any };
+type ChoiceComponent = { key: ComponentType; component: any };
 function dispatchComponent(
   component: BaseComponent<ComponentType>,
 ): ChoiceComponent | undefined {
-  console.log('dispatchComponent', component);
-
   switch (component.type) {
     case ComponentType.Requirements:
       return {
