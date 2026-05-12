@@ -7,7 +7,9 @@
     </div>
     <div v-if="object.type === 'choice'" class="flex flex-row gap-2">
       <div class="flex flex-col gap-2">
-        <div class="font-bold">{{ object.header?.title }}</div>
+        <div v-if="object.header?.title !== object.name" class="font-bold">
+          {{ object.header?.title }}
+        </div>
         <div class="max-h-30 overflow-hidden text-ellipsis">
           {{ object.header?.text }}
         </div>

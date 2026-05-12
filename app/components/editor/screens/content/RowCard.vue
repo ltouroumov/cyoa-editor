@@ -1,39 +1,105 @@
 <template>
-  <div class="flex flex-row gap-3 py-2 items-start">
-    <RowMove :row-id="rowId" :index="index" />
-    <div class="flex flex-col gap-2 grow justify-center">
-      <div
-        class="flex flex-row gap-2 items-center cursor-pointer group"
-        @click="editRow()"
-      >
-        <div class="text-primary font-bold grow group-hover:underline">
-          {{ row.name }}
-        </div>
-        <div class="text-surface-500 font-mono text-sm">
-          {{ row.id }}
+  <div class="flex flex-col py-2 gap-2">
+    <div class="flex flex-row gap-3 items-center">
+      <RowMove :row-id="rowId" :index="index" />
+      <div class="flex flex-col gap-2 grow justify-center">
+        <div
+          class="flex flex-row gap-2 items-center cursor-pointer group"
+          @click="editRow()"
+        >
+          <div class="text-primary font-bold grow group-hover:underline">
+            {{ row.name }}
+          </div>
+          <div class="text-surface-500 font-mono text-sm">
+            {{ row.id }}
+          </div>
         </div>
       </div>
+      <div class="flex flex-row gap-2">
+        <ButtonGroup>
+          <Button
+            variant="outlined"
+            size="small"
+            severity="secondary"
+            icon="iconify solar--copy-line-duotone"
+            label="Clone"
+          />
+          <Button
+            variant="outlined"
+            size="small"
+            severity="secondary"
+            icon="iconify solar--arrow-right-up-line-duotone"
+            label="Move"
+          />
+          <Button
+            variant="outlined"
+            size="small"
+            severity="secondary"
+            icon="iconify solar--clipboard-text-line-duotone"
+            label="Copy"
+            @click="copyRow()"
+          />
+          <Button
+            variant="outlined"
+            size="small"
+            severity="secondary"
+            icon="iconify solar--scissors-line-duotone"
+            label="Cut"
+          />
+        </ButtonGroup>
+        <Button
+          variant="outlined"
+          size="small"
+          severity="danger"
+          icon="iconify solar--trash-bin-trash-line-duotone"
+          label="Delete"
+        />
+      </div>
     </div>
-    <div class="flex flex-row gap-2">
-      <Button variant="outlined" size="small" severity="secondary">
-        Clone
-      </Button>
-      <Button variant="outlined" size="small" severity="danger">
-        Delete
-      </Button>
+    <div v-if="row.header" class="flex flex-row gap-2">
+      <div>
+        <Skeleton
+          v-if="isNil(row.header?.image)"
+          width="5rem"
+          height="3rem"
+          animation="none"
+        />
+        <ChoiceImage
+          v-if="row.header?.image"
+          :media-id="row.header.image"
+          width="5rem"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <div v-if="row.header?.title !== row.name" class="font-bold">
+          {{ row.header?.title }}
+        </div>
+        <div
+          v-if="row.header?.text"
+          class="max-h-[10rem] overflow-hidden text-ellipsis"
+        >
+          {{ row.header?.text }}
+        </div>
+        <div v-else class="text-surface-500 text-sm">No Description</div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { isNil } from 'ramda';
+
+import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
 import RowMove from '~/components/editor/screens/content/row/RowMove.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import type { RowObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
+import { useProjectClipboard } from '~/composables/project/useProjectClipboard';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const editorStore = useEditorStore();
 const projectStore = useProjectStore();
+const clipboardUtils = useProjectClipboard();
 
 const props = defineProps<{
   rowId: string;
@@ -49,6 +115,10 @@ function editRow() {
     type: 'edit-row',
     rowId: row.value.id,
   });
+}
+
+function copyRow() {
+  clipboardUtils.copyObject(props.rowId);
 }
 </script>
 

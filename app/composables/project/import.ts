@@ -133,7 +133,6 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
       name: row.title,
       header: {
         title: row.title,
-        text: row.titleText,
       },
       layout: {
         itemAlign: row.rowJustify ?? 'left',
@@ -145,7 +144,11 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
       },
     };
 
-    if (row.image) {
+    if (isNotEmpty(row.titleText)) {
+      rowObject.header!.text = row.titleText;
+    }
+
+    if (isNotEmpty(row.image)) {
       const mediaId = createId('media');
       data.media.images[mediaId] = {
         id: mediaId,

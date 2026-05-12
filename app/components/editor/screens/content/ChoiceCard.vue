@@ -48,7 +48,9 @@
         />
       </div>
       <div class="flex flex-col gap-2">
-        <div class="font-bold">{{ choice.header?.title }}</div>
+        <div v-if="choice.header?.title !== choice.name" class="font-bold">
+          {{ choice.header?.title }}
+        </div>
         <div class="max-h-[10rem] overflow-hidden text-ellipsis">
           {{ choice.header?.text }}
         </div>
