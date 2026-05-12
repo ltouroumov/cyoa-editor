@@ -112,31 +112,17 @@ its children (`EditSimpleContentStyle`).
 ## Special Case: ChoiceComponentsForm Dynamic Dispatch
 
 `ChoiceComponentsForm` renders children via `<component :is="..." v-bind="component.props" />`.
-Currently `component.props` is `{ choiceId: props.choiceId }`. After migration it must forward
-the choice model to children that now expect `modelValue`.
+Currently `component.props` is `{ choiceId: props.choiceId }`. After migration, all dynamic
+children use `defineModel<ChoiceObject>()`, so the choice is passed via `v-model` directly on
+the dynamic component tag:
 
-**Change:** replace the `props` field in each `dispatchComponent` return:
-
-```ts
-// Before
-props: { choiceId: props.choiceId }
-
-// After
-props: {
-  modelValue: choice.value,
-  'onUpdate:modelValue': (v: ChoiceObject) => { choice.value = v },
-}
+```html
+<component :is="component.component" v-bind="component.props ?? {}" v-model="choice" />
 ```
 
-Where `choice` is the `defineModel<ChoiceObject>()` ref in `ChoiceComponentsForm`.
-
-**Why this is correct:** `choice.value` passes the same object reference as `modelValue` to
-the child. In-place mutations the child makes (e.g. `model.value.components.scores.items = ...`)
-modify the same object, which is the draft held by `ChoiceScreen`. These mutations accumulate
-and flush together. If a child replaces the whole object (`model.value = { ...model.value, x }`)
-it emits `update:modelValue`, which calls the handler and updates `choice.value` in
-`ChoiceComponentsForm`, which in turn emits its own `update:modelValue`, updating the draft in
-`ChoiceScreen`.
+Where `choice` is the `defineModel<ChoiceObject>()` ref in `ChoiceComponentsForm`. The
+`dispatchComponent` function drops `choiceId` from `props` (or removes `props` entirely if
+there is nothing else to pass).
 
 **Note:** `ChoiceScoreForm` and `ChoiceRequirementsForm` still read from `projectStore` for
 reference data (list of available scores, list of choices for condition pickers). These read-only
