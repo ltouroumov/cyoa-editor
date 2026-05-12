@@ -73,18 +73,11 @@
 import { append, equals, indexOf, reject, swap, uniq } from 'ramda';
 
 import type { ChoiceObject } from '~/composables/project/types/v2/objects';
-import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { StyleTarget } from '~/composables/project/types/v2/styles';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const projectStore = useProjectStore();
-const props = defineProps<{
-  choiceId: string;
-}>();
-
-const choice = computed((): ChoiceObject => {
-  return projectStore.get(props.choiceId, ObjectType.choice)!;
-});
+const choice = defineModel<ChoiceObject>({ required: true });
 
 const rowStyles = computed(() => {
   return (choice.value.styles ?? []).map((styleId) => {

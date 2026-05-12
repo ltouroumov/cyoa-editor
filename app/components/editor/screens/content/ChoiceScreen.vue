@@ -16,20 +16,20 @@
         <div class="border-b border-surface-700 pb-1 mb-2">
           <div class="text-xl font-bold text-primary">Header</div>
         </div>
-        <ChoiceHeaderForm :choice-id="choiceId" />
+        <ChoiceHeaderForm v-model="choice" />
       </div>
       <div class="flex flex-row gap-2">
         <div class="flex flex-col flex-2">
           <div class="border-b border-surface-700 pb-1 mb-2">
             <div class="text-xl font-bold text-primary">Components</div>
           </div>
-          <ChoiceComponentsForm :choice-id="choiceId" />
+          <ChoiceComponentsForm v-model="choice" />
         </div>
         <div class="flex flex-col flex-1">
           <div class="border-b border-surface-700 pb-1 mb-2">
             <div class="text-xl font-bold text-primary">Choice Styles</div>
           </div>
-          <ChoiceStyleForm :choice-id="choiceId" />
+          <ChoiceStyleForm v-model="choice" />
         </div>
       </div>
     </div>
@@ -74,7 +74,7 @@
 import { filter, includes, isEmpty, toLower } from 'ramda';
 
 import ChoiceComponentsForm from '~/components/editor/screens/content/choice/ChoiceComponentsForm.vue';
-import type { ChoiceObject } from '~/composables/project/types/v2/objects';
+import { useDraftObject } from '~/composables/editor/useDraftObject';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
@@ -83,9 +83,7 @@ const props = defineProps<{
   choiceId: string;
 }>();
 
-const choice = computed((): ChoiceObject => {
-  return projectStore.get(props.choiceId, ObjectType.choice)!;
-});
+const choice = useDraftObject(() => props.choiceId, ObjectType.choice);
 
 const children = computed(() => {
   const _search = search.value;

@@ -89,7 +89,6 @@ import IconButton from '~/components/utils/IconButton.vue';
 import { ScoreTypes } from '~/composables/editor/const';
 import { createId } from '~/composables/project/types/v2/id';
 import type { ChoiceObject } from '~/composables/project/types/v2/objects';
-import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import {
   ComponentType,
   type ScoresComponent,
@@ -108,13 +107,8 @@ const $confirm = useConfirm();
 const $dialog = useDialog();
 
 const projectStore = useProjectStore();
-const props = defineProps<{
-  choiceId: string;
-}>();
 
-const choice = computed((): ChoiceObject => {
-  return projectStore.get(props.choiceId, ObjectType.choice)!;
-});
+const choice = defineModel<ChoiceObject>({ required: true });
 const component = computed((): ScoresComponent => {
   return choice.value.components[ComponentType.Scores]!;
 });

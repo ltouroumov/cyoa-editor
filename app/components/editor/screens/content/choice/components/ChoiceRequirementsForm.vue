@@ -125,13 +125,8 @@ const LazyEditRequirementModal = defineAsyncComponent(
 const $confirm = useConfirm();
 const $dialog = useDialog();
 const projectStore = useProjectStore();
-const props = defineProps<{
-  choiceId: string;
-}>();
 
-const choice = computed((): ChoiceObject => {
-  return projectStore.get(props.choiceId, ObjectType.choice)!;
-});
+const choice = defineModel<ChoiceObject>({ required: true });
 const component = computed((): RequirementsComponent => {
   return choice.value.components[ComponentType.Requirements]!;
 });
