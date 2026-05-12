@@ -13,11 +13,11 @@ export function useDraft<T>(
 
   const initial = getFromStore();
   if (initial === undefined) {
-    console.warn(
-      '[useDraft] getFromStore() returned undefined on init — entity may not exist in the store',
+    throw new Error(
+      '[useDraft] getFromStore() returned undefined on init — entity does not exist in the store',
     );
   }
-  const draft = ref<T>(clone((initial ?? {}) as T)) as Ref<T>;
+  const draft = ref<T>(clone(initial)) as Ref<T>;
   let isWriting = false;
 
   const doFlush = (value: T): void => {

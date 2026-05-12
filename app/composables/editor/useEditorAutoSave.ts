@@ -72,7 +72,10 @@ export function useEditorAutoSave() {
     console.log(`trigger auto-save at ${Date.now()}`);
   }, resolveDelay($editor.autoSaveInterval));
 
-  watch(() => $project.changeVersion, triggerSave);
+  watch(
+    () => $project.changeVersion,
+    () => triggerSave(),
+  );
 
   return { autoSaveInterval: $editor.autoSaveInterval, menuOptions };
 }
