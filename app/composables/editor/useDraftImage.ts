@@ -1,7 +1,7 @@
 import type { MaybeRefOrGetter } from 'vue';
 
-import type { ProjectImage } from '~/composables/project/types/v2/media';
 import { useDraft } from '~/composables/editor/useDraft';
+import type { ProjectImage } from '~/composables/project/types/v2/media';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 export function useDraftImage(

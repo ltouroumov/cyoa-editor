@@ -1,7 +1,7 @@
 import type { MaybeRefOrGetter } from 'vue';
 
-import type { AnyStyle } from '~/composables/project/types/v2/styles';
 import { useDraft } from '~/composables/editor/useDraft';
+import type { AnyStyle } from '~/composables/project/types/v2/styles';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 export function useDraftStyle(source: MaybeRefOrGetter<string>): Ref<AnyStyle> {
