@@ -1,10 +1,8 @@
 import type { MaybeRefOrGetter } from 'vue';
 
-import type {
-  ObjectMap,
-  ObjectType,
-} from '~/composables/project/types/v2/objects';
 import { useDraft } from '~/composables/editor/useDraft';
+import type { ObjectMap } from '~/composables/project/types/v2/objects';
+import type { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 export function useDraftObject<T extends ObjectType>(
