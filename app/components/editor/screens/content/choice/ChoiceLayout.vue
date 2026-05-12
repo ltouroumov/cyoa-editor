@@ -16,9 +16,10 @@
             :options="WidthOptions"
             option-label="label"
             option-value="value"
+            class="grow"
             fluid
           />
-          <Button label="Save" fluid @click="saveLayout" />
+          <Button label="Save" @click="saveLayout" />
         </div>
         <IftaLabel>
           <Select
