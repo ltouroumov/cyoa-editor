@@ -41,6 +41,11 @@ export const useProjectStore = defineStore('project-v2', () => {
 
   const clipboard = ref<ClipboardItem[]>([]);
 
+  const changeVersion = ref(0);
+  function markDirty() {
+    changeVersion.value++;
+  }
+
   const parents = computed((): Map<string, string> => {
     const _parents = new Map();
     for (const [parentId, childObjects] of children.value.entries()) {
@@ -127,6 +132,7 @@ export const useProjectStore = defineStore('project-v2', () => {
     styles,
     media,
     clipboard,
+    changeVersion,
     // Getters
     get,
     getObject,
@@ -137,6 +143,7 @@ export const useProjectStore = defineStore('project-v2', () => {
     importData,
     exportData,
     clearData,
+    markDirty,
   };
 });
 
