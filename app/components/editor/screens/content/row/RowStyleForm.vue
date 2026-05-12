@@ -73,18 +73,11 @@
 import { append, equals, indexOf, isNotEmpty, reject, swap, uniq } from 'ramda';
 
 import type { RowObject } from '~/composables/project/types/v2/objects';
-import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { StyleTarget } from '~/composables/project/types/v2/styles';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const projectStore = useProjectStore();
-const props = defineProps<{
-  rowId: string;
-}>();
-
-const row = computed((): RowObject => {
-  return projectStore.get(props.rowId, ObjectType.row)!;
-});
+const row = defineModel<RowObject>({ required: true });
 
 const rowStyles = computed(() => {
   return (row.value.styles ?? []).map((styleId) => {
@@ -111,13 +104,11 @@ const doRemoveStyle = (styleId: string) => {
 
 const doMoveUp = (styleId: string) => {
   const idx = indexOf(styleId, row.value.styles ?? []);
-  // not found or at the first position
   if (idx === -1 || idx === 0) return;
   row.value.styles = swap(idx, idx - 1, row.value.styles ?? []);
 };
 const doMoveDown = (styleId: string) => {
   const idx = indexOf(styleId, row.value.styles ?? []);
-  // not found or at the last position
   if (idx === -1 || idx === (row.value.styles ?? []).length - 1) return;
   row.value.styles = swap(idx, idx + 1, row.value.styles ?? []);
 };

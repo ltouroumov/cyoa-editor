@@ -69,22 +69,13 @@ import { P, match } from 'ts-pattern';
 
 import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 import type { RowObject } from '~/composables/project/types/v2/objects';
-import { ObjectType } from '~/composables/project/types/v2/objects/base';
-import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const LazyEditConditionModal = defineAsyncComponent(
   () => import('~/components/editor/modals/EditConditionModal.vue'),
 );
 const $dialog = useDialog();
 
-const projectStore = useProjectStore();
-const props = defineProps<{
-  rowId: string;
-}>();
-
-const row = computed((): RowObject => {
-  return projectStore.get(props.rowId, ObjectType.row)!;
-});
+const row = defineModel<RowObject>({ required: true });
 
 const doEditDisplayRequirements = () => {
   $dialog.open(LazyEditConditionModal, {
@@ -103,9 +94,7 @@ const doEditDisplayRequirements = () => {
         .with({ remove: true }, () => {
           row.value.requirements.display = undefined;
         })
-        .otherwise(() => {
-          // no changes, the operation was cancelled
-        });
+        .otherwise(() => {});
     },
     props: {
       header: `Edit Requirements for ${row.value.name}`,
@@ -134,9 +123,7 @@ const doEditChoiceRequirements = () => {
         .with({ remove: true }, () => {
           row.value.requirements.choices = undefined;
         })
-        .otherwise(() => {
-          // no changes, the operation was cancelled
-        });
+        .otherwise(() => {});
     },
     props: {
       header: `Edit Requirements for ${row.value.name}`,

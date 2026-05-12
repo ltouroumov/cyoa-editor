@@ -65,17 +65,8 @@ import { isNil } from 'ramda';
 
 import RowImage from '~/components/editor/screens/content/row/RowImage.vue';
 import type { RowObject } from '~/composables/project/types/v2/objects';
-import { ObjectType } from '~/composables/project/types/v2/objects/base';
-import { useProjectStore } from '~/composables/project/useProjectStore';
 
-const projectStore = useProjectStore();
-const props = defineProps<{
-  rowId: string;
-}>();
-
-const row = computed((): RowObject => {
-  return projectStore.get(props.rowId, ObjectType.row)!;
-});
+const row = defineModel<RowObject>({ required: true });
 </script>
 
 <style scoped lang="scss"></style>
