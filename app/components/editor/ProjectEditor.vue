@@ -2,15 +2,15 @@
   <div class="flex flex-col p-2 gap-2 h-full w-full">
     <Menubar :model="menu" class="rounded">
       <template #end>
-        <div class="flex flex-row items-center">
+        <div class="flex flex-row items-center gap-2">
           <div v-if="false" class="flex flex-row items-center">
             <label class="me-2">Preview</label>
             <ToggleSwitch v-model="preview" size="small" variant="outlined" />
           </div>
           <Button
             :unstyled="true"
-            class="flex flex-row items-center border border-surface-500 rounded-full ps-3 pe-2 py-1 relative cursor-pointer"
-            @click="editorStore.showOmniBar = !editorStore.showOmniBar"
+            class="flex flex-row items-center border border-surface-500 rounded ps-3 pe-2 py-1 relative cursor-pointer h-8"
+            @click="editorStore.toggleOmniBar(true)"
           >
             <div class="hidden lg:block text-sm text-muted-color me-2">
               Search ...
@@ -21,10 +21,20 @@
             <div class="block lg:hidden h-5 w-8"></div>
             <div class="size-5 iconify solar--magnifer-outline"></div>
           </Button>
-          <Divider layout="vertical" />
+          <Button
+            :unstyled="true"
+            class="flex flex-row items-center border border-surface-500 rounded px-2 py-1 relative cursor-pointer h-8"
+            @click="editorStore.toggleClipboard(true)"
+          >
+            <div class="text-sm text-muted-color me-1">Clipboard</div>
+            <div
+              class="size-5 iconify solar--clipboard-list-bold-duotone"
+            ></div>
+          </Button>
+          <!-- <Divider layout="vertical" />
           <h1 class="text-amber-500 text-xl">
             {{ editorStore.project!.name }}
-          </h1>
+          </h1> -->
         </div>
       </template>
     </Menubar>
@@ -49,6 +59,7 @@
     </Card>
   </div>
   <OmniBar />
+  <ClipboardPanel />
 </template>
 
 <script setup lang="ts">

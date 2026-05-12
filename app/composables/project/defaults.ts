@@ -40,4 +40,5 @@ export const DefaultProject: Project = {
   config: DefaultProjectConfig,
   styles: DefaultProjectStyles,
   media: DefaultProjectMedia,
+  clipboard: [],
 };

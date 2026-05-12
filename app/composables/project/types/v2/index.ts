@@ -1,4 +1,5 @@
 import type { BackpackRow } from '~/composables/project/types/v2/backpack';
+import type { ClipboardItem } from '~/composables/project/types/v2/clipboard';
 import type { ProjectImage } from '~/composables/project/types/v2/media';
 import type {
   AnyObject,
@@ -67,4 +68,6 @@ export interface Project {
 
   // Index media files
   media: ProjectMedia;
+
+  clipboard: ClipboardItem[];
 }

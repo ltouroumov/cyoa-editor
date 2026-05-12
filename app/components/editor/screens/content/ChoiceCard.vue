@@ -14,12 +14,8 @@
         <Menu ref="menu" :model="menuItems" :popup="true">
           <template #item="{ item }">
             <a
-              v-ripple
               class="px-2 py-1 flex items-center gap-1 cursor-pointer"
               :class="item.class"
-              @click="
-                item.command?.call($el, { originalEvent: $event, item: item })
-              "
             >
               <span :class="item.icon" />
               <span>{{ item.label }}</span>
@@ -62,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
+import type { MenuItem } from 'primevue/menuitem';
 import { clone, findIndex, isNil, propEq } from 'ramda';
 
 import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
@@ -73,10 +69,12 @@ import type {
   ChoiceObject,
 } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
+import { useProjectClipboard } from '~/composables/project/useProjectClipboard';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const editorStore = useEditorStore();
 const projectStore = useProjectStore();
+const clipboardUtils = useProjectClipboard();
 
 const props = defineProps<{
   choiceId: string;
@@ -123,29 +121,30 @@ const menuItems: MenuItem[] = [
   {
     label: 'Clone',
     icon: 'iconify solar--copy-line-duotone',
-    command: (evt: MenuItemCommandEvent) => {
+    command: () => {
       console.log('Clone command triggered');
     },
   },
   {
     label: 'Move',
     icon: 'iconify solar--arrow-right-up-line-duotone',
-    command: (evt: MenuItemCommandEvent) => {
-      console.log('Clone command triggered');
+    command: () => {
+      console.log('Move command triggered');
     },
   },
   {
     label: 'Copy',
     icon: 'iconify solar--clipboard-text-line-duotone',
-    command: (evt: MenuItemCommandEvent) => {
-      console.log('Clone command triggered');
+    command: () => {
+      const parentId = projectStore.getParent(props.choiceId);
+      clipboardUtils.copyObject(props.choiceId, parentId);
     },
   },
   {
     label: 'Cut',
     icon: 'iconify solar--scissors-line-duotone',
-    command: (evt: MenuItemCommandEvent) => {
-      console.log('Clone command triggered');
+    command: () => {
+      console.log('Cut command triggered');
     },
   },
   { separator: true },
@@ -153,8 +152,8 @@ const menuItems: MenuItem[] = [
     label: 'Delete',
     icon: 'iconify solar--trash-bin-trash-line-duotone',
     class: 'text-red-400',
-    command: (evt: MenuItemCommandEvent) => {
-      console.log('Clone command triggered');
+    command: () => {
+      console.log('Delete command triggered');
     },
   },
 ];

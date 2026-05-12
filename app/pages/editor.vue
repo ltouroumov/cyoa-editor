@@ -4,6 +4,7 @@
   <DynamicDialog />
   <ConfirmDialog group="modal" />
   <ConfirmPopup group="popup" />
+  <Toast />
 </template>
 
 <script setup lang="ts">

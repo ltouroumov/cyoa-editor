@@ -13,6 +13,7 @@ import type {
   ProjectMedia,
   ProjectStyles,
 } from '~/composables/project/types/v2';
+import type { ClipboardItem } from '~/composables/project/types/v2/clipboard';
 import type {
   AnyObject,
   ChildObject,
@@ -38,6 +39,8 @@ export const useProjectStore = defineStore('project-v2', () => {
   const styles = ref<ProjectStyles>(DefaultProjectStyles);
   const media = ref<ProjectMedia>(DefaultProjectMedia);
 
+  const clipboard = ref<ClipboardItem[]>([]);
+
   const parents = computed((): Map<string, string> => {
     const _parents = new Map();
     for (const [parentId, childObjects] of children.value.entries()) {
@@ -58,6 +61,7 @@ export const useProjectStore = defineStore('project-v2', () => {
     config.value = project.config;
     styles.value = project.styles;
     media.value = project.media;
+    clipboard.value = project.clipboard;
   }
 
   function exportData(): Project {
@@ -70,6 +74,7 @@ export const useProjectStore = defineStore('project-v2', () => {
       config: clone(config.value),
       styles: clone(styles.value),
       media: clone(media.value),
+      clipboard: clone(clipboard.value),
     };
   }
 
@@ -81,7 +86,7 @@ export const useProjectStore = defineStore('project-v2', () => {
     id: string,
     type: T,
   ): ObjectMap[T] | undefined {
-    const object: AnyObject | undefined = objects.value.get(id);
+    const object: AnyObject | undefined = getObject(id);
     if (isNil(object)) {
       return undefined;
     } else if (object.type === type) {
@@ -89,6 +94,9 @@ export const useProjectStore = defineStore('project-v2', () => {
     } else {
       return undefined;
     }
+  }
+  function getObject(id: string): AnyObject | undefined {
+    return objects.value.get(id);
   }
 
   function getChildren(id: string): ChildObject[] {
@@ -118,8 +126,10 @@ export const useProjectStore = defineStore('project-v2', () => {
     config,
     styles,
     media,
+    clipboard,
     // Getters
     get,
+    getObject,
     getChildren,
     getParent,
     getParents,

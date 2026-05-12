@@ -19,6 +19,14 @@ export const useEditorStore = defineStore('editor', () => {
   const stack = ref<any[]>([]);
 
   const showOmniBar = ref<boolean>(false);
+  const showClipboard = ref<boolean>(false);
+
+  const toggleOmniBar = (set?: boolean) => {
+    showOmniBar.value = set ?? !showOmniBar.value;
+  };
+  const toggleClipboard = (set?: boolean) => {
+    showClipboard.value = set ?? !showClipboard.value;
+  };
 
   function pushScreen(screen: any) {
     stack.value = append(screen, stack.value);
@@ -65,10 +73,13 @@ export const useEditorStore = defineStore('editor', () => {
     root,
     stack,
     showOmniBar,
+    showClipboard,
     // Functions
     pushScreen,
     clearStack,
     popStack,
     withLoadingState,
+    toggleOmniBar,
+    toggleClipboard,
   };
 });
