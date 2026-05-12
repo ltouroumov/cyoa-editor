@@ -51,7 +51,7 @@
               outlined
               severity="danger"
               icon="iconify solar--trash-bin-trash-line-duotone"
-              @click="removeRequirement(requirement.id)"
+              @click="removeRequirement(requirement.id, $event)"
             />
           </div>
         </div>
@@ -122,6 +122,7 @@ const LazyEditRequirementModal = defineAsyncComponent(
   () => import('~/components/editor/modals/EditRequirementModal.vue'),
 );
 
+const $confirm = useConfirm();
 const $dialog = useDialog();
 const projectStore = useProjectStore();
 const props = defineProps<{
@@ -207,11 +208,28 @@ const addRequirement = () => {
   });
 };
 
-const removeRequirement = (id: string) => {
-  component.value.requirements = reject(
-    (cond) => cond.id === id,
-    component.value.requirements,
-  );
+const removeRequirement = (id: string, $event: any) => {
+  $confirm.require({
+    group: 'popup',
+    target: $event.currentTarget,
+    icon: 'pi pi-exclamation-triangle',
+    header: 'Remove Requirement',
+    message: 'Are you sure?',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Delete',
+    },
+    accept: () => {
+      component.value.requirements = reject(
+        (cond) => cond.id === id,
+        component.value.requirements,
+      );
+    },
+  });
 };
 
 const moveRequirement = (id: string, direction: 'up' | 'down') => {

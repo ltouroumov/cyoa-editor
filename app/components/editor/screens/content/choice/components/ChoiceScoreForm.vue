@@ -45,7 +45,7 @@
                 outlined
                 severity="danger"
                 icon="iconify solar--trash-bin-trash-line-duotone"
-                @click="removeScore(score.id)"
+                @click="removeScore(score.id, $event)"
               />
             </div>
           </div>
@@ -104,6 +104,7 @@ const LazyEditScoreModal = defineAsyncComponent(
   () => import('~/components/editor/modals/EditScoreModal.vue'),
 );
 
+const $confirm = useConfirm();
 const $dialog = useDialog();
 
 const projectStore = useProjectStore();
@@ -180,11 +181,28 @@ const addScore = () => {
   });
 };
 
-const removeScore = (id: string) => {
-  component.value.scores = reject(
-    (cond) => cond.id === id,
-    component.value.scores,
-  );
+const removeScore = (id: string, $event: any) => {
+  $confirm.require({
+    group: 'popup',
+    target: $event.currentTarget,
+    icon: 'pi pi-exclamation-triangle',
+    header: 'Remove Requirement',
+    message: 'Are you sure?',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Delete',
+    },
+    accept: () => {
+      component.value.scores = reject(
+        (cond) => cond.id === id,
+        component.value.scores,
+      );
+    },
+  });
 };
 
 const moveScore = (id: string, direction: 'up' | 'down') => {

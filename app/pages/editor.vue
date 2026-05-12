@@ -2,6 +2,8 @@
   <LazyProjectLibrary v-if="editorStore.mode == 'library'" />
   <LazyProjectEditor v-if="editorStore.mode === 'editor'" />
   <DynamicDialog />
+  <ConfirmDialog group="modal" />
+  <ConfirmPopup group="popup" />
 </template>
 
 <script setup lang="ts">
