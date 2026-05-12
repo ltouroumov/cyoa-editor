@@ -57,18 +57,14 @@
 </template>
 
 <script setup lang="ts">
+import { useDraftStyle } from '~/composables/editor/useDraftStyle';
 import { StyleType } from '~/composables/project/types/v2/styles';
-import { useProjectStore } from '~/composables/project/useProjectStore';
-
-const projectStore = useProjectStore();
 
 const props = defineProps<{
   styleId: string;
 }>();
 
-const style = computed(() => {
-  return projectStore.styles.rules[props.styleId];
-});
+const style = useDraftStyle(() => props.styleId);
 </script>
 
 <style scoped lang="scss"></style>

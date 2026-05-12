@@ -9,36 +9,36 @@
       <div class="grid grid-cols-form gap-2">
         <label class="font-bold">Layout</label>
         <Select
-          v-model="style.contents.layout"
+          v-model="simpleStyle.contents.layout"
           :options="['list', 'grid']"
           fluid
         />
       </div>
       <div class="grid grid-cols-form gap-2">
         <label class="font-bold">Gap</label>
-        <InputText v-model="style.contents.gap" fluid />
+        <InputText v-model="simpleStyle.contents.gap" fluid />
       </div>
     </div>
 
     <!-- Contents Margins -->
-    <div v-if="style.contents.margins" class="flex flex-col gap-2">
+    <div v-if="simpleStyle.contents.margins" class="flex flex-col gap-2">
       <div class="font-bold">Margins</div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
         <div class="grid grid-cols-form gap-2">
           <label>Top</label>
-          <InputText v-model="style.contents.margins.top" fluid />
+          <InputText v-model="simpleStyle.contents.margins.top" fluid />
         </div>
         <div class="grid grid-cols-form gap-2">
           <label>Right</label>
-          <InputText v-model="style.contents.margins.right" fluid />
+          <InputText v-model="simpleStyle.contents.margins.right" fluid />
         </div>
         <div class="grid grid-cols-form gap-2">
           <label>Bottom</label>
-          <InputText v-model="style.contents.margins.bottom" fluid />
+          <InputText v-model="simpleStyle.contents.margins.bottom" fluid />
         </div>
         <div class="grid grid-cols-form gap-2">
           <label>Left</label>
-          <InputText v-model="style.contents.margins.left" fluid />
+          <InputText v-model="simpleStyle.contents.margins.left" fluid />
         </div>
       </div>
     </div>
@@ -46,18 +46,15 @@
 </template>
 
 <script setup lang="ts">
-import type { AnySimpleStyle } from '~/composables/project/types/v2/styles';
-import { useProjectStore } from '~/composables/project/useProjectStore';
+import type {
+  AnySimpleStyle,
+  AnyStyle,
+} from '~/composables/project/types/v2/styles';
 
-const projectStore = useProjectStore();
-
-const props = defineProps<{
-  styleId: string;
-}>();
-
-const style = computed((): AnySimpleStyle => {
-  return projectStore.styles.rules[props.styleId] as AnySimpleStyle;
-});
+const style = defineModel<AnyStyle>({ required: true });
+const simpleStyle = computed(
+  (): AnySimpleStyle => style.value as AnySimpleStyle,
+);
 </script>
 
 <style scoped lang="scss"></style>

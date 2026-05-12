@@ -1,22 +1,14 @@
 <template>
   <div class="flex flex-col gap-4">
-    <EditSimpleHeaderStyle :style-id="styleId" />
-    <EditSimpleContentStyle :style-id="styleId" />
+    <EditSimpleHeaderStyle v-model="style" />
+    <EditSimpleContentStyle v-model="style" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { AnySimpleStyle } from '~/composables/project/types/v2/styles';
-import { useProjectStore } from '~/composables/project/useProjectStore';
-const projectStore = useProjectStore();
+import type { AnyStyle } from '~/composables/project/types/v2/styles';
 
-const props = defineProps<{
-  styleId: string;
-}>();
-
-const style = computed((): AnySimpleStyle => {
-  return projectStore.styles.rules[props.styleId] as AnySimpleStyle;
-});
+const style = defineModel<AnyStyle>({ required: true });
 </script>
 
 <style scoped lang="scss"></style>
