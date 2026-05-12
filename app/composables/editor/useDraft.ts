@@ -11,7 +11,13 @@ export function useDraft<T>(
 ): Ref<T> {
   const $project = useProjectStore();
 
-  const draft = ref<T>(clone(getFromStore() as T)) as Ref<T>;
+  const initial = getFromStore();
+  if (initial === undefined) {
+    console.warn(
+      '[useDraft] getFromStore() returned undefined on init — entity may not exist in the store',
+    );
+  }
+  const draft = ref<T>(clone((initial ?? {}) as T)) as Ref<T>;
   let isWriting = false;
 
   const doFlush = (value: T): void => {
@@ -35,7 +41,7 @@ export function useDraft<T>(
 
   watch(getFromStore, (newVal) => {
     if (isWriting) return;
-    debouncedFlush.flush();
+    debouncedFlush.cancel();
     if (newVal !== undefined) {
       draft.value = clone(newVal);
     }
