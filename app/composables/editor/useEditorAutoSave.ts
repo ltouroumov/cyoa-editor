@@ -7,6 +7,14 @@ import {
 import { useProjectStore } from '~/composables/project/useProjectStore';
 import { debounce } from '~/composables/utils/debounce';
 
+const AUTO_SAVE_DEFAULT_DELAY = 2000;
+
+function resolveDelay(interval: AutoSaveInterval): number {
+  if (interval === 'auto') return AUTO_SAVE_DEFAULT_DELAY;
+  if (interval === 'off') return 0;
+  return interval;
+}
+
 export function useEditorAutoSave() {
   const $editor = useEditorStore();
   const $project = useProjectStore();
@@ -57,12 +65,14 @@ export function useEditorAutoSave() {
     ];
   });
 
-  $project.$subscribe(
-    debounce(() => {
-      console.log(`project changed ${Date.now()}`);
-    }, 200),
-    { flush: 'post' },
-  );
+  // NOTE: delay is fixed at setup time; reconnecting this to a reactive interval
+  // is deferred until the real save logic is implemented.
+  const triggerSave = debounce(() => {
+    if ($editor.autoSaveInterval === 'off') return;
+    console.log(`trigger auto-save at ${Date.now()}`);
+  }, resolveDelay($editor.autoSaveInterval));
+
+  watch(() => $project.changeVersion, triggerSave);
 
   return { autoSaveInterval: $editor.autoSaveInterval, menuOptions };
 }
