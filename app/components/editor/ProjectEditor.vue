@@ -67,35 +67,25 @@ import type { MenuItem } from 'primevue/menuitem';
 
 import EditorBreadcrumbs from '~/components/editor/screens/EditorBreadcrumbs.vue';
 import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
+import { useEditorAutoSave } from '~/composables/editor/useEditorAutoSave';
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 
 const { unloadProject, saveProject } = useEditorLibrary();
 const editorStore = useEditorStore();
+const autoSaveUtils = useEditorAutoSave();
 const { screen } = useScreenDispatch();
 
 const preview = ref<boolean>(false);
-const menu: MenuItem[] = [
+const menu: ComputedRef<MenuItem[]> = computed(() => [
   {
     label: 'Project',
     icon: 'iconify solar--file-bold-duotone',
     items: [
       {
         label: 'Auto Save',
-        items: [
-          {
-            label: 'Disabled',
-          },
-          {
-            label: '1 Minute',
-            icon: 'iconify solar--check-circle-line-duotone',
-          },
-          { label: '2 Minutes' },
-          { label: '5 Minutes' },
-          { label: '10 Minutes' },
-        ],
+        items: autoSaveUtils.menuOptions.value,
       },
-
       { separator: true },
       {
         label: 'Save',
@@ -135,7 +125,7 @@ const menu: MenuItem[] = [
       editorStore.clearStack('styles');
     },
   },
-];
+]);
 
 const { ctrl_k, esc } = useMagicKeys({
   passive: false,

@@ -9,6 +9,8 @@ import type {
 type EditorStatus = 'empty' | 'loading' | 'ready';
 
 type EditorStackRoot = 'content' | 'media' | 'styles';
+export type AutoSaveInterval = 'off' | 'auto' | number;
+
 export const useEditorStore = defineStore('editor', () => {
   const status = ref<EditorStatus>('empty');
   const project = ref<EditorProject | null>(null);
@@ -20,6 +22,8 @@ export const useEditorStore = defineStore('editor', () => {
 
   const showOmniBar = ref<boolean>(false);
   const showClipboard = ref<boolean>(false);
+
+  const autoSaveInterval = ref<AutoSaveInterval>('auto');
 
   const toggleOmniBar = (set?: boolean) => {
     showOmniBar.value = set ?? !showOmniBar.value;
@@ -74,6 +78,7 @@ export const useEditorStore = defineStore('editor', () => {
     stack,
     showOmniBar,
     showClipboard,
+    autoSaveInterval,
     // Functions
     pushScreen,
     clearStack,
