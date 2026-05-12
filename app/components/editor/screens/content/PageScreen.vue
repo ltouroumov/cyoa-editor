@@ -52,6 +52,7 @@
 <script setup lang="ts">
 import { filter, includes, isEmpty, toLower } from 'ramda';
 
+import { useDraftObject } from '~/composables/editor/useDraftObject';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
@@ -60,9 +61,7 @@ const props = defineProps<{
   pageId: string;
 }>();
 
-const page = computed(() => {
-  return projectStore.get(props.pageId, ObjectType.page)!;
-});
+const page = useDraftObject(() => props.pageId, ObjectType.page);
 
 const children = computed(() => {
   const _search = search.value;
