@@ -2,14 +2,30 @@
   <div class="flex flex-col gap-2 rounded border border-surface-700 p-2">
     <div class="flex flex-row justify-between items-center">
       <ChoiceMove :choice-id="choiceId" :index="index" />
-      <ChoiceLayout :choice-id="choiceId" :index="index" />
       <div class="flex flex-row gap-2">
-        <Button variant="outlined" size="small" severity="secondary">
-          Clone
-        </Button>
-        <Button variant="outlined" size="small" severity="danger">
-          Delete
-        </Button>
+        <ChoiceLayout :choice-id="choiceId" :index="index" />
+        <IconButton
+          severity="secondary"
+          variant="outlined"
+          size="small"
+          icon="iconify solar--menu-dots-bold-duotone"
+          @click="openMenu($event)"
+        />
+        <Menu ref="menu" :model="menuItems" :popup="true">
+          <template #item="{ item }">
+            <a
+              v-ripple
+              class="px-2 py-1 flex items-center gap-1 cursor-pointer"
+              :class="item.class"
+              @click="
+                item.command?.call($el, { originalEvent: $event, item: item })
+              "
+            >
+              <span :class="item.icon" />
+              <span>{{ item.label }}</span>
+            </a>
+          </template>
+        </Menu>
       </div>
     </div>
     <div
@@ -46,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
 import { clone, findIndex, isNil, propEq } from 'ramda';
 
 import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
@@ -100,6 +117,50 @@ function moveDown() {
     projectStore.children.set(parentId, childArr);
   }
 }
+
+const menu = ref();
+const menuItems: MenuItem[] = [
+  {
+    label: 'Clone',
+    icon: 'iconify solar--copy-line-duotone',
+    command: (evt: MenuItemCommandEvent) => {
+      console.log('Clone command triggered');
+    },
+  },
+  {
+    label: 'Move',
+    icon: 'iconify solar--arrow-right-up-line-duotone',
+    command: (evt: MenuItemCommandEvent) => {
+      console.log('Clone command triggered');
+    },
+  },
+  {
+    label: 'Copy',
+    icon: 'iconify solar--clipboard-text-line-duotone',
+    command: (evt: MenuItemCommandEvent) => {
+      console.log('Clone command triggered');
+    },
+  },
+  {
+    label: 'Cut',
+    icon: 'iconify solar--scissors-line-duotone',
+    command: (evt: MenuItemCommandEvent) => {
+      console.log('Clone command triggered');
+    },
+  },
+  { separator: true },
+  {
+    label: 'Delete',
+    icon: 'iconify solar--trash-bin-trash-line-duotone',
+    class: 'text-red-400',
+    command: (evt: MenuItemCommandEvent) => {
+      console.log('Clone command triggered');
+    },
+  },
+];
+const openMenu = ($event: any) => {
+  menu.value.toggle($event);
+};
 </script>
 
 <style scoped lang="scss"></style>
