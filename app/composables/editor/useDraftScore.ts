@@ -1,0 +1,18 @@
+import type { MaybeRefOrGetter } from 'vue';
+
+import type { ProjectScore } from '~/composables/project/types/v2/score';
+import { useDraft } from '~/composables/editor/useDraft';
+import { useProjectStore } from '~/composables/project/useProjectStore';
+
+export function useDraftScore(
+  source: MaybeRefOrGetter<string>,
+): Ref<ProjectScore> {
+  const $project = useProjectStore();
+
+  return useDraft<ProjectScore>(
+    () => $project.scores.value.get(toValue(source)),
+    (value) => {
+      $project.scores.value.set(toValue(source), value);
+    },
+  );
+}
