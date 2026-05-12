@@ -12,7 +12,7 @@
       </div>
     </template>
     <div class="flex flex-col gap-2">
-      <template v-for="(item, idx) in projectStore.clipboard" :key="item.id">
+      <template v-for="item in projectStore.clipboard" :key="item.id">
         <ClipboardEntry :entry="item" />
       </template>
     </div>

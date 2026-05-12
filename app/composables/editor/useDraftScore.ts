@@ -10,9 +10,9 @@ export function useDraftScore(
   const $project = useProjectStore();
 
   return useDraft<ProjectScore>(
-    () => $project.scores.value.get(toValue(source)),
+    () => $project.scores.get(toValue(source)),
     (value) => {
-      $project.scores.value.set(toValue(source), value);
+      $project.scores.set(toValue(source), value);
     },
   );
 }

@@ -14,7 +14,7 @@ export function useDraftObject<T extends ObjectType>(
   return useDraft<ObjectMap[T]>(
     () => $project.get(toValue(source), type),
     (value) => {
-      $project.objects.value.set(toValue(source), value);
+      $project.objects.set(toValue(source), value);
     },
   );
 }

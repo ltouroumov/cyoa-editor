@@ -10,9 +10,9 @@ export function useDraftImage(
   const $project = useProjectStore();
 
   return useDraft<ProjectImage>(
-    () => $project.media.value.images[toValue(source)],
+    () => $project.media.images[toValue(source)],
     (value) => {
-      $project.media.value.images[toValue(source)] = value;
+      $project.media.images[toValue(source)] = value;
     },
   );
 }

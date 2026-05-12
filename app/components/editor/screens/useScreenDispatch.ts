@@ -72,6 +72,7 @@ export function buildStackFromObjectId(objectId: string): any[] {
       styleId: objectId,
     });
   } else if (has(objectId, projectStore.media.images)) {
+    // TODO: edit media
   }
 
   return stack;

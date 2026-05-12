@@ -8,9 +8,9 @@ export function useDraftStyle(source: MaybeRefOrGetter<string>): Ref<AnyStyle> {
   const $project = useProjectStore();
 
   return useDraft<AnyStyle>(
-    () => $project.styles.value.rules[toValue(source)],
+    () => $project.styles.rules[toValue(source)],
     (value) => {
-      $project.styles.value.rules[toValue(source)] = value;
+      $project.styles.rules[toValue(source)] = value;
     },
   );
 }
