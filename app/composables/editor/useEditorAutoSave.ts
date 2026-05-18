@@ -10,7 +10,8 @@ import {
 import { useProjectStore } from '~/composables/project/useProjectStore';
 import { debounce } from '~/composables/utils/debounce';
 
-const AUTO_SAVE_DEFAULT_DELAY = 2000;
+// auto-save every 5 seconds
+const AUTO_SAVE_DEFAULT_DELAY = 1000 * 5;
 
 function resolveDelay(interval: AutoSaveInterval): number {
   if (interval === 'auto') return AUTO_SAVE_DEFAULT_DELAY;
@@ -74,43 +75,53 @@ export const useEditorAutoSave = defineStore('editor/auto-save', () => {
     ];
   });
 
-  let lastDynamicSaveTime = Date.now();
-  let dynamicSaveTimer: any = undefined;
+  const lastSaveVersion = ref<number>($project.changeVersion);
+  const lastSaveTime = ref<number>(Date.now());
+
+  const isDirty = computed(
+    () => $project.changeVersion > lastSaveVersion.value,
+  );
+
+  const dynamicSaveTimer = ref<any>(undefined);
+
+  const doSave = () => {
+    $library.saveProject().then(() => {
+      console.log(`project saved at ${Date.now()} (${$project.changeVersion})`);
+      // update the last auto-save time
+      lastSaveVersion.value = $project.changeVersion;
+      lastSaveTime.value = Date.now();
+    });
+  };
+
   const triggerSave = debounce(() => {
     if ($editor.autoSaveInterval !== 'auto') return;
 
-    const curTime = Date.now();
-    if (curTime - lastDynamicSaveTime < AUTO_SAVE_DEFAULT_DELAY) {
-      // if the last auto-save was less than the default delay ago, schedule one in the future
-      // this ensures that we save at least once every 2 seconds
-      dynamicSaveTimer = setTimeout(
-        () => triggerSave(),
-        AUTO_SAVE_DEFAULT_DELAY,
-      );
-    } else {
-      // if the last auto-save was more than the default delay ago, save immediately
+    if ($project.changeVersion > lastSaveVersion.value) {
+      const now = Date.now();
+      const elapsed = now - lastSaveTime.value;
+      if (elapsed < AUTO_SAVE_DEFAULT_DELAY) {
+        const saveDelay = AUTO_SAVE_DEFAULT_DELAY - elapsed;
+        dynamicSaveTimer.value = setTimeout(() => doSave(), saveDelay);
+        console.log(`auto-save delayed by ${saveDelay}ms`);
+      } else {
+        // kill any pending save operation
+        clearTimeout(dynamicSaveTimer.value);
+        dynamicSaveTimer.value = undefined;
 
-      // clear the pending auto-save timer, in case there is a pending operation
-      clearTimeout(dynamicSaveTimer);
-      dynamicSaveTimer = undefined;
-
-      // save the project
-      $library.saveProject().then(() => {
-        console.log(`project saved at ${Date.now()}`);
-        // update the last auto-save time
-        lastDynamicSaveTime = curTime;
-      });
+        // if the project has changed since the last save, trigger a save
+        doSave();
+      }
     }
   }, 200);
 
-  let scheduledSaveTimer: any = undefined;
-  let lastScheduledSaveVersion = $project.changeVersion;
+  const scheduledSaveTimer = ref<any>(undefined);
+
   watch(
     () => $editor.autoSaveInterval,
     () => {
-      if (isNotNil(scheduledSaveTimer)) {
-        clearInterval(scheduledSaveTimer);
-        scheduledSaveTimer = undefined;
+      if (isNotNil(scheduledSaveTimer.value)) {
+        clearInterval(scheduledSaveTimer.value);
+        scheduledSaveTimer.value = undefined;
       }
 
       if (
@@ -118,15 +129,10 @@ export const useEditorAutoSave = defineStore('editor/auto-save', () => {
         $editor.autoSaveInterval !== 'off'
       ) {
         const delay = resolveDelay($editor.autoSaveInterval);
-        scheduledSaveTimer = setInterval(() => {
+        scheduledSaveTimer.value = setInterval(() => {
           // save the project
-          if ($project.changeVersion > lastScheduledSaveVersion) {
-            $library.saveProject().then(() => {
-              console.log(
-                `project saved at ${Date.now()} (${$project.changeVersion})`,
-              );
-              lastScheduledSaveVersion = $project.changeVersion;
-            });
+          if ($project.changeVersion > lastSaveVersion.value) {
+            doSave();
           } else {
             console.log(`save skipped: no changes (${$project.changeVersion})`);
           }
@@ -142,5 +148,15 @@ export const useEditorAutoSave = defineStore('editor/auto-save', () => {
     () => triggerSave(),
   );
 
-  return { autoSaveInterval: $editor.autoSaveInterval, menuOptions };
+  return {
+    autoSaveInterval: $editor.autoSaveInterval,
+    menuOptions,
+    lastSaveTime,
+    lastSaveVersion,
+    isDirty,
+    // private store values
+    // note: pinia requires all store refs to be returned to work properly
+    __dynamicSaveTimer: dynamicSaveTimer,
+    __scheduledSaveTimer: scheduledSaveTimer,
+  };
 });

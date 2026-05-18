@@ -18,6 +18,7 @@
       </li>
     </ul>
     <div class="flex flex-row items-center gap-2">
+      <AutoSaveStatus />
       <Button
         :unstyled="true"
         class="flex flex-row items-center border border-surface-500 rounded ps-3 pe-2 py-1 relative cursor-pointer h-8"
@@ -97,6 +98,7 @@
 <script setup lang="ts">
 import { P, match } from 'ts-pattern';
 
+import AutoSaveStatus from '~/components/editor/menu/AutoSaveStatus.vue';
 import MenuItem from '~/components/editor/menu/MenuItem.vue';
 import { useEditorAutoSave } from '~/composables/editor/useEditorAutoSave';
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
