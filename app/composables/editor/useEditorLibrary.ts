@@ -10,6 +10,8 @@ import type { EditorProjectVersion } from '~/composables/shared/tables/editor_pr
 import { useDexie } from '~/composables/shared/useDexie';
 
 export function useEditorLibrary() {
+  const $toast = useToast();
+
   const dexie = useDexie();
   const editorStore = useEditorStore();
   const projectStore = useProjectStore();
@@ -112,13 +114,22 @@ export function useEditorLibrary() {
     });
   }
 
-  async function saveProject() {
+  async function saveProject(notify?: boolean) {
     await editorStore.withLoadingState(async () => {
       const projectId = editorStore.project!.id;
       const version = await createVersion(projectId, projectStore.exportData());
       await dexie.editor_projects.update(projectId, {
         currentVersionId: version.id,
       });
+
+      if (notify) {
+        $toast.add({
+          severity: 'success',
+          summary: 'Project saved',
+          detail: 'Your project has been saved successfully.',
+          life: 3000,
+        });
+      }
     });
   }
 

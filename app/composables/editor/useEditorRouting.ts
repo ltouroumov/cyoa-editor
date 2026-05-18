@@ -43,7 +43,7 @@ function buildHash(state: HashState): string {
     params.set('screen', state.screen);
   }
 
-  return params.toString() ? `#${params.toString()}` : '';
+  return params.size > 0 ? `#${params.toString()}` : '';
 }
 
 function serializeScreen(screen: any): string {

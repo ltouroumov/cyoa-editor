@@ -28,13 +28,9 @@
 <script setup lang="ts">
 import EditorBreadcrumbs from '~/components/editor/screens/EditorBreadcrumbs.vue';
 import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
-import { useEditorAutoSave } from '~/composables/editor/useEditorAutoSave';
-import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 
-const { unloadProject, saveProject } = useEditorLibrary();
 const editorStore = useEditorStore();
-const autoSaveUtils = useEditorAutoSave();
 const { screen } = useScreenDispatch();
 
 const preview = ref<boolean>(false);

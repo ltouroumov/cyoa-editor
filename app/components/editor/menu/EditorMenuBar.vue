@@ -76,10 +76,16 @@
             </div>
           </div>
         </MenuItem>
-        <MenuItem icon="iconify solar--file-download-bold-duotone">
+        <MenuItem
+          icon="iconify solar--file-download-bold-duotone"
+          @click="library.saveProject(true)"
+        >
           Save Project
         </MenuItem>
-        <MenuItem icon="iconify solar--file-remove-bold-duotone">
+        <MenuItem
+          icon="iconify solar--file-remove-bold-duotone"
+          @click="library.unloadProject()"
+        >
           Close Project
         </MenuItem>
       </div>
@@ -91,10 +97,12 @@
 <script setup lang="ts">
 import { P, match } from 'ts-pattern';
 
-import MenuItem from '~/components/menu/MenuItem.vue';
+import MenuItem from '~/components/editor/menu/MenuItem.vue';
 import { useEditorAutoSave } from '~/composables/editor/useEditorAutoSave';
+import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 
+const library = useEditorLibrary();
 const editorStore = useEditorStore();
 const autoSaveUtils = useEditorAutoSave();
 
