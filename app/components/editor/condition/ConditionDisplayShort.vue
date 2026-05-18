@@ -1,5 +1,5 @@
 <template>
-  <span class="truncate">
+  <span class="w-full truncate">
     {{ termText }}
   </span>
 </template>

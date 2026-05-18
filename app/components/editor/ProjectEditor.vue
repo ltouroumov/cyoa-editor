@@ -1,43 +1,6 @@
 <template>
   <div class="flex flex-col p-2 gap-2 h-full w-full">
-    <Menubar :model="menu" class="rounded">
-      <template #end>
-        <div class="flex flex-row items-center gap-2">
-          <div v-if="false" class="flex flex-row items-center">
-            <label class="me-2">Preview</label>
-            <ToggleSwitch v-model="preview" size="small" variant="outlined" />
-          </div>
-          <Button
-            :unstyled="true"
-            class="flex flex-row items-center border border-surface-500 rounded ps-3 pe-2 py-1 relative cursor-pointer h-8"
-            @click="editorStore.toggleOmniBar(true)"
-          >
-            <div class="hidden lg:block text-sm text-muted-color me-2">
-              Search ...
-            </div>
-            <div
-              class="block lg:hidden w-4 border-b border-surface-300 h-5"
-            ></div>
-            <div class="block lg:hidden h-5 w-8"></div>
-            <div class="size-5 iconify solar--magnifer-outline"></div>
-          </Button>
-          <Button
-            :unstyled="true"
-            class="flex flex-row items-center border border-surface-500 rounded px-2 py-1 relative cursor-pointer h-8"
-            @click="editorStore.toggleClipboard(true)"
-          >
-            <div class="text-sm text-muted-color me-1">Clipboard</div>
-            <div
-              class="size-5 iconify solar--clipboard-list-bold-duotone"
-            ></div>
-          </Button>
-          <!-- <Divider layout="vertical" />
-          <h1 class="text-amber-500 text-xl">
-            {{ editorStore.project!.name }}
-          </h1> -->
-        </div>
-      </template>
-    </Menubar>
+    <EditorMenuBar />
     <div v-if="preview">PREVIEW</div>
     <Card
       v-if="!preview"
@@ -63,8 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import type { MenuItem } from 'primevue/menuitem';
-
 import EditorBreadcrumbs from '~/components/editor/screens/EditorBreadcrumbs.vue';
 import { useScreenDispatch } from '~/components/editor/screens/useScreenDispatch';
 import { useEditorAutoSave } from '~/composables/editor/useEditorAutoSave';
@@ -77,55 +38,6 @@ const autoSaveUtils = useEditorAutoSave();
 const { screen } = useScreenDispatch();
 
 const preview = ref<boolean>(false);
-const menu: ComputedRef<MenuItem[]> = computed(() => [
-  {
-    label: 'Project',
-    icon: 'iconify solar--file-bold-duotone',
-    items: [
-      {
-        label: 'Auto Save',
-        items: autoSaveUtils.menuOptions.value,
-      },
-      { separator: true },
-      {
-        label: 'Save',
-        icon: 'iconify solar--file-download-bold-duotone',
-        command: async () => {
-          await saveProject();
-        },
-      },
-      {
-        label: 'Close',
-        icon: 'iconify solar--file-remove-bold-duotone',
-        command: () => {
-          unloadProject();
-        },
-      },
-    ],
-  },
-  { separator: true, class: 'border-l border-surface-700 h-4' },
-  {
-    label: 'Content',
-    icon: 'iconify solar--documents-minimalistic-line-duotone',
-    command: () => {
-      editorStore.clearStack('content');
-    },
-  },
-  {
-    label: 'Media',
-    icon: 'iconify solar--gallery-line-duotone',
-    command: () => {
-      editorStore.clearStack('media');
-    },
-  },
-  {
-    label: 'Styles',
-    icon: 'iconify solar--pallete-2-line-duotone',
-    command: () => {
-      editorStore.clearStack('styles');
-    },
-  },
-]);
 
 const { ctrl_k, esc } = useMagicKeys({
   passive: false,
