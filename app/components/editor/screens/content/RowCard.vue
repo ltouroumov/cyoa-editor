@@ -15,47 +15,7 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-row gap-2">
-        <ButtonGroup>
-          <Button
-            variant="outlined"
-            size="small"
-            severity="secondary"
-            icon="iconify solar--copy-line-duotone"
-            label="Clone"
-          />
-          <Button
-            variant="outlined"
-            size="small"
-            severity="secondary"
-            icon="iconify solar--arrow-right-up-line-duotone"
-            label="Move"
-          />
-          <Button
-            variant="outlined"
-            size="small"
-            severity="secondary"
-            icon="iconify solar--clipboard-text-line-duotone"
-            label="Copy"
-            @click="copyRow()"
-          />
-          <Button
-            variant="outlined"
-            size="small"
-            severity="secondary"
-            icon="iconify solar--scissors-line-duotone"
-            label="Cut"
-          />
-        </ButtonGroup>
-        <Button
-          variant="outlined"
-          size="small"
-          severity="danger"
-          icon="iconify solar--trash-bin-trash-line-duotone"
-          label="Delete"
-          @click="deleteRow($event)"
-        />
-      </div>
+      <CardMenu :object-id="rowId" />
     </div>
     <div v-if="row.header" class="flex flex-row gap-2">
       <div>

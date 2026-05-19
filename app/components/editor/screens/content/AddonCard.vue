@@ -3,12 +3,7 @@
     <div class="flex flex-row justify-between">
       <AddonMove :addon-id="addonId" :index="index" />
       <div class="flex flex-row gap-2">
-        <Button variant="outlined" size="small" severity="secondary">
-          Clone
-        </Button>
-        <Button variant="outlined" size="small" severity="danger">
-          Delete
-        </Button>
+        <CardMenu :object-id="addonId" />
       </div>
     </div>
     <div

@@ -4,24 +4,7 @@
       <ChoiceMove :choice-id="choiceId" :index="index" />
       <div class="flex flex-row gap-2">
         <ChoiceLayout :choice-id="choiceId" :index="index" />
-        <IconButton
-          severity="secondary"
-          variant="outlined"
-          size="small"
-          icon="iconify solar--menu-dots-bold-duotone"
-          @click="openMenu($event)"
-        />
-        <Menu ref="menu" :model="menuItems" :popup="true">
-          <template #item="{ item }">
-            <a
-              class="px-2 py-1 flex items-center gap-1 cursor-pointer"
-              :class="item.class"
-            >
-              <span :class="item.icon" />
-              <span>{{ item.label }}</span>
-            </a>
-          </template>
-        </Menu>
+        <CardMenu :object-id="choiceId" />
       </div>
     </div>
     <div

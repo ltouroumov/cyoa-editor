@@ -1,3 +1,4 @@
+import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { ConditionType } from '~/composables/project/types/v2/objects/components/condition';
 import { ScoreType } from '~/composables/project/types/v2/score';
 
@@ -34,3 +35,10 @@ export const ScoreTypes: { label: string; value: ScoreType }[] = [
   { label: 'Gain', value: ScoreType.Gain },
   { label: 'Set', value: ScoreType.Set },
 ];
+
+export const ObjectTypeNames: Record<ObjectType, string> = {
+  [ObjectType.page]: 'Page',
+  [ObjectType.row]: 'Row',
+  [ObjectType.choice]: 'Choice',
+  [ObjectType.addon]: 'Addon',
+};
