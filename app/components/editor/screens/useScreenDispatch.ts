@@ -1,5 +1,5 @@
 import type { MenuItem } from 'primevue/menuitem';
-import { has, isEmpty, last } from 'ramda';
+import { has, isEmpty, isNil, last } from 'ramda';
 
 import BlankScreen from '~/components/editor/screens/BlankScreen.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
@@ -33,12 +33,19 @@ const StyleEditScreen = defineAsyncComponent(
 const ScoresScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/content/scores/ScoresScreen.vue'),
 );
+const EditScoreScreen = defineAsyncComponent(
+  () =>
+    import('~/components/editor/screens/content/scores/EditScoreScreen.vue'),
+);
 
-export function buildStackFromObjectId(objectId: string): any[] {
+export function buildStackFromObjectId(objectId: string, hint?: string): any[] {
   const projectStore = useProjectStore();
   const stack = [];
 
-  if (projectStore.objects.has(objectId)) {
+  if (
+    (hint === 'object' || isNil(hint)) &&
+    projectStore.objects.has(objectId)
+  ) {
     const parents = projectStore.getParents(objectId);
     for (const parentId of parents) {
       const object = projectStore.objects.get(parentId)!;
@@ -69,12 +76,26 @@ export function buildStackFromObjectId(objectId: string): any[] {
           break;
       }
     }
-  } else if (has(objectId, projectStore.styles.rules)) {
+  } else if (
+    (hint === 'score' || isNil(hint)) &&
+    projectStore.scores.has(objectId)
+  ) {
+    stack.push({
+      type: 'edit-score',
+      scoreId: objectId,
+    });
+  } else if (
+    (hint === 'style' || isNil(hint)) &&
+    has(objectId, projectStore.styles.rules)
+  ) {
     stack.push({
       type: 'edit-style',
       styleId: objectId,
     });
-  } else if (has(objectId, projectStore.media.images)) {
+  } else if (
+    (hint === 'media' || isNil(hint)) &&
+    has(objectId, projectStore.media.images)
+  ) {
     // TODO: edit media
   }
 
@@ -93,6 +114,15 @@ export function useScreenDispatch() {
         return { component: RowScreen, props: { rowId: top.rowId } };
       case 'edit-choice':
         return { component: ChoiceScreen, props: { choiceId: top.choiceId } };
+      default:
+        return { component: BlankScreen, props: {} };
+    }
+  }
+
+  function dispatchScoreScreen(top: any): ScreenComponent {
+    switch (top.type) {
+      case 'edit-score':
+        return { component: EditScoreScreen, props: { scoreId: top.scoreId } };
       default:
         return { component: BlankScreen, props: {} };
     }
@@ -117,7 +147,12 @@ export function useScreenDispatch() {
           return dispatchContentScreen(top);
         }
       case 'scores':
-        return { component: ScoresScreen };
+        if (isEmpty(editorStore.stack)) {
+          return { component: ScoresScreen };
+        } else {
+          const top = last(editorStore.stack);
+          return dispatchScoreScreen(top);
+        }
       case 'media':
         return { component: MediaScreen };
       case 'styles':
@@ -204,6 +239,14 @@ export function useScreenDispatch() {
           return {
             label: style.name || style.id,
             icon: 'iconify solar--pallete-2-line-duotone',
+            command: () => editorStore.popStack(index),
+          };
+        }
+        case 'edit-score': {
+          const score = projectStore.scores.get(item.scoreId);
+          return {
+            label: score?.title || score?.id,
+            icon: 'iconify solar--card-2-line-duotone',
             command: () => editorStore.popStack(index),
           };
         }

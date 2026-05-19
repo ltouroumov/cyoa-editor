@@ -33,7 +33,10 @@
       </div>
       <div class="inline-flex flex-row gap-1">
         <span class="font-bold">Condition:</span>
-        <span v-if="isNotNil(score.activeWhen)">{{ score.activeWhen }}</span>
+        <ConditionDisplayShort
+          v-if="isNotNil(score.activeWhen)"
+          :term="score.activeWhen"
+        />
         <span v-else class="italic">Always Enabled</span>
       </div>
     </div>
@@ -60,8 +63,8 @@ const score = computed((): ProjectScore => {
 
 function editPage() {
   editorStore.pushScreen({
-    type: 'edit-page',
-    pageId: score.value.id,
+    type: 'edit-score',
+    scoreId: score.value.id,
   });
 }
 </script>

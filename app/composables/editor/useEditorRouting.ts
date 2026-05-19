@@ -49,27 +49,33 @@ function buildHash(state: HashState): string {
 function serializeScreen(screen: any): string {
   switch (screen.type) {
     case 'edit-page':
-      return `page:${screen.pageId}`;
+      return `object:${screen.pageId}`;
     case 'edit-row':
-      return `row:${screen.rowId}`;
+      return `object:${screen.rowId}`;
     case 'edit-choice':
-      return `choice:${screen.choiceId}`;
+      return `object:${screen.choiceId}`;
     case 'edit-addon':
-      return `addon:${screen.addonId}`;
+      return `object:${screen.addonId}`;
     case 'edit-style':
       return `style:${screen.styleId}`;
+    case 'edit-media':
+      return `media:${screen.mediaId}`;
+    case 'edit-score':
+      return `score:${screen.scoreId}`;
     default:
       return '';
   }
 }
 
-function deserializeScreen(screenStr: string): { objectId: string } | null {
+function deserializeScreen(
+  screenStr: string,
+): { type: string; objectId: string } | null {
   if (!screenStr) return null;
 
-  const [_type, objectId] = screenStr.split(':');
+  const [type, objectId] = screenStr.split(':');
   if (!objectId) return null;
 
-  return { objectId };
+  return { type, objectId };
 }
 
 export function useEditorRouting() {
@@ -121,7 +127,7 @@ export function useEditorRouting() {
     }
 
     // Rebuild full stack from object ID
-    const stack = buildStackFromObjectId(screen.objectId);
+    const stack = buildStackFromObjectId(screen.objectId, screen.type);
     editorStore.stack = stack;
   }
 

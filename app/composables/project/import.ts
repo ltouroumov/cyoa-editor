@@ -22,6 +22,7 @@ import { V1ProjectSchema } from '~/composables/project/schema/v1-format';
 import { V2ProjectSchema } from '~/composables/project/schema/v2-format';
 import type { Project as LegacyProject } from '~/composables/project/types/v1';
 import type { Project } from '~/composables/project/types/v2';
+import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 import { createId } from '~/composables/project/types/v2/id';
 import type {
   ChoiceObject,
@@ -114,12 +115,17 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
 
   if (isNotEmpty(legacy.pointTypes)) {
     for (const pointType of legacy.pointTypes) {
+      let enabledWhen: ConditionTerm | undefined = undefined;
+      if (pointType.activatedId) {
+        enabledWhen = { isSelected: pointType.activatedId };
+      }
+
       data.content.scores[pointType.id] = {
         id: pointType.id,
         title: pointType.name,
         unit: pointType.afterText,
         defaultValue: pointType.startingSum,
-        // enabledWhen: ???
+        activeWhen: enabledWhen,
       };
     }
   }
