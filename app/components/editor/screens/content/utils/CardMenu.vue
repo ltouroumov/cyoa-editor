@@ -146,7 +146,7 @@ function copyObject() {
       clipboardUtils.copyObject(props.objectId, parentId);
     })
     .with(EntityType.Score, () => {
-      console.log('Copy Score command triggered');
+      clipboardUtils.copyScore(props.objectId);
     })
     .with(EntityType.Image, () => {
       console.log('Copy Image command triggered');
