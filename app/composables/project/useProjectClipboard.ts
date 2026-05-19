@@ -1,4 +1,4 @@
-import { isNil } from 'ramda';
+import { clone, isNil } from 'ramda';
 
 import { EntityType } from '~/composables/project/types/v2/base';
 import { createId } from '~/composables/project/types/v2/id';
@@ -15,9 +15,10 @@ export function useProjectClipboard() {
     $project.clipboard.push({
       type: EntityType.Object,
       id: createId(),
-      data: objectData,
+      data: clone(objectData),
       from: from,
     });
+    $project.markDirty();
     $toast.add({
       severity: 'success',
       summary: 'Copied to clipboard',
@@ -32,8 +33,9 @@ export function useProjectClipboard() {
     $project.clipboard.push({
       type: EntityType.Score,
       id: createId(),
-      data: objectData,
+      data: clone(objectData),
     });
+    $project.markDirty();
     $toast.add({
       severity: 'success',
       summary: 'Copied to clipboard',
@@ -41,10 +43,16 @@ export function useProjectClipboard() {
     });
   };
 
+  const removeFromClipboard = (id: string) => {
+    $project.clipboard = $project.clipboard.filter((item) => item.id !== id);
+    $project.markDirty();
+  };
+
   return {
     clipboard: $project.clipboard,
     // Functions
     copyObject,
     copyScore,
+    removeFromClipboard,
   };
 }
