@@ -62,10 +62,13 @@ const score = computed((): ProjectScore => {
 });
 
 function editPage() {
-  editorStore.pushScreen({
-    type: 'edit-score',
-    scoreId: score.value.id,
-  });
+  editorStore.pushScreen(
+    {
+      type: 'edit-score',
+      scoreId: score.value.id,
+    },
+    true,
+  );
 }
 </script>
 

@@ -19,6 +19,7 @@ export function useDraft<T>(
   }
   const draft = ref<T>(clone(initial)) as Ref<T>;
   let isWriting = false;
+  let isUpdating = false;
 
   const doFlush = (value: T): void => {
     isWriting = true;
@@ -34,6 +35,7 @@ export function useDraft<T>(
   watch(
     draft,
     (value) => {
+      if (isUpdating) return;
       debouncedFlush(value);
     },
     { deep: true },
@@ -43,7 +45,11 @@ export function useDraft<T>(
     if (isWriting) return;
     debouncedFlush.cancel();
     if (newVal !== undefined) {
+      isUpdating = true;
       draft.value = clone(newVal);
+      nextTick(() => {
+        isUpdating = false;
+      });
     }
   });
 

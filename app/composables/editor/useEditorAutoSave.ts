@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import type { MenuItem } from 'primevue/menuitem';
-import { isNotNil } from 'ramda';
+import { isNil, isNotNil } from 'ramda';
 
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import {
@@ -100,9 +100,14 @@ export const useEditorAutoSave = defineStore('editor/auto-save', () => {
       const now = Date.now();
       const elapsed = now - lastSaveTime.value;
       if (elapsed < AUTO_SAVE_DEFAULT_DELAY) {
-        const saveDelay = AUTO_SAVE_DEFAULT_DELAY - elapsed;
-        dynamicSaveTimer.value = setTimeout(() => doSave(), saveDelay);
-        console.log(`auto-save delayed by ${saveDelay}ms`);
+        if (isNil(dynamicSaveTimer.value)) {
+          // only start a timer if there's no pending save
+          const saveDelay = AUTO_SAVE_DEFAULT_DELAY - elapsed;
+          dynamicSaveTimer.value = setTimeout(() => doSave(), saveDelay);
+          console.log(`auto-save delayed by ${saveDelay}ms`);
+        } else {
+          console.log('auto-save already pending, skipping');
+        }
       } else {
         // kill any pending save operation
         clearTimeout(dynamicSaveTimer.value);

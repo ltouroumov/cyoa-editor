@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { append, dropLast, take } from 'ramda';
+import { append, dropLast, isNotNil, last, take } from 'ramda';
 
 import type {
   EditorProject,
@@ -32,8 +32,19 @@ export const useEditorStore = defineStore('editor', () => {
     showClipboard.value = set ?? !showClipboard.value;
   };
 
-  function pushScreen(screen: any) {
-    stack.value = append(screen, stack.value);
+  function pushScreen(screen: any, idempotent?: boolean) {
+    if (idempotent) {
+      const topScreen = last(stack.value);
+      if (isNotNil(topScreen) && topScreen.type === screen.type) {
+        // replace
+        stack.value = append(screen, dropLast(1, stack.value));
+      } else {
+        // push on the stack
+        stack.value = append(screen, stack.value);
+      }
+    } else {
+      stack.value = append(screen, stack.value);
+    }
   }
 
   function clearStack(setRoot?: EditorStackRoot) {

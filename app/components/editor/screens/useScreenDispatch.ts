@@ -147,12 +147,7 @@ export function useScreenDispatch() {
           return dispatchContentScreen(top);
         }
       case 'scores':
-        if (isEmpty(editorStore.stack)) {
-          return { component: ScoresScreen };
-        } else {
-          const top = last(editorStore.stack);
-          return dispatchScoreScreen(top);
-        }
+        return { component: ScoresScreen };
       case 'media':
         return { component: MediaScreen };
       case 'styles':

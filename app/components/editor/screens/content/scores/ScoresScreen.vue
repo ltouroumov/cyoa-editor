@@ -1,20 +1,30 @@
 <template>
-  <DataView :value="scores" data-key="id">
-    <template #list="{ items }">
-      <div class="grid grid-cols-3 gap-2">
-        <div
-          v-for="item in items"
-          :key="item.id"
-          class="col-span-3 md:col-span-1"
-        >
-          <ScoreCard :score-id="item.id" />
+  <div class="flex flex-row gap-2">
+    <DataView :value="scores" data-key="id" class="grow">
+      <template #list="{ items }">
+        <div class="grid grid-cols-2 gap-2">
+          <div
+            v-for="item in items"
+            :key="item.id"
+            class="col-span-3 md:col-span-1"
+          >
+            <ScoreCard :score-id="item.id" />
+          </div>
         </div>
+      </template>
+    </DataView>
+    <div class="w-1/3">
+      <div v-if="editScoreId" class="border-l border-surface-700 pl-2">
+        <EditScoreScreen :score-id="editScoreId" />
       </div>
-    </template>
-  </DataView>
+      <div v-else>Empty</div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { last, prop } from 'ramda';
+
 import ScoreCard from '~/components/editor/screens/content/scores/ScoreCard.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import type { ProjectScore } from '~/composables/project/types/v2/score';
@@ -25,6 +35,15 @@ const projectStore = useProjectStore();
 
 const scores = computed((): ProjectScore[] => {
   return Array.from(projectStore.scores.values());
+});
+
+const editScoreId = computed(() => {
+  const screen = last(editorStore.stack);
+  if (prop('type', screen) === 'edit-score') {
+    return screen.scoreId;
+  } else {
+    return undefined;
+  }
 });
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-w-[60vw] min-h-[60vh] flex flex-col">
+  <div class="flex flex-col">
     <div class="flex flex-col gap-2 flex-1">
       <EditCondition
         title="Edit Condition"
