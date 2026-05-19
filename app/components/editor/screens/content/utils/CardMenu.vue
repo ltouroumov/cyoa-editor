@@ -21,12 +21,14 @@
 
 <script setup lang="ts">
 import type { MenuItem } from 'primevue/menuitem';
+import { filter } from 'ramda';
 import { match } from 'ts-pattern';
 
 import { ObjectTypeNames } from '~/composables/editor/const';
 import { useProjectWriter } from '~/composables/editor/useProjectWriter';
 import { EntityType } from '~/composables/project/types/v2/base';
 import type { AnyObject } from '~/composables/project/types/v2/objects';
+import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectClipboard } from '~/composables/project/useProjectClipboard';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
@@ -50,51 +52,127 @@ const entity = computed(() => {
     .exhaustive();
 });
 
+const isTypes = (...types: EntityType[]) => types.includes(props.type);
+
+const isTypesWhen = (
+  types: Partial<Record<EntityType, boolean | ((entity: any) => boolean)>>,
+): boolean => {
+  if (props.type in types) {
+    const typeMatcher = types[props.type]!;
+    if (typeof typeMatcher === 'boolean') {
+      return typeMatcher;
+    } else {
+      return typeMatcher(entity.value);
+    }
+  } else {
+    return false;
+  }
+};
+
 const menu = ref();
-const menuItems: MenuItem[] = [
-  {
-    label: 'Clone',
-    icon: 'iconify solar--copy-line-duotone',
-    command: () => {
-      console.log('Clone command triggered');
-    },
-  },
-  {
-    label: 'Move',
-    icon: 'iconify solar--arrow-right-up-line-duotone',
-    command: () => {
-      console.log('Move command triggered');
-    },
-  },
-  {
-    label: 'Copy',
-    icon: 'iconify solar--clipboard-text-line-duotone',
-    command: () => {
-      const parentId = projectStore.getParent(props.objectId);
-      clipboardUtils.copyObject(props.objectId, parentId);
-    },
-  },
-  {
-    label: 'Cut',
-    icon: 'iconify solar--scissors-line-duotone',
-    command: () => {
-      console.log('Cut command triggered');
-    },
-  },
-  { separator: true },
-  {
-    label: 'Delete',
-    icon: 'iconify solar--trash-bin-trash-line-duotone',
-    class: 'text-red-400',
-    command: () => {
-      deleteObject();
-    },
-  },
-];
+const menuItems: ComputedRef<MenuItem[]> = computed((): MenuItem[] => {
+  return filter(
+    (item) => !item.disabled,
+    [
+      {
+        label: 'Clone',
+        icon: 'iconify solar--copy-line-duotone',
+        command: () => cloneObject(),
+        disabled: !isTypesWhen({
+          [EntityType.Object]: (obj) => obj.type !== ObjectType.page,
+          [EntityType.Score]: true,
+        }),
+      },
+      {
+        label: 'Move',
+        icon: 'iconify solar--arrow-right-up-line-duotone',
+        command: () => moveObject(),
+        disabled: !isTypesWhen({
+          [EntityType.Object]: (obj) => obj.type !== ObjectType.page,
+        }),
+      },
+      {
+        label: 'Copy',
+        icon: 'iconify solar--clipboard-text-line-duotone',
+        command: () => copyObject(),
+      },
+      {
+        label: 'Cut',
+        icon: 'iconify solar--scissors-line-duotone',
+        command: () => cutObject(),
+      },
+      { separator: true },
+      {
+        label: 'Delete',
+        icon: 'iconify solar--trash-bin-trash-line-duotone',
+        class: 'text-red-400',
+        command: () => deleteObject(),
+      },
+    ],
+  );
+});
 
 const openMenu = ($event: any) => {
   menu.value.toggle($event);
 };
+
+function cloneObject() {
+  match(props.type)
+    .with(EntityType.Object, () => {
+      console.log('Clone Object command triggered');
+    })
+    .with(EntityType.Score, () => {
+      console.log('Clone Score command triggered');
+    })
+    .otherwise(() => {
+      console.error(`Clone command not supported for ${props.type}`);
+    });
+}
+
+function moveObject() {
+  match(props.type)
+    .with(EntityType.Object, () => {
+      console.log('Move Object command triggered');
+    })
+    .otherwise(() => {
+      console.error(`Move command not supported for ${props.type}`);
+    });
+}
+
+function copyObject() {
+  match(props.type)
+    .with(EntityType.Object, () => {
+      const parentId = projectStore.getParent(props.objectId);
+      clipboardUtils.copyObject(props.objectId, parentId);
+    })
+    .with(EntityType.Score, () => {
+      console.log('Copy Score command triggered');
+    })
+    .with(EntityType.Image, () => {
+      console.log('Copy Image command triggered');
+    })
+    .with(EntityType.Style, () => {
+      console.log('Copy Style command triggered');
+    })
+    .exhaustive();
+}
+
+function cutObject() {
+  match(props.type)
+    .with(EntityType.Object, () => {
+      console.log('Cut Object command triggered');
+    })
+    .with(EntityType.Score, () => {
+      console.log('Cut Score command triggered');
+    })
+    .with(EntityType.Image, () => {
+      console.log('Cut Image command triggered');
+    })
+    .with(EntityType.Style, () => {
+      console.log('Cut Style command triggered');
+    })
+    .exhaustive();
+}
 
 function deleteObject() {
   const entityName = match(props.type)
