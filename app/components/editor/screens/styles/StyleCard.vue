@@ -29,18 +29,14 @@
         <span class="iconify solar--pen-line-duotone" />
         Edit
       </Button>
-      <Button
-        size="small"
-        variant="outlined"
-        severity="danger"
-        icon="iconify solar--trash-bin-trash-line-duotone"
-      />
+      <CardMenu :object-id="style.id" :type="EntityType.Style" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useEditorStore } from '~/composables/editor/useEditorStore';
+import { EntityType } from '~/composables/project/types/v2/base';
 import type { AnyStyle } from '~/composables/project/types/v2/styles';
 
 const editorStore = useEditorStore();

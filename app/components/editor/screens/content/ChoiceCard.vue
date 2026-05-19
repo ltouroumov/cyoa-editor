@@ -4,7 +4,7 @@
       <ChoiceMove :choice-id="choiceId" :index="index" />
       <div class="flex flex-row gap-2">
         <ChoiceLayout :choice-id="choiceId" :index="index" />
-        <CardMenu :object-id="choiceId" />
+        <CardMenu :object-id="choiceId" :type="EntityType.Object" />
       </div>
     </div>
     <div
@@ -50,6 +50,7 @@ import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.
 import ChoiceMove from '~/components/editor/screens/content/choice/ChoiceMove.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import { useProjectWriter } from '~/composables/editor/useProjectWriter';
+import { EntityType } from '~/composables/project/types/v2/base';
 import type {
   ChildObject,
   ChoiceObject,

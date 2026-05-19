@@ -38,7 +38,6 @@ const menuToggle = ref();
 const showMenu = ref<boolean>(false);
 
 const toggleMenu = () => {
-  console.log('Toggling menu visibility');
   showMenu.value = !showMenu.value;
 };
 
@@ -46,8 +45,6 @@ const stopMenuClickOutside = onClickOutside(
   menu,
   () => {
     if (!showMenu.value) return;
-
-    console.log('Stopping menu click outside');
     showMenu.value = false;
   },
   { ignore: [menuToggle] },

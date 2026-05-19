@@ -12,12 +12,7 @@
         </span>
       </div>
       <div class="flex flex-row gap-2 justify-end">
-        <Button size="small" variant="outlined" severity="secondary">
-          Clone
-        </Button>
-        <Button size="small" variant="outlined" severity="danger">
-          Delete
-        </Button>
+        <CardMenu :object-id="score.id" :type="EntityType.Score" />
       </div>
     </div>
     <div class="flex flex-col gap-1 text-sm text-muted-color">
@@ -47,6 +42,7 @@
 import { isNotNil } from 'ramda';
 
 import { useEditorStore } from '~/composables/editor/useEditorStore';
+import { EntityType } from '~/composables/project/types/v2/base';
 import type { ProjectScore } from '~/composables/project/types/v2/score';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 

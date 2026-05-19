@@ -21,9 +21,11 @@
 
 <script setup lang="ts">
 import type { MenuItem } from 'primevue/menuitem';
+import { match } from 'ts-pattern';
 
 import { ObjectTypeNames } from '~/composables/editor/const';
 import { useProjectWriter } from '~/composables/editor/useProjectWriter';
+import { EntityType } from '~/composables/project/types/v2/base';
 import type { AnyObject } from '~/composables/project/types/v2/objects';
 import { useProjectClipboard } from '~/composables/project/useProjectClipboard';
 import { useProjectStore } from '~/composables/project/useProjectStore';
@@ -36,11 +38,17 @@ const clipboardUtils = useProjectClipboard();
 
 const props = defineProps<{
   objectId: string;
+  type: EntityType;
 }>();
 
-const object = computed(
-  (): AnyObject => projectStore.getObject(props.objectId)!,
-);
+const entity = computed(() => {
+  return match(props.type)
+    .with(EntityType.Object, () => projectStore.getObject(props.objectId))
+    .with(EntityType.Score, () => projectStore.scores.get(props.objectId))
+    .with(EntityType.Image, () => projectStore.media.images[props.objectId])
+    .with(EntityType.Style, () => projectStore.styles.rules[props.objectId])
+    .exhaustive();
+});
 
 const menu = ref();
 const menuItems: MenuItem[] = [
@@ -89,10 +97,20 @@ const openMenu = ($event: any) => {
 };
 
 function deleteObject() {
+  const entityName = match(props.type)
+    .with(
+      EntityType.Object,
+      () => ObjectTypeNames[(entity.value as AnyObject).type],
+    )
+    .with(EntityType.Score, () => 'Score')
+    .with(EntityType.Image, () => 'Image')
+    .with(EntityType.Style, () => 'Style')
+    .exhaustive();
+
   $confirm.require({
     group: 'modal',
     icon: 'pi pi-exclamation-triangle',
-    header: `Remove ${ObjectTypeNames[object.value.type]}`,
+    header: `Remove ${entityName}`,
     message: 'Are you sure?',
     rejectProps: {
       label: 'Cancel',

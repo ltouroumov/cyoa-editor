@@ -12,17 +12,7 @@
         </span>
       </div>
       <div class="flex flex-row gap-2 justify-end">
-        <Button size="small" variant="outlined" severity="secondary">
-          Clone
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          severity="danger"
-          @click="deletePage()"
-        >
-          Delete
-        </Button>
+        <CardMenu :object-id="page.id" :type="EntityType.Object" />
       </div>
     </div>
   </div>
@@ -31,6 +21,7 @@
 <script setup lang="ts">
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import { useProjectWriter } from '~/composables/editor/useProjectWriter';
+import { EntityType } from '~/composables/project/types/v2/base';
 import type { PageObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';

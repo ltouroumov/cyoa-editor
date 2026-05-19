@@ -11,7 +11,7 @@
         outlined
         severity="secondary"
         :label="toString(index)"
-        pt:root:class="leading-none p-0 w-[2.5rem] h-[2.0rem]"
+        pt:root:class="leading-none p-0 w-[2.5rem] h-[2.25rem]"
         pt:icon:class="leading-none text-[1.5rem] w-[1.5rem] h-[1.5rem]"
         @click="showMoveIndex"
       />

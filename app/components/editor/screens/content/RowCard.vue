@@ -15,7 +15,7 @@
           </div>
         </div>
       </div>
-      <CardMenu :object-id="rowId" />
+      <CardMenu :object-id="rowId" :type="EntityType.Object" />
     </div>
     <div v-if="row.header" class="flex flex-row gap-2">
       <div>
@@ -54,6 +54,7 @@ import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.
 import RowMove from '~/components/editor/screens/content/row/RowMove.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import { useProjectWriter } from '~/composables/editor/useProjectWriter';
+import { EntityType } from '~/composables/project/types/v2/base';
 import type { RowObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectClipboard } from '~/composables/project/useProjectClipboard';

@@ -3,7 +3,7 @@
     <div class="flex flex-row justify-between">
       <AddonMove :addon-id="addonId" :index="index" />
       <div class="flex flex-row gap-2">
-        <CardMenu :object-id="addonId" />
+        <CardMenu :object-id="addonId" :type="EntityType.Object" />
       </div>
     </div>
     <div
@@ -45,6 +45,7 @@ import { isNil } from 'ramda';
 import AddonMove from '~/components/editor/screens/content/addon/AddonMove.vue';
 import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
+import { EntityType } from '~/composables/project/types/v2/base';
 import type { AddonObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';

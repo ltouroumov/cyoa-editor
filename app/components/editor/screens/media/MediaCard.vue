@@ -32,14 +32,13 @@
         <span class="iconify solar--link-line-duotone" />
       </Button>
       <div class="grow"></div>
-      <Button size="small" variant="outlined" severity="danger">
-        <span class="iconify solar--trash-bin-trash-line-duotone" />
-      </Button>
+      <CardMenu :object-id="image.id" :type="EntityType.Image" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { EntityType } from '~/composables/project/types/v2/base';
 import type { ProjectImage } from '~/composables/project/types/v2/media';
 
 const props = defineProps<{
