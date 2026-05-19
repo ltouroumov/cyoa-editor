@@ -32,7 +32,7 @@
                       </h2>
                       <span class="text-sm text-surface-500">
                         <span>Last Modified: 2024-01-01</span> /
-                        <span>Version: {{ item.currentVersionId }}</span>
+                        <span>Version: {{ item.currentVersion }}</span>
                       </span>
                       <div>
                         <Tag>Worm</Tag>

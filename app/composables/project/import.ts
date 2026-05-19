@@ -42,7 +42,10 @@ import {
 } from '~/composables/project/types/v2/score';
 import type { EditorProject } from '~/composables/shared/tables/editor_projects';
 
-type ImportResult = { project: Omit<EditorProject, 'id'>; data: Project };
+type ImportResult = {
+  project: Omit<EditorProject, 'id'>;
+  data: Project;
+};
 
 class ImportError extends Error {}
 
@@ -92,6 +95,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
     tags: [],
     createdAt: new Date(),
     updatedAt: new Date(),
+    currentVersion: 1,
   };
 
   const data = clone(DefaultProject);

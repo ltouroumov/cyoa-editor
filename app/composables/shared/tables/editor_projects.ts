@@ -4,6 +4,7 @@ export interface EditorProject {
   id: number;
   name: string;
   tags: string[];
+  currentVersion: number;
   currentVersionId?: number;
 
   createdAt: Date;
@@ -18,4 +19,6 @@ export interface EditorProjectVersion {
 
   data: Project;
   createdAt: Date;
+  updatedAt?: Date;
+  version?: number;
 }

@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import type { Evolver } from 'ramda';
+import { evolve, has, omit } from 'ramda';
 import { onMounted, ref, watch } from 'vue';
 
 import { useDexie } from '~/composables/shared/useDexie';
 
 const db = useDexie();
 
+const ROWS_PER_PAGE = 25;
+
 const selectedTable = ref<string>('viewer_builds');
-const tableData = ref<any[]>([]);
+const tableDataRows = ref<any[]>([]);
+const tableDataCount = ref<number>(0);
+const tableDataOffset = ref<number>(0);
 const tableColumns = ref<string[]>([]);
 const loadingTable = ref(false);
 
@@ -17,11 +23,43 @@ const tables = [
   'editor_projects_versions',
 ];
 
+// columns to exclude from the view, since they are BIG
+const BIG_COLUMNS_MAP: Record<string, { omit?: string[]; evolve?: Evolver }> = {
+  editor_projects_versions: {
+    evolve: {
+      data: (value: any) =>
+        `Size: ${Math.ceil(JSON.stringify(value).length / (1024 * 1024))}Mb`,
+    },
+  },
+};
+
 async function loadTable(tableName: string) {
   loadingTable.value = true;
   try {
-    const data = await db.table(tableName).toArray();
-    tableData.value = data;
+    const dataCount = await db.table(tableName).count();
+
+    const data: any[] = [];
+    await db
+      .table(tableName)
+      .limit(ROWS_PER_PAGE)
+      .offset(tableDataOffset.value)
+      .each((record0) => {
+        if (has(tableName, BIG_COLUMNS_MAP)) {
+          let record = record0;
+          if (BIG_COLUMNS_MAP[tableName].omit) {
+            record = omit(BIG_COLUMNS_MAP[tableName].omit, record0);
+          }
+          if (BIG_COLUMNS_MAP[tableName].evolve) {
+            record = evolve(BIG_COLUMNS_MAP[tableName].evolve, record);
+          }
+          data.push(record);
+        } else {
+          data.push(record0);
+        }
+      });
+
+    tableDataCount.value = dataCount;
+    tableDataRows.value = data;
 
     if (data.length > 0) {
       tableColumns.value = Object.keys(data[0]);
@@ -30,7 +68,7 @@ async function loadTable(tableName: string) {
     }
   } catch (error) {
     console.error('Error loading table:', error);
-    tableData.value = [];
+    tableDataRows.value = [];
     tableColumns.value = [];
   } finally {
     loadingTable.value = false;
@@ -112,7 +150,7 @@ watch(selectedTable, async (newTable) => {
     </div>
 
     <div
-      v-else-if="tableData.length === 0"
+      v-else-if="tableDataRows.length === 0"
       class="text-center py-8 text-gray-600 dark:text-gray-400"
     >
       No data in this table
@@ -139,7 +177,7 @@ watch(selectedTable, async (newTable) => {
         <tbody
           class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
         >
-          <tr v-for="row in tableData" :key="row.id">
+          <tr v-for="row in tableDataRows" :key="row.id">
             <td
               v-for="column in tableColumns"
               :key="column"
@@ -164,8 +202,15 @@ watch(selectedTable, async (newTable) => {
       </table>
 
       <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-        Total records: {{ tableData.length }}
+        Total records: {{ tableDataRows.length }}
       </div>
+
+      <Paginator
+        v-model:first="tableDataOffset"
+        :total-records="tableDataCount"
+        :rows="ROWS_PER_PAGE"
+        template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      />
     </div>
   </div>
 </template>

@@ -72,7 +72,7 @@
         </MenuItem>
         <MenuItem
           icon="iconify solar--file-download-bold-duotone"
-          @click="library.saveProject(true)"
+          @click="library.saveProject({ notify: true, eager: true })"
         >
           Save Project
         </MenuItem>
