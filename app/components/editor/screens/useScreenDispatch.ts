@@ -2,7 +2,6 @@ import type { MenuItem } from 'primevue/menuitem';
 import { has, isEmpty, last } from 'ramda';
 
 import BlankScreen from '~/components/editor/screens/BlankScreen.vue';
-import ScoresScreen from '~/components/editor/screens/content/ScoresScreen.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
@@ -30,6 +29,9 @@ const StylesScreen = defineAsyncComponent(
 );
 const StyleEditScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/styles/EditStyleScreen.vue'),
+);
+const ScoresScreen = defineAsyncComponent(
+  () => import('~/components/editor/screens/content/scores/ScoresScreen.vue'),
 );
 
 export function buildStackFromObjectId(objectId: string): any[] {

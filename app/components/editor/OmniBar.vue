@@ -1,7 +1,7 @@
 <template>
   <Dialog
     v-model:visible="editorStore.showOmniBar"
-    dismissable-mask
+    :dismissable-mask="true"
     pt:root:class="!border-0 !bg-transparent"
     pt:mask:class="bg-surface-900/60 backdrop-blur-sm"
   >

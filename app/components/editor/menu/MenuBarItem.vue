@@ -66,7 +66,7 @@ onUnmounted(() => {
   color: var(--p-menubar-item-color);
   border-radius: var(--p-menubar-item-border-radius);
 
-  border: 1px solid var(--color-surface-800);
+  border: 1px solid var(--color-surface-700);
 
   transition:
     background var(--p-menubar-transition-duration),

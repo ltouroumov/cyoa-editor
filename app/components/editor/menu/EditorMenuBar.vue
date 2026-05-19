@@ -14,7 +14,7 @@
       <AutoSaveStatus />
       <Button
         :unstyled="true"
-        class="flex flex-row items-center border border-surface-500 rounded ps-3 pe-2 py-1 relative cursor-pointer h-8"
+        class="flex flex-row items-center border border-surface-700 rounded ps-3 pe-2 py-1 relative cursor-pointer h-8"
         @click="editorStore.toggleOmniBar(true)"
       >
         <div class="hidden lg:block text-sm text-muted-color me-2">
@@ -26,7 +26,7 @@
       </Button>
       <Button
         :unstyled="true"
-        class="flex flex-row items-center border border-surface-500 rounded px-2 py-1 relative cursor-pointer h-8"
+        class="flex flex-row items-center border border-surface-700 rounded px-2 py-1 relative cursor-pointer h-8"
         @click="editorStore.toggleClipboard(true)"
       >
         <div class="text-sm text-muted-color me-1">Clipboard</div>

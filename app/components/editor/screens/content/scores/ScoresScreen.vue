@@ -7,7 +7,7 @@
           :key="item.id"
           class="col-span-3 md:col-span-1"
         >
-          {{ item.id }} - {{ item.name }}
+          <ScoreCard :score-id="item.id" />
         </div>
       </div>
     </template>
@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import ScoreCard from '~/components/editor/screens/content/scores/ScoreCard.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import type { ProjectScore } from '~/composables/project/types/v2/score';
 import { useProjectStore } from '~/composables/project/useProjectStore';
