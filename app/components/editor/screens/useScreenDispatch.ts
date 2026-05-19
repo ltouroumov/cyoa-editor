@@ -2,6 +2,7 @@ import type { MenuItem } from 'primevue/menuitem';
 import { has, isEmpty, last } from 'ramda';
 
 import BlankScreen from '~/components/editor/screens/BlankScreen.vue';
+import ScoresScreen from '~/components/editor/screens/content/ScoresScreen.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
@@ -113,6 +114,8 @@ export function useScreenDispatch() {
           const top = last(editorStore.stack);
           return dispatchContentScreen(top);
         }
+      case 'scores':
+        return { component: ScoresScreen };
       case 'media':
         return { component: MediaScreen };
       case 'styles':
@@ -134,6 +137,13 @@ export function useScreenDispatch() {
           root: true,
           label: 'Pages',
           icon: 'iconify solar--documents-line-duotone',
+          command: () => editorStore.clearStack(),
+        };
+      case 'scores':
+        return {
+          root: true,
+          label: 'Scores',
+          icon: 'iconify solar--card-2-line-duotone',
           command: () => editorStore.clearStack(),
         };
       case 'media':

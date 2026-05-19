@@ -8,7 +8,7 @@ import type {
 
 type EditorStatus = 'empty' | 'loading' | 'ready';
 
-type EditorStackRoot = 'content' | 'media' | 'styles';
+type EditorStackRoot = 'content' | 'media' | 'styles' | 'scores';
 export type AutoSaveInterval = 'off' | 'auto' | number;
 
 export const useEditorStore = defineStore('editor', () => {

@@ -1,21 +1,14 @@
 <template>
   <div class="p-component p-menubar rounded">
     <div class="flex flex-row items-center gap-2">
-      <MenuButton
+      <MenuBarButton
         icon="iconify solar--hamburger-menu-line-duotone"
         @click="toggleMenu()"
       />
     </div>
     <div class="h-[50%] my-2 border-l border-surface-700"></div>
     <ul class="flex flex-row items-center gap-2 grow">
-      <li v-for="(tab, idx) in TABS" :key="idx" class="p-menubar-item">
-        <div class="p-menubar-item-content">
-          <a class="p-menubar-item-link" @click="tab.command">
-            <span class="p-menubar-item-icon" :class="tab.icon"></span>
-            <span class="p-menubar-item-label">{{ tab.label }}</span>
-          </a>
-        </div>
-      </li>
+      <MenuBarItem v-for="(tab, idx) in TABS" :key="idx" :item="tab" />
     </ul>
     <div class="flex flex-row items-center gap-2">
       <AutoSaveStatus />
@@ -99,7 +92,9 @@
 import { P, match } from 'ts-pattern';
 
 import AutoSaveStatus from '~/components/editor/menu/AutoSaveStatus.vue';
+import MenuBarItem from '~/components/editor/menu/MenuBarItem.vue';
 import MenuItem from '~/components/editor/menu/MenuItem.vue';
+import type { MenuBarItemData } from '~/components/editor/menu/types';
 import { useEditorAutoSave } from '~/composables/editor/useEditorAutoSave';
 import { useEditorLibrary } from '~/composables/editor/useEditorLibrary';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
@@ -115,13 +110,26 @@ const toggleMenu = (set?: boolean) => {
   showMenu.value = set ?? !showMenu.value;
 };
 
-const TABS = [
+const TABS: MenuBarItemData[] = [
   {
     label: 'Content',
     icon: 'iconify solar--documents-minimalistic-line-duotone',
     command: () => {
       editorStore.clearStack('content');
     },
+    menu: [
+      {
+        label: 'Scores',
+        icon: 'iconify solar--card-2-line-duotone',
+        command: () => {
+          editorStore.clearStack('scores');
+        },
+      },
+      {
+        label: 'Variables',
+        icon: 'iconify solar--card-line-duotone',
+      },
+    ],
   },
   {
     label: 'Media',
