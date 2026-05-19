@@ -82,17 +82,20 @@ export const useEditorAutoSave = defineStore('editor/auto-save', () => {
     () => $project.changeVersion > lastSaveVersion.value,
   );
 
-  const dynamicSaveTimer = ref<any>(undefined);
-
+  const saveMutex = ref<boolean>(false);
   const doSave = () => {
+    if (saveMutex.value) return;
+    saveMutex.value = true;
     $library.saveProject().then(() => {
       console.log(`project saved at ${Date.now()} (${$project.changeVersion})`);
       // update the last auto-save time
       lastSaveVersion.value = $project.changeVersion;
       lastSaveTime.value = Date.now();
+      saveMutex.value = false;
     });
   };
 
+  const dynamicSaveTimer = ref<any>(undefined);
   const triggerSave = debounce(() => {
     if ($editor.autoSaveInterval !== 'auto') return;
 
@@ -120,7 +123,6 @@ export const useEditorAutoSave = defineStore('editor/auto-save', () => {
   }, 200);
 
   const scheduledSaveTimer = ref<any>(undefined);
-
   watch(
     () => $editor.autoSaveInterval,
     () => {
@@ -163,5 +165,6 @@ export const useEditorAutoSave = defineStore('editor/auto-save', () => {
     // note: pinia requires all store refs to be returned to work properly
     __dynamicSaveTimer: dynamicSaveTimer,
     __scheduledSaveTimer: scheduledSaveTimer,
+    __saveMutex: saveMutex,
   };
 });

@@ -1,6 +1,6 @@
 import type { MaybeRefOrGetter } from 'vue';
 
-import { useDraft } from '~/composables/editor/useDraft';
+import { useDraft } from '~/composables/editor/draft/useDraft';
 import type { ProjectScore } from '~/composables/project/types/v2/score';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 

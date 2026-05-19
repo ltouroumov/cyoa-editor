@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import RowRequirementsForm from '~/components/editor/screens/content/row/RowRequirementsForm.vue';
-import { useDraftObject } from '~/composables/editor/useDraftObject';
+import { useDraftObject } from '~/composables/editor/draft/useDraftObject';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 
 const props = defineProps<{

@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDraftStyle } from '~/composables/editor/useDraftStyle';
+import { useDraftStyle } from '~/composables/editor/draft/useDraftStyle';
 import { StyleType } from '~/composables/project/types/v2/styles';
 
 const props = defineProps<{

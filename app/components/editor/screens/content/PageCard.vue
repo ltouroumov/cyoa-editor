@@ -15,7 +15,12 @@
         <Button size="small" variant="outlined" severity="secondary">
           Clone
         </Button>
-        <Button size="small" variant="outlined" severity="danger">
+        <Button
+          size="small"
+          variant="outlined"
+          severity="danger"
+          @click="deletePage()"
+        >
           Delete
         </Button>
       </div>
@@ -25,12 +30,14 @@
 
 <script setup lang="ts">
 import { useEditorStore } from '~/composables/editor/useEditorStore';
+import { useProjectWriter } from '~/composables/editor/useProjectWriter';
 import type { PageObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
 const editorStore = useEditorStore();
 const projectStore = useProjectStore();
+const projectWriter = useProjectWriter();
 
 const props = defineProps<{
   pageId: string;
@@ -46,6 +53,10 @@ function editPage() {
     pageId: page.value.id,
   });
 }
+
+const deletePage = () => {
+  projectWriter.removeObject(props.pageId);
+};
 </script>
 
 <style scoped lang="scss"></style>

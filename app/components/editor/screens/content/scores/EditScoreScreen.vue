@@ -57,7 +57,7 @@
 import type { DynamicDialogCloseOptions } from 'primevue/dynamicdialogoptions';
 import { P, match } from 'ts-pattern';
 
-import { useDraftScore } from '~/composables/editor/useDraftScore';
+import { useDraftScore } from '~/composables/editor/draft/useDraftScore';
 import type { ConditionTerm } from '~/composables/project/types/v2/condition';
 
 const LazyEditConditionModal = defineAsyncComponent(

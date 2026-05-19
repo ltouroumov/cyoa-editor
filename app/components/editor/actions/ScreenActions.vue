@@ -6,6 +6,7 @@
         :icon="action.icon"
         :severity="action.severity"
         size="small"
+        @click="action?.command?.call(action)"
       />
     </div>
   </div>

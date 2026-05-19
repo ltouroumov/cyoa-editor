@@ -66,6 +66,7 @@ import { clone, findIndex, isNil, propEq } from 'ramda';
 import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
 import ChoiceMove from '~/components/editor/screens/content/choice/ChoiceMove.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
+import { useProjectWriter } from '~/composables/editor/useProjectWriter';
 import type {
   ChildObject,
   ChoiceObject,
@@ -74,8 +75,11 @@ import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectClipboard } from '~/composables/project/useProjectClipboard';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
+const $confirm = useConfirm();
+
 const editorStore = useEditorStore();
 const projectStore = useProjectStore();
+const projectWriter = useProjectWriter();
 const clipboardUtils = useProjectClipboard();
 
 const props = defineProps<{
@@ -155,13 +159,34 @@ const menuItems: MenuItem[] = [
     icon: 'iconify solar--trash-bin-trash-line-duotone',
     class: 'text-red-400',
     command: () => {
-      console.log('Delete command triggered');
+      deleteChoice();
     },
   },
 ];
+
 const openMenu = ($event: any) => {
   menu.value.toggle($event);
 };
+
+function deleteChoice() {
+  $confirm.require({
+    group: 'modal',
+    icon: 'pi pi-exclamation-triangle',
+    header: 'Remove Choice',
+    message: 'Are you sure?',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Delete',
+    },
+    accept: () => {
+      projectWriter.removeObject(props.choiceId);
+    },
+  });
+}
 </script>
 
 <style scoped lang="scss"></style>

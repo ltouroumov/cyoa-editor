@@ -53,6 +53,7 @@
           severity="danger"
           icon="iconify solar--trash-bin-trash-line-duotone"
           label="Delete"
+          @click="deleteRow($event)"
         />
       </div>
     </div>
@@ -92,13 +93,17 @@ import { isNil } from 'ramda';
 import ChoiceImage from '~/components/editor/screens/content/choice/ChoiceImage.vue';
 import RowMove from '~/components/editor/screens/content/row/RowMove.vue';
 import { useEditorStore } from '~/composables/editor/useEditorStore';
+import { useProjectWriter } from '~/composables/editor/useProjectWriter';
 import type { RowObject } from '~/composables/project/types/v2/objects';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectClipboard } from '~/composables/project/useProjectClipboard';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
+const $confirm = useConfirm();
+
 const editorStore = useEditorStore();
 const projectStore = useProjectStore();
+const projectWriter = useProjectWriter();
 const clipboardUtils = useProjectClipboard();
 
 const props = defineProps<{
@@ -119,6 +124,27 @@ function editRow() {
 
 function copyRow() {
   clipboardUtils.copyObject(props.rowId);
+}
+
+function deleteRow($event: any) {
+  $confirm.require({
+    group: 'modal',
+    target: $event.currentTarget,
+    icon: 'pi pi-exclamation-triangle',
+    header: 'Remove Row',
+    message: 'Are you sure?',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Delete',
+    },
+    accept: () => {
+      projectWriter.removeObject(props.rowId);
+    },
+  });
 }
 </script>
 

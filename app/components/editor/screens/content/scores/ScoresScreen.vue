@@ -14,10 +14,15 @@
       </template>
     </DataView>
     <div class="w-1/3">
-      <div v-if="editScoreId" class="border-l border-surface-700 pl-2">
+      <div v-if="editScoreId" class="border-l border-surface-700 pl-2 h-full">
         <EditScoreScreen :score-id="editScoreId" />
       </div>
-      <div v-else>Empty</div>
+      <div
+        v-else
+        class="bg-surface-800 rounded p-4 h-full flex flex-row items-center justify-center"
+      >
+        <div class="text-sm text-muted-color">No Score Selected</div>
+      </div>
     </div>
   </div>
 </template>

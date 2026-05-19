@@ -74,7 +74,7 @@
 import { filter, includes, isEmpty, toLower } from 'ramda';
 
 import ChoiceComponentsForm from '~/components/editor/screens/content/choice/ChoiceComponentsForm.vue';
-import { useDraftObject } from '~/composables/editor/useDraftObject';
+import { useDraftObject } from '~/composables/editor/draft/useDraftObject';
 import { ObjectType } from '~/composables/project/types/v2/objects/base';
 import { useProjectStore } from '~/composables/project/useProjectStore';
 
