@@ -3,7 +3,7 @@ export interface ProjectImage {
   isRemote: boolean;
   // contains the URL or base64 data (src ready)
   data: string;
-  metadata?: ImageMeta;
+  metadata: ImageMeta;
 }
 
 export interface ImageMeta {

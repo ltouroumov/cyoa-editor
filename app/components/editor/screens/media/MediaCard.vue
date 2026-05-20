@@ -24,7 +24,12 @@
       </div>
     </div>
     <div class="p-2 flex flex-row gap-2">
-      <Button size="small" variant="outlined" severity="secondary">
+      <Button
+        size="small"
+        variant="outlined"
+        severity="secondary"
+        @click="editImage()"
+      >
         <span class="iconify solar--pen-line-duotone" />
         Edit
       </Button>
@@ -38,12 +43,22 @@
 </template>
 
 <script setup lang="ts">
+import { useEditorStore } from '~/composables/editor/useEditorStore';
 import { EntityType } from '~/composables/project/types/v2/base';
 import type { ProjectImage } from '~/composables/project/types/v2/media';
+
+const editorStore = useEditorStore();
 
 const props = defineProps<{
   image: ProjectImage;
 }>();
+
+function editImage() {
+  editorStore.pushScreen({
+    type: 'edit-image',
+    imageId: props.image.id,
+  });
+}
 </script>
 
 <style scoped lang="scss"></style>

@@ -58,8 +58,8 @@ function serializeScreen(screen: any): string {
       return `object:${screen.addonId}`;
     case 'edit-style':
       return `style:${screen.styleId}`;
-    case 'edit-media':
-      return `media:${screen.mediaId}`;
+    case 'edit-image':
+      return `image:${screen.imageId}`;
     case 'edit-score':
       return `score:${screen.scoreId}`;
     default:

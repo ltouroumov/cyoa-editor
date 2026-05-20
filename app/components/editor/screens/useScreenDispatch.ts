@@ -24,6 +24,9 @@ const ChoiceScreen = defineAsyncComponent(
 const MediaScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/media/MediaScreen.vue'),
 );
+const EditImageScreen = defineAsyncComponent(
+  () => import('~/components/editor/screens/media/EditImageScreen.vue'),
+);
 const StylesScreen = defineAsyncComponent(
   () => import('~/components/editor/screens/styles/StylesScreen.vue'),
 );
@@ -93,10 +96,13 @@ export function buildStackFromObjectId(objectId: string, hint?: string): any[] {
       styleId: objectId,
     });
   } else if (
-    (hint === 'media' || isNil(hint)) &&
+    (hint === 'image' || isNil(hint)) &&
     has(objectId, projectStore.media.images)
   ) {
-    // TODO: edit media
+    stack.push({
+      type: 'edit-image',
+      imageId: objectId,
+    });
   }
 
   return stack;
@@ -119,19 +125,19 @@ export function useScreenDispatch() {
     }
   }
 
-  function dispatchScoreScreen(top: any): ScreenComponent {
+  function dispatchStyleScreen(top: any): ScreenComponent {
     switch (top.type) {
-      case 'edit-score':
-        return { component: EditScoreScreen, props: { scoreId: top.scoreId } };
+      case 'edit-style':
+        return { component: StyleEditScreen, props: { styleId: top.styleId } };
       default:
         return { component: BlankScreen, props: {} };
     }
   }
 
-  function dispatchStyleScreen(top: any): ScreenComponent {
+  function dispatchMediaScreen(top: any): ScreenComponent {
     switch (top.type) {
-      case 'edit-style':
-        return { component: StyleEditScreen, props: { styleId: top.styleId } };
+      case 'edit-image':
+        return { component: EditImageScreen, props: { imageId: top.imageId } };
       default:
         return { component: BlankScreen, props: {} };
     }
@@ -149,7 +155,12 @@ export function useScreenDispatch() {
       case 'scores':
         return { component: ScoresScreen };
       case 'media':
-        return { component: MediaScreen };
+        if (isEmpty(editorStore.stack)) {
+          return { component: MediaScreen };
+        } else {
+          const top = last(editorStore.stack);
+          return dispatchMediaScreen(top);
+        }
       case 'styles':
         if (isEmpty(editorStore.stack)) {
           return { component: StylesScreen };
@@ -182,7 +193,7 @@ export function useScreenDispatch() {
         return {
           root: true,
           label: 'Media',
-          icon: 'iconify solar--gallery-line-duotone',
+          icon: 'iconify solar--gallery-wide-line-duotone',
           command: () => editorStore.clearStack(),
         };
       case 'styles':
@@ -242,6 +253,14 @@ export function useScreenDispatch() {
           return {
             label: score?.title || score?.id,
             icon: 'iconify solar--card-2-line-duotone',
+            command: () => editorStore.popStack(index),
+          };
+        }
+        case 'edit-image': {
+          const image = projectStore.media.images[item.imageId];
+          return {
+            label: image?.metadata?.title || image?.id,
+            icon: 'iconify solar--gallery-line-duotone',
             command: () => editorStore.popStack(index),
           };
         }
