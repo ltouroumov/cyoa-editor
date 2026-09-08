@@ -70,6 +70,7 @@
               :addon="addon"
               :obj-id="obj.id"
               :display="display"
+              :view-object="viewObject"
             />
           </div>
         </div>

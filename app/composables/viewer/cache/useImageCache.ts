@@ -2,7 +2,7 @@ import { Base64 } from 'js-base64';
 import { isNil, isNotNil, last } from 'ramda';
 import { match } from 'ts-pattern';
 
-import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
+import type { HasImage } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import { useSettingStore } from '~/composables/store/settings';
 import { isCacheable, isUrl, resolveUrl } from '~/composables/utils/url';
@@ -11,9 +11,7 @@ export function useImageCache() {
   const { project, isLocal, isOriginLocal } = useProjectRefs();
   const settingsStore = useSettingStore();
 
-  const loadImageSrc = async (
-    element: ProjectObj | ProjectRow,
-  ): Promise<string | null> => {
+  const loadImageSrc = async (element: HasImage): Promise<string | null> => {
     // Check if image isn't cacheable (data URL, blob, empty etc.), return the value as-is
     if (!isCacheable(element.image)) return element.image;
 

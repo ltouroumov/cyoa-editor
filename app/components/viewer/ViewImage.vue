@@ -15,12 +15,12 @@
 <script setup lang="ts">
 import { isNil, isNotNil } from 'ramda';
 
-import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
+import type { HasImage } from '~/composables/project/types/v1';
 import { useImageCache } from '~/composables/viewer/cache/useImageCache';
 
 const { loadImageSrc } = useImageCache();
 const $props = defineProps<{
-  element: ProjectObj | ProjectRow;
+  element: HasImage & { title?: string };
   alwaysEnable?: boolean;
 }>();
 

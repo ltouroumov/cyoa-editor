@@ -113,23 +113,29 @@ const $props = defineProps<{
   display: DisplaySettings;
 }>();
 
-// Image cache integration
-const imageSrc = computedAsync(
-  async () => {
-    if ($props.obj.image) {
-      return await loadImageSrc($props.obj);
-    }
-    return null;
-  },
-  null, // initial value
-);
-
 const showTab = ref<'main' | 'addon'>('main');
 const showAddonIdx = ref<number>(-1);
 const showAddon = computed(() => ({
   index: showAddonIdx.value,
   data: $props.obj.addons[showAddonIdx.value],
 }));
+
+// Image cache integration
+const imageSrc = computedAsync(
+  async () => {
+    if (showTab.value === 'main' && $props.obj.image) {
+      return await loadImageSrc($props.obj);
+    } else if (
+      showTab.value === 'addon' &&
+      $props.obj.addons[showAddonIdx.value].image
+    ) {
+      console.log('Loading addon image', showAddonIdx.value);
+      return await loadImageSrc($props.obj.addons[showAddonIdx.value]);
+    }
+    return null;
+  },
+  null, // initial value
+);
 
 const addonStates = computed(() => {
   const states: Record<number, ComputedRef<boolean>> = {};

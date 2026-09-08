@@ -147,6 +147,11 @@ export type HasId = {
   id: string;
 };
 
+export type HasImage = {
+  image: string;
+  imageIsLink: boolean;
+};
+
 export type Score = HasRequirements & {
   id: string;
   value: string;
@@ -155,18 +160,17 @@ export type Score = HasRequirements & {
 };
 
 export type ObjAddon = Partial<HasId> &
-  HasRequirements & {
+  HasRequirements &
+  HasImage & {
     title: string;
     text: string;
-    image: string;
   };
 
 export type ProjectObj = HasId &
-  HasRequirements & {
+  HasRequirements &
+  HasImage & {
     title: string;
     text: string;
-    image: string;
-    imageIsLink: boolean;
     objectWidth?: string;
     scores: Score[];
     addons: ObjAddon[];
@@ -191,12 +195,11 @@ export type ProjectObj = HasId &
   };
 
 export type ProjectRow = HasId &
-  HasRequirements & {
+  HasRequirements &
+  HasImage & {
     title: string;
     titleText?: string;
 
-    image: string;
-    imageIsLink: boolean;
     objectWidth: string;
     rowJustify?: 'left' | 'right' | 'center';
 
