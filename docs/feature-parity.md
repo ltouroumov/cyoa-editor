@@ -25,7 +25,7 @@ ICC-Neo has two independent sides, tracked separately on every row:
 
 ## Legend
 
-`- <capability> — viewer: [Status] · editor: [Status]`
+`- <capability> — viewer: [<status>] · editor: [<status>]`
 
 | Status       | Meaning                                                            |
 |--------------|-------------------------------------------------------------------|
@@ -36,15 +36,22 @@ ICC-Neo has two independent sides, tracked separately on every row:
 | `[N/A]`      | Concept does not apply to this side / format.                     |
 | `[?]`        | Not yet verified against code — confirm and retag.               |
 
+**Progress counters:** each category header shows `viewer: done/in-scope;
+editor: done/in-scope`. *In-scope* = rows for that side that are neither `[N/A]`
+nor `[Deferred]`. Only `[Done]` counts toward *done* — `[Partial]`, `[Missing]`
+and `[?]` do not. Recompute the affected header when you retag a row.
+
 **Maintenance:** edit a status inline when it changes; add rows under the right
 section; keep "Last reviewed" current on a sweep.
 
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
+Overall: **viewer 61/107 · editor 21/108**
+
 ---
 
-## Content model
+## Content model (viewer: 4/6; editor: 3/8)
 
 - Rows — viewer: [Done] · editor: [Done]
 - Choices (`objects[]`) — viewer: [Done] · editor: [Done]
@@ -56,14 +63,14 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Chapters (`app.chapters`) — viewer: [Deferred] · editor: [Deferred] — Standard-CYOA only, always empty in image projects
 - Pages / multiple screens — viewer: [N/A] · editor: [Partial] — V2 `page` object type exists; "only one page supported" today. Not a V1 concept.
 
-## Groups
+## Groups (viewer: 2/4; editor: 0/4)
 
 - Choice group membership (`obj.groups[]`) — viewer: [Done] · editor: [Missing] — viewer uses the first group id to bucket selections in the Backpack
 - Row result-group id (`row.resultGroupId`) — viewer: [Done] · editor: [Missing] — Backpack rows whose `resultGroupId` matches a group collect that group's selected choices, with per-group score subtotals
 - Top-level named row groups (`groups[]` = `{id, name, elements[]}`) for jump-to-section navigation — viewer: [Missing] · editor: [Missing] — parsed into the V1 type; no navigation menu consumes it
 - Group id usable as a target of "deactivate other choice" (deselect a whole group) — viewer: [Missing] · editor: [Missing]
 
-## Backpack
+## Backpack (viewer: 6/7; editor: 0/3)
 
 - Backpack view (summary of selected choices, grouped) — viewer: [Done] · editor: [Missing] — `BackpackModal` / `BackpackView`; V2 only has a `BackpackRow {id}` stub
 - Backpack rows authored as normal rows (`backpack[]`, same shape as `rows[]`) — viewer: [Done] · editor: [Missing]
@@ -73,7 +80,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Backpack styling (`Manage Backpack Design`, `backPackWidth`) — viewer: [Partial] · editor: [Missing] — visual, mostly out of scope
 - "Import selected choices from an id list" dialog (`importedChoicesIsOpen` / ActivatedViewer) — viewer: [Done] · editor: [N/A] — superseded by build codes + saved builds
 
-## Choice selection behaviour
+## Choice selection behaviour (viewer: 6/9; editor: 1/9)
 
 - Single-select choice — viewer: [Done] · editor: [Done]
 - Non-selectable choice (`isNotSelectable`) — viewer: [Done] · editor: [Missing]
@@ -85,7 +92,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Choice raises/lowers another row's limit on select (`addToAllowChoice` / `idOfAllowChoice` / `numbAddToAllowChoice`) — viewer: [Done] · editor: [Missing]
 - Row auto-deselects its choices when its own requirements stop being met (`deselectChoices`) — viewer: [Missing] · editor: [Missing]
 
-## Choice "functions" (on-select / on-deselect actions)
+## Choice "functions" (on-select / on-deselect actions) (viewer: 1/8; editor: 0/8)
 
 - Activate & lock other choices (`activateOtherChoice` / `activateThisChoice`, comma list) — viewer: [Done] · editor: [Missing]
 - Deactivate other choices (`deactivateOtherChoice` / `deactivateThisChoice`, comma list) — viewer: [Partial] · editor: [Missing] — ICC-Neo matches choice ids only; legacy also matches `resultGroupId` and group ids
@@ -96,7 +103,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Score-dependency cascade: re-evaluating this choice re-toggles any selected choice whose *score* condition references it ("Scores Updated On …" notice) — viewer: [Missing] · editor: [Missing]
 - Object-level button (`isButtonObject`) — viewer: [Missing] · editor: [Missing]
 
-## Button rows
+## Button rows (viewer: 0/9; editor: 0/9)
 
 - Button row with custom label (`isButtonRow` / `buttonText` / `buttonId`) — viewer: [Missing] · editor: [Missing]
 - Toggleable vs permanent button (`buttonType`) — viewer: [Missing] · editor: [Missing]
@@ -108,7 +115,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Button adds a sum to a point type (`btnPointAddon` / `pointTypeRandom`) — viewer: [Missing] · editor: [Missing]
 - Button bound to a variable (`row.buttonRandom` false path → push `buttonId` to activated) — viewer: [Missing] · editor: [Missing]
 
-## Scoring & points
+## Scoring & points (viewer: 8/10; editor: 5/10)
 
 - Point types with starting sum (`pointTypes[]` / `startingSum`) — viewer: [Done] · editor: [Done] — V2 `ProjectScore.defaultValue`
 - Additive scores on choices (`scores[]` / `value`) — viewer: [Done] · editor: [Done] — V2 `ObjectScore` `type: gain | cost`
@@ -124,7 +131,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Point type icon / image (`iconIsOn` / `image` / `imageOnSide` / `imageSidePlacement`) — viewer: [Deferred] · editor: [Deferred] — visual, out of scope
 - Fixed point bar showing all (gated) point types — viewer: [Done] · editor: [N/A] — `ViewScoreStatus` / `RowScores`
 
-## Requirements & conditions
+## Requirements & conditions (viewer: 6/9; editor: 5/9)
 
 - Require selected id, AND of up to four (`type: id`, `required: true`, `reqId`..`reqId3`) — viewer: [Done] · editor: [Done] — V2 `isSelected` / `allOf`
 - Incompatible with id(s) (`type: id`, `required: false`) — viewer: [Done] · editor: [Done] — V2 `isNotSelected`
@@ -137,13 +144,13 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Split row-display condition vs choice-eligibility condition — viewer: [N/A] · editor: [Done] — Neo improvement (`RowRequirements.display` vs `.choices`); V1 has one list
 - Boolean toggle variables (`variables[]` / `isTrue`, referenced as ids in conditions and set by choice functions) — viewer: [Missing] · editor: [Missing] — parsed into the V1 type, no runtime consumer
 
-## Visibility of blocked content
+## Visibility of blocked content (viewer: 2/3; editor: 0/3)
 
 - Blocked choice shown with a "requirement" filter (blur/dim/etc.) — viewer: [Done] · editor: [Missing]
 - Blocked choice hidden entirely (`reqFilterVisibleIsOn` / per-choice `object.reqFilterVisibleIsOn`) — viewer: [Missing] · editor: [Missing]
 - Blocked row hidden entirely — viewer: [Done] · editor: [?]
 
-## Text & dynamic content
+## Text & dynamic content (viewer: 2/5; editor: 1/7)
 
 - Plain / rich (sanitised HTML) text in titles and bodies — viewer: [Done] · editor: [Done]
 - Row body text (`titleText`) distinct from row title — viewer: [Done] · editor: [?]
@@ -153,7 +160,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Project default text fills (`defaultRowText`, `defaultChoiceTitle`, `defaultBeforePoint`, …) — viewer: [N/A] · editor: [Missing] — authoring convenience; values bake into the saved file
 - "Change all ids to titles" bulk authoring helper — viewer: [N/A] · editor: [Missing]
 
-## Layout
+## Layout (viewer: 3/9; editor: 1/9)
 
 - Choice image layout: image top / left / right (`obj.template` 1/2/3) — viewer: [Done] · editor: [Partial] — V2 `header.layout` string; mapping unverified
 - Row layout: image top / right / left / bottom (`row.template` 1/2/3/4) — viewer: [Missing] · editor: [?] — ICC-Neo renders one row layout
@@ -165,7 +172,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Equalise choice heights within a row (`styling.objectHeight`) — viewer: [Missing] · editor: [Missing]
 - Hide all choice text in a row (`textIsRemoved`) — viewer: [Missing] · editor: [Missing]
 
-## Styling (capability level only — visual fidelity out of scope)
+## Styling (capability level only — visual fidelity out of scope) (viewer: 11/11; editor: 2/14)
 
 - Global project style — viewer: [Done] · editor: [Partial] — V2 redesigned into simple / advanced / CSS frameworks; not a 1:1 port of V1's ~150 properties
 - Per-row / per-choice private styling (`isPrivateStyling` + inline `styling`) — viewer: [Done] · editor: [Partial] — V2 uses shared style rules referenced by id (`styles[]`)
@@ -182,7 +189,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Image object-fit / fixed container height (`objectImgObjectFillIsOn` / `objectImgObjectFillHeight`) — viewer: [Done] · editor: [?]
 - Style Templates — one-click preset themes (Fall, Book, Dark, Rainbow, …) — viewer: [N/A] · editor: [Missing]
 
-## Media
+## Media (viewer: 4/7; editor: 1/8)
 
 - Base64-embedded images — viewer: [Done] · editor: [Done] — V2 `media.images` keyed by id
 - Image by URL (`imageIsUrl`) — viewer: [Done] · editor: [?]
@@ -194,7 +201,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Symbol / alt-code palette helper — viewer: [N/A] · editor: [Missing]
 - Image caching / offline use — viewer: [Done] · editor: [N/A] — Neo-only
 
-## Import / export / persistence
+## Import / export / persistence (viewer: 6/10; editor: 2/7)
 
 - Load a legacy (V1) project JSON — viewer: [Done] · editor: [Done] — editor converts V1 → V2 on import
 - Export project JSON — viewer: [?] · editor: [?] — editor exports V2; V1 round-trip export unconfirmed
@@ -208,7 +215,7 @@ runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/mai
 - Project stats screen — viewer: [Missing] · editor: [Missing]
 - Multi-project library / project menu — viewer: [Done] · editor: [Done]
 
-## Deferred: Standard (text-adventure) CYOA mode
+## Deferred: Standard (text-adventure) CYOA mode (deferred)
 
 The legacy app had a second mode with its own components (`standardcyoa/`,
 `type: "standard"` branches in `Row.vue`). ICC-Neo does not implement it and it is
