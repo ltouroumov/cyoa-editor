@@ -54,10 +54,14 @@ export function useObject({
   });
 
   const minSelectedAmount = computed(() =>
-    Number.parseInt(obj.value.numMultipleTimesMinus),
+    typeof obj.value.numMultipleTimesMinus === 'string'
+      ? Number.parseInt(obj.value.numMultipleTimesMinus)
+      : obj.value.numMultipleTimesMinus,
   );
   const maxSelectedAmount = computed(() =>
-    Number.parseInt(obj.value.numMultipleTimesPluss),
+    typeof obj.value.numMultipleTimesPluss === 'string'
+      ? Number.parseInt(obj.value.numMultipleTimesPluss)
+      : obj.value.numMultipleTimesPluss,
   );
 
   const toggle = () => {

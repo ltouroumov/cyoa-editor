@@ -78,14 +78,18 @@ function classToWidth(widthClass: string): number {
 }
 
 export async function importProject(inputData: any): Promise<ImportResult> {
-  if (V1ProjectSchema.isValidSync(inputData)) {
-    return convertLegacyProject(inputData as LegacyProject);
-  } else if (V2ProjectSchema.isValidSync(inputData)) {
-    const project = prop('$project', inputData) as EditorProject;
-    const data = omit(['$schema', '$project'], inputData) as Project;
-    return { project, data };
+  const v1ParseResult = V1ProjectSchema.safeParse(inputData);
+  if (v1ParseResult.success) {
+    return convertLegacyProject(v1ParseResult.data);
   } else {
-    throw new ImportError('Invalid Schema');
+    const v2ParseResult = V2ProjectSchema.safeParse(inputData);
+    if (v2ParseResult.success) {
+      const project = prop('$project', inputData) as EditorProject;
+      const data = omit(['$schema', '$project'], inputData) as Project;
+      return { project, data };
+    } else {
+      throw new ImportError('Invalid Schema');
+    }
   }
 }
 
@@ -199,7 +203,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         header: {
           title: object.title,
           text: object.text,
-          layout: object.template,
+          layout: `${object.template}`,
         },
 
         components: {},

@@ -4,7 +4,7 @@ import type {
   RowStyles,
 } from '~/composables/project/types/v1/styles';
 
-type _ArbReqId = {
+export type _ArbReqId = {
   // Arbitrary number of reqId properties
   [K in `reqId${number}`]: string;
 };
@@ -12,10 +12,12 @@ type _ArbReqId = {
 export type ConditionTerm = _ArbReqId & {
   id: string;
   reqId: string;
+  reqPoints?: number;
+  operator?: number;
   orRequired: { req: string }[];
   required: boolean;
   showRequired: boolean;
-  type: 'id' | 'or';
+  type: 'id' | 'or' | 'points' | 'pointCompare';
 
   requireds: ConditionTerm[];
 
@@ -31,84 +33,124 @@ export type HasId = {
   id: string;
 };
 
-export type Score = HasRequirements & {
+export type HasImage = {
+  image: string;
+  imageIsUrl: boolean;
+  imageLink: string;
+};
+
+export type Score = {
   id: string;
   value: string;
   beforeText: string;
   afterText: string;
+  requireds: ConditionTerm[];
 };
 
-export type ObjAddon = Partial<HasId> &
-  HasRequirements & {
-    title: string;
-    text: string;
-    image: string;
-  };
+export type ObjAddon = {
+  id?: string;
+  title: string;
+  text: string;
+  image: string;
+  imageIsUrl: boolean;
+  imageLink: string;
+  requireds: ConditionTerm[];
+};
 
-export type ProjectObj = HasId &
-  HasRequirements & {
-    title: string;
-    text: string;
-    image: string;
-    imageIsLink: boolean;
-    objectWidth?: string;
-    scores: Score[];
-    addons: ObjAddon[];
-    activateOtherChoice: boolean;
-    activateThisChoice: string;
-    deactivateOtherChoice: boolean;
-    deactivateThisChoice: string;
-    groups: { id: string }[];
+export type ProjectObj = {
+  id: string;
+  requireds: ConditionTerm[];
+  image: string;
+  imageIsUrl: boolean;
+  imageLink: string;
+  title: string;
+  text: string;
+  objectWidth?: string;
+  scores: Score[];
+  addons: ObjAddon[];
+  activateOtherChoice: boolean;
+  activateThisChoice: string;
+  deactivateOtherChoice: boolean;
+  deactivateThisChoice: string;
+  groups: { id: string }[];
 
-    isSelectableMultiple: boolean;
-    isNotSelectable: boolean;
-    numMultipleTimesMinus: string;
-    numMultipleTimesPluss: string;
+  isSelectableMultiple: boolean;
+  isNotSelectable: boolean;
+  isVisible: boolean;
+  isImageUpload: boolean;
+  numMultipleTimesMinus: number | string;
+  numMultipleTimesPluss: number | string;
+  multipleUseVariable: number;
+  multipleScoreId: string;
 
-    addToAllowChoice: boolean;
-    numbAddToAllowChoice: number;
-    idOfAllowChoice: string;
+  addToAllowChoice: boolean;
+  numbAddToAllowChoice: number;
+  idOfAllowChoice: string;
 
-    isPrivateStyling: boolean;
-    styling: ObjStyles;
-    template: string;
-  };
+  isPrivateStyling: boolean;
+  styling: ObjStyles | null;
+  template: number;
+};
 
-export type ProjectRow = HasId &
-  HasRequirements & {
-    title: string;
-    titleText?: string;
+export type ProjectRow = {
+  id: string;
+  requireds: ConditionTerm[];
+  image: string;
+  imageIsUrl: boolean;
+  imageLink: string;
+  title: string;
+  titleText?: string;
 
-    image: string;
-    imageIsLink: boolean;
-    objectWidth: string;
-    rowJustify?: 'left' | 'right' | 'center';
+  objectWidth: string;
+  rowJustify?: 'left' | 'right' | 'center';
 
-    resultGroupId: string;
-    allowedChoices: number;
-    isInfoRow: boolean;
+  resultGroupId: string;
+  allowedChoices: number;
+  isInfoRow: boolean;
+  isButtonRow: boolean;
+  isResultRow: boolean;
 
-    objects: ProjectObj[];
+  objects: ProjectObj[];
 
-    isPrivateStyling: boolean;
-    styling?: RowStyles;
-  };
+  isPrivateStyling: boolean;
+  styling?: RowStyles;
+};
 
 export type PointType = {
   id: string;
   name: string;
-  beforeText: string;
-  afterText: string;
   startingSum: number;
   activatedId: string;
+  afterText: string;
+  beforeText: string;
+  iconHeight?: string;
+  iconWidth?: string;
+  iconIsOn?: boolean;
+  image?: string;
+  imageOnSide?: boolean;
+  imageSidePlacement?: boolean;
+  initValue?: number;
+};
+
+export type RowGroup = {
+  id: string;
+  name: string;
+  elements: string[];
+};
+
+export type Variable = {
+  id: string;
+  isTrue: boolean;
 };
 
 export type Project = {
   $projectId?: string;
-  rows: ProjectRow[];
   backpack: ProjectRow[];
+  groups: RowGroup[];
   pointTypes: PointType[];
+  rows: ProjectRow[];
   styling: ProjectStyles;
+  variables: Variable[];
 };
 
 export type ProjectFile = {
@@ -149,4 +191,6 @@ export const EMPTY_PROJECT: Project = {
   backpack: [],
   pointTypes: [],
   styling: {} as ProjectStyles,
+  variables: [],
+  groups: [],
 };

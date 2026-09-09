@@ -435,7 +435,10 @@ export const useProjectStore = defineStore('project', () => {
       setSelected(id, true);
     } else {
       const obj = getObject.value(id);
-      const maxValue = Number.parseInt(obj.numMultipleTimesPluss);
+      const maxValue =
+        typeof obj.numMultipleTimesPluss === 'string'
+          ? Number.parseInt(obj.numMultipleTimesPluss)
+          : obj.numMultipleTimesPluss;
 
       const curValue = selected.value[id];
       selected.value[id] = Math.min(curValue + incValue, maxValue);
@@ -445,7 +448,10 @@ export const useProjectStore = defineStore('project', () => {
   const decSelected = (id: string, decValue: number = 1) => {
     if (R.has(id, selected.value)) {
       const obj = getObject.value(id);
-      const minValue = Number.parseInt(obj.numMultipleTimesMinus);
+      const minValue =
+        typeof obj.numMultipleTimesMinus === 'string'
+          ? Number.parseInt(obj.numMultipleTimesMinus)
+          : obj.numMultipleTimesMinus;
 
       const curValue = selected.value[id];
       const nextValue = Math.max(curValue - decValue, minValue);

@@ -18,53 +18,54 @@ export type AddonStyles = {
   addonTitleTextSize: number;
 };
 
-export type ObjStyles = ScoreStyles & {
-  objectTitle: string;
-  objectTitleTextSize: number;
-  objectTitleColor: string;
-  objectTitleAlign: TextAlignT;
+export type ObjStyles = ScoreStyles &
+  AddonStyles & {
+    objectTitle: string;
+    objectTitleTextSize: number;
+    objectTitleColor: string;
+    objectTitleAlign: TextAlignT;
 
-  objectText: string;
-  objectTextTextSize: number;
-  objectTextAlign: TextAlignT;
-  objectTextColor: string;
-  objectTextPadding: number;
+    objectText: string;
+    objectTextTextSize: number;
+    objectTextAlign: TextAlignT;
+    objectTextColor: string;
+    objectTextPadding: number;
 
-  objectImageWidth: number;
-  objectImageMarginTop: number;
-  objectImageMarginBottom: number;
+    objectImageWidth: number;
+    objectImageMarginTop: number;
+    objectImageMarginBottom: number;
 
-  objectBgColorIsOn: boolean;
-  objectBgColor: string;
-  objectBackgroundImage: string;
+    objectBgColorIsOn: boolean;
+    objectBgColor: string;
+    objectBackgroundImage: string;
 
-  objectBorderIsOn: boolean;
-  objectBorderColor: string;
-  objectBorderStyle: string;
-  objectBorderWidth: number;
-  objectBorderRadiusTopLeft: string | number;
-  objectBorderRadiusTopRight: string | number;
-  objectBorderRadiusBottomRight: string | number;
-  objectBorderRadiusBottomLeft: string | number;
-  objectBorderRadiusIsPixels: boolean;
+    objectBorderIsOn: boolean;
+    objectBorderColor: string;
+    objectBorderStyle: string;
+    objectBorderWidth: number;
+    objectBorderRadiusTopLeft: string | number;
+    objectBorderRadiusTopRight: string | number;
+    objectBorderRadiusBottomRight: string | number;
+    objectBorderRadiusBottomLeft: string | number;
+    objectBorderRadiusIsPixels: boolean;
 
-  objectImgBorderColor: string;
-  objectImgBorderIsOn: boolean;
-  objectImgFillIsOn: boolean;
-  objectImgObjectFillStyle: string;
-  objectImgObjectFillHeight: string;
-  objectImgOverflowIsOn: boolean;
+    objectImgBorderColor: string;
+    objectImgBorderIsOn: boolean;
+    objectImgFillIsOn: boolean;
+    objectImgObjectFillStyle: string;
+    objectImgObjectFillHeight: string;
+    objectImgOverflowIsOn: boolean;
 
-  objectMargin: number;
-  objectHeight: boolean;
-  objectOverflowIsOn: boolean;
+    objectMargin: number;
+    objectHeight: boolean;
+    objectOverflowIsOn: boolean;
 
-  selBgColorIsOn: boolean;
-  selFilterBgColor: string;
+    selBgColorIsOn: boolean;
+    selFilterBgColor: string;
 
-  reqBgColorIsOn: boolean;
-  reqFilterBgColor: string;
-};
+    reqBgColorIsOn: boolean;
+    reqFilterBgColor: string;
+  };
 
 export type RowStyles = ObjStyles &
   AddonStyles & {

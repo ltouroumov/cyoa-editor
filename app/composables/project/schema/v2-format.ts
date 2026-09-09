@@ -1,33 +1,33 @@
-import { array, object, string } from 'yup';
+import { z } from 'zod';
 
 export const V2SchemaId = 'https://cyoa.ltouroumov.ch/.schema/v2.json';
 
-export const V2ProjectSchema = object({
-  $schema: string().test(
-    'is-v2-schema',
-    (d) => `${d.path} is not ${V2SchemaId}`,
-    (value: string | undefined) => value === V2SchemaId,
-  ),
-  $project: object({
-    name: string(),
+export const V2ProjectSchema = z.object({
+  $schema: z
+    .string()
+    .refine((value: string | undefined) => value === V2SchemaId, {
+      error: (d) => `${d} is not ${V2SchemaId}`,
+    }),
+  $project: z.object({
+    name: z.string(),
   }),
 
-  content: object({
-    objects: object(),
-    children: object(),
-    scores: object(),
+  content: z.object({
+    objects: z.object({}),
+    children: z.object({}),
+    scores: z.object({}),
   }),
-  config: object({
-    pages: object({
-      main: string(),
+  config: z.object({
+    pages: z.object({
+      main: z.string(),
     }),
-    backpack: object({
-      rows: array(object()),
+    backpack: z.object({
+      rows: z.array(z.object({})),
     }),
   }),
-  styles: object({
-    rules: object({}),
-    defaults: object({}),
+  styles: z.object({
+    rules: z.object({}),
+    defaults: z.object({}),
   }),
-  media: object({}),
+  media: z.object({}),
 });
