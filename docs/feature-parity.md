@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 62/106 · editor 21/107**
+Overall: **viewer 62/105 · editor 21/106**
 
 ---
 
@@ -63,11 +63,10 @@ Overall: **viewer 62/106 · editor 21/107**
 - Chapters (`app.chapters`) — viewer: [Deferred] · editor: [Deferred] — Standard-CYOA only, always empty in image projects
 - Pages / multiple screens — viewer: [N/A] · editor: [Partial] — V2 `page` object type exists; "only one page supported" today. Not a V1 concept.
 
-## Groups (viewer: 2/4; editor: 0/4)
+## Groups (viewer: 2/3; editor: 0/3)
 
 - Choice group membership (`obj.groups[]`) — viewer: [Done] · editor: [Missing] — viewer uses the first group id to bucket selections in the Backpack
 - Row result-group id (`row.resultGroupId`) — viewer: [Done] · editor: [Missing] — Backpack rows whose `resultGroupId` matches a group collect that group's selected choices, with per-group score subtotals
-- Top-level named row groups (`groups[]` = `{id, name, elements[]}`) for jump-to-section navigation — viewer: [Missing] · editor: [Missing] — parsed into the V1 type; no navigation menu consumes it
 - Group id usable as a target of "deactivate other choice" (deselect a whole group) — viewer: [Missing] · editor: [Missing]
 
 ## Backpack (viewer: 6/7; editor: 0/3)
