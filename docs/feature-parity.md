@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 64/105 · editor 21/106**
+Overall: **viewer 65/104 · editor 21/105**
 
 ---
 
@@ -79,11 +79,10 @@ Overall: **viewer 64/105 · editor 21/106**
 - Backpack styling (`Manage Backpack Design`, `backPackWidth`) — viewer: [Partial] · editor: [Missing] — visual, mostly out of scope
 - "Import selected choices from an id list" dialog (`importedChoicesIsOpen` / ActivatedViewer) — viewer: [Done] · editor: [N/A] — superseded by build codes + saved builds
 
-## Choice selection behaviour (viewer: 6/9; editor: 1/9)
+## Choice selection behaviour (viewer: 6/8; editor: 1/8)
 
 - Single-select choice — viewer: [Done] · editor: [Done]
 - Non-selectable choice (`isNotSelectable`) — viewer: [Done] · editor: [Missing]
-- Hidden choice (`isVisible` false) — viewer: [?] · editor: [Missing]
 - Multi-select choice, point-sum backed (`isSelectableMultiple` + `multipleScoreId`) — viewer: [Done] · editor: [Partial] — V2 `MultiSelectComponent`; backing model differs
 - Multi-select choice, own-counter backed (`isMultipleUseVariable` + `multipleUseVariable`) — viewer: [Partial] · editor: [Missing] — ICC-Neo treats all multi-select the same; the two legacy modes are not distinguished
 - Multi-select min / max (`numMultipleTimesMinus` / `numMultipleTimesPluss`) — viewer: [Done] · editor: [Partial] — `minAmount` / `maxAmount`
@@ -114,7 +113,7 @@ Overall: **viewer 64/105 · editor 21/106**
 - Button adds a sum to a point type (`btnPointAddon` / `pointTypeRandom`) — viewer: [Missing] · editor: [Missing]
 - Button bound to a variable (`row.buttonRandom` false path → push `buttonId` to activated) — viewer: [Missing] · editor: [Missing]
 
-## Scoring & points (viewer: 8/10; editor: 5/10)
+## Scoring & points (viewer: 9/10; editor: 5/10)
 
 - Point types with starting sum (`pointTypes[]` / `startingSum`) — viewer: [Done] · editor: [Done] — V2 `ProjectScore.defaultValue`
 - Additive scores on choices (`scores[]` / `value`) — viewer: [Done] · editor: [Done] — V2 `ObjectScore` `type: gain | cost`
@@ -124,7 +123,7 @@ Overall: **viewer 64/105 · editor 21/106**
 - Point type shown only once an id is selected (`activatedId`) — viewer: [Done] · editor: [Partial] — approximated by `ProjectScore.activeWhen`; confirm semantics
 - Multi-select scores scale with the pick count — viewer: [Done] · editor: [?]
 - Per-score before/after label text (`beforeText` / `afterText`) — viewer: [Done] · editor: [Partial] — V2 has one `unit`, no per-score text
-- Clamp at zero — block a selection that would push a point type below zero (`belowZeroNotAllowed`, enforced in `checkPoints`) — viewer: [Missing] · editor: [Missing]
+- Clamp at zero — block a selection that would push a point type below zero (`belowZeroNotAllowed`, enforced in `checkPoints`) — viewer: [Done] · editor: [Missing] — `violatesBelowZero` guard in `setSelected` rejects an interactive select whose totals would go negative for a flagged point type; bulk import bypasses it, matching legacy
 - `+` / `-` sign prefix and its inversion (`plussOrMinusAdded` / `plussOrMinusInverted`) — viewer: [Missing] · editor: [Missing]
 - Positive / negative point colours (`pointColorsIsOn` / `positiveColor` / `negativeColor`, plus `barPointPos` / `barPointNeg` on the bar) — viewer: [Deferred] · editor: [Deferred] — visual, out of scope
 - Point type icon / image (`iconIsOn` / `image` / `imageOnSide` / `imageSidePlacement`) — viewer: [Deferred] · editor: [Deferred] — visual, out of scope

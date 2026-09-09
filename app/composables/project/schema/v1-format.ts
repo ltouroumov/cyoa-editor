@@ -34,6 +34,7 @@ const PointTypeSchema = z.toZod<PointType>()(
     activatedId: z.string(),
     afterText: z.string(),
     beforeText: z.string(),
+    belowZeroNotAllowed: z.boolean().optional(),
     iconHeight: z.string().optional(),
     iconWidth: z.string().optional(),
     iconIsOn: z.boolean().optional(),

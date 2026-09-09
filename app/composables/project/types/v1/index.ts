@@ -123,6 +123,7 @@ export type PointType = {
   activatedId: string;
   afterText: string;
   beforeText: string;
+  belowZeroNotAllowed?: boolean;
   iconHeight?: string;
   iconWidth?: string;
   iconIsOn?: boolean;

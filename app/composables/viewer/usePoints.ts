@@ -65,9 +65,8 @@ export function usePoints() {
   ): Record<string, number> =>
     R.map((acc: ScoreAcc) => acc.gain - acc.cost, scores);
 
-  const points = computed<Record<string, number>>(() => {
-    const _selected = R.clone(store.selected);
-
+  // Point totals a given selection would produce (starting sums + score deltas).
+  const pointsForSelection = (selected: Selections): Record<string, number> => {
     const startingSums: Record<string, number> = R.pipe(
       R.map(({ id, startingSum }: PointType): [string, number] => [
         id,
@@ -80,8 +79,12 @@ export function usePoints() {
       computePointsForSelection,
       mergeScoreAcc,
       R.mergeWith(R.add, startingSums),
-    )(_selected);
-  });
+    )(selected);
+  };
 
-  return { points, computePointsForSelection };
+  const points = computed<Record<string, number>>(() =>
+    pointsForSelection(R.clone(store.selected)),
+  );
+
+  return { points, pointsForSelection, computePointsForSelection };
 }

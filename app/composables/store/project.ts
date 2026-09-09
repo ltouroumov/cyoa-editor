@@ -23,6 +23,8 @@ import type {
 import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
 import { resolveDeactivateTargets } from '~/composables/store/deactivate';
 import { bufferToHex, stringToBuffer } from '~/composables/utils';
+import { violatesBelowZero } from '~/composables/viewer/belowZero';
+import { usePoints } from '~/composables/viewer/usePoints';
 
 export type Selections = Record<string, number>;
 type Transform = (sel: Selections) => Selections;
@@ -427,6 +429,18 @@ export const useProjectStore = defineStore('project', () => {
     let newSelected = newSelected0;
     if (addedIds.length > 0) {
       newSelected = enforceRowLimits(addedIds)(newSelected);
+    }
+
+    // Legacy `checkPoints` parity: block an interactive select that would drive
+    // a point type flagged `belowZeroNotAllowed` below zero. Bulk selection
+    // (build/code import) bypasses this, matching the legacy viewer.
+    if (typeof selectObj === 'string' && isSelected) {
+      const { pointsForSelection } = usePoints();
+      if (
+        violatesBelowZero(pointTypes.value, pointsForSelection(newSelected))
+      ) {
+        return;
+      }
     }
     if (removedIds.length > 0) {
       const removedNames = R.map((objId: string): string => {
