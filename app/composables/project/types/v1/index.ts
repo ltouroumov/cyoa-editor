@@ -20,7 +20,7 @@ export type AddonStyles = {
 
 export type ObjStyles = ScoreStyles & {
   objectTitle: string;
-  objectTitleTextSize: 200;
+  objectTitleTextSize: number;
   objectTitleColor: string;
   objectTitleAlign: TextAlignT;
 
@@ -128,10 +128,15 @@ type _ArbReqId = {
 export type ConditionTerm = _ArbReqId & {
   id: string;
   reqId: string;
+  reqId1?: string;
+  reqId2?: string;
+  reqId3?: string;
+  reqPoints?: number;
+  operator?: number;
   orRequired: { req: string }[];
   required: boolean;
   showRequired: boolean;
-  type: 'id' | 'or';
+  type: 'id' | 'or' | 'points' | 'pointCompare';
 
   requireds: ConditionTerm[];
 
@@ -149,7 +154,8 @@ export type HasId = {
 
 export type HasImage = {
   image: string;
-  imageIsLink: boolean;
+  imageIsUrl: boolean;
+  imageLink: string;
 };
 
 export type Score = HasRequirements & {
@@ -182,16 +188,20 @@ export type ProjectObj = HasId &
 
     isSelectableMultiple: boolean;
     isNotSelectable: boolean;
-    numMultipleTimesMinus: string;
-    numMultipleTimesPluss: string;
+    isVisible: boolean;
+    isImageUpload: boolean;
+    numMultipleTimesMinus: number;
+    numMultipleTimesPluss: number;
+    multipleUseVariable: number;
+    multipleScoreId: string;
 
     addToAllowChoice: boolean;
     numbAddToAllowChoice: number;
     idOfAllowChoice: string;
 
     isPrivateStyling: boolean;
-    styling: ObjStyles;
-    template: string;
+    styling: ObjStyles | null;
+    template: number;
   };
 
 export type ProjectRow = HasId &
@@ -206,6 +216,8 @@ export type ProjectRow = HasId &
     resultGroupId: string;
     allowedChoices: number;
     isInfoRow: boolean;
+    isButtonRow: boolean;
+    isResultRow: boolean;
 
     objects: ProjectObj[];
 
@@ -216,18 +228,38 @@ export type ProjectRow = HasId &
 export type PointType = {
   id: string;
   name: string;
-  beforeText: string;
-  afterText: string;
   startingSum: number;
   activatedId: string;
+  afterText: string;
+  beforeText: string;
+  iconHeight?: string;
+  iconWidth?: string;
+  iconIsOn?: boolean;
+  image?: string;
+  imageOnSide?: boolean;
+  imageSidePlacement?: boolean;
+  initValue?: number;
+};
+
+export type RowGroup = {
+  id: string;
+  name: string;
+  elements: string[];
+};
+
+export type Variable = {
+  id: string;
+  isTrue: boolean;
 };
 
 export type Project = {
   $projectId?: string;
-  rows: ProjectRow[];
   backpack: ProjectRow[];
+  groups: RowGroup[];
   pointTypes: PointType[];
+  rows: ProjectRow[];
   styling: ProjectStyles;
+  variables: Variable[];
 };
 
 export type ProjectFile = {
@@ -268,4 +300,6 @@ export const EMPTY_PROJECT: Project = {
   backpack: [],
   pointTypes: [],
   styling: {} as ProjectStyles,
+  variables: [],
+  groups: [],
 };
