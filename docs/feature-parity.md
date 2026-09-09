@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 61/107 · editor 21/108**
+Overall: **viewer 61/106 · editor 21/107**
 
 ---
 
@@ -189,12 +189,12 @@ Overall: **viewer 61/107 · editor 21/108**
 - Image object-fit / fixed container height (`objectImgObjectFillIsOn` / `objectImgObjectFillHeight`) — viewer: [Done] · editor: [?]
 - Style Templates — one-click preset themes (Fall, Book, Dark, Rainbow, …) — viewer: [N/A] · editor: [Missing]
 
-## Media (viewer: 4/7; editor: 1/8)
+## Media (viewer: 4/6; editor: 1/7)
 
 - Base64-embedded images — viewer: [Done] · editor: [Done] — V2 `media.images` keyed by id
 - Image by URL (`imageIsUrl`) — viewer: [Done] · editor: [?]
 - Image source tooltip / attribution (`imageSourceTooltip`) — viewer: [Missing] · editor: [Missing]
-- Image click-through link (`imageLink`) — viewer: [Missing] · editor: [Missing]
+- `imageLink` field — viewer: [N/A] · editor: [N/A] — not a runtime property: legacy binds it to a text box in the image-upload form and copies it into `image` on a "Make This The Image" click (`imageCyoa/row/ImageUpload.vue`). When `imageIsUrl` is set, the URL lives in `image`.
 - Addon images — viewer: [Done] · editor: [?] — viewer support added recently (`f566469`)
 - Player image-upload choice (`isImageUpload` — the player attaches their own picture) — viewer: [Missing] · editor: [Missing]
 - Bulk image compression tool — viewer: [N/A] · editor: [Missing]
