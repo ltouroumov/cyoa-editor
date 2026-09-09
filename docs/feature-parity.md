@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 62/105 · editor 21/106**
+Overall: **viewer 64/105 · editor 21/106**
 
 ---
 
@@ -63,11 +63,11 @@ Overall: **viewer 62/105 · editor 21/106**
 - Chapters (`app.chapters`) — viewer: [Deferred] · editor: [Deferred] — Standard-CYOA only, always empty in image projects
 - Pages / multiple screens — viewer: [N/A] · editor: [Partial] — V2 `page` object type exists; "only one page supported" today. Not a V1 concept.
 
-## Groups (viewer: 2/3; editor: 0/3)
+## Groups (viewer: 3/3; editor: 0/3)
 
 - Choice group membership (`obj.groups[]`) — viewer: [Done] · editor: [Missing] — viewer uses the first group id to bucket selections in the Backpack
 - Row result-group id (`row.resultGroupId`) — viewer: [Done] · editor: [Missing] — Backpack rows whose `resultGroupId` matches a group collect that group's selected choices, with per-group score subtotals
-- Group id usable as a target of "deactivate other choice" (deselect a whole group) — viewer: [Missing] · editor: [Missing]
+- Group id usable as a target of "deactivate other choice" (deselect a whole group) — viewer: [Done] · editor: [Missing] — `resolveDeactivateTargets` expands a `deactivateThisChoice` token that is a row `resultGroupId` or a declared group id into its member choices
 
 ## Backpack (viewer: 6/7; editor: 0/3)
 
@@ -91,10 +91,10 @@ Overall: **viewer 62/105 · editor 21/106**
 - Choice raises/lowers another row's limit on select (`addToAllowChoice` / `idOfAllowChoice` / `numbAddToAllowChoice`) — viewer: [Done] · editor: [Missing]
 - Row auto-deselects its choices when its own requirements stop being met (`deselectChoices`) — viewer: [Missing] · editor: [Missing]
 
-## Choice "functions" (on-select / on-deselect actions) (viewer: 1/8; editor: 0/8)
+## Choice "functions" (on-select / on-deselect actions) (viewer: 2/8; editor: 0/8)
 
 - Activate & lock other choices (`activateOtherChoice` / `activateThisChoice`, comma list) — viewer: [Done] · editor: [Missing]
-- Deactivate other choices (`deactivateOtherChoice` / `deactivateThisChoice`, comma list) — viewer: [Partial] · editor: [Missing] — ICC-Neo matches choice ids only; legacy also matches `resultGroupId` and group ids
+- Deactivate other choices (`deactivateOtherChoice` / `deactivateThisChoice`, comma list) — viewer: [Done] · editor: [Missing] — matches choice ids, row `resultGroupId`, and declared group ids (`resolveDeactivateTargets`); like legacy, runs on select only
 - Reset all selections on select (`cleanACtivatedOnSelect`) — viewer: [Missing] · editor: [Missing]
 - Multiply a point type on select (`multiplyPointtypeIsOn` + `pointTypeToMultiply` + `multiplyWithThis`, where `multiplyWithThis` may be a constant or another point type id) — viewer: [Missing] · editor: [Missing]
 - Divide a point type on select (`dividePointtypeIsOn` + `pointTypeToDivide` + `divideWithThis`) — viewer: [Missing] · editor: [Missing]

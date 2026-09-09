@@ -21,6 +21,7 @@ import type {
   EditorProjectVersion,
 } from '~/composables/shared/tables/editor_projects';
 import type { SavedBuildData } from '~/composables/shared/tables/viewer_builds';
+import { resolveDeactivateTargets } from '~/composables/store/deactivate';
 import { bufferToHex, stringToBuffer } from '~/composables/utils';
 
 export type Selections = Record<string, number>;
@@ -275,7 +276,16 @@ export const useProjectStore = defineStore('project', () => {
       if (!obj.deactivateOtherChoice || !addToSelected) {
         return R.identity;
       } else {
-        const choices = R.split(',', obj.deactivateThisChoice);
+        const tokens = R.split(',', obj.deactivateThisChoice);
+        const groupIds = new Set(
+          R.map(R.prop('id'), project.value?.data.groups ?? []),
+        );
+        // A token may be a choice id, a row resultGroupId, or a group id
+        const choices = resolveDeactivateTargets(
+          projectRows.value,
+          groupIds,
+          tokens,
+        );
         return addOrRemoveAll(choices, false);
       }
     };
