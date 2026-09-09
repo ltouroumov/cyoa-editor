@@ -4,18 +4,18 @@
 @layer base, primevue;
 
 @plugin "@iconify/tailwind4" {
-  prefixes: carbon, solar, material-symbols, material-symbols-light;
+    prefixes: carbon, solar, material-symbols, material-symbols-light;
 }
 
 @plugin "tailwind-bootstrap-grid" {
-  container-max-widths: ['sm', '540px', 'md', '720px', 'lg', '960px', 'xl', '1140px', '2xl', '1320px'];
-  grid-gutters: ['2', '0.5rem'];
+    container_max_widths: 'sm', '540px', 'md', '720px', 'lg', '960px', 'xl', '1140px', '2xl', '1320px';
+    grid_gutters: '2', '0.5rem';
 }
 
 @theme {
-  /* Grid Template Columns Extensions */
-  --grid-template-columns-60: repeat(60, minmax(0, 1fr));
-  --grid-template-columns-form: max-content 1fr;
+    /* Grid Template Columns Extensions */
+    --grid-template-columns-60: repeat(60, minmax(0, 1fr));
+    --grid-template-columns-form: max-content 1fr;
 }
 
 /* Flex Grow Extensions */
