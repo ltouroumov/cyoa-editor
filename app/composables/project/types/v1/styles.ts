@@ -20,15 +20,15 @@ export type AddonStyles = {
 
 export type ObjStyles = ScoreStyles & {
   objectTitle: string;
-  objectTitleTextSize: 200;
+  objectTitleTextSize: number;
   objectTitleColor: string;
   objectTitleAlign: TextAlignT;
 
   objectText: string;
-  objectTextTextSize: 100;
+  objectTextTextSize: number;
   objectTextAlign: TextAlignT;
   objectTextColor: string;
-  objectTextPadding: 10;
+  objectTextPadding: number;
 
   objectImageWidth: number;
   objectImageMarginTop: number;

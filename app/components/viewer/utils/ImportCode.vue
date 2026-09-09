@@ -94,7 +94,7 @@ function readImportCode($event: any) {
     });
   } else {
     setSelected(result.selections, true, true);
-    buildNotes.value = {};
+    buildNotes.value = result.notes ?? {};
 
     importCode.value = '';
     $toast.add({

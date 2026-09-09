@@ -7,7 +7,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "eslint \"**/*.{ts,js,vue}\""
+    "lint": "eslint \"**/*.{ts,js,vue}\"",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -38,6 +39,7 @@
     "tailwindcss-primeui": "0.6.1",
     "typescript": "6.0.2",
     "typescript-eslint": "8.58.2",
+    "vitest": "^4.1.4",
     "vue-eslint-parser": "10.4.0",
     "vue-tsc": "3.2.6"
   },

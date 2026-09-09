@@ -15,15 +15,16 @@
 <script setup lang="ts">
 import { isNil, isNotNil } from 'ramda';
 
-import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
+import type { HasImage } from '~/composables/project/types/v1';
 import { useImageCache } from '~/composables/viewer/cache/useImageCache';
 
 const { loadImageSrc } = useImageCache();
 const $props = defineProps<{
-  element: ProjectObj | ProjectRow;
+  element: HasImage & { title?: string };
   alwaysEnable?: boolean;
 }>();
 
+const isVisible = ref<boolean>(false);
 const imageSrc = ref<string | null>(null);
 
 const wrapper = ref<HTMLDivElement>();
@@ -34,9 +35,7 @@ const handleObserver: IntersectionObserverCallback = (entries) => {
       entry.target === wrapper.value &&
       isNil(imageSrc.value)
     ) {
-      loadImageSrc($props.element).then((src) => {
-        imageSrc.value = src;
-      });
+      isVisible.value = true;
     }
   });
 };
@@ -51,6 +50,14 @@ onMounted(() => {
 });
 onUnmounted(() => {
   observer.disconnect();
+});
+
+watch([isVisible, () => $props.element], ([isVisible0, newValue]) => {
+  if (isVisible0) {
+    loadImageSrc(newValue).then((src) => {
+      imageSrc.value = src;
+    });
+  }
 });
 </script>
 

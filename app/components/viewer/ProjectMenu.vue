@@ -44,6 +44,10 @@
               class="text-sm text-surface-600 italic mt-2"
             >
               Local Project
+              <span v-if="project.cachedAt">
+                (Last Updated:
+                {{ format(project.cachedAt, 'yyyy-MM-dd HH:mm:ss') }})
+              </span>
             </div>
             <div
               v-if="isNotNil(project.description)"
