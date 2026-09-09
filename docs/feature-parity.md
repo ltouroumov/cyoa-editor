@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 61/106 · editor 21/107**
+Overall: **viewer 62/106 · editor 21/107**
 
 ---
 
@@ -160,7 +160,7 @@ Overall: **viewer 61/106 · editor 21/107**
 - Project default text fills (`defaultRowText`, `defaultChoiceTitle`, `defaultBeforePoint`, …) — viewer: [N/A] · editor: [Missing] — authoring convenience; values bake into the saved file
 - "Change all ids to titles" bulk authoring helper — viewer: [N/A] · editor: [Missing]
 
-## Layout (viewer: 3/9; editor: 1/9)
+## Layout (viewer: 4/9; editor: 1/9)
 
 - Choice image layout: image top / left / right (`obj.template` 1/2/3) — viewer: [Done] · editor: [Partial] — V2 `header.layout` string; mapping unverified
 - Row layout: image top / right / left / bottom (`row.template` 1/2/3/4) — viewer: [Missing] · editor: [?] — ICC-Neo renders one row layout
@@ -169,7 +169,7 @@ Overall: **viewer 61/106 · editor 21/107**
 - Row flex justification (`rowJustify` left/right/center) — viewer: [Partial] · editor: [Done] — V1→V2 import carries `rowJustify`; V2 `RowLayoutProps.itemAlign`; viewer honouring unverified
 - Half-width rows on wide screens (`row.width`) — viewer: [?] · editor: [?]
 - Per-choice / per-row width via 60-column grid (`objectWidth`, `col-*` / `w-*` classes) — viewer: [Done] · editor: [Partial] — V2 `itemWidth` is a bare number; class mapping TBD
-- Equalise choice heights within a row (`styling.objectHeight`) — viewer: [Missing] · editor: [Missing]
+- Equalise choice heights within a row (`styling.objectHeight`) — viewer: [Done] · editor: [Missing] — global flag only (matches legacy); `false` disables the row stretch via `.obj-height-natural`
 - Hide all choice text in a row (`textIsRemoved`) — viewer: [Missing] · editor: [Missing]
 
 ## Styling (capability level only — visual fidelity out of scope) (viewer: 11/11; editor: 2/14)

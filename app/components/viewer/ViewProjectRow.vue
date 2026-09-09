@@ -30,7 +30,10 @@
         :is-visible="isVisible"
         :items="row.objects"
         :step="10"
-        :wrapper="{ tag: 'div', props: { class: 'row g-2' } }"
+        :wrapper="{
+          tag: 'div',
+          props: { class: ['row g-2', { 'obj-height-natural': !equaliseHeights }] },
+        }"
       >
         <template #item="{ item }">
           <ViewProjectObj
@@ -41,7 +44,7 @@
           />
         </template>
         <template #loader>
-          <div class="row g-2">
+          <div class="row g-2" :class="{ 'obj-height-natural': !equaliseHeights }">
             <div
               v-for="obj in row.objects"
               :key="obj.id"
@@ -74,10 +77,17 @@ const $props = defineProps<{
   display?: DisplaySettings;
 }>();
 
-const { selectedIds } = useProjectRefs();
+const { project, selectedIds } = useProjectRefs();
 
 const condition = computed(() => buildConditions($props.row));
 const isVisible = computed(() => condition.value(selectedIds.value));
+
+// Legacy `styling.objectHeight` (global, default true): equalises choice
+// heights within a row. When explicitly false, choices keep their natural
+// height. Matches `imageCyoaViewer/Row.vue` which only reads the global flag.
+const equaliseHeights = computed(
+  () => project.value?.data.styling.objectHeight !== false,
+);
 
 const hasTitle = computed(() => isNotEmpty($props.row.title));
 const hasTitleText = computed(() => isNotEmpty($props.row.titleText));

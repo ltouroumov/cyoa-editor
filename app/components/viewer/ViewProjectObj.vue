@@ -299,6 +299,16 @@ const isInBackpack = computed<boolean>(() => {
 </style>
 
 <style lang="scss">
+// Legacy `styling.objectHeight === false`: don't stretch choices to equal
+// height within a row (see ViewProjectRow `equaliseHeights`).
+.row.obj-height-natural {
+  align-items: flex-start;
+
+  .project-obj.obj-default {
+    height: auto;
+  }
+}
+
 .project-obj.obj-default {
   height: 100%;
   overflow: hidden;
