@@ -72,6 +72,7 @@ export type ProjectObj = {
   activateThisChoice: string;
   deactivateOtherChoice: boolean;
   deactivateThisChoice: string;
+  cleanACtivatedOnSelect: boolean;
   groups: { id: string }[];
 
   isSelectableMultiple: boolean;

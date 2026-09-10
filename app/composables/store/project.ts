@@ -411,6 +411,11 @@ export const useProjectStore = defineStore('project', () => {
       newSelected0 = clearIncompatibleChoices()(newSelected_);
     } else {
       const obj = getObject.value(selectObj);
+      // Legacy `cleanACtivatedOnSelect`: selecting a flagged choice wipes every
+      // selection first, then this choice (and its `activateOtherChoice`
+      // targets) is re-added on top. Runs on interactive select only.
+      const base: Selections =
+        isSelected && obj?.cleanACtivatedOnSelect ? {} : oldSelected;
       newSelected0 = R.pipe(
         // Add or remove the objectId to the selection array
         addOrRemove(selectObj, isSelected),
@@ -420,7 +425,7 @@ export const useProjectStore = defineStore('project', () => {
         addDeactivateOtherChoice(obj, isSelected),
         // Remove incompatible objects
         clearIncompatibleChoices(),
-      )(oldSelected);
+      )(base);
     }
 
     // Compute which elements were added (if any)

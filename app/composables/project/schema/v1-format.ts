@@ -273,6 +273,7 @@ const ProjectObjSchema = z.toZod<ProjectObj>()(
     activateThisChoice: z.string(),
     deactivateOtherChoice: z.boolean(),
     deactivateThisChoice: z.string(),
+    cleanACtivatedOnSelect: z.boolean(),
     groups: z.array(z.object({ id: z.string() })),
     isSelectableMultiple: z.boolean(),
     isNotSelectable: z.boolean(),
