@@ -20,6 +20,7 @@ import * as R from 'ramda';
 import { match } from 'ts-pattern';
 import { type ComputedRef, computed, ref } from 'vue';
 
+import { extractReqIds } from '~/composables/conditions';
 import type {
   ConditionTerm,
   ObjAddon,
@@ -29,7 +30,10 @@ import type {
   ProjectRow,
   Score,
 } from '~/composables/project/types/v1';
-import { foldDiacritics, sanitizeString } from '~/composables/viewer/search/norm';
+import {
+  foldDiacritics,
+  sanitizeString,
+} from '~/composables/viewer/search/norm';
 import type {
   SearchEvent,
   WorkerSearchResult,
@@ -238,10 +242,7 @@ function createSearchFunction(searchText: string) {
     const resolveReq = (req: ConditionTerm): string[] => {
       return reject(
         isEmpty,
-        concat(
-          [req.reqId, req.reqId1, req.reqId2, req.reqId3],
-          map(prop('req'), req.orRequired),
-        ),
+        concat(extractReqIds(req), map(prop('req'), req.orRequired)),
       );
     };
 

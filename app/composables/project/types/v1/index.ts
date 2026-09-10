@@ -25,10 +25,10 @@ export type ObjStyles = ScoreStyles & {
   objectTitleAlign: TextAlignT;
 
   objectText: string;
-  objectTextTextSize: 100;
+  objectTextTextSize: number;
   objectTextAlign: TextAlignT;
   objectTextColor: string;
-  objectTextPadding: 10;
+  objectTextPadding: number;
 
   objectImageWidth: number;
   objectImageMarginTop: number;
@@ -128,9 +128,6 @@ type _ArbReqId = {
 export type ConditionTerm = _ArbReqId & {
   id: string;
   reqId: string;
-  reqId1?: string;
-  reqId2?: string;
-  reqId3?: string;
   reqPoints?: number;
   operator?: number;
   orRequired: { req: string }[];
@@ -190,8 +187,8 @@ export type ProjectObj = HasId &
     isNotSelectable: boolean;
     isVisible: boolean;
     isImageUpload: boolean;
-    numMultipleTimesMinus: number;
-    numMultipleTimesPluss: number;
+    numMultipleTimesMinus: number | string;
+    numMultipleTimesPluss: number | string;
     multipleUseVariable: number;
     multipleScoreId: string;
 

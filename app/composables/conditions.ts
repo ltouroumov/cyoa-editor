@@ -34,25 +34,25 @@ export const buildRootCondition = (terms: ConditionTerm[]): ConditionExec => {
   };
 };
 
+export const extractReqIds = (term: ConditionTerm): string[] =>
+  R.prepend(
+    term.reqId,
+    R.unfold((n) => {
+      if (R.has(`reqId${n}`, term)) {
+        return [term[`reqId${n}`], n + 1];
+      } else return false;
+    }, 1),
+  );
+
 const buildCondition = (term: ConditionTerm): Condition => {
   // Compute the base condition microcode
   const base = match(term)
     .with({ type: 'id', required: true }, () => {
-      const ids = R.reject(R.isEmpty, [
-        term.reqId,
-        term.reqId1,
-        term.reqId2,
-        term.reqId3,
-      ]);
+      const ids: string[] = extractReqIds(term);
       return AND(R.map(SELECTED, ids));
     })
     .with({ type: 'id', required: false }, () => {
-      const ids = R.reject(R.isEmpty, [
-        term.reqId,
-        term.reqId1,
-        term.reqId2,
-        term.reqId3,
-      ]);
+      const ids = extractReqIds(term);
       return AND(R.map(UNSELECTED, ids));
     })
     .with(

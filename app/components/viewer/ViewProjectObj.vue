@@ -1,7 +1,7 @@
 <template>
   <div :id="`obj-${obj.id}`" :class="objClass">
     <StyleObj
-      v-if="obj.isPrivateStyling"
+      v-if="obj.isPrivateStyling && obj.styling"
       :styles="obj.styling"
       :obj-id="obj.id"
     />
@@ -194,7 +194,7 @@ const objTemplateClass = computed(() => {
 
 const objBgColor = computed(() => {
   if ($props.obj.isPrivateStyling) {
-    if ($props.obj.styling.objectBgColorIsOn) {
+    if ($props.obj.styling?.objectBgColorIsOn) {
       return $props.obj.styling.objectBgColor;
     } else {
       return 'transparent';

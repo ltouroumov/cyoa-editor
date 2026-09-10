@@ -18,6 +18,7 @@ import {
 } from 'ramda';
 import { P, match } from 'ts-pattern';
 
+import { extractReqIds } from '~/composables/conditions';
 import { DefaultProject } from '~/composables/project/defaults';
 import { V1ProjectSchema } from '~/composables/project/schema/v1-format';
 import { V2ProjectSchema } from '~/composables/project/schema/v2-format';
@@ -89,21 +90,11 @@ function toConditionTerm(terms: ConditionTermV1[]): ConditionTerm | undefined {
     // Compute the base condition microcode
     const base = match(term)
       .with({ type: 'id', required: true }, (): ConditionTerm => {
-        const ids = R.reject(R.isEmpty, [
-          term.reqId,
-          term.reqId1,
-          term.reqId2,
-          term.reqId3,
-        ]);
+        const ids = extractReqIds(term);
         return AllOf(R.map(IsSelected, ids));
       })
       .with({ type: 'id', required: false }, (): ConditionTerm => {
-        const ids = R.reject(R.isEmpty, [
-          term.reqId,
-          term.reqId1,
-          term.reqId2,
-          term.reqId3,
-        ]);
+        const ids = extractReqIds(term);
         return AllOf(R.map(IsNotSelected, ids));
       })
       .with(
@@ -231,7 +222,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
       const mediaId = createId('media');
       data.media.images[mediaId] = {
         id: mediaId,
-        isRemote: row.imageIsLink,
+        isRemote: row.imageIsUrl,
         data: row.image,
       };
 
@@ -258,7 +249,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         header: {
           title: object.title,
           text: object.text,
-          layout: object.template,
+          layout: `${object.template}`,
         },
 
         components: {},
@@ -304,7 +295,7 @@ function convertLegacyProject(legacy: LegacyProject): ImportResult {
         const mediaId = createId('media');
         data.media.images[mediaId] = {
           id: mediaId,
-          isRemote: object.imageIsLink,
+          isRemote: object.imageIsUrl,
           data: object.image,
         };
 
