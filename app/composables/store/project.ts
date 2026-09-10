@@ -293,6 +293,7 @@ export const useProjectStore = defineStore('project', () => {
     };
 
     const clearIncompatibleChoices = (): Transform => (sel: Selections) => {
+      const { pointsForSelection } = usePoints();
       let sel0 = R.clone(sel);
       let sel1 = R.clone(sel);
 
@@ -301,10 +302,12 @@ export const useProjectStore = defineStore('project', () => {
       let changed = true;
       let depth = 0;
       while (changed && depth < 10) {
+        const sel0Ids = R.keys(sel0);
+        const sel0Points = pointsForSelection(sel0);
         sel1 = R.pickBy((_, objectId): boolean => {
           const object = getObject.value(objectId);
           const pred = buildConditions(object);
-          return pred(R.keys(sel0));
+          return pred(sel0Ids, sel0Points);
         }, sel0);
 
         const diff = R.symmetricDifference(R.keys(sel1), R.keys(sel0));

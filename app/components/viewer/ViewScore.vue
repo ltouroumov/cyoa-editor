@@ -13,10 +13,12 @@ import { buildConditions } from '~/composables/conditions';
 import type { Score } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import { applyScoreSign } from '~/composables/viewer/scoreSign';
+import { usePoints } from '~/composables/viewer/usePoints';
 
 const { score } = defineProps<{ score: Score }>();
 
 const { selectedIds, getPointType } = useProjectRefs();
+const { points } = usePoints();
 
 const displayValue = computed<string>(() => {
   const raw = Number.parseInt(score.value) || 0;
@@ -27,7 +29,7 @@ const condition = buildConditions(score);
 const isEnabled = computed<boolean>(() => {
   const pointType = getPointType.value(score.id);
   return (
-    condition(selectedIds.value) &&
+    condition(selectedIds.value, points.value) &&
     (isNotNil(pointType)
       ? R.isEmpty(pointType.activatedId) ||
         R.includes(pointType.activatedId, selectedIds.value)

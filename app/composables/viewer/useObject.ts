@@ -4,6 +4,7 @@ import type { ComputedRef } from 'vue';
 import { buildConditions } from '~/composables/conditions';
 import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { usePoints } from '~/composables/viewer/usePoints';
 export function useObject({
   obj,
   row,
@@ -15,10 +16,11 @@ export function useObject({
 }) {
   const store = useProjectStore();
   const { selectedIds, selected } = useProjectRefs();
+  const { points } = usePoints();
 
   const condition = computed(() => buildConditions(obj.value));
   const isEnabled = computed<boolean>(() => {
-    return condition.value(selectedIds.value);
+    return condition.value(selectedIds.value, points.value);
   });
   const isSelected = computed<boolean>(() => {
     return R.has(obj.value.id, selected.value);

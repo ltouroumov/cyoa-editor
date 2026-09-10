@@ -25,6 +25,7 @@ import type { ObjAddon } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import { useViewerStore } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
+import { usePoints } from '~/composables/viewer/usePoints';
 
 const $props = defineProps<{
   objId: string;
@@ -33,9 +34,12 @@ const $props = defineProps<{
 }>();
 
 const { selectedIds } = useProjectRefs();
+const { points } = usePoints();
 
 const condition = computed(() => buildConditions($props.addon));
-const isEnabled = computed(() => condition.value(selectedIds.value));
+const isEnabled = computed(() =>
+  condition.value(selectedIds.value, points.value),
+);
 
 const viewerStore = useViewerStore();
 const showParents = () => {

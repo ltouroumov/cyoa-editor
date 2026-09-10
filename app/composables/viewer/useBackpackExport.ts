@@ -218,7 +218,7 @@ export function useBackpackExport() {
           const cond = buildConditions(score);
           const pointType = getPointType.value(score.id);
           return (
-            cond(selectedIds.value) &&
+            cond(selectedIds.value, points.value) &&
             (R.isNil(pointType) ||
               R.isEmpty(pointType.activatedId) ||
               R.includes(pointType.activatedId, selectedIds.value))

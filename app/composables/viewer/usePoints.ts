@@ -15,12 +15,27 @@ type ScoreRes = { id: string } & ScoreAcc;
 export function usePoints() {
   const store = useProjectStore();
 
+  const startingSums = (): Record<string, number> =>
+    R.pipe(
+      R.map(({ id, startingSum }: PointType): [string, number] => [
+        id,
+        startingSum,
+      ]),
+      R.fromPairs,
+    )(store.pointTypes);
+
   const computePointsForSelection = (
     selected: Selections,
     globalSelected?: Selections,
   ): Record<string, ScoreAcc> => {
     const _globalSelectedIds = R.keys(globalSelected ?? selected);
     const _selectedIds = R.keys(selected);
+
+    // A `type: points` condition on a score is evaluated against the base
+    // (pre-delta) sums: the running totals aren't known while they are still
+    // being computed here. This mirrors the legacy viewer's order-dependent
+    // behaviour closely enough for a rare edge case.
+    const _startingSums = startingSums();
 
     return R.pipe(
       R.map((id: string): { obj: ProjectObj; count: number } => ({
@@ -34,7 +49,7 @@ export function usePoints() {
             const pointType = store.getPointType(score.id);
             const cond = buildConditions(score);
             return (
-              cond(_globalSelectedIds) &&
+              cond(_globalSelectedIds, _startingSums) &&
               (R.isEmpty(pointType.activatedId) ||
                 R.includes(pointType.activatedId, _globalSelectedIds))
             );
@@ -66,21 +81,12 @@ export function usePoints() {
     R.map((acc: ScoreAcc) => acc.gain - acc.cost, scores);
 
   // Point totals a given selection would produce (starting sums + score deltas).
-  const pointsForSelection = (selected: Selections): Record<string, number> => {
-    const startingSums: Record<string, number> = R.pipe(
-      R.map(({ id, startingSum }: PointType): [string, number] => [
-        id,
-        startingSum,
-      ]),
-      R.fromPairs,
-    )(store.pointTypes);
-
-    return R.pipe(
+  const pointsForSelection = (selected: Selections): Record<string, number> =>
+    R.pipe(
       computePointsForSelection,
       mergeScoreAcc,
-      R.mergeWith(R.add, startingSums),
+      R.mergeWith(R.add, startingSums()),
     )(selected);
-  };
 
   const points = computed<Record<string, number>>(() =>
     pointsForSelection(R.clone(store.selected)),

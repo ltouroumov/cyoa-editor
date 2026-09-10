@@ -41,7 +41,7 @@ export type PackRow = {
 export function useBackpack() {
   const { getObject, getObjectRow, getRow } = useProjectStore();
   const { selected, selectedIds, backpack, indexMap } = useProjectRefs();
-  const { computePointsForSelection } = usePoints();
+  const { points, computePointsForSelection } = usePoints();
 
   const packRows = computed(() => {
     const _indexMap: IndexMapT = indexMap.value;
@@ -66,7 +66,7 @@ export function useBackpack() {
 
       const activeAddons = filter((addon) => {
         const condition = buildConditions(addon);
-        return condition(selectedIds.value);
+        return condition(selectedIds.value, points.value);
       }, obj.addons);
 
       return {

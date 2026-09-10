@@ -16,6 +16,7 @@
 import { buildConditions, buildRootCondition } from '~/composables/conditions';
 import type { ConditionTerm } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
+import { usePoints } from '~/composables/viewer/usePoints';
 
 const $props = defineProps<{
   req: ConditionTerm;
@@ -26,14 +27,17 @@ const $props = defineProps<{
 const { getObject } = useProjectStore();
 
 const { selectedIds } = useProjectRefs();
+const { points } = usePoints();
 
 const enabledCond = computed(() => buildConditions($props.req));
-const isEnabled = computed<boolean>(() => enabledCond.value(selectedIds.value));
+const isEnabled = computed<boolean>(() =>
+  enabledCond.value(selectedIds.value, points.value),
+);
 
 const activeCond = computed(() => buildRootCondition([$props.req]));
 const isActive = computed<boolean>(() => {
   const { exec } = activeCond.value;
-  return exec(selectedIds.value);
+  return exec(selectedIds.value, points.value);
 });
 
 const condText = computed(() => {

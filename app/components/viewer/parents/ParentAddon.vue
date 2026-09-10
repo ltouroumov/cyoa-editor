@@ -20,12 +20,16 @@
 import { buildConditions } from '~/composables/conditions';
 import type { ObjAddon, ProjectObj } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
+import { usePoints } from '~/composables/viewer/usePoints';
 
 const $props = defineProps<{ obj: ProjectObj; addon: ObjAddon }>();
 
 const { selectedIds } = useProjectRefs();
+const { points } = usePoints();
 const condition = computed(() => buildConditions($props.addon));
-const isEnabled = computed(() => condition.value(selectedIds.value));
+const isEnabled = computed(() =>
+  condition.value(selectedIds.value, points.value),
+);
 </script>
 
 <style scoped lang="scss">

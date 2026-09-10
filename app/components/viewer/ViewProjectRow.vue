@@ -32,7 +32,9 @@
         :step="10"
         :wrapper="{
           tag: 'div',
-          props: { class: ['row g-2', { 'obj-height-natural': !equaliseHeights }] },
+          props: {
+            class: ['row g-2', { 'obj-height-natural': !equaliseHeights }],
+          },
         }"
       >
         <template #item="{ item }">
@@ -44,7 +46,10 @@
           />
         </template>
         <template #loader>
-          <div class="row g-2" :class="{ 'obj-height-natural': !equaliseHeights }">
+          <div
+            class="row g-2"
+            :class="{ 'obj-height-natural': !equaliseHeights }"
+          >
             <div
               v-for="obj in row.objects"
               :key="obj.id"
@@ -71,6 +76,7 @@ import type { ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
 import { formatText } from '~/composables/text';
+import { usePoints } from '~/composables/viewer/usePoints';
 
 const $props = defineProps<{
   row: ProjectRow;
@@ -78,9 +84,12 @@ const $props = defineProps<{
 }>();
 
 const { project, selectedIds } = useProjectRefs();
+const { points } = usePoints();
 
 const condition = computed(() => buildConditions($props.row));
-const isVisible = computed(() => condition.value(selectedIds.value));
+const isVisible = computed(() =>
+  condition.value(selectedIds.value, points.value),
+);
 
 // Legacy `styling.objectHeight` (global, default true): equalises choice
 // heights within a row. When explicitly false, choices keep their natural

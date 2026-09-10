@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 66/104 · editor 21/105**
+Overall: **viewer 68/104 · editor 21/105**
 
 ---
 
@@ -129,14 +129,14 @@ Overall: **viewer 66/104 · editor 21/105**
 - Point type icon / image (`iconIsOn` / `image` / `imageOnSide` / `imageSidePlacement`) — viewer: [Deferred] · editor: [Deferred] — visual, out of scope
 - Fixed point bar showing all (gated) point types — viewer: [Done] · editor: [N/A] — `ViewScoreStatus` / `RowScores`
 
-## Requirements & conditions (viewer: 6/9; editor: 5/9)
+## Requirements & conditions (viewer: 8/9; editor: 5/9)
 
 - Require selected id, AND of up to four (`type: id`, `required: true`, `reqId`..`reqId3`) — viewer: [Done] · editor: [Done] — V2 `isSelected` / `allOf`
 - Incompatible with id(s) (`type: id`, `required: false`) — viewer: [Done] · editor: [Done] — V2 `isNotSelected`
 - OR group (`type: or` / `orRequired[]`) — viewer: [Done] · editor: [Done] — V2 `anyOf`
 - Nested sub-conditions (`requireds` on a term) — viewer: [Done] · editor: [Done] — V2 `allOf` / `anyOf` nesting
-- Points threshold (`type: points`, operators `> >= == <= <`) — viewer: [Missing] · editor: [Missing] — `buildConditions` and the V1→V2 import both fall through to "always"; V2 has no score predicate
-- Point comparison of two point types (`type: pointCompare`, `reqId` vs `reqId1`) — viewer: [Missing] · editor: [Missing]
+- Points threshold (`type: points`, operators `> >= == <= <`) — viewer: [Done] · editor: [Missing] — `conditions.ts` compiles a `points` term against live point totals threaded into the condition fn; legacy operator numbering `1:> 2:>= 3:== 4:<= 5:<`, absent operator ⇒ `>=`; `required: false` cleanly inverts the term. V1→V2 import still falls through; V2 has no score predicate
+- Point comparison of two point types (`type: pointCompare`, `reqId` vs `reqId1`) — viewer: [Done] · editor: [Missing] — same mechanism; `pointCompare` uses its own legacy numbering `1:> 2:== 3:>=`
 - Requirement display text (`showRequired` / `beforeText` / `afterText`, resolves ids and point names to titles) — viewer: [Done] · editor: [?]
 - Transitive incompatibility resolution (deselecting A cascades to anything that needed A) — viewer: [Done] · editor: [N/A] — `clearIncompatibleChoices`; a Neo improvement over legacy's ad-hoc handling
 - Split row-display condition vs choice-eligibility condition — viewer: [N/A] · editor: [Done] — Neo improvement (`RowRequirements.display` vs `.choices`); V1 has one list

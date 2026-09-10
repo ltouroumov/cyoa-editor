@@ -102,10 +102,12 @@ import type { ProjectObj, ProjectRow } from '~/composables/project/types/v1';
 import { useProjectRefs, useProjectStore } from '~/composables/store/project';
 import type { DisplaySettings } from '~/composables/store/settings';
 import { useImageCache } from '~/composables/viewer/cache/useImageCache';
+import { usePoints } from '~/composables/viewer/usePoints';
 
 const store = useProjectStore();
 const { selectedIds, selected } = useProjectRefs();
 const { loadImageSrc } = useImageCache();
+const { points } = usePoints();
 
 const $props = defineProps<{
   row: ProjectRow;
@@ -142,7 +144,9 @@ const addonStates = computed(() => {
   for (let idx = 0; idx < R.length($props.obj.addons); idx++) {
     const addon = $props.obj.addons[idx];
     const condition = buildConditions(addon);
-    const isEnabled = computed(() => condition(selectedIds.value));
+    const isEnabled = computed(() =>
+      condition(selectedIds.value, points.value),
+    );
     states[idx] = isEnabled;
   }
   return states;
