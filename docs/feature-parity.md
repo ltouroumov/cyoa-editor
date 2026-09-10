@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 72/103 · editor 21/104**
+Overall: **viewer 74/103 · editor 21/104**
 
 ---
 
@@ -141,10 +141,10 @@ Overall: **viewer 72/103 · editor 21/104**
 - Transitive incompatibility resolution (deselecting A cascades to anything that needed A) — viewer: [Done] · editor: [N/A] — `clearIncompatibleChoices`; a Neo improvement over legacy's ad-hoc handling
 - Split row-display condition vs choice-eligibility condition — viewer: [N/A] · editor: [Done] — Neo improvement (`RowRequirements.display` vs `.choices`); V1 has one list
 
-## Visibility of blocked content (viewer: 2/3; editor: 0/3)
+## Visibility of blocked content (viewer: 3/3; editor: 0/3)
 
 - Blocked choice shown with a "requirement" filter (blur/dim/etc.) — viewer: [Done] · editor: [Missing]
-- Blocked choice hidden entirely (`reqFilterVisibleIsOn` / per-choice `object.reqFilterVisibleIsOn`) — viewer: [Missing] · editor: [Missing]
+- Blocked choice hidden entirely (`reqFilterVisibleIsOn`) — viewer: [Done] · editor: [Missing] — `resolveReqFilterVisible` (in `reqFilterVisible.ts`) resolves the styling flag through the same choice → row → project cascade the style engine applies (`StyleObj` / `StyleRow` containers over the global `:not(.hasPrivateStyling)` rules); `ViewProjectObj` drops a blocked choice from the row with `v-if` when it is set. Legacy's buggy top-level `object.reqFilterVisibleIsOn` read (the field is styling-only) is normalised to `obj.styling`. Backpack contexts force `isEnabled`, so nothing hides there
 - Blocked row hidden entirely — viewer: [Done] · editor: [?]
 
 ## Text & dynamic content (viewer: 2/5; editor: 1/7)
@@ -157,7 +157,7 @@ Overall: **viewer 72/103 · editor 21/104**
 - Project default text fills (`defaultRowText`, `defaultChoiceTitle`, `defaultBeforePoint`, …) — viewer: [N/A] · editor: [Missing] — authoring convenience; values bake into the saved file
 - "Change all ids to titles" bulk authoring helper — viewer: [N/A] · editor: [Missing]
 
-## Layout (viewer: 4/9; editor: 1/9)
+## Layout (viewer: 5/9; editor: 1/9)
 
 - Choice image layout: image top / left / right (`obj.template` 1/2/3) — viewer: [Done] · editor: [Partial] — V2 `header.layout` string; mapping unverified
 - Row layout: image top / right / left / bottom (`row.template` 1/2/3/4) — viewer: [Missing] · editor: [?] — ICC-Neo renders one row layout
@@ -167,7 +167,7 @@ Overall: **viewer 72/103 · editor 21/104**
 - Half-width rows on wide screens (`row.width`) — viewer: [?] · editor: [?]
 - Per-choice / per-row width via 60-column grid (`objectWidth`, `col-*` / `w-*` classes) — viewer: [Done] · editor: [Partial] — V2 `itemWidth` is a bare number; class mapping TBD
 - Equalise choice heights within a row (`styling.objectHeight`) — viewer: [Done] · editor: [Missing] — global flag only (matches legacy); `false` disables the row stretch via `.obj-height-natural`
-- Hide all choice text in a row (`textIsRemoved`) — viewer: [Missing] · editor: [Missing]
+- Hide all choice text in a row (`textIsRemoved`) — viewer: [Done] · editor: [Missing] — `ViewProjectObj` gates the `.obj-text` body element on `!row.textIsRemoved`, matching `imageCyoaViewer/Object.vue` which hides only that paragraph (title, scores, requirements, addons stay). The "More…" expander is unchanged
 
 ## Styling (capability level only — visual fidelity out of scope) (viewer: 11/11; editor: 2/14)
 

@@ -65,6 +65,7 @@ export type ObjStyles = ScoreStyles &
 
     reqBgColorIsOn: boolean;
     reqFilterBgColor: string;
+    reqFilterVisibleIsOn?: boolean;
   };
 
 export type RowStyles = ObjStyles &

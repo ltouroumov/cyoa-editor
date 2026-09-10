@@ -127,6 +127,7 @@ const ObjStylesSchema = z.toZod<ObjStyles>()(
       selFilterBgColor: z.string(),
       reqBgColorIsOn: z.boolean(),
       reqFilterBgColor: z.string(),
+      reqFilterVisibleIsOn: z.boolean().optional(),
     }),
   ),
 );
@@ -308,6 +309,7 @@ const ProjectRowSchema = z.toZod<ProjectRow>()(
     titleText: z.string().optional(),
     objectWidth: z.string(),
     rowJustify: z.enum(['left', 'right', 'center']).optional(),
+    textIsRemoved: z.boolean().optional(),
     resultGroupId: z.string(),
     allowedChoices: z.number(),
     isInfoRow: z.boolean(),

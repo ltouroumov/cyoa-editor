@@ -1,5 +1,5 @@
 <template>
-  <div :id="`obj-${obj.id}`" :class="objClass">
+  <div v-if="!isHidden" :id="`obj-${obj.id}`" :class="objClass">
     <StyleObj
       v-if="obj.isPrivateStyling && obj.styling"
       :styles="obj.styling"
@@ -57,7 +57,7 @@
         >
           <!-- eslint-disable vue/no-v-html -->
           <div
-            v-if="obj.text && !display?.hideObjectText"
+            v-if="obj.text && !display?.hideObjectText && !row.textIsRemoved"
             class="obj-text"
             v-html="formatText(obj.text)"
           ></div>
@@ -121,6 +121,7 @@ import type { DisplaySettings } from '~/composables/store/settings';
 import { useViewerStore } from '~/composables/store/viewer';
 import { formatText } from '~/composables/text';
 import { ViewContext } from '~/composables/viewer';
+import { resolveReqFilterVisible } from '~/composables/viewer/reqFilterVisible';
 import { useObject } from '~/composables/viewer/useObject';
 
 const LazyViewAddon = defineAsyncComponent(() => import('./ViewAddon.vue'));
@@ -288,6 +289,18 @@ const isInBackpack = computed<boolean>(() => {
   return (
     $props.viewObject === ViewContext.BackpackEnabled ||
     $props.viewObject === ViewContext.BackpackDisabled
+  );
+});
+
+// Legacy `reqFilterVisibleIsOn`: a choice that fails its requirements is
+// removed from the row entirely rather than shown with the blocked filter.
+// `isEnabled` is forced true in Backpack contexts, so this never hides there.
+const isHidden = computed<boolean>(() => {
+  if (isEnabled.value) return false;
+  return resolveReqFilterVisible(
+    $props.obj,
+    $props.row,
+    store.project?.data.styling,
   );
 });
 </script>

@@ -112,6 +112,7 @@ export type ProjectRow = {
 
   objectWidth: string;
   rowJustify?: 'left' | 'right' | 'center';
+  textIsRemoved?: boolean;
 
   resultGroupId: string;
   allowedChoices: number;
