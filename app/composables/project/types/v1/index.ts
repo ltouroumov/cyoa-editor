@@ -75,6 +75,14 @@ export type ProjectObj = {
   cleanACtivatedOnSelect: boolean;
   groups: { id: string }[];
 
+  multiplyPointtypeIsOn: boolean;
+  multiplyPointtypeIsId: boolean;
+  pointTypeToMultiply: string;
+  multiplyWithThis: number | string;
+  dividePointtypeIsOn: boolean;
+  pointTypeToDivide: string;
+  divideWithThis: number | string;
+
   isSelectableMultiple: boolean;
   isNotSelectable: boolean;
   isVisible: boolean;

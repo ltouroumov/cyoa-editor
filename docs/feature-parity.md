@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 69/103 · editor 21/104**
+Overall: **viewer 71/103 · editor 21/104**
 
 ---
 
@@ -90,13 +90,13 @@ Overall: **viewer 69/103 · editor 21/104**
 - Choice raises/lowers another row's limit on select (`addToAllowChoice` / `idOfAllowChoice` / `numbAddToAllowChoice`) — viewer: [Done] · editor: [Missing]
 - Row auto-deselects its choices when its own requirements stop being met (`deselectChoices`) — viewer: [Missing] · editor: [Missing]
 
-## Choice "functions" (on-select / on-deselect actions) (viewer: 3/8; editor: 0/8)
+## Choice "functions" (on-select / on-deselect actions) (viewer: 5/8; editor: 0/8)
 
 - Activate & lock other choices (`activateOtherChoice` / `activateThisChoice`, comma list) — viewer: [Done] · editor: [Missing]
 - Deactivate other choices (`deactivateOtherChoice` / `deactivateThisChoice`, comma list) — viewer: [Done] · editor: [Missing] — matches choice ids, row `resultGroupId`, and declared group ids (`resolveDeactivateTargets`); like legacy, runs on select only
 - Reset all selections on select (`cleanACtivatedOnSelect`) — viewer: [Done] · editor: [Missing] — `setSelected` seeds the pipe from an empty selection when a flagged choice is selected interactively, so only that choice and its `activateOtherChoice` targets survive; derived state (points, allowed-choice deltas, multi-use counts) resets for free. Bulk build/code import bypasses it, matching legacy
-- Multiply a point type on select (`multiplyPointtypeIsOn` + `pointTypeToMultiply` + `multiplyWithThis`, where `multiplyWithThis` may be a constant or another point type id) — viewer: [Missing] · editor: [Missing]
-- Divide a point type on select (`dividePointtypeIsOn` + `pointTypeToDivide` + `divideWithThis`) — viewer: [Missing] · editor: [Missing]
+- Multiply a point type on select (`multiplyPointtypeIsOn` + `pointTypeToMultiply` + `multiplyWithThis`, where `multiplyWithThis` may be a constant or another point type id) — viewer: [Done] · editor: [Missing] — folded into `pointsForSelection` as `round((startingSum + gain) · Π multipliers / Π dividers − cost)`: multipliers scale the point *gain* before *costs* subtract, so it composes with additive scores. `collectPointMutators` gathers the ops from selected choices, `resolvePointTotals` (in `pointMutators.ts`) evaluates them; `multiplyPointtypeIsId` refs resolve via DFS/memo in dependency order, a reference cycle falling back to the referenced type's raw starting sum. Rounding hits only point types that carry a multiplier/divider. Pure recompute ⇒ auto-reverses on deselect and on build/code import
+- Divide a point type on select (`dividePointtypeIsOn` + `pointTypeToDivide` + `divideWithThis`) — viewer: [Done] · editor: [Missing] — same `resolvePointTotals` pipeline; `divideWithThis` is a constant only (legacy has no id form), and a `0` / `NaN` divisor is dropped in `collectPointMutators`
 - Set a Word's replacement text on select vs deselect (`textfieldIsOn` / `idOfTheTextfieldWord` / `wordChangeSelect` / `wordChangeDeselect`) — viewer: [Missing] · editor: [Missing]
 - Score-dependency cascade: re-evaluating this choice re-toggles any selected choice whose *score* condition references it ("Scores Updated On …" notice) — viewer: [Missing] · editor: [Missing]
 - Object-level button (`isButtonObject`) — viewer: [Missing] · editor: [Missing]

@@ -8,6 +8,10 @@ import type {
   Score,
 } from '~/composables/project/types/v1';
 import { type Selections, useProjectStore } from '~/composables/store/project';
+import {
+  collectPointMutators,
+  resolvePointTotals,
+} from '~/composables/viewer/pointMutators';
 
 export type ScoreAcc = { cost: number; gain: number };
 type ScoreRes = { id: string } & ScoreAcc;
@@ -75,18 +79,24 @@ export function usePoints() {
     )(_selectedIds);
   };
 
-  const mergeScoreAcc = (
-    scores: Record<string, ScoreAcc>,
-  ): Record<string, number> =>
-    R.map((acc: ScoreAcc) => acc.gain - acc.cost, scores);
-
-  // Point totals a given selection would produce (starting sums + score deltas).
-  const pointsForSelection = (selected: Selections): Record<string, number> =>
-    R.pipe(
-      computePointsForSelection,
-      mergeScoreAcc,
-      R.mergeWith(R.add, startingSums()),
-    )(selected);
+  // Point totals a given selection would produce:
+  //   round( (startingSum + gain) · Π multipliers / Π dividers − cost )
+  // Additive score deltas fold in first; the legacy `multiplyPointtypeIsOn` /
+  // `dividePointtypeIsOn` choice functions then scale the point gain before the
+  // costs are subtracted. Point types with no multiplier/divider keep their
+  // exact `startingSum + gain − cost` value (no rounding).
+  const pointsForSelection = (selected: Selections): Record<string, number> => {
+    const sums = startingSums();
+    const acc = computePointsForSelection(selected);
+    const mutators = collectPointMutators(R.keys(selected), store.getObject);
+    return resolvePointTotals({
+      pointTypeIds: R.union(R.keys(sums), R.keys(acc)),
+      startingSum: (id) => sums[id] ?? 0,
+      gain: (id) => acc[id]?.gain ?? 0,
+      cost: (id) => acc[id]?.cost ?? 0,
+      mutators,
+    });
+  };
 
   const points = computed<Record<string, number>>(() =>
     pointsForSelection(R.clone(store.selected)),
