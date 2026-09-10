@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 68/104 · editor 21/105**
+Overall: **viewer 68/103 · editor 21/104**
 
 ---
 
@@ -111,7 +111,7 @@ Overall: **viewer 68/104 · editor 21/105**
 - "Only pick from unselected choices" (`onlyUnselectedChoices`) — viewer: [Missing] · editor: [Missing]
 - "Button usable only if the row has no selection" (`onlyIfNoChoices`) — viewer: [Missing] · editor: [Missing]
 - Button adds a sum to a point type (`btnPointAddon` / `pointTypeRandom`) — viewer: [Missing] · editor: [Missing]
-- Button bound to a variable (`row.buttonRandom` false path → push `buttonId` to activated) — viewer: [Missing] · editor: [Missing]
+- Button bound to a boolean toggle variable (`variables[]`; `row.buttonRandom` false path) — viewer: [Missing] · editor: [Missing] — the only real "variable" behaviour in the legacy image viewer. A button row names a variable id; clicking the button toggles that id in `activated`, and conditions referencing the id then resolve through the ordinary selected-id check. Legacy's `variables[].isTrue` field is dead (rendered `disabled`, never written, never read) — moved here from "Requirements & conditions". **Neo note:** do not emulate by pushing synthetic ids into the selection set; model toggle variables as their own runtime state that `conditions.ts` can read alongside `selected` / point totals.
 
 ## Scoring & points (viewer: 10/10; editor: 5/10)
 
@@ -129,7 +129,7 @@ Overall: **viewer 68/104 · editor 21/105**
 - Point type icon / image (`iconIsOn` / `image` / `imageOnSide` / `imageSidePlacement`) — viewer: [Deferred] · editor: [Deferred] — visual, out of scope
 - Fixed point bar showing all (gated) point types — viewer: [Done] · editor: [N/A] — `ViewScoreStatus` / `RowScores`
 
-## Requirements & conditions (viewer: 8/9; editor: 5/9)
+## Requirements & conditions (viewer: 8/8; editor: 5/8)
 
 - Require selected id, AND of up to four (`type: id`, `required: true`, `reqId`..`reqId3`) — viewer: [Done] · editor: [Done] — V2 `isSelected` / `allOf`
 - Incompatible with id(s) (`type: id`, `required: false`) — viewer: [Done] · editor: [Done] — V2 `isNotSelected`
@@ -140,7 +140,6 @@ Overall: **viewer 68/104 · editor 21/105**
 - Requirement display text (`showRequired` / `beforeText` / `afterText`, resolves ids and point names to titles) — viewer: [Done] · editor: [?]
 - Transitive incompatibility resolution (deselecting A cascades to anything that needed A) — viewer: [Done] · editor: [N/A] — `clearIncompatibleChoices`; a Neo improvement over legacy's ad-hoc handling
 - Split row-display condition vs choice-eligibility condition — viewer: [N/A] · editor: [Done] — Neo improvement (`RowRequirements.display` vs `.choices`); V1 has one list
-- Boolean toggle variables (`variables[]` / `isTrue`, referenced as ids in conditions and set by choice functions) — viewer: [Missing] · editor: [Missing] — parsed into the V1 type, no runtime consumer
 
 ## Visibility of blocked content (viewer: 2/3; editor: 0/3)
 
