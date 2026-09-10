@@ -35,13 +35,16 @@ export const buildRootCondition = (terms: ConditionTerm[]): ConditionExec => {
 };
 
 export const extractReqIds = (term: ConditionTerm): string[] =>
-  R.prepend(
-    term.reqId,
-    R.unfold((n) => {
-      if (R.has(`reqId${n}`, term)) {
-        return [term[`reqId${n}`], n + 1];
-      } else return false;
-    }, 1),
+  R.reject(
+    R.isEmpty,
+    R.prepend(
+      term.reqId,
+      R.unfold((n) => {
+        if (R.has(`reqId${n}`, term)) {
+          return [term[`reqId${n}`], n + 1];
+        } else return false;
+      }, 1),
+    ),
   );
 
 const buildCondition = (term: ConditionTerm): Condition => {
