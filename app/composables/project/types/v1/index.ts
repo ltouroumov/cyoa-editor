@@ -124,6 +124,8 @@ export type PointType = {
   afterText: string;
   beforeText: string;
   belowZeroNotAllowed?: boolean;
+  plussOrMinusAdded?: boolean;
+  plussOrMinusInverted?: boolean;
   iconHeight?: string;
   iconWidth?: string;
   iconIsOn?: boolean;

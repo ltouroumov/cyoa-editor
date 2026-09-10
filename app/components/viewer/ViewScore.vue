@@ -1,12 +1,6 @@
 <template>
   <div class="obj-score" :class="{ disabled: !isEnabled }">
-    {{
-      score.beforeText +
-      ' ' +
-      Math.abs(Number.parseInt(score.value)) +
-      ' ' +
-      score.afterText
-    }}
+    {{ score.beforeText + ' ' + displayValue + ' ' + score.afterText }}
   </div>
 </template>
 
@@ -18,10 +12,16 @@ import { computed } from 'vue';
 import { buildConditions } from '~/composables/conditions';
 import type { Score } from '~/composables/project/types/v1';
 import { useProjectRefs } from '~/composables/store/project';
+import { applyScoreSign } from '~/composables/viewer/scoreSign';
 
 const { score } = defineProps<{ score: Score }>();
 
 const { selectedIds, getPointType } = useProjectRefs();
+
+const displayValue = computed<string>(() => {
+  const raw = Number.parseInt(score.value) || 0;
+  return applyScoreSign(raw, getPointType.value(score.id));
+});
 
 const condition = buildConditions(score);
 const isEnabled = computed<boolean>(() => {

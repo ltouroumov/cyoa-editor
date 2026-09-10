@@ -47,7 +47,7 @@ section; keep "Last reviewed" current on a sweep.
 Last reviewed: 2026-09-09 (second pass, after a deep read of the legacy viewer
 runtime — `imageCyoaViewer/Row.vue`, `imageCyoaViewer/Object.vue`, `stores/main.js`)
 
-Overall: **viewer 65/104 · editor 21/105**
+Overall: **viewer 66/104 · editor 21/105**
 
 ---
 
@@ -113,7 +113,7 @@ Overall: **viewer 65/104 · editor 21/105**
 - Button adds a sum to a point type (`btnPointAddon` / `pointTypeRandom`) — viewer: [Missing] · editor: [Missing]
 - Button bound to a variable (`row.buttonRandom` false path → push `buttonId` to activated) — viewer: [Missing] · editor: [Missing]
 
-## Scoring & points (viewer: 9/10; editor: 5/10)
+## Scoring & points (viewer: 10/10; editor: 5/10)
 
 - Point types with starting sum (`pointTypes[]` / `startingSum`) — viewer: [Done] · editor: [Done] — V2 `ProjectScore.defaultValue`
 - Additive scores on choices (`scores[]` / `value`) — viewer: [Done] · editor: [Done] — V2 `ObjectScore` `type: gain | cost`
@@ -124,7 +124,7 @@ Overall: **viewer 65/104 · editor 21/105**
 - Multi-select scores scale with the pick count — viewer: [Done] · editor: [?]
 - Per-score before/after label text (`beforeText` / `afterText`) — viewer: [Done] · editor: [Partial] — V2 has one `unit`, no per-score text
 - Clamp at zero — block a selection that would push a point type below zero (`belowZeroNotAllowed`, enforced in `checkPoints`) — viewer: [Done] · editor: [Missing] — `violatesBelowZero` guard in `setSelected` rejects an interactive select whose totals would go negative for a flagged point type; bulk import bypasses it, matching legacy
-- `+` / `-` sign prefix and its inversion (`plussOrMinusAdded` / `plussOrMinusInverted`) — viewer: [Missing] · editor: [Missing]
+- `+` / `-` sign prefix and its inversion (`plussOrMinusAdded` / `plussOrMinusInverted`) — viewer: [Done] · editor: [Missing] — `applyScoreSign` in `ViewScore.vue` ports the legacy `ObjectScore` badge: magnitude only, with an optional sign when `plussOrMinusAdded` is set (legacy-default polarity: negative value shows `+`, `plussOrMinusInverted` flips it). Row/point-bar totals keep the real signed value, matching legacy
 - Positive / negative point colours (`pointColorsIsOn` / `positiveColor` / `negativeColor`, plus `barPointPos` / `barPointNeg` on the bar) — viewer: [Deferred] · editor: [Deferred] — visual, out of scope
 - Point type icon / image (`iconIsOn` / `image` / `imageOnSide` / `imageSidePlacement`) — viewer: [Deferred] · editor: [Deferred] — visual, out of scope
 - Fixed point bar showing all (gated) point types — viewer: [Done] · editor: [N/A] — `ViewScoreStatus` / `RowScores`
